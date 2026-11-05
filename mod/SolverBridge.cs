@@ -23,6 +23,7 @@ public sealed class SolverResult
     public string Error;
     public string Report = "";
     public string AnalysisJson;
+    public string EvaluatorVersion = "unknown";
     public readonly Dictionary<int, BestMove> Best = new Dictionary<int, BestMove>();
 }
 
@@ -142,6 +143,10 @@ public sealed class SolverBridge
             else if (line.StartsWith("ANALYSIS ", StringComparison.Ordinal))
             {
                 result.AnalysisJson = line.Substring("ANALYSIS ".Length).Trim();
+            }
+            else if (line.StartsWith("VERSION ", StringComparison.Ordinal))
+            {
+                result.EvaluatorVersion = line.Substring("VERSION ".Length).Trim();
             }
         }
         return result;

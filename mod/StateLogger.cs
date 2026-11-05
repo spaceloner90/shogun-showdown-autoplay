@@ -4,10 +4,11 @@
 //   state    - everything visible when the hero can act (grid, enemies, tiles, waves, skills, potions)
 //   event    - what happened during a turn (decisions, actions, tiles played, attacks, hits, deaths...)
 //   catalog  - name and description of each tile, skill, potion or enemy, the first time it is seen
-//   analysis - the solver's scores for every move at every depth, from an F8 press
+//   analysis - the solver's scores for every move at every depth, with the evaluator's version
 //
-// The mod only acts when asked. F8 has the Python solver score the current position, and F1-F4 play
-// the top move for that search depth, through the same calls the game's own input uses.
+// The mod only acts when asked. F1-F4 have the Python solver score the current position and play the
+// top move for that search depth, through the same calls the game's own input uses. F8 shows the
+// scores without playing anything.
 //
 // The Harmony patches only observe method calls. They never change arguments, results or game state,
 // and each one catches its own exceptions so a logging failure cannot affect the game.
@@ -25,7 +26,7 @@ using BepInEx;
 using HarmonyLib;
 using UnityEngine;
 
-[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.5.0")]
+[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.6.0")]
 public class StateLoggerPlugin : BaseUnityPlugin
 {
     private const float PollIntervalSeconds = 0.1f;
@@ -61,6 +62,9 @@ public class StateLoggerPlugin : BaseUnityPlugin
     private bool updateSeen;
     private readonly SolverBridge solver = new SolverBridge();
     private SolverResult analysis;
+    // The depth to play once the running analysis finishes, or 0. A single value rather than a list,
+    // so extra presses while waiting can't add up to extra moves.
+    private int pendingDepth;
     private string pendingActionSource;
     private int pendingActionFrame;
 
@@ -79,7 +83,7 @@ public class StateLoggerPlugin : BaseUnityPlugin
         statePath = Path.Combine(dir, "state.jsonl");
         File.WriteAllText(statePath, "");
         Logger.LogInfo("State logger loaded. Writing to " + statePath);
-        Logger.LogInfo("In combat, press " + AnalyzeKey + " to score the position, then F1-F4 to play the top move for that depth.");
+        Logger.LogInfo("In combat, press F1-F4 to play the top move for that depth, or " + AnalyzeKey + " to see the scores without playing.");
         ApplyPatches();
     }
 
@@ -157,7 +161,11 @@ public class StateLoggerPlugin : BaseUnityPlugin
             IgnoreKey("the solver is still working");
             return;
         }
+        StartAnalysis();
+    }
 
+    private void StartAnalysis()
+    {
         // Log the latest state first, so the analysis can point at exactly what it was based on.
         Poll();
         analysis = null;
@@ -171,22 +179,29 @@ public class StateLoggerPlugin : BaseUnityPlugin
         SolverResult result = solver.TakeResult();
         if (result == null) return;
 
+        int depthToPlay = pendingDepth;
+        pendingDepth = 0;
+
         if (result.Error != null)
         {
             LogEvent("solver_error", "Solver error: " + result.Error, "");
+            return;
         }
-        else if (result.StateSequence != lastStateSequence)
+
+        Poll();
+        if (result.StateSequence != lastStateSequence)
         {
-            IgnoreKey("the position changed while the solver was working, so press F8 again");
+            IgnoreKey("the position changed while the solver was working, so press the key again");
+            return;
         }
-        else
-        {
-            analysis = result;
-            // The solver's JSON is a whole object, and WriteLine supplies the outer braces.
-            string json = result.AnalysisJson;
-            WriteLine("analysis", json.Substring(1, json.Length - 2));
-            Logger.LogInfo(result.Report);
-        }
+
+        analysis = result;
+        // The solver's JSON is a whole object, and WriteLine supplies the outer braces.
+        string json = result.AnalysisJson;
+        WriteLine("analysis", json.Substring(1, json.Length - 2));
+        Logger.LogInfo(result.Report);
+
+        if (depthToPlay != 0) PlayDepth(depthToPlay);
     }
 
     private void PlayDepth(int depth)
@@ -199,19 +214,11 @@ public class StateLoggerPlugin : BaseUnityPlugin
         }
 
         Poll();
-        if (solver.Busy)
+        if (analysis == null || analysis.StateSequence != lastStateSequence)
         {
-            IgnoreKey("the solver is still working");
-            return;
-        }
-        if (analysis == null)
-        {
-            IgnoreKey("press F8 to analyze this position first");
-            return;
-        }
-        if (analysis.StateSequence != lastStateSequence)
-        {
-            IgnoreKey("the position changed since the last F8, so press F8 again");
+            // No scores for this position yet. Get them, and play when they arrive.
+            pendingDepth = depth;
+            if (!solver.Busy) StartAnalysis();
             return;
         }
 
@@ -225,8 +232,9 @@ public class StateLoggerPlugin : BaseUnityPlugin
         CombatEnums.ActionEnum action = (CombatEnums.ActionEnum)Enum.Parse(typeof(CombatEnums.ActionEnum), move.Action);
         Tile tile = move.DeckIndex >= 0 ? GetTiles()[move.DeckIndex] : null;
         string reason = "score " + Num(move.Score) + ", plan: " + move.Line;
+        string source = "Evaluator " + analysis.EvaluatorVersion + " depth " + depth;
         analysis = null;
-        Execute(new Decision(action, tile, reason), "Evaluator depth " + depth);
+        Execute(new Decision(action, tile, reason), source);
     }
 
     // Plays exactly one move through the game's own input calls, and logs where it came from.

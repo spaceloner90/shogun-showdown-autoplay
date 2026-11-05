@@ -99,10 +99,14 @@ At the end of each turn:
 So clearing the room brings the next wave immediately, and `turnsUntilNext = 1` means the wave
 arrives during the coming turn. Newly spawned enemies can't act until the next turn.
 
+## Confirmed from play
+
+The fight in `logs/first_f1_win` matched the simulator's predicted next state on all 29 turns it
+could check, including 11 hero moves and 4 hero flips. A hero flip uses a turn, and this hero doesn't
+have the free version the code allows (`TurnAroundIsFree`).
+
 ## Not confirmed yet
 
-- Flip is assumed to use a turn. The code allows a free version (`TurnAroundIsFree`), but this
-  hero doesn't appear to have it, and no logged fight has shown a flip by the hero yet.
 - Swap hasn't appeared in any fight log yet, so that section comes from the code alone. The v0
   solver doesn't consider it. It stays switched off until a log confirms these rules.
 - The saved fight log never has Swirl hitting two agents at once. An earlier log did show it, but

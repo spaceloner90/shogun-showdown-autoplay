@@ -1,9 +1,10 @@
-"""Answers the mod's F8 request: reads a state as JSON on stdin and reports the best move per depth.
+"""Answers the mod's analysis request: reads a state as JSON on stdin and reports the best move per depth.
 
-The mod runs this as a new process for every request, so evaluator changes apply on the next F8
-without restarting the game.
+The mod runs this as a new process for every request, so evaluator changes apply on the next key
+press without restarting the game.
 
 Output is line based:
+    VERSION <evaluator version>
     BEST <depth> <game action> <deck index or -1> <score> <label>
     ANALYSIS <one line of JSON for the log>
     REPORT
@@ -13,7 +14,7 @@ import json
 import sys
 import time
 
-from evaluator import rank_actions
+from evaluator import VERSION, rank_actions
 from review import board
 from rules import MODELED, state_from_log
 
@@ -56,7 +57,7 @@ def build_report(row, state, by_depth):
 
     lines = [
         "",
-        f"==== Analysis: turn {row['turn']} | HP {state.hero.hp}/{state.hero.max_hp}{wave_text}",
+        f"==== Analysis ({VERSION}): turn {row['turn']} | HP {state.hero.hp}/{state.hero.max_hp}{wave_text}",
         "  " + board(row),
         f"  Tiles: {', '.join(tiles)} | Swap {state.swap_charge}/{state.swap_cooldown} (not used by the solver yet)",
     ]
@@ -92,6 +93,7 @@ def main():
     by_depth = {depth: rank_actions(state, depth=depth) for depth in DEPTHS}
     elapsed = time.perf_counter() - started
 
+    print(f"VERSION {VERSION}")
     for depth in DEPTHS:
         best = by_depth[depth][0]
         action = best.actions[0]
@@ -99,6 +101,7 @@ def main():
         print(f"BEST {depth} {game_action(state, action)} {deck_index} {best.score:.1f} {' -> '.join(best.labels)}")
 
     analysis = {
+        "evaluatorVersion": VERSION,
         "basedOnStateSeq": row.get("seq"),
         "seconds": round(elapsed, 3),
         "depths": {

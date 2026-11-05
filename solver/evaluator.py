@@ -16,6 +16,10 @@ Principles, from how the game plays:
 - Killing fast matters, because the next wave arrives on a timer and can overload the room.
 
 All the weights are first guesses, kept together here so they're easy to change.
+
+Versions: bump VERSION with any change that can alter a choice (weights, scoring, search, or the
+simulation in rules.py), commit it, and tag the commit evaluator-<version>. Every report, analysis
+and decision in the logs records the version it came from.
 """
 from __future__ import annotations
 
@@ -23,6 +27,8 @@ import copy
 from dataclasses import dataclass, field
 
 from rules import ONE_ENEMY_WAVE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, fire_hero_queue, legal_actions, step
+
+VERSION = "v0.1"
 
 WEIGHTS = {
     # What happens along the line.

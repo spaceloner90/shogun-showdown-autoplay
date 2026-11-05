@@ -1,0 +1,74 @@
+[Message:   BepInEx] BepInEx 5.4.23.6 - ShogunShowdown (9/22/2026 11:59:44 AM)
+[Info   :   BepInEx] Running under Unity v2021.3.45.8976527
+[Info   :   BepInEx] CLR runtime version: 4.0.30319.42000
+[Info   :   BepInEx] Supports SRE: True
+[Info   :   BepInEx] System platform: Bits64, Windows
+[Message:   BepInEx] Preloader started
+[Info   :   BepInEx] Loaded 1 patcher method from [BepInEx.Preloader 5.4.23.6]
+[Info   :   BepInEx] 1 patcher plugin loaded
+[Info   :   BepInEx] Patching [UnityEngine.CoreModule] with [BepInEx.Chainloader]
+[Message:   BepInEx] Preloader finished
+[Message:   BepInEx] Chainloader ready
+[Message:   BepInEx] Chainloader started
+[Info   :   BepInEx] 1 plugin to load
+[Info   :   BepInEx] Loading [Shogun State Logger 0.5.0]
+[Info   :Shogun State Logger] State logger loaded. Writing to C:\Program Files\Epic Games\ShogunShowdown611f6\BepInEx\autoplay\state.jsonl
+[Info   :Shogun State Logger] In combat, press F8 to score the position, then F1-F4 to play the top move for that depth.
+[Message:   BepInEx] Chainloader startup complete
+[Info   :Shogun State Logger] State logger Update loop is running.
+[Info   :Shogun State Logger]   > Combat begins (camp)
+[Info   :Shogun State Logger]   [new tile] Swirl L0 None None = Swirl: Strike the cells directly ahead and behind.
+[Info   :Shogun State Logger]   [new tile] Arrow L0 None None = Arrow: Strike the first target ahead.
+[Info   :Shogun State Logger]   [new hero] Wanderer = Swap: Special ability: can swap position with an enemy in front of her by moving forward.
+[Info   :Shogun State Logger] 
+==== Turn 1 | CampRoom | 10 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:.
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+[Info   :Shogun State Logger]   > Turn 1 action: HERO MoveRight [from: human]
+[Info   :Shogun State Logger]   > Turn 2 action: HERO MoveRight [from: human]
+[Info   :Shogun State Logger] 
+==== Turn 3 | CampRoom | 10 coins
+  Grid: 0:.  1:.  2:.  3:.  4:HERO>
+  Hero: cell 4, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+[Info   :Shogun State Logger]   > Combat ended
+[Info   :Shogun State Logger]   > Combat begins
+[Info   :Shogun State Logger]   > Wave 1/4 spawns
+[Info   :Shogun State Logger]   [new enemy] Ashigaru = Ashigaru: A common swordsman, but their dedication to the Shogun's cause should not be underestimated.
+[Info   :Shogun State Logger] 
+==== Turn 1 | WaveRoom | wave 1/4, next in 9 turns | 10 coins
+  Grid: 0:.  1:<Ashigaru  2:HERO>  3:.  4:.
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 1, facing Left, HP 3/3, next: Wait
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+[Info   :Shogun State Logger] 
+==== Analysis: turn 1 | HP 10/10 | wave 1/4, next in 9
+  0:.  1:<Ashigaru[3hp Wait]  2:HERO>  3:.  4:.
+  Tiles: Swirl (ready), Arrow (ready) | Swap 4/4 (not used by the solver yet)
+  Move                  D1        D2        D3        D4
+  PlayTile Swirl      2.1*     14.8*     22.2*     36.8*
+  Flip               -3.0       5.1      18.1      36.8 
+  PlayTile Arrow     -3.0       5.1      18.1      36.8 
+  Wait               -8.1       0.7      12.3      18.6 
+  MoveRight          -9.8      -5.1       2.1      12.3 
+  F1 PlayTile Swirl
+     beats Flip by 5.1: firepower +10.2, facing -5.1
+  F2 PlayTile Swirl -> Attack
+     beats Flip by 9.8: enemy_damage +17.0, firepower -8.7, enemy_hp_left +5.8
+  F3 PlayTile Swirl -> Attack -> PlayTile Arrow
+     beats Flip by 4.1: enemy_damage +17.0, firepower -14.7, enemy_hp_left +4.9
+  F4 PlayTile Swirl -> Flip -> PlayTile Arrow -> Attack
+     tied with Flip, but its position improves sooner

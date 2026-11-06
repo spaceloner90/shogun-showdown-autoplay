@@ -33,8 +33,20 @@ only real play can test.
 | Shove counts as an answer to melee | Scoring | Nothing | It's used to dodge when stepping back isn't possible |
 | No distance credit for the shove | Scoring | Nothing. Tried on winning-run boards with a Ronin deck: 51 shoves on 121 chances, 37 for collision damage and 14 saving a hit | Whether it shoves too much for collision damage, spending the charge a dodge needs |
 | Smoke Bomb played by the hero | Rule | Only enemies have used it in a log | Both trade places, and neither turns |
+| Grappling Hook played by the hero | Rule | Only enemies have used it in a log, where the pull matched | The target lands beside the hero, and hook-then-melee kills as predicted |
 | Damaging Move with a shove | Rule | Nothing. The hit comes first, then the shove | Only if you pick that skill |
 | Two Way Move with a shove | Rule | Nothing | Only if you pick that skill |
+
+## New in v1.3: Shockwave
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **Damage of 1** | **Assumed** | **Nothing. It's stored in the game's assets, not its code** | **The first "(no attacker) hits" line after a Shockwave tile fires at touching enemies** |
+| Chain through touching enemies, stopping at a gap, wall or hero | Rule | Nothing | Who gets hit |
+| The target is hit again if the chain reaches anyone | Rule | Nothing | Its HP drops by the tile's damage plus 1 |
+| No extra hit on an isolated target | Rule | 4 firings on an isolated target in the live run showed no extra hit | Stays true |
+| Each target of a multi-target tile sets off its own | Rule | Nothing. Read from where the game calls it | A Spear hitting two touching enemies: each should lose 4 |
+| A killed target still sets it off | Rule | Nothing. Assumes a dead agent keeps its cell | Neighbours of a killed target are hit |
 
 ## Poison's value
 

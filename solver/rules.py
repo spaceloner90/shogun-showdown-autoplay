@@ -29,6 +29,7 @@ POISON_TURNS = 3  # Applying poison sets this many turns left, and each turn's e
 BOMB_FUSE = 2     # Turns a placed bomb waits after the one it's placed on, before it goes off on the next.
 BARRICADE_HP = 5
 MAX_SHOVE_CREDIT = 3  # A shove counts for at most this many cells: further than that gains little.
+SHOCKWAVE_DAMAGE = 1  # Assumed: it's stored in the game's assets, and no log has shown it yet.
 
 # Each hero has one special move, triggered by moving into an occupied cell. Swap is the Wanderer's, and
 # Shove is the Ronin's. The other heroes' moves aren't simulated, so they aren't offered as actions.
@@ -59,7 +60,7 @@ class Attack:
     value: int
     range: list[int]
     first_target: bool = False  # Stops at the first agent in range, rather than hitting them all.
-    effect: str = "None"  # Applied to whoever it hits and doesn't kill. Curse and Poison are modeled.
+    effect: str = "None"  # Curse, Poison, Perfect Strike and Shockwave are modeled.
     target_cell: int | None = None  # For a Volley: the cell it's locked onto, shown as a warning in the game.
 
 
@@ -274,7 +275,8 @@ def unmodeled_content(row):
     def check_attack(data):
         if data["name"] not in MODELED and data["name"] != UNKNOWN_TILE:
             note(f"attack {data['name']}")
-        if data["name"] != "Summon" and data.get("effect") not in (None, "None", "Curse", "PerfectStrike", "Poison"):
+        if data["name"] != "Summon" and data.get("effect") not in (None, "None", "Curse", "PerfectStrike", "Poison",
+                                                                   "Shockwave"):
             note(f"{data['name']} effect {data['effect']}")
         if data.get("tileEffect") not in (None, "None", "FreePlay"):
             note(f"{data['name']} tile effect {data['tileEffect']}")
@@ -533,6 +535,26 @@ def push(state, attacker, target, direction, outcome, credit_distance=True):
         land_hit(state, attacker, target, 1, outcome, collision=True)
 
 
+def shockwave(state, attacker, target, outcome):
+    """Runs both ways from the target through touching agents, stopping at a gap, a wall or the hero.
+
+    Everyone it reaches is hit, and so is the target, but only if it reached someone.
+    """
+    chain = []
+    for direction in (-1, 1):
+        cell = target.cell + direction
+        while 0 <= cell < state.cells:
+            agent = state.occupant(cell)
+            if agent is None or agent is state.hero:
+                break
+            chain.append(agent)
+            cell += direction
+    if chain:
+        for agent in [target] + chain:
+            if agent.alive:
+                land_hit(state, attacker, agent, SHOCKWAVE_DAMAGE, outcome, collision=True)
+
+
 def spawn_barricade(state, attacker):
     """Puts a Barricade on the cell in front of the attacker, if that cell exists and is free."""
     cell = attacker.cell + attacker.facing
@@ -658,6 +680,9 @@ def apply_attack(state, attacker, attack, outcome):
         # Sets the turns left rather than adding to them, so poisoning again only refreshes it.
         if target.alive and attack.effect == "Poison":
             target.poison = POISON_TURNS
+        # Each target sets off its own, even one that just died, and a shield on the target doesn't stop it.
+        if attack.effect == "Shockwave":
+            shockwave(state, attacker, target, outcome)
         # A shield blocks the hook's damage, but not its pull.
         if attack.name == "GrapplingHook" and target.alive and target.movable:
             target.cell = attacker.cell + attacker.facing

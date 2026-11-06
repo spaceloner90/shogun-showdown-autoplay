@@ -1662,6 +1662,147 @@ class ShoveSpecialMoveTest(unittest.TestCase):
         self.assertEqual((state.special, state.swap_charge, state.swap_cooldown), ("PushSpecialMove", 3, 3))
 
 
+HOOK = Attack("GrapplingHook", 1, [1, 2, 3, 4], first_target=True)
+
+
+class HeroGrapplingHookTest(unittest.TestCase):
+    def test_it_hits_and_pulls_the_target_next_to_the_hero(self):
+        after, outcome = fire(make_state(hero_cell=0, enemies=[enemy(3, hp=5)]), HOOK)
+        self.assertEqual((after.hero.cell, after.enemies[0].cell, after.enemies[0].hp), (0, 1, 4))
+        self.assertEqual(outcome.enemy_damage, 1)
+
+    def test_it_works_facing_left(self):
+        after, _ = fire(make_state(hero_cell=4, facing=-1, enemies=[enemy(1, facing=1, hp=5)]), HOOK)
+        self.assertEqual(after.enemies[0].cell, 3)
+
+    def test_it_stops_at_the_first_target(self):
+        after, _ = fire(make_state(hero_cell=0, enemies=[enemy(2, hp=5), enemy(4, hp=5)]), HOOK)
+        self.assertEqual([(e.cell, e.hp) for e in after.enemies], [(1, 4), (4, 5)])
+
+    def test_a_shield_blocks_the_damage_but_not_the_pull(self):
+        guarded = enemy(3, hp=5)
+        guarded.shield = True
+        after, _ = fire(make_state(hero_cell=0, enemies=[guarded]), HOOK)
+        self.assertEqual((after.enemies[0].cell, after.enemies[0].hp, after.enemies[0].shield), (1, 5, False))
+
+    def test_a_heavy_target_stays_put(self):
+        heavy = enemy(3, hp=5)
+        heavy.movable = False
+        after, _ = fire(make_state(hero_cell=0, enemies=[heavy]), HOOK)
+        self.assertEqual((after.enemies[0].cell, after.enemies[0].hp), (3, 4))
+
+    def test_nothing_in_range_is_a_wasted_attack(self):
+        _, outcome = fire(make_state(hero_cell=0, enemies=[enemy(4)]), Attack("GrapplingHook", 1, [1, 2], first_target=True))
+        self.assertEqual(outcome.wasted_attacks, 1)
+
+    def test_the_hook_then_melee_combo_is_valued(self):
+        # Katana alone can't reach. Hook first pulls it in, and the two together kill.
+        def stack(attacks):
+            state = make_state(hero_cell=0, enemies=[enemy(3, hp=3)])
+            tiles = [Tile(a, cooldown=3, charge=3, in_queue=True) for a in attacks]
+            state.tiles, state.queue_tiles = tiles, list(tiles)
+            state.hero.queue = list(attacks)
+            return leaf_terms(state)["stack"]
+        self.assertAlmostEqual(stack([KATANA, HOOK]), (30 + 60) * 0.6)
+
+    def test_it_will_fire_the_combo_in_the_right_order(self):
+        state = make_state(hero_cell=0, enemies=[enemy(3, hp=3)])
+        katana, hook = Tile(KATANA, cooldown=3, charge=3, in_queue=True), Tile(HOOK, cooldown=3, charge=3, in_queue=True)
+        state.tiles, state.queue_tiles = [katana, hook], [katana, hook]
+        state.hero.queue = [KATANA, HOOK]
+        best = rank_actions(state, depth=1)[0]
+        self.assertEqual(best.terms.get("kills", 0), 60)
+        self.assertIn("GrapplingHook > Katana", best.labels[0])
+
+
+WAVE_KATANA = Attack("Katana", 2, [1], first_target=True, effect="Shockwave")
+WAVE_SPEAR = Attack("Spear", 2, [1, 2], effect="Shockwave")
+
+
+class ShockwaveTest(unittest.TestCase):
+    def hp_of(self, state):
+        return [(e.cell, e.hp) for e in state.enemies]
+
+    def test_alone_it_does_nothing_extra(self):
+        # As played: every firing on an isolated target in the live run dealt only the tile's damage.
+        after, outcome = fire(make_state(hero_cell=0, enemies=[enemy(1, hp=5)]), WAVE_KATANA)
+        self.assertEqual(self.hp_of(after), [(1, 3)])
+        self.assertEqual(outcome.enemy_damage, 2)
+
+    def test_a_touching_enemy_is_hit_and_so_is_the_target_again(self):
+        after, outcome = fire(make_state(hero_cell=0, enemies=[enemy(1, hp=5), enemy(2, hp=5)]), WAVE_KATANA)
+        self.assertEqual(self.hp_of(after), [(1, 2), (2, 4)])
+        self.assertEqual(outcome.enemy_damage, 4)
+
+    def test_it_runs_through_a_whole_chain(self):
+        state = make_state(hero_cell=0, enemies=[enemy(1, hp=5), enemy(2, hp=5), enemy(3, hp=5)])
+        after, _ = fire(state, WAVE_KATANA)
+        self.assertEqual(self.hp_of(after), [(1, 2), (2, 4), (3, 4)])
+
+    def test_a_gap_stops_it(self):
+        state = make_state(hero_cell=0, enemies=[enemy(1, hp=5), enemy(3, hp=5)])
+        after, _ = fire(state, WAVE_KATANA)
+        self.assertEqual(self.hp_of(after), [(1, 3), (3, 5)])
+
+    def test_the_hero_stops_it_and_takes_nothing(self):
+        # The enemy behind the hero is only connected through the hero.
+        state = make_state(hero_cell=1, enemies=[enemy(0, facing=1, hp=5), enemy(2, hp=5)])
+        after, outcome = fire(state, WAVE_KATANA)
+        self.assertEqual(self.hp_of(after), [(0, 5), (2, 3)])
+        self.assertEqual(outcome.hp_lost, 0)
+
+    def test_killing_the_target_still_sets_it_off(self):
+        after, outcome = fire(make_state(hero_cell=0, enemies=[enemy(1, hp=2), enemy(2, hp=5)]), WAVE_KATANA)
+        self.assertEqual(self.hp_of(after), [(2, 4)])
+        self.assertEqual(outcome.kills, 1)
+
+    def test_a_shield_on_the_target_doesnt_stop_it_and_blocks_only_the_first_hit(self):
+        guarded = enemy(1, hp=5)
+        guarded.shield = True
+        after, _ = fire(make_state(hero_cell=0, enemies=[guarded, enemy(2, hp=5)]), WAVE_KATANA)
+        self.assertEqual(self.hp_of(after), [(1, 4), (2, 4)])
+
+    def test_a_shield_in_the_chain_blocks_its_hit(self):
+        guarded = enemy(2, hp=5)
+        guarded.shield = True
+        after, _ = fire(make_state(hero_cell=0, enemies=[enemy(1, hp=5), guarded]), WAVE_KATANA)
+        self.assertEqual(self.hp_of(after), [(1, 2), (2, 5)])
+        self.assertFalse(after.enemies[1].shield)
+
+    def test_it_can_kill_for_kill_credit(self):
+        after, outcome = fire(make_state(hero_cell=0, enemies=[enemy(1, hp=5), enemy(2, hp=1)]), WAVE_KATANA)
+        self.assertEqual((self.hp_of(after), outcome.kills), ([(1, 2)], 1))
+
+    def test_each_target_of_a_spear_sets_off_its_own(self):
+        state = make_state(hero_cell=0, enemies=[enemy(1, hp=9), enemy(2, hp=9)])
+        after, _ = fire(state, WAVE_SPEAR)
+        # Each takes 2 from the Spear, and 1 from each of the two shockwaves.
+        self.assertEqual(self.hp_of(after), [(1, 5), (2, 5)])
+
+    def test_a_boss_dying_ends_it(self):
+        state = make_state(hero_cell=0, enemies=[shogun(cell=1, hp=2), enemy(2, hp=5)])
+        after, outcome = fire(state, WAVE_KATANA)
+        self.assertEqual((after.enemies, outcome.kills), ([], 1))
+
+    def test_a_statue_in_the_chain_earns_little(self):
+        state = make_state(hero_cell=0, enemies=[shogun(cell=1, hp=20), statue(cell=2)])
+        _, outcome = fire(state, WAVE_KATANA)
+        self.assertEqual((outcome.enemy_damage, outcome.tank_damage), (3, 1))
+
+    def test_a_loaded_stack_counts_the_extra_damage(self):
+        def stack(attack):
+            state = make_state(hero_cell=0, enemies=[enemy(1, hp=9), enemy(2, hp=9)])
+            tile = Tile(attack, cooldown=3, charge=3, in_queue=True)
+            state.tiles, state.queue_tiles = [tile], [tile]
+            state.hero.queue = [attack]
+            return leaf_terms(state)["stack"]
+        self.assertGreater(stack(WAVE_KATANA), stack(KATANA))
+
+    def test_it_raises_no_warning(self):
+        tile = {"attack": {"name": "Spear", "effect": "Shockwave"}}
+        self.assertEqual(unmodeled_content({"tiles": [tile], "hero": {"queue": []}, "enemies": [], "skills": []}), [])
+
+
 class WarningsTest(unittest.TestCase):
     def notes(self, enemy_row, skills=()):
         return unmodeled_content({"tiles": [], "hero": {"queue": []}, "enemies": [enemy_row], "skills": list(skills)})

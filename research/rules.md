@@ -203,6 +203,12 @@ v1.1, and listed in `unvetted.md` where a log doesn't confirm them):
 - **Barricade** puts a 5 HP inanimate enemy on the cell in front of its user, if that cell is free.
 - **Two Way Move** lets Swap work backward. By the code, a swap never turns the hero.
 
+Shockwave, read from the code (simulated as of v1.3):
+
+- After a tile's hit, it runs both ways from the target through touching agents, stopping at a gap, a wall or
+  the hero, who isn't hit. Everyone it reaches is hit. So is the target, but only if it reached someone.
+- The damage is stored in the game's assets, so 1 is an assumption until a log shows it.
+
 The Ronin, read from the code (simulated as of v1.2):
 
 - **Shove** is the Ronin's special move, triggered like Swap by moving into an occupied cell. The hero stays

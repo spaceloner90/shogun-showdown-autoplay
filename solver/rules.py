@@ -32,6 +32,7 @@ class Attack:
     value: int
     range: list[int]
     first_target: bool = False  # Stops at the first agent in range, rather than hitting them all.
+    effect: str = "None"  # Applied to whoever it hits and doesn't kill. Only Curse is modeled.
 
 
 @dataclass
@@ -59,6 +60,7 @@ class Agent:
     queue: list[Attack] = field(default_factory=list)
     action: str = "Wait"  # Only meaningful for enemies.
     moved: bool = False
+    curse: bool = False  # The next hit that deals damage is doubled, and uses up the curse.
 
     @property
     def alive(self):
@@ -138,7 +140,8 @@ class Action:
 def state_from_log(row):
     """Builds a State from a 'state' line of state.jsonl."""
     def attack(data):
-        return Attack(data["name"], data["value"] or 0, list(data["range"]), bool(data["closestTargetOnly"]))
+        return Attack(data["name"], data["value"] or 0, list(data["range"]), bool(data["closestTargetOnly"]),
+                      data.get("effect") or "None")
 
     def agent(data):
         return Agent(
@@ -150,6 +153,7 @@ def state_from_log(row):
             shield=data["shield"],
             queue=[attack(a) for a in data["queue"]],
             action=data["action"],
+            curse=bool(data.get("curse")),
         )
 
     tiles = [
@@ -206,7 +210,7 @@ def unmodeled_content(row):
     def check_attack(data):
         if data["name"] not in MODELED and data["name"] != UNKNOWN_TILE:
             note(f"attack {data['name']}")
-        if data.get("effect") not in (None, "None"):
+        if data.get("effect") not in (None, "None", "Curse"):
             note(f"{data['name']} effect {data['effect']}")
         if data.get("tileEffect") not in (None, "None", "FreePlay"):
             note(f"{data['name']} tile effect {data['tileEffect']}")
@@ -217,8 +221,6 @@ def unmodeled_content(row):
         for status in ("poison", "ice"):
             if agent.get(status):
                 note(f"{name} {status}")
-        if agent.get("curse"):
-            note(f"{name} curse")
 
     for tile in row["tiles"]:
         check_attack(tile["attack"])
@@ -363,22 +365,33 @@ def apply_attack(state, attacker, attack, outcome):
     if not hits and attacker is state.hero and attack.name not in PLAIN_DASHES:
         outcome.wasted_attacks += 1
     for target in hits:
+        # A shield blocks the hit and leaves any curse in place, but the effect still lands.
         if target.shield:
             target.shield = False
-            continue
-        damage = min(attack.value, target.hp)
-        target.hp -= damage
-        if target is state.hero:
-            outcome.hp_lost += damage
-        elif attacker is state.hero:
-            outcome.enemy_damage += damage
-            if not target.alive:
-                outcome.kills += 1
         else:
-            # An enemy hitting an ally still removes HP from the room.
-            outcome.friendly_damage += damage
-            if not target.alive:
-                outcome.kills += 1
+            deal_damage(state, attacker, target, attack.value, outcome)
+        # After the hit, so a curse never doubles the attack that applied it.
+        if target.alive and attack.effect == "Curse":
+            target.curse = True
+
+
+def deal_damage(state, attacker, target, value, outcome):
+    if target.curse and value > 0:
+        value *= 2
+        target.curse = False
+    damage = min(value, target.hp)
+    target.hp -= damage
+    if target is state.hero:
+        outcome.hp_lost += damage
+    elif attacker is state.hero:
+        outcome.enemy_damage += damage
+        if not target.alive:
+            outcome.kills += 1
+    else:
+        # An enemy hitting an ally still removes HP from the room.
+        outcome.friendly_damage += damage
+        if not target.alive:
+            outcome.kills += 1
 
 
 def fire_hero_queue(state, outcome, order=None):

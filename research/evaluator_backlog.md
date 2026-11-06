@@ -23,8 +23,9 @@ Enemy AI code is for offline simulation and tuning only.
   OriginOfSymmetry, Tanegashima. Each needs its rules read first.
 - **Summons:** a Summon's arrival isn't predicted, and summons die with their boss. Both prediction
   misses in run 2 are Summons.
-- **Status effects:** poison, ice and curse, as tile effects or on agents. Set aside for now as too
-  much to scope.
+- **Status effects:** poison and ice, as tile effects or on agents. Curse is modeled as of v0.6, but
+  being cursed has no direct cost in how the hero's position is scored yet, and the enemy Curse
+  attack still isn't modeled.
 - **Skills:** 36 exist, by the game's code. See the survey below.
 
 ## Skill survey

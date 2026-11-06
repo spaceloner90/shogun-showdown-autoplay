@@ -23,6 +23,8 @@ Principles, from how the game plays:
 - A kill is worth far more than the same damage as a wound, and one volley doing the work of several
   saves turns. So what a stack could do counts even when it needs a step or a flip to get there.
   Bosses need no special handling: when no stack can reach a kill, there's no kill to value.
+- A curse doubles the enemy's next hit, so it's worth what that adds to the hero's next attack, which
+  is worth more when it turns a wound into a kill. It's worth nothing on an enemy that dies.
 
 All the weights are first guesses, kept together here so they're easy to change.
 
@@ -39,7 +41,7 @@ from dataclasses import dataclass, field
 from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, apply_attack,
                    can_swap, fireable_attacks, legal_actions, step)
 
-VERSION = "v0.5"
+VERSION = "v0.6"
 
 WEIGHTS = {
     # What happens along the line.
@@ -59,6 +61,7 @@ WEIGHTS = {
     "ready_tile": 2.0,        # Per tile that's charged, in hand or queue.
     "loaded_damage": 2.0,     # Per point of damage in the queue, whether or not anything's in range.
     "swap_ready": 3.0,        # Having Swap charged, so spending it has a cost.
+    "curse": 0.5,             # Fraction of what a curse would add to the hero's next hit on that enemy.
     "facing_ideal": 6.0,      # Facing the enemy we most want to hit.
     "facing_other": 2.0,      # Facing an enemy, but not that one.
     "distance": -2.0,         # Per cell of gap between the hero and the ideal target.
@@ -143,6 +146,35 @@ def _stack_value(state):
             _, outcome = _preview_fire(state, attacks, None, flip)
             best = max(best, _volley_value(outcome) * fractions[int(flip)])
     return best
+
+
+def _hit_value(enemy, damage):
+    value = min(damage, enemy.hp) * WEIGHTS["enemy_damage"]
+    return value + WEIGHTS["kill"] if damage >= enemy.hp else value
+
+
+def _curse_value(state):
+    """What the curses on enemies are worth: a fraction of how much better each makes the next hit there.
+
+    That compares the hero's best hit with the curse against the best without it, with a discount for
+    each turn until a tile is ready. Both are capped by the enemy's health, so a curse adds nothing to
+    an enemy that a ready tile would kill anyway. When tiles are ready to fire, the stack's value
+    already includes the doubled damage, so this adds nothing.
+    """
+    if fireable_attacks(state):
+        return 0.0
+    total = 0.0
+    for enemy in state.enemies:
+        if not enemy.alive or not enemy.curse:
+            continue
+        with_curse = without_curse = 0.0
+        for tile in state.tiles:
+            value = tile.attack.value
+            discount = WEIGHTS["future_discount"] ** max(0, tile.cooldown - tile.charge)
+            with_curse = max(with_curse, _hit_value(enemy, value * 2) * discount)
+            without_curse = max(without_curse, _hit_value(enemy, value) * discount)
+        total += with_curse - without_curse
+    return total * WEIGHTS["curse"]
 
 
 def _threat_damage(state, cell):
@@ -256,6 +288,7 @@ def leaf_terms(state: State) -> dict[str, float]:
     """Scores a position by itself, as named parts so a decision can be explained."""
     terms = {
         "stack": _stack_value(state),
+        "curse": _curse_value(state),
         "ready_tiles": WEIGHTS["ready_tile"] * sum(t.ready for t in state.tiles),
         "loaded": WEIGHTS["loaded_damage"] * sum(a.value for a in fireable_attacks(state)),
         "swap_ready": WEIGHTS["swap_ready"] if state.swap_charge >= state.swap_cooldown else 0.0,

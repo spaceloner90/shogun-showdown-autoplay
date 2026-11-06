@@ -5,7 +5,7 @@ Run with: python solver/test_rules.py
 import unittest
 
 from evaluator import _threat_damage, leaf_terms, rank_actions, unanswerable_damage
-from rules import Action, Agent, Attack, State, Tile, legal_actions, step
+from rules import Action, Agent, Attack, State, Tile, legal_actions, step, unmodeled_content
 
 SWIRL = Attack("Swirl", 2, [-1, 1])
 ARROW = Attack("Arrow", 2, list(range(1, 11)), first_target=True)
@@ -268,6 +268,151 @@ class RulesTest(unittest.TestCase):
         self.assertEqual(Action("Attack").label(state), "Attack")
         self.assertEqual(Action("Attack", order=(1, 0)).label(state), "Attack Arrow > Swirl")
         self.assertEqual(Action("Attack", order=(1,)).label(state), "Attack Arrow (Swirl to hand)")
+
+
+class CurseTest(unittest.TestCase):
+    CURSED_ARROW = Attack("Arrow", 2, list(range(1, 11)), first_target=True, effect="Curse")
+
+    def _with_curse_arrow(self, enemies, queue=("Arrow",)):
+        state = make_state(enemies=enemies, queue=queue)
+        state.tiles[1].attack = self.CURSED_ARROW
+        state.hero.queue = [t.attack for t in state.queue_tiles]
+        return state
+
+    def test_a_curse_doubles_one_hit_and_is_used_up(self):
+        target = enemy(3, hp=9)
+        target.curse = True
+        state = make_state(enemies=[target], queue=["Swirl", "Arrow"])
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual(outcome.enemy_damage, 6)  # Swirl doubled to 4, then Arrow's normal 2.
+        self.assertFalse(after.enemies[0].curse)
+
+    def test_a_curse_does_not_double_the_attack_that_applied_it(self):
+        after, outcome = step(self._with_curse_arrow([enemy(3, hp=9)]), Action("Attack"))
+        self.assertEqual(outcome.enemy_damage, 2)
+        self.assertTrue(after.enemies[0].curse)
+
+    def test_firing_order_decides_whether_the_curse_pays_off_this_attack(self):
+        curse_first = self._with_curse_arrow([enemy(3, hp=9)], queue=("Swirl", "Arrow"))
+        _, swirl_then_curse = step(curse_first, Action("Attack"))
+        _, curse_then_swirl = step(curse_first, Action("Attack", order=(1, 0)))
+        self.assertEqual(swirl_then_curse.enemy_damage, 4)
+        self.assertEqual(curse_then_swirl.enemy_damage, 6)
+
+    def test_a_killed_enemy_stays_dead_and_uncursed(self):
+        after, outcome = step(self._with_curse_arrow([enemy(3, hp=2)]), Action("Attack"))
+        self.assertEqual(outcome.kills, 1)
+        self.assertEqual(after.enemies, [])
+
+    def test_swirl_doubles_each_cursed_target_separately(self):
+        left, right = enemy(1, facing=1, hp=9), enemy(3, hp=9)
+        left.curse = right.curse = True
+        state = make_state(enemies=[left, right], queue=["Swirl"])
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual(outcome.enemy_damage, 8)
+        self.assertFalse(any(e.curse for e in after.enemies))
+
+    def test_a_shield_blocks_the_hit_but_keeps_the_curse_and_takes_the_effect(self):
+        kept = enemy(3, hp=9)
+        kept.curse = True
+        kept.shield = True
+        state = make_state(enemies=[kept], queue=["Swirl"])
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual(outcome.enemy_damage, 0)
+        self.assertFalse(after.enemies[0].shield)
+        self.assertTrue(after.enemies[0].curse)
+        fresh = enemy(3, hp=9)
+        fresh.shield = True
+        after, _ = step(self._with_curse_arrow([fresh]), Action("Attack"))
+        self.assertTrue(after.enemies[0].curse)
+
+    def test_a_cursed_ally_takes_double_from_enemies_too(self):
+        ally = enemy(2, facing=1, hp=9)
+        ally.curse = True
+        state = make_state(hero_cell=4, facing=-1, enemies=[enemy(1, facing=1, action="Attack", queue=[KATANA]), ally])
+        after, outcome = step(state, Action("Wait"))
+        self.assertEqual(outcome.friendly_damage, 4)
+        self.assertFalse(after.enemies[1].curse)
+        self.assertEqual(leaf_terms(after)["curse"], 0)
+
+    def test_a_curse_is_worthless_when_every_tile_already_kills(self):
+        state = make_state(enemies=[enemy(3, hp=2)])
+        state.enemies[0].curse = True
+        self.assertEqual(leaf_terms(state)["curse"], 0)
+
+    def test_a_curse_is_worthless_when_the_best_ready_tile_already_kills(self):
+        # Swirl kills this 3hp enemy anyway, so helping Arrow do it too adds nothing.
+        state = make_state(enemies=[enemy(3, hp=3)])
+        state.enemies[0].curse = True
+        state.tiles[0].attack = Attack("Swirl", 3, [-1, 1])
+        self.assertEqual(leaf_terms(state)["curse"], 0)
+
+    def test_a_curse_counts_when_it_makes_a_kill_available_sooner(self):
+        # Swirl would kill, but it's cooling down. The curse lets the ready Arrow do it now.
+        state = make_state(enemies=[enemy(3, hp=3)])
+        state.enemies[0].curse = True
+        state.tiles[0].attack = Attack("Swirl", 3, [-1, 1])
+        state.tiles[0].charge = 0
+        self.assertGreater(leaf_terms(state)["curse"], 0)
+
+    def test_a_curse_gains_only_up_to_the_health_left(self):
+        # Doubling 2 to 4 only adds 1 real damage on a 3hp enemy, but the kill is worth having.
+        barely = make_state(enemies=[enemy(3, hp=3)])
+        barely.enemies[0].curse = True
+        for tile in barely.tiles:
+            tile.attack = Attack(tile.attack.name, 2, tile.attack.range)
+        full = make_state(enemies=[enemy(3, hp=4)])
+        full.enemies[0].curse = True
+        self.assertLess(leaf_terms(barely)["curse"], leaf_terms(full)["curse"])
+
+    def test_a_cursed_hero_takes_double_once(self):
+        state = make_state(enemies=[enemy(3, action="Attack", queue=[KATANA, KATANA])])
+        state.hero.curse = True
+        self.assertEqual(_threat_damage(state, 2), 6)
+        after, outcome = step(state, Action("Wait"))
+        self.assertEqual(outcome.hp_lost, 6)
+        self.assertFalse(after.hero.curse)
+
+    def test_a_curse_is_worth_something_on_a_survivor(self):
+        cursed = make_state(enemies=[enemy(3, hp=9)])
+        cursed.enemies[0].curse = True
+        plain = make_state(enemies=[enemy(3, hp=9)])
+        self.assertGreater(leaf_terms(cursed)["curse"], 0)
+        self.assertEqual(leaf_terms(plain)["curse"], 0)
+
+    def test_a_curse_is_worth_more_when_it_turns_a_wound_into_a_kill(self):
+        kill = make_state(enemies=[enemy(3, hp=4)])
+        kill.enemies[0].curse = True
+        wound = make_state(enemies=[enemy(3, hp=9)])
+        wound.enemies[0].curse = True
+        self.assertGreater(leaf_terms(kill)["curse"], leaf_terms(wound)["curse"])
+
+    def test_a_curse_is_worth_less_while_every_tile_is_cooling_down(self):
+        ready = make_state(enemies=[enemy(3, hp=9)])
+        ready.enemies[0].curse = True
+        cooling = make_state(enemies=[enemy(3, hp=9)])
+        cooling.enemies[0].curse = True
+        for tile in cooling.tiles:
+            tile.charge = 0
+        self.assertLess(leaf_terms(cooling)["curse"], leaf_terms(ready)["curse"])
+
+    def test_a_loaded_stack_counts_the_curse_only_once(self):
+        state = make_state(enemies=[enemy(3, hp=9)], queue=["Swirl"])
+        state.enemies[0].curse = True
+        terms = leaf_terms(state)
+        self.assertEqual(terms["curse"], 0)
+        plain = make_state(enemies=[enemy(3, hp=9)], queue=["Swirl"])
+        self.assertGreater(terms["stack"], leaf_terms(plain)["stack"])
+
+    def test_fires_the_curse_first_when_stacked(self):
+        state = self._with_curse_arrow([enemy(3, hp=9)], queue=("Swirl", "Arrow"))
+        best = rank_actions(state, depth=1)[0]
+        self.assertEqual(best.actions[0], Action("Attack", order=(1, 0)))
+
+    def test_curse_gets_no_warning(self):
+        row = {"tiles": [{"attack": {"name": "Arrow", "effect": "Curse", "tileEffect": "None"}}],
+               "hero": {"queue": [], "curse": True}, "enemies": [], "skills": []}
+        self.assertEqual(unmodeled_content(row), [])
 
 
 class EvaluatorTest(unittest.TestCase):

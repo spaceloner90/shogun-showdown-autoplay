@@ -129,6 +129,10 @@ Fight 7 of the same log showed:
 ## Not confirmed yet
 
 - Mod 0.8.0 plays Free Play tiles from hand in the same key press as the attack. That hasn't run yet.
+- **Curse** comes from the code alone (`Agent.ReceiveAttack`, `Attack.HitTarget`). It should double one
+  hit that deals damage, meaning one tile against one target, and then be used up. It's applied after
+  the hit that carries it, only if the target survives, and a shield blocks a hit without using it up.
+  It stays on until used, and doesn't stack.
 - Whether an enemy can refuse a swap isn't modeled. The game would refuse the move, and the mod would
   log that.
 - The saved fight log never has Swirl hitting two agents at once. An earlier log did show it, but

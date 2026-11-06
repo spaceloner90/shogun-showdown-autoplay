@@ -4,7 +4,7 @@ Run with: python solver/test_rules.py
 """
 import unittest
 
-from evaluator import _threat_damage, ideal_target, leaf_terms, rank_actions, unanswerable_damage
+from evaluator import _has_way_out, _threat_damage, ideal_target, leaf_terms, preferred_distance, rank_actions, unanswerable_damage
 from rules import Action, Agent, Attack, State, Tile, legal_actions, state_from_log, step, unmodeled_content
 
 SWIRL = Attack("Swirl", 2, [-1, 1])
@@ -1801,6 +1801,133 @@ class ShockwaveTest(unittest.TestCase):
     def test_it_raises_no_warning(self):
         tile = {"attack": {"name": "Spear", "effect": "Shockwave"}}
         self.assertEqual(unmodeled_content({"tiles": [tile], "hero": {"queue": []}, "enemies": [], "skills": []}), [])
+
+
+class KeepingSmokeBombTest(unittest.TestCase):
+    SMOKE = Attack("SmokeBomb", 1, [1, 2, 3, 4, 5, 6], first_target=True)
+
+    def with_smoke(self, enemies, hero_cell=0, loaded=True, charge=5):
+        state = ronin(hero_cell=hero_cell, enemies=enemies)
+        state.cells = 7
+        tile = Tile(self.SMOKE, cooldown=5, charge=charge, in_queue=loaded)
+        state.tiles = [tile]
+        state.queue_tiles = [tile] if loaded else []
+        state.hero.queue = [self.SMOKE] if loaded else []
+        return state
+
+    def test_a_loaded_one_with_a_target_is_worth_keeping(self):
+        self.assertEqual(leaf_terms(self.with_smoke([enemy(3, hp=9)]))["escape"], 12)
+
+    def test_one_in_hand_is_worth_less(self):
+        self.assertEqual(leaf_terms(self.with_smoke([enemy(3, hp=9)], loaded=False))["escape"], 4)
+
+    def test_one_on_cooldown_is_worth_nothing(self):
+        self.assertEqual(leaf_terms(self.with_smoke([enemy(3, hp=9)], loaded=False, charge=2))["escape"], 0)
+
+    def test_it_needs_someone_to_reach(self):
+        behind = self.with_smoke([enemy(0, facing=1, hp=9)], hero_cell=3)
+        self.assertEqual(leaf_terms(behind)["escape"], 4)
+
+    def test_it_needs_a_movable_target(self):
+        heavy = enemy(3, hp=9)
+        heavy.movable = False
+        self.assertEqual(leaf_terms(self.with_smoke([heavy]))["escape"], 4)
+
+    def test_it_earns_nothing_if_it_would_kill_from_here(self):
+        self.assertEqual(leaf_terms(self.with_smoke([enemy(3, hp=1)]))["escape"], 0)
+
+    def test_it_still_fires_for_a_kill(self):
+        best = rank_actions(self.with_smoke([enemy(3, hp=1)]), depth=1)[0]
+        self.assertEqual(best.terms.get("kills", 0), 60)
+
+    def test_it_still_fires_to_dodge(self):
+        # A Katana is coming. Trading places leaves the attacker facing away, with the hero behind it.
+        attacker = enemy(1, facing=-1, hp=9, action="Attack", queue=[KATANA])
+        attacker.facing = -1
+        state = self.with_smoke([attacker], hero_cell=0)
+        state.swap_charge = 0
+        state.hero.facing = 1
+        best = rank_actions(state, depth=1)[0]
+        self.assertEqual(best.terms.get("hp_lost", 0), 0)
+
+    def test_the_wanderers_deck_is_unaffected(self):
+        self.assertEqual(leaf_terms(make_state(enemies=[enemy(3)]))["escape"], 0)
+
+
+class KitPositionTest(unittest.TestCase):
+    SPEAR = Attack("Spear", 2, [1, 2])
+    HOOK = Attack("GrapplingHook", 1, [1, 2, 3, 4, 5, 6], first_target=True)
+    SMOKE = Attack("SmokeBomb", 1, [1, 2, 3, 4, 5, 6], first_target=True)
+
+    def kit(self, *tiles, hero_cell=3, enemies=(), swap=False):
+        state = make_state(hero_cell=hero_cell, enemies=list(enemies))
+        state.cells = 9
+        if not swap:
+            state.special = "PushSpecialMove"
+        state.tiles = [Tile(attack, cooldown=5, charge=5 - wait) for attack, wait in tiles]
+        return state
+
+    def test_the_swap_hero_always_wants_to_be_adjacent(self):
+        self.assertEqual(preferred_distance(self.kit((self.SPEAR, 0), (self.HOOK, 0), swap=True)), 1)
+
+    def test_melee_without_swap_still_has_to_be_adjacent(self):
+        self.assertEqual(preferred_distance(self.kit((KATANA, 0))), 1)
+
+    def test_a_spear_wants_its_full_reach(self):
+        self.assertEqual(preferred_distance(self.kit((self.SPEAR, 0))), 2)
+
+    def test_the_most_damage_decides_it(self):
+        self.assertEqual(preferred_distance(self.kit((self.SPEAR, 0), (self.HOOK, 0), (self.SMOKE, 0))), 2)
+
+    def test_long_reach_stands_off_but_not_all_the_way_to_the_wall(self):
+        self.assertEqual(preferred_distance(self.kit((self.HOOK, 0))), 3)
+
+    def test_only_tiles_available_soon_count(self):
+        self.assertEqual(preferred_distance(self.kit((self.SPEAR, 3), (self.HOOK, 0))), 3)
+
+    def test_with_everything_on_cooldown_the_whole_deck_counts(self):
+        self.assertEqual(preferred_distance(self.kit((self.SPEAR, 4))), 2)
+
+    def test_being_too_close_costs_something(self):
+        state = self.kit((self.SPEAR, 0), hero_cell=3, enemies=[enemy(4)])
+        self.assertEqual(leaf_terms(state)["crowding"], -3)
+
+    def test_at_full_reach_it_doesnt(self):
+        terms = leaf_terms(self.kit((self.SPEAR, 0), hero_cell=3, enemies=[enemy(5)]))
+        self.assertEqual((terms["crowding"], terms["distance"]), (0, 0))
+
+    def test_too_far_still_costs_something(self):
+        self.assertLess(leaf_terms(self.kit((self.SPEAR, 0), hero_cell=1, enemies=[enemy(6)]))["distance"], 0)
+
+    def test_the_swap_hero_is_never_crowded(self):
+        self.assertEqual(leaf_terms(self.kit((self.SPEAR, 0), enemies=[enemy(4)], swap=True))["crowding"], 0)
+
+    def test_flanked_with_no_way_out_is_much_worse(self):
+        enemies = [enemy(0, facing=1), enemy(6)]
+        self.assertEqual(leaf_terms(self.kit((self.SPEAR, 0), enemies=enemies))["surrounded"], -15)
+        self.assertEqual(leaf_terms(self.kit((self.SPEAR, 0), enemies=enemies, swap=True))["surrounded"], -6)
+
+    def test_surrounded_with_no_way_out_is_much_worse(self):
+        enemies = [enemy(2, facing=1), enemy(4)]
+        self.assertEqual(leaf_terms(self.kit((self.SPEAR, 0), enemies=enemies))["surrounded"], -50)
+        self.assertEqual(leaf_terms(self.kit((self.SPEAR, 0), enemies=enemies, swap=True))["surrounded"], -20)
+
+    def test_a_loaded_smoke_bomb_that_reaches_someone_is_a_way_out(self):
+        state = self.kit((self.SMOKE, 0), enemies=[enemy(0, facing=1), enemy(6)])
+        self.assertFalse(_has_way_out(state))
+        state.tiles[0].in_queue = True
+        state.queue_tiles = [state.tiles[0]]
+        state.hero.queue = [self.SMOKE]
+        self.assertTrue(_has_way_out(state))
+        self.assertEqual(leaf_terms(state)["surrounded"], -6)
+
+    def test_one_with_nobody_to_reach_isnt(self):
+        heavy = enemy(6)
+        heavy.movable = False
+        state = self.kit((self.SMOKE, 0), enemies=[enemy(0, facing=1), heavy])
+        state.tiles[0].in_queue = True
+        state.queue_tiles = [state.tiles[0]]
+        self.assertFalse(_has_way_out(state))
 
 
 class WarningsTest(unittest.TestCase):

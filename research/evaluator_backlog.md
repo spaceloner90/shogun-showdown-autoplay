@@ -100,6 +100,27 @@ Measured with enemies standing still, on the final deck and the positions of `lo
 
 Next idea to test: raise what a stack's damage is worth while holding what its kills are worth.
 
+## The Ronin without Swap
+
+From the first Ronin run (`logs/run6`), which took damage in a chapter that usually costs none. The player's read:
+firing Smoke Bomb for the damage while ignoring position is very bad here, and without Swap everything is less
+forgiving. The player's further read: "close in and face enemies" suited melee with Swap, and where to stand should
+depend on the kit. A hero with reach and a hook wants to stay back and only grab the enemies it wants to deal
+with, and being surrounded should cost more. v1.4 does a first version of both, and values a kept Smoke Bomb. Still open:
+
+- **The hook drags enemies in.** Fight 2, turn 30: it pulled a TwinTachi adjacent for 1 damage, winning by 5 points,
+  and the hero took 2 from a Swirl two turns later. v1.4's crowding penalty only stops this at -6, which is close to
+  stalling fights, so it still happens at -3. Choosing who to grab belongs with enemy priority.
+- **Backing into walls.** Standing off could get the hero pinned, as on fight 2, turn 10. Nothing scores being
+  near a wall yet.
+- **Kits other than these.** Preferred distance is read from any tile's reach, but it's only been looked at on the
+  Ronin's deck. The Swap hero keeps the old rule on purpose, since that's what won.
+- **The shove for collision damage.** Fight 2, turn 7 spent it for 2 damage, and it was down for 4 turns.
+- **Facing.** Fight 2, turn 32: Spear killed one TwinTachi while the one behind the hero hit. The answer was to
+  flip a turn earlier, which depth 1 only partly sees.
+- **Weak starting decks.** A still enemy with 25 HP takes about 50 turns with the Ronin's starting tiles, against
+  about 10 for the Wanderer's final deck, so fights last longer and each mistake costs more.
+
 ## Ideas not yet tried
 
 - **Cooldowns aren't valued.** Which tile to load depends on damage and reach. Changing a cooldown

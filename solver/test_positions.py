@@ -14,7 +14,7 @@ from rules import Action, state_from_log, step
 LOGS = Path(__file__).resolve().parent.parent / "research" / "logs"
 ROWS = {
     name: [json.loads(line) for line in (LOGS / name / "state.jsonl").read_text(encoding="utf-8").splitlines()]
-    for name in ("run2_complete", "run3_v03", "run3_part2", "run4", "run5_full")
+    for name in ("run2_complete", "run3_v03", "run3_part2", "run4", "run5_full", "run6")
 }
 
 
@@ -217,6 +217,48 @@ class WinningRun(unittest.TestCase):
         best = choice(30, 8, "run5_full")
         self.assertEqual(best.actions[0].kind, "Attack")
         self.assertEqual(best.terms.get("hp_lost", 0), 0)
+
+
+class RoninAsPlayed(unittest.TestCase):
+    """The first Ronin run, on v1.2, which spent Smoke Bomb for 1 damage with nothing left to dodge with."""
+
+    def fires_smoke(self, fight, turn):
+        state = position(fight, turn, "run6")
+        action = rank_actions(state, depth=1)[0].actions[0]
+        if action.kind != "Attack":
+            return False
+        fired = state.queue_tiles if action.order is None else [state.tiles[i] for i in action.order]
+        return any(t.attack.name == "SmokeBomb" for t in fired)
+
+    def test_keeps_it_rather_than_jump_in_for_1_damage(self):
+        self.assertFalse(self.fires_smoke(1, 14))
+        self.assertFalse(self.fires_smoke(3, 6))
+        self.assertFalse(self.fires_smoke(3, 24))
+
+    def test_still_takes_the_boss_kill(self):
+        # Fight 3, turn 36: Smoke Bomb, then the hook, then Spear finishes Rei and ends the fight.
+        self.assertEqual(choice(3, 36, "run6").terms.get("kills", 0), 60)
+
+    def test_still_fires_it_to_get_out_of_a_hit(self):
+        # Fight 2, turn 10: pinned at the wall with a Katana coming.
+        self.assertEqual(choice(2, 10, "run6").terms.get("hp_lost", 0), 0)
+
+    def test_a_held_bomb_would_have_dodged_rei(self):
+        # Fight 3, turn 28: the hero took 2 from Charge and Dragon Punch with the bomb on cooldown.
+        rows = ROWS["run6"]
+        start = [i for i, r in enumerate(rows) if r.get("event") == "combat_start"][3]
+        row = json.loads(json.dumps(next(r for r in rows[start:] if r["type"] == "state" and r["turn"] == 28)))
+        for tile in row["tiles"]:
+            if tile["attack"]["name"] == "SmokeBomb":
+                tile.update(where="HeroAttackQueue", charged=True, turnsBeforeCharged=0)
+                row["hero"]["queue"] = [tile["attack"]]
+        best = rank_actions(state_from_log(row), depth=1)[0]
+        self.assertEqual(best.terms.get("hp_lost", 0), 0)
+
+    def test_the_hook_pulls_as_played(self):
+        # Fight 2, turn 45: the hook pulled the Ashigaru next to the hero, as predicted.
+        after, _ = step(position(2, 45, "run6"), Action("Attack"))
+        self.assertTrue(any(abs(e.cell - after.hero.cell) == 1 for e in after.enemies))
 
 
 def final_boss_rows():

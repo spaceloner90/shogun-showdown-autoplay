@@ -29,6 +29,10 @@ Principles, from how the game plays:
   Spending it on a hit that could have been dodged has a cost.
 - An enemy's shield is different: it has to be removed anyway, so it counts as extra HP, equal to the
   hero's weakest tile, since that's the cheapest way to remove it. Breaking one earns that credit.
+- Where to stand depends on the kit. Melee with Swap wants to be adjacent, since it can get out again. A
+  kit without Swap wants the farthest distance its tiles can still hit from, and being flanked or
+  surrounded is much worse with no way out.
+- A Smoke Bomb is a dodge as well as an attack, so firing it for 1 damage gives up more than the tile.
 - When a boss dies, everyone else dies too. Ordinary summons are still real threats worth killing, but
   the Shogun's statues are only there to get in the way, so the boss comes first.
 
@@ -44,10 +48,11 @@ import copy
 import itertools
 from dataclasses import dataclass, field
 
-from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, apply_attack,
-                   can_use_special, fireable_attacks, is_tank, legal_actions, perform_special, step, strike_cell)
+from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SWAP, UNKNOWN_TILE, Action, Attack, Outcome, State,
+                   apply_attack, can_use_special, fireable_attacks, is_tank, legal_actions, perform_special, step,
+                   strike_cell, targets_of)
 
-VERSION = "v1.3"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.4"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -70,6 +75,8 @@ WEIGHTS = {
     "ready_tile": 2.0,        # Per tile that's charged, in hand or queue.
     "loaded_damage": 2.0,     # Per point of damage in the queue, whether or not anything's in range.
     "swap_ready": 3.0,        # Having the special move charged, so spending it has a cost.
+    "escape_loaded": 12.0,    # A loaded Smoke Bomb with a target: a dodge that's ready to use.
+    "escape_ready": 4.0,      # One charged in hand or a turn from being usable: a dodge a turn away.
     "curse": 0.5,             # Fraction of what a curse would add to the hero's next hit on that enemy.
     "shield": 100.0,          # Holding a shield, worth about 1 HP. Hits average 1.4, but it may go unused.
     "facing_ideal": 6.0,      # Facing the enemy we most want to hit.
@@ -78,6 +85,9 @@ WEIGHTS = {
     "unarmed_distance": 0.25, # The share of that which still applies with nothing to threaten them.
     "surrounded": -20.0,      # Enemies directly on both sides.
     "flanked": -6.0,          # Enemies on both sides, at any distance.
+    "no_way_out": 2.5,        # How much worse those are with no Swap and no loaded Smoke Bomb.
+    "crowding": -3.0,         # Per cell an enemy is closer than the hero's tiles need it to be. -10 stalls fights.
+    "max_standoff": 3,        # The furthest a kit prefers to stand off, so it doesn't run to the wall.
     "enemy_hp_left": -4.0,    # Per enemy HP still in the room.
     "wave_pressure": -3.0,    # Per enemy HP in the room, scaled up as the next wave gets close.
 }
@@ -285,6 +295,30 @@ def _threat_presented(state, target):
     return min(1.0, damage / max(1, _effective_hp(state, target)))
 
 
+def preferred_distance(state):
+    """How far from an enemy the hero wants to stand, from what its tiles can reach.
+
+    Melee with Swap wants to be adjacent, since it can get out again. Any other kit wants the farthest
+    distance where the tiles it will have soon can all still hit, so reach is used to stay out of trouble.
+    """
+    if state.special == SWAP:
+        return 1
+    soon = [t for t in state.tiles if t.attack.value > 0 and (t.in_queue or t.cooldown - t.charge <= 1)]
+    tiles = soon or [t for t in state.tiles if t.attack.value > 0]
+    reach = {d: sum(t.attack.value for t in tiles if d in map(abs, t.attack.range))
+             for d in range(1, WEIGHTS["max_standoff"] + 1)}
+    most = max(reach.values())
+    return max(d for d, damage in reach.items() if damage == most) if most else 1
+
+
+def _has_way_out(state):
+    """Whether the hero can get past an enemy on either side: Swap, or a loaded Smoke Bomb that reaches one."""
+    if state.special == SWAP:
+        return True
+    return any(t.attack.name in SMOKE_BOMBS and t.ready and t.in_queue
+               and any(a.movable for a in targets_of(state, state.hero, t.attack)[:1]) for t in state.tiles)
+
+
 def _position_terms(state):
     target = ideal_target(state)
     if target is None:
@@ -302,13 +336,19 @@ def _position_terms(state):
     if left and right:
         adjacent = state.occupant(hero.cell - 1) is not None and state.occupant(hero.cell + 1) is not None
         surrounded = WEIGHTS["surrounded"] if adjacent else WEIGHTS["flanked"]
+        if not _has_way_out(state):
+            surrounded *= WEIGHTS["no_way_out"]
 
     # Closing in matters less with nothing to threaten them with.
     floor = WEIGHTS["unarmed_distance"]
     armed = floor + (1.0 - floor) * _threat_presented(state, target)
+    preferred = preferred_distance(state)
+    nearest = min(abs(e.cell - hero.cell) for e in state.enemies if e.alive and not is_tank(state, e)) \
+        if any(e.alive and not is_tank(state, e) for e in state.enemies) else preferred
     return {
         "facing": facing,
-        "distance": WEIGHTS["distance"] * armed * max(0, abs(target.cell - hero.cell) - 1),
+        "distance": WEIGHTS["distance"] * armed * max(0, abs(target.cell - hero.cell) - preferred),
+        "crowding": WEIGHTS["crowding"] * max(0, preferred - nearest),
         "surrounded": surrounded,
     }
 
@@ -323,6 +363,29 @@ def _pressure_terms(state):
     return terms
 
 
+def _escape_value(state):
+    """A Smoke Bomb trades places with an enemy at range, so it's a dodge as well as 1 damage.
+
+    Firing it for the damage alone gives that up for several turns, which is worth counting. It's only a
+    dodge while it can reach someone. If the loaded tiles can kill from here, it's going to be fired rather
+    than kept, so it earns nothing: otherwise it could talk the hero out of the kill.
+    """
+    attacks_available = fireable_attacks(state)
+    for attacks in itertools.permutations(attacks_available, min(len(attacks_available), QUEUE_CAP)):
+        if attacks and _preview_fire(state, attacks)[1].kills:
+            return 0.0
+    best = 0.0
+    for tile in state.tiles:
+        if tile.attack.name not in SMOKE_BOMBS:
+            continue
+        reaches = any(t.movable for t in targets_of(state, state.hero, tile.attack)[:1])
+        if tile.ready and tile.in_queue and reaches:
+            best = max(best, WEIGHTS["escape_loaded"])
+        elif tile.ready:
+            best = max(best, WEIGHTS["escape_ready"])
+    return best
+
+
 def _poison_value(state):
     """Poison still to come: good on an enemy, as far as its HP goes, and bad on the hero."""
     value = sum(min(e.poison, e.hp) * WEIGHTS["poison_turn"] for e in state.enemies
@@ -334,6 +397,7 @@ def leaf_terms(state: State) -> dict[str, float]:
     """Scores a position by itself, as named parts so a decision can be explained."""
     terms = {
         "poison": _poison_value(state),
+        "escape": _escape_value(state),
         "stack": _stack_value(state),
         "curse": _curse_value(state),
         "shield": WEIGHTS["shield"] if state.hero.shield else 0.0,

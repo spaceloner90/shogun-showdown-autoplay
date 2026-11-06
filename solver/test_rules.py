@@ -726,6 +726,32 @@ class DamagingMoveTest(unittest.TestCase):
         killing.swap_damage = 1
         self.assertEqual(unanswerable_damage(killing), 0)
 
+    def _archer_behind(self, blocker_hp, swap_damage):
+        # An Archer on cell 0 is firing right. Swapping with the enemy on cell 3 puts it in the way.
+        state = make_state(hero_cell=2, facing=1, enemies=[
+            enemy(0, facing=1, action="Attack", queue=[ARROW]), enemy(3, facing=-1, hp=blocker_hp)])
+        state.swap_damage = swap_damage
+        return state
+
+    def test_a_swap_blocks_a_projectile_with_the_enemy_it_passes(self):
+        _, outcome = step(self._archer_behind(9, 1), Action("MoveRight"))
+        self.assertEqual(outcome.hp_lost, 0)
+        self.assertEqual(outcome.friendly_damage, 2)
+
+    def test_a_swap_that_kills_the_blocker_lets_the_projectile_through(self):
+        after, outcome = step(self._archer_behind(1, 1), Action("MoveRight"))
+        self.assertEqual((outcome.kills, outcome.hp_lost), (1, 2))
+        self.assertEqual(after.hero.cell, 3)
+
+    def test_the_threat_check_knows_a_dead_blocker_blocks_nothing(self):
+        # With nowhere safe to step, a swap is only a full answer if the blocker survives it.
+        def left_over(blocker_hp):
+            state = self._archer_behind(blocker_hp, 1)
+            state.enemies[0].action = "Wait"
+            return unanswerable_damage(state)
+        self.assertEqual(left_over(9), 0)
+        self.assertEqual(left_over(1), 2)
+
     def test_the_skill_level_is_read_from_the_log(self):
         row = {"cells": 5, "tiles": [], "enemies": [], "skills": [{"name": "DamagingMove", "level": 2}],
                "hero": {"kind": "H", "cell": 0, "facing": "Right", "hp": 9, "maxHp": 9, "shield": False, "queue": [],

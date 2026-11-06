@@ -1240,6 +1240,76 @@ class UnfriendlyFireTest(unittest.TestCase):
         self.assertEqual([(e.cell, e.hp) for e in after.enemies], [(1, 3), (3, 2), (4, 4)])
 
 
+def volley(target_cell=None):
+    return Attack("Volley", 2, FAR, first_target=True, target_cell=target_cell)
+
+
+def sniper(cell=4, target_cell=2, action="Attack"):
+    return Agent("Sniper", cell, -1, 3, 3, queue=[volley(target_cell)], action=action)
+
+
+class VolleyTest(unittest.TestCase):
+    def test_staying_on_the_locked_cell_takes_the_hit(self):
+        _, outcome = step(make_state(enemies=[sniper()]), Action("Wait"))
+        self.assertEqual(outcome.hp_lost, 2)
+
+    def test_stepping_off_dodges_it_even_along_the_same_line(self):
+        after, outcome = step(make_state(enemies=[sniper()]), Action("MoveLeft"))
+        self.assertEqual((after.hero.cell, outcome.hp_lost), (1, 0))
+
+    def test_it_passes_over_anyone_in_between(self):
+        blocker = enemy(3)
+        after, outcome = step(make_state(enemies=[blocker, sniper()]), Action("Wait"))
+        self.assertEqual((outcome.hp_lost, after.enemies[0].hp), (2, 3))
+
+    def test_it_hits_whoever_is_on_the_cell_when_it_lands(self):
+        after, outcome = step(make_state(enemies=[enemy(3, hp=5), sniper()]), Action("MoveRight"))
+        self.assertEqual(after.hero.cell, 3)
+        by_kind = {e.kind: e for e in after.enemies}
+        self.assertEqual((outcome.hp_lost, by_kind["Ashigaru"].cell, by_kind["Ashigaru"].hp), (0, 2, 3))
+
+    def test_a_shield_blocks_it(self):
+        state = make_state(enemies=[sniper()])
+        state.hero.shield = True
+        after, outcome = step(state, Action("Wait"))
+        self.assertEqual((outcome.hp_lost, after.hero.shield), (0, False))
+
+    def test_killing_the_sniper_cancels_it(self):
+        _, outcome = fire(make_state(enemies=[sniper(cell=3)]), TETSUBO)
+        self.assertEqual(outcome.hp_lost, 0)
+
+    def test_a_loaded_volley_locks_onto_where_the_hero_ends_the_turn(self):
+        after, _ = step(make_state(enemies=[sniper(target_cell=None, action="Wait")]), Action("MoveLeft"))
+        self.assertEqual(after.enemies[0].queue[0].target_cell, 1)
+
+    def test_it_only_threatens_the_locked_cell(self):
+        state = make_state(enemies=[sniper()])
+        self.assertEqual(_threat_damage(state, 2), 2)
+        self.assertEqual(_threat_damage(state, 1), 0)
+
+    def test_a_free_cell_beside_the_hero_is_an_answer(self):
+        self.assertEqual(unanswerable_damage(make_state(enemies=[sniper()])), 0)
+
+    def test_having_nowhere_to_step_is_not_an_answer(self):
+        state = make_state(hero_cell=0, facing=1, swap_charge=0, enemies=[enemy(1), sniper(target_cell=0)])
+        self.assertEqual(unanswerable_damage(state), 2)
+
+    def test_the_hero_steps_off_the_locked_cell(self):
+        best = rank_actions(make_state(enemies=[sniper()]), depth=1)[0]
+        self.assertEqual(best.terms.get("hp_lost", 0), 0)
+
+    def test_state_from_log_locks_it_only_on_the_turn_it_fires(self):
+        def attacks_for(action):
+            shot = {"name": "Volley", "value": 2, "range": FAR, "closestTargetOnly": True, "effect": "None"}
+            shooter = {"kind": "Sniper", "cell": 6, "facing": "Left", "hp": 3, "maxHp": 3, "shield": False,
+                       "queue": [shot], "action": action}
+            hero = {"kind": "Wanderer", "cell": 2, "facing": "Left", "hp": 10, "maxHp": 10, "shield": False,
+                    "queue": [], "action": "Wait"}
+            return state_from_log({"cells": 7, "hero": hero, "enemies": [shooter], "tiles": []}).enemies[0].queue[0]
+        self.assertEqual(attacks_for("Attack").target_cell, 2)
+        self.assertIsNone(attacks_for("Wait").target_cell)
+
+
 class WarningsTest(unittest.TestCase):
     def notes(self, enemy_row, skills=()):
         return unmodeled_content({"tiles": [], "hero": {"queue": []}, "enemies": [enemy_row], "skills": list(skills)})

@@ -47,7 +47,7 @@ from dataclasses import dataclass, field
 from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, apply_attack,
                    can_swap, fireable_attacks, is_tank, land_hit, legal_actions, step, strike_cell)
 
-VERSION = "v0.11"
+VERSION = "v0.12"
 
 WEIGHTS = {
     # What happens along the line.

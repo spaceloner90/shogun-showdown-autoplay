@@ -14,7 +14,7 @@ from rules import Action, state_from_log, step
 LOGS = Path(__file__).resolve().parent.parent / "research" / "logs"
 ROWS = {
     name: [json.loads(line) for line in (LOGS / name / "state.jsonl").read_text(encoding="utf-8").splitlines()]
-    for name in ("run2_complete", "run3_v03", "run3_part2")
+    for name in ("run2_complete", "run3_v03", "run3_part2", "run4")
 }
 
 
@@ -155,6 +155,32 @@ class GoodPlaysToKeep(unittest.TestCase):
         # Every option here dodges for free, so none should take the hit.
         for fight, turn in ((8, 6), (8, 10), (7, 10), (4, 14)):
             self.assertEqual(choice(fight, turn).terms.get("hp_lost", 0), 0, (fight, turn))
+
+
+class SniperAsPlayed(unittest.TestCase):
+    """Run 4, the first with Snipers. v0.11 stayed on the locked cell and took every one of these."""
+
+    def test_steps_off_instead_of_taking_the_shot(self):
+        for fight, turn in ((4, 22), (4, 37), (6, 16), (7, 19)):
+            self.assertEqual(choice(fight, turn, "run4").terms.get("hp_lost", 0), 0, (fight, turn))
+
+    def test_can_take_the_shot_to_clear_two_enemies_at_once(self):
+        # Fight 7, turn 15: firing kills the Archer and Ashigaru. Dodging leaves both, and the Archer's shot.
+        best = choice(7, 15, "run4")
+        self.assertEqual(best.actions[0].kind, "Attack")
+        self.assertEqual(best.terms.get("kills", 0) / 60, 2)
+
+    def test_stepping_off_dodged_it_as_played(self):
+        # Turn 5 of fight 4: the hero moved right off cell 3, and the game showed no hit.
+        _, outcome = step(position(4, 5, "run4"), Action("MoveRight"))
+        self.assertEqual(outcome.hp_lost, 0)
+
+    def test_the_shot_passes_over_the_ashigaru_in_between(self):
+        # Turn 15 of fight 7: the shot hit the hero behind the Ashigaru, and left the Ashigaru alone.
+        state = position(7, 15, "run4")
+        after, outcome = step(state, Action("Wait"))
+        self.assertEqual(outcome.hp_lost, 2)
+        self.assertEqual(next(e.hp for e in after.enemies if e.kind == "Ashigaru"), 3)
 
 
 def final_boss_rows():

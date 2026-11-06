@@ -17,7 +17,7 @@ ONE_ENEMY_WAVE_CAP = 6
 MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Charge", "CorruptedBarrage", "Curse", "Dash",
            "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "SmokeBomb", "Spear", "Summon", "SwapToss",
-           "Swirl", "Tetsubo"}
+           "Swirl", "Tetsubo", "Volley"}
 
 # Skills the solver handles. Most need no modeling because their effects show up in the logged state,
 # like a shield, max HP or a shorter Swap cooldown. Damaging Move and Unfriendly Fire are simulated.
@@ -47,6 +47,7 @@ class Attack:
     range: list[int]
     first_target: bool = False  # Stops at the first agent in range, rather than hitting them all.
     effect: str = "None"  # Applied to whoever it hits and doesn't kill. Only Curse is modeled.
+    target_cell: int | None = None  # For a Volley: the cell it's locked onto, shown as a warning in the game.
 
 
 @dataclass
@@ -159,6 +160,12 @@ class Action:
         return self.kind
 
 
+def aim_volleys(enemy, hero):
+    for attack in enemy.queue:
+        if attack.name == "Volley" and attack.target_cell is None:
+            attack.target_cell = hero.cell
+
+
 def state_from_log(row):
     """Builds a State from a 'state' line of state.jsonl."""
     def attack(data):
@@ -191,6 +198,11 @@ def state_from_log(row):
     ]
     hero = agent(row["hero"])
     hero.action = "Wait"
+    enemies = [agent(e) for e in row["enemies"]]
+    # The game locks a Volley onto the hero's cell as the turn it fires begins.
+    for enemy in enemies:
+        if enemy.action == "Attack":
+            aim_volleys(enemy, hero)
 
     # The log gives the queue's order by attack. Match each entry to a tile in the queue. The deck can
     # hold two tiles of the same name, so match on damage as well when possible.
@@ -212,7 +224,7 @@ def state_from_log(row):
     return State(
         cells=row["cells"],
         hero=hero,
-        enemies=[agent(e) for e in row["enemies"]],
+        enemies=enemies,
         tiles=tiles,
         queue_tiles=queue_tiles,
         swap_charge=special.get("charge", 0),
@@ -385,6 +397,10 @@ def attack_hits(state, attacker, attack):
         return []
     if attack.name in SHADOW_DASHES:
         return shadow_dash(state, attacker, attack, attacker.facing * SHADOW_DASHES[attack.name])
+    # A Volley lands on its locked cell, on whoever is there, ignoring anyone in between.
+    if attack.name == "Volley":
+        struck = state.occupant(attack.target_cell) if attack.target_cell is not None else None
+        return [struck] if struck is not None else []
     if attack.name in SMOKE_BOMBS:
         targets = targets_of(state, attacker, attack)
         if not targets or not targets[0].movable:
@@ -719,6 +735,8 @@ def end_turn(state, swapped):
     for enemy in state.enemies:
         enemy.moved = False
         enemy.action = "Wait"  # What it does next isn't known until the game shows it.
+        # A loaded Volley will lock onto wherever the hero ends this turn, leaving a turn to step off.
+        aim_volleys(enemy, state.hero)
 
 
 def step(state, action):

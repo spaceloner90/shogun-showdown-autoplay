@@ -182,8 +182,18 @@ Later bosses in that log, with the rules read from the game's code (simulated as
 - **Origin of Symmetry** moves its user to the centre, trading places with anyone there. Nobody turns.
 - **Dragon Punch** hits, then pushes the target as far as it goes. If someone stops it, they each take 1.
 
+Run 4, the first after beating the game, added new enemies (simulated as of v0.12):
+
+- **Volley** (Sniper, Baru) locks onto the hero's cell as the turn it fires begins, which the game shows as
+  a warning on that cell. It then lands there, on whoever is on the cell, passing over anyone in between.
+  Its logged range looks like a shot along the row, but that isn't how it works. Stepping off dodges it,
+  in either direction, as on turns 5 and 41 of fight 4. On turn 15 of fight 7, it hit the hero behind an
+  Ashigaru and left the Ashigaru alone.
+
 ## Not confirmed yet
 
+- **A Volley hitting an enemy on the locked cell** comes from the code alone, since it has only hit the hero
+  in the logs. So does a shield blocking it.
 - **The Corrupted Barrage warnings** are read from the game's task object. The rule above comes from the
   code and two logged hits, and no log has the new `hazards` field yet.
 - **Mirror on an even room's last cell** would land off the board. The simulator treats that as doing nothing.

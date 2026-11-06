@@ -21,6 +21,9 @@ Enemy AI code is for offline simulation and tuning only.
 
 - **Attacks that displace others:** KiPush, TwinTessen, Hookblade, Tanegashima. Each needs its rules
   read first, as they come up.
+- **Barricade (Baru's tile):** spawns a 5 HP inanimate Barricade on the cell in front of its user, if that
+  cell is empty. Its location is predictable, unlike a Summon's, so it could be simulated. For now it only
+  causes a warning and an enemy-count miss, and F1 reads the Barricade correctly once it's on the board.
 - **Other corruption patterns:** the game can also send corruption left to right, right to left, or even
   and odd cells in turn. The mod logs all of them as `hazards`, and only the attack that starts them
   needs adding, but none has been seen yet.

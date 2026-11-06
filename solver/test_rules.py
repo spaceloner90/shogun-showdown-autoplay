@@ -168,6 +168,69 @@ class RulesTest(unittest.TestCase):
         after, outcome = step(state, Action("Attack"))
         self.assertEqual((after.hero.cell, outcome.enemy_damage), (3, 1))
 
+    def _fire_back_charge(self, hero_cell, facing, enemies, cells=5, also=()):
+        back = Attack("BackCharge", 3, list(range(1, 11)), first_target=True)
+        state = make_state(hero_cell=hero_cell, facing=facing, enemies=enemies)
+        state.cells = cells
+        state.tiles[0].attack = back
+        state.tiles[0].in_queue = True
+        state.queue_tiles = [state.tiles[0]]
+        state.hero.queue = [back]
+        for name in also:
+            tile = next(t for t in state.tiles if t.attack.name == name)
+            tile.in_queue = True
+            state.queue_tiles.append(tile)
+            state.hero.queue.append(tile.attack)
+        return state
+
+    def test_back_charge_runs_backward_to_the_target_without_turning(self):
+        state = self._fire_back_charge(4, 1, [enemy(1, hp=9)])
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual((after.hero.cell, after.hero.facing, outcome.enemy_damage), (2, 1, 3))
+
+    def test_back_charge_hits_an_adjacent_target_without_moving(self):
+        state = self._fire_back_charge(3, 1, [enemy(2, hp=9)])
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual((after.hero.cell, outcome.enemy_damage), (3, 3))
+
+    def test_back_charge_ignores_targets_ahead(self):
+        state = self._fire_back_charge(2, 1, [enemy(3, hp=9)])
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual((after.hero.cell, outcome.enemy_damage), (0, 0))
+
+    def test_back_charge_with_nothing_behind_is_a_retreat_not_a_waste(self):
+        state = self._fire_back_charge(2, 1, [enemy(4, hp=9)])
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual((after.hero.cell, outcome.wasted_attacks), (0, 0))
+
+    def test_back_charge_against_the_wall_does_nothing_but_uses_the_tile(self):
+        state = self._fire_back_charge(0, 1, [enemy(3, hp=9)])
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual((after.hero.cell, outcome.enemy_damage, outcome.wasted_attacks), (0, 0, 1))
+        self.assertEqual(after.tiles[0].charge, 0)
+
+    def test_back_charge_dodges_a_telegraphed_attack(self):
+        state = self._fire_back_charge(3, 1, [enemy(4, action="Attack", queue=[KATANA])])
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual((after.hero.cell, outcome.hp_lost), (0, 0))
+
+    def test_tiles_after_a_back_charge_fire_from_where_it_landed(self):
+        # Facing right, it runs left to cell 2, next to the enemy on cell 1. Swirl then reaches it.
+        state = self._fire_back_charge(4, 1, [enemy(1, hp=9)], also=("Arrow",))
+        state.tiles[1].attack = SWIRL
+        state.hero.queue[1] = SWIRL
+        _, outcome = step(state, Action("Attack"))
+        self.assertEqual(outcome.enemy_damage, 5)
+
+    def test_a_charge_that_does_nothing_is_still_a_waste(self):
+        state = make_state(hero_cell=4, facing=1, enemies=[enemy(0)])
+        state.tiles[0].attack = CHARGE
+        state.tiles[0].in_queue = True
+        state.queue_tiles = [state.tiles[0]]
+        state.hero.queue = [CHARGE]
+        _, outcome = step(state, Action("Attack"))
+        self.assertEqual(outcome.wasted_attacks, 1)
+
     def test_plain_dash_moves_to_the_last_free_cell_and_hits_nothing(self):
         dash_attack = Attack("Dash", 0, list(range(1, 11)))
         state = make_state(hero_cell=0, facing=1, enemies=[enemy(4)])

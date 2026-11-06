@@ -87,7 +87,11 @@ class CurseAsPlayed(unittest.TestCase):
 
     def test_a_curse_doubles_exactly_one_tile(self):
         # Turn 8 in the game: Swirl hit for 3 and cursed, Arrow's 4 hit for 8, then Swirl's 2 hit for 2.
-        state = position(-1, 8, "run3_part2")
+        rows = ROWS["run3_part2"]
+        twins_row = next(i for i, r in enumerate(rows) if r["type"] == "state"
+                         and any(e["kind"] == "TwinMainBoss" for e in r["enemies"]))
+        fight = sum(r.get("event") == "combat_start" for r in rows[:twins_row]) - 1
+        state = position(fight, 8, "run3_part2")
         swirl3 = next(i for i, t in enumerate(state.tiles) if t.attack.name == "Swirl" and t.attack.value == 3)
         arrow = next(i for i, t in enumerate(state.tiles) if t.attack.name == "Arrow")
         swirl2 = next(i for i, t in enumerate(state.tiles) if t.attack.name == "Swirl" and t.attack.value == 2)

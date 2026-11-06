@@ -366,9 +366,10 @@ def apply_attack(state, attacker, attack, outcome):
         return
     if attack.name not in MODELED and attack.name not in outcome.unmodeled:
         outcome.unmodeled.append(attack.name)
+    start_cell = attacker.cell
     hits = attack_hits(state, attacker, attack)
-    # A plain dash is used for the move, so hitting nothing isn't a waste.
-    if not hits and attacker is state.hero and attack.name not in PLAIN_DASHES:
+    # An attack that moved the hero still did something, even if it hit nothing.
+    if not hits and attacker is state.hero and attacker.cell == start_cell:
         outcome.wasted_attacks += 1
     for target in hits:
         # A shield blocks the hit and leaves any curse in place, but the effect still lands.

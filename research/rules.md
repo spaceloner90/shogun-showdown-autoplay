@@ -140,6 +140,9 @@ The twins boss, later in the same log, showed:
 
 ## Not confirmed yet
 
+- **Back Charge** comes from the code alone. It runs away from the facing direction without turning,
+  stops at the last free cell, and hits whatever is next. With nothing behind, it runs to the wall.
+  Backed against a wall with no one adjacent, it does nothing, and the tile still goes on cooldown.
 - The shield rules, for the hero, for enemies and for curse, come from the code alone. No logged hit
   has landed on a shielded target.
 - Whether an enemy can refuse a swap isn't modeled. The game would refuse the move, and the mod would

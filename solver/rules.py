@@ -20,7 +20,7 @@ MODELED = {"Arrow", "BackCharge", "BackShadowDash", "Charge", "Dash", "EarthImpa
 # Attacks that move the attacker. Each value is the direction relative to the attacker's facing.
 CHARGES = {"Charge": 1, "BackCharge": -1}  # Run to the last free cell, and hit whatever is next.
 PLAIN_DASHES = {"Dash": 1}                 # Run to the last free cell, and hit nothing.
-SHADOW_DASHES = {"ShadowDash": 1, "BackShadowDash": -1}  # Pass through adjacent agents, hitting them all.
+SHADOW_DASHES = {"ShadowDash": 1, "BackShadowDash": -1}  # Land behind a target, hitting all they pass.
 
 # An enemy tile being played. Its identity isn't visible until it lands in the queue.
 UNKNOWN_TILE = "Unknown"
@@ -102,6 +102,14 @@ class Outcome:
     unmodeled: list[str] = field(default_factory=list)
 
 
+def _tile_name(state, tile):
+    """A tile's name, with its damage added when the deck has another of that name that hits differently."""
+    name = tile.attack.name
+    if any(t is not tile and t.attack.name == name and t.attack.value != tile.attack.value for t in state.tiles):
+        return f"{name} ({tile.attack.value})"
+    return name
+
+
 @dataclass(frozen=True)
 class Action:
     kind: str  # Wait, MoveLeft, MoveRight, Flip, Attack or PlayTile
@@ -113,11 +121,11 @@ class Action:
     def label(self, state):
         if self.kind == "PlayTile":
             tile = state.tiles[self.tile]
-            return f"PlayTile {tile.attack.name}{' (free)' if tile.free_play else ''}"
+            return f"PlayTile {_tile_name(state, tile)}{' (free)' if tile.free_play else ''}"
         if self.kind == "Attack" and self.order is not None:
             fired = [state.tiles[i] for i in self.order]
-            kept = [t.attack.name for t in state.queue_tiles if not any(t is f for f in fired)]
-            text = "Attack " + " > ".join(t.attack.name for t in fired)
+            kept = [_tile_name(state, t) for t in state.queue_tiles if not any(t is f for f in fired)]
+            text = "Attack " + " > ".join(_tile_name(state, t) for t in fired)
             return f"{text} ({', '.join(kept)} to hand)" if kept else text
         if self.kind in ("MoveLeft", "MoveRight"):
             direction = -1 if self.kind == "MoveLeft" else 1
@@ -156,11 +164,13 @@ def state_from_log(row):
     hero = agent(row["hero"])
     hero.action = "Wait"
 
-    # The log gives the queue's order by attack. Match each entry to a tile in the queue.
+    # The log gives the queue's order by attack. Match each entry to a tile in the queue. The deck can
+    # hold two tiles of the same name, so match on damage as well when possible.
     available = [t for t in tiles if t.in_queue]
     queue_tiles = []
     for queued in hero.queue:
-        match = next((t for t in available if t.attack.name == queued.name), None)
+        same_name = [t for t in available if t.attack.name == queued.name]
+        match = next((t for t in same_name if t.attack.value == queued.value), same_name[0] if same_name else None)
         if match is None:
             # Queued, but not from the deck the log shows. Track it anyway, so firing still works.
             match = Tile(queued, cooldown=0, charge=0, in_queue=True)
@@ -294,21 +304,25 @@ def run_to_last_free_cell(state, attacker, direction):
 
 
 def shadow_dash(state, attacker, attack, direction):
-    """Passes through the agents in a row beside the attacker, landing just past them, hitting them all.
+    """Goes through targets at any distance, stopping at the first free cell behind one, hitting all it passed.
 
-    Does nothing if nobody is in range, or if there's no free cell to land on.
+    Does nothing if nobody is in range, or if no target has a free cell behind it. The tile still goes
+    on cooldown either way.
     """
     if not targets_of(state, attacker, attack):
         return []
-    cell = attacker.cell + direction
     passed = []
-    while 0 <= cell < state.cells and state.occupant(cell) is not None:
-        passed.append(state.occupant(cell))
+    cell = attacker.cell + direction
+    while 0 <= cell < state.cells:
+        agent = state.occupant(cell)
+        if agent is not None:
+            passed.append(agent)
+            behind = cell + direction
+            if 0 <= behind < state.cells and state.occupant(behind) is None:
+                attacker.cell = behind
+                return passed
         cell += direction
-    if not 0 <= cell < state.cells:
-        return []
-    attacker.cell = cell
-    return passed
+    return []
 
 
 def attack_hits(state, attacker, attack):

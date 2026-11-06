@@ -115,9 +115,15 @@ The fight in `logs/battle2_swap_queue` showed:
   `logs/run2_complete` (turn 20 of battle 2) was then predicted exactly.
 - **Charge moves its user.** It runs to the last free cell and hits whatever is next, allies included.
 
+The second boss in `logs/run3_v03` showed:
+
+- **Shadow Dash lands behind its target.** It reaches a target at any distance, passes it, and stops at
+  the first free cell behind it, hitting everyone it passed. With no free cell behind, it does nothing
+  and still goes on cooldown. A stack fires from wherever the dash lands.
+
 ## Not confirmed yet
 
-- Mod 0.7.0 makes queue edits with `Submit` and `SwapTiles`. Neither has run in the game yet.
+- Free Play tiles haven't appeared in a log, so that rule comes from the code alone.
 - Whether an enemy can refuse a swap isn't modeled. The game would refuse the move, and the mod would
   log that.
 - The saved fight log never has Swirl hitting two agents at once. An earlier log did show it, but

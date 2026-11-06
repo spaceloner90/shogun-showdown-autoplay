@@ -53,13 +53,16 @@ def turns_from_log(rows):
             before_action = None
 
 
-def to_action(state, name, tile_name):
+def to_action(state, name, tile_name, after):
     if name in ("FlipLeft", "FlipRight"):
         return Action("Flip")
     if name != "PlayTile":
         return Action(name)
-    index = next(i for i, t in enumerate(state.tiles) if t.attack.name == tile_name and not t.in_queue)
-    return Action("PlayTile", index)
+    # The event only names the tile, and the deck can hold two of the same name. The next state shows
+    # which one went into the queue.
+    candidates = [i for i, t in enumerate(state.tiles) if t.attack.name == tile_name and not t.in_queue]
+    moved = [i for i in candidates if i < len(after["tiles"]) and "AttackQueue" in after["tiles"][i]["where"]]
+    return Action("PlayTile", (moved or candidates)[0])
 
 
 def compare(predicted, actual_row, spawned):
@@ -124,7 +127,7 @@ def main():
             skipped.append(before["turn"])
             continue
         state = state_from_log(before)
-        predicted, _ = step(state, to_action(state, action_name, tile_name))
+        predicted, _ = step(state, to_action(state, action_name, tile_name, after))
         problems = compare(predicted, after, spawned)
         total += 1
         actions[action_name] += 1

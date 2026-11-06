@@ -9,23 +9,27 @@ import unittest
 from pathlib import Path
 
 from evaluator import rank_actions
-from rules import state_from_log
+from rules import Action, state_from_log, step
 
-LOG = Path(__file__).resolve().parent.parent / "research" / "logs" / "run2_complete" / "state.jsonl"
-ROWS = [json.loads(line) for line in LOG.read_text(encoding="utf-8").splitlines()]
+LOGS = Path(__file__).resolve().parent.parent / "research" / "logs"
+ROWS = {
+    name: [json.loads(line) for line in (LOGS / name / "state.jsonl").read_text(encoding="utf-8").splitlines()]
+    for name in ("run2_complete", "run3_v03")
+}
 
 
-def position(fight, turn):
+def position(fight, turn, log="run2_complete"):
     """The first state of a turn. Fights are numbered as played, and the log's first combat is the camp."""
-    start = [i for i, r in enumerate(ROWS) if r.get("event") == "combat_start"][fight]
-    for row in ROWS[start:]:
+    rows = ROWS[log]
+    start = [i for i, r in enumerate(rows) if r.get("event") == "combat_start"][fight]
+    for row in rows[start:]:
         if row["type"] == "state" and row["turn"] == turn:
             return state_from_log(row)
     raise LookupError(f"fight {fight} has no turn {turn}")
 
 
-def choice(fight, turn):
-    return rank_actions(position(fight, turn), depth=1)[0]
+def choice(fight, turn, log="run2_complete"):
+    return rank_actions(position(fight, turn, log), depth=1)[0]
 
 
 class MistakesToAvoid(unittest.TestCase):
@@ -55,6 +59,27 @@ class MistakesToAvoid(unittest.TestCase):
     def test_loads_what_removes_the_lethal_threat(self):
         # Fight 9, turn 19, on 1hp: a 1hp Yari Master behind is about to turn and attack.
         self.assertEqual(choice(9, 19).labels[0], "PlayTile Swirl")
+
+
+class ShadowDash(unittest.TestCase):
+    """Run 3's second boss: one failed use by F1 and one test by the player, with results to match."""
+
+    def test_does_not_count_on_a_dash_with_no_room_behind_the_target(self):
+        # Turn 10: the boss is on the last cell, and a Spear is about to reach the hero.
+        best = choice(6, 10, "run3_v03")
+        self.assertEqual(best.terms.get("hp_lost", 0), 0)
+        self.assertNotEqual(best.actions[0].kind, "Attack")
+
+    def test_simulates_the_failed_use_as_it_happened(self):
+        after, outcome = step(position(6, 10, "run3_v03"), Action("Attack"))
+        self.assertEqual((after.hero.cell, outcome.hp_lost), (4, 2))
+        self.assertEqual(next(e.hp for e in after.enemies if e.kind == "IwaoBoss"), 13)
+
+    def test_simulates_the_successful_use_as_it_happened(self):
+        # Turn 28: past the boss to cell 5, where Arrow kills the Charger and Swirl hits the boss.
+        after, _ = step(position(6, 28, "run3_v03"), Action("Attack"))
+        self.assertEqual(after.hero.cell, 5)
+        self.assertEqual([(e.kind, e.cell, e.hp) for e in after.enemies], [("IwaoBoss", 4, 7)])
 
 
 class GoodPlaysToKeep(unittest.TestCase):

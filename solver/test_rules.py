@@ -178,25 +178,44 @@ class RulesTest(unittest.TestCase):
         after, outcome = step(state, Action("Attack"))
         self.assertEqual((after.hero.cell, outcome.enemy_damage, outcome.wasted_attacks), (3, 0, 0))
 
-    def test_shadow_dash_passes_through_and_hits_everyone_adjacent_in_a_row(self):
-        shadow = Attack("ShadowDash", 2, [1], first_target=True)
-        state = make_state(hero_cell=1, facing=1, enemies=[enemy(2), enemy(3)])
+    def _fire_shadow_dash(self, hero_cell, enemies):
+        shadow = Attack("ShadowDash", 2, list(range(1, 11)), first_target=True)
+        state = make_state(hero_cell=hero_cell, facing=1, enemies=enemies)
         state.tiles[0].attack = shadow
         state.tiles[0].in_queue = True
         state.queue_tiles = [state.tiles[0]]
         state.hero.queue = [shadow]
-        after, outcome = step(state, Action("Attack"))
+        return step(state, Action("Attack"))
+
+    def test_shadow_dash_passes_through_and_hits_everyone_in_a_row(self):
+        after, outcome = self._fire_shadow_dash(1, [enemy(2), enemy(3)])
         self.assertEqual((after.hero.cell, outcome.enemy_damage), (4, 4))
 
-    def test_shadow_dash_needs_a_free_cell_to_land_on(self):
-        shadow = Attack("ShadowDash", 2, [1], first_target=True)
-        state = make_state(hero_cell=3, facing=1, enemies=[enemy(4)])
-        state.tiles[0].attack = shadow
-        state.tiles[0].in_queue = True
-        state.queue_tiles = [state.tiles[0]]
-        state.hero.queue = [shadow]
-        after, outcome = step(state, Action("Attack"))
-        self.assertEqual((after.hero.cell, outcome.enemy_damage), (3, 0))
+    def test_shadow_dash_reaches_a_target_at_any_distance(self):
+        after, outcome = self._fire_shadow_dash(0, [enemy(2)])
+        self.assertEqual((after.hero.cell, outcome.enemy_damage), (3, 2))
+
+    def test_shadow_dash_fails_with_no_free_cell_behind_the_target(self):
+        # There's a free cell before the target, but only one behind it counts.
+        after, outcome = self._fire_shadow_dash(2, [enemy(4)])
+        self.assertEqual((after.hero.cell, outcome.enemy_damage, outcome.wasted_attacks), (2, 0, 1))
+        self.assertEqual(after.tiles[0].charge, 0)
+
+    def test_shadow_dash_stops_behind_the_first_target_with_room(self):
+        after, outcome = self._fire_shadow_dash(0, [enemy(1), enemy(3)])
+        self.assertEqual((after.hero.cell, outcome.enemy_damage), (2, 2))
+
+    def test_shadow_dash_needs_a_target(self):
+        after, outcome = self._fire_shadow_dash(1, [enemy(0, facing=1)])
+        self.assertEqual((after.hero.cell, outcome.enemy_damage), (1, 0))
+
+    def test_two_tiles_of_a_name_are_told_apart(self):
+        weak = Attack("Swirl", 2, [-1, 1])
+        strong = Attack("Swirl", 3, [-1, 1])
+        state = make_state(enemies=[enemy(3)])
+        state.tiles = [Tile(weak, 3, 3), Tile(strong, 3, 3)]
+        self.assertEqual(Action("PlayTile", 1).label(state), "PlayTile Swirl (3)")
+        self.assertNotEqual(Action("PlayTile", 0).label(state), Action("PlayTile", 1).label(state))
 
     def test_free_play_tile_does_not_end_the_turn(self):
         state = make_state(enemies=[enemy(3, action="Attack", queue=[KATANA])])

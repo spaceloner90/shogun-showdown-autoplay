@@ -36,7 +36,7 @@ Enemy AI code is for offline simulation and tuning only.
   one yet, because F1 killed each one first.
 - **Heavy enemies:** the Statue boss has a Heavy trait, which may mean it can't be moved. Swap and the
   moving attacks don't check for that yet. If so, the game should refuse the swap and the mod logs it.
-- **Other new attacks seen:** Shuriken, Shadow Kama, Smoke Bomb and Summon still trigger the warning.
+- **Other new attacks seen:** Smoke Bomb and Summon still trigger the warning.
 - **Perfect Strike:** a tile with this effect recharges fully when its hit deals exactly the target's
   remaining HP, counting a curse's doubling. Not modeled, and cooldowns aren't valued anyway, so F1
   won't aim for it. A kill that triggers it just gets read correctly on the next turn.

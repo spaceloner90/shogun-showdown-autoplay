@@ -719,11 +719,9 @@ class DamagingMoveTest(unittest.TestCase):
         self.assertEqual(rank_actions(state, depth=1)[0].labels[0], "MoveRight (swap)")
 
     def test_a_killing_swap_answers_a_threat_a_plain_swap_cannot(self):
-        # Hit either way after a plain swap, from the Swirl, with no free cell to step to.
-        target = enemy(1, hp=1, queue=[SWIRL])
-        plain = make_state(hero_cell=0, enemies=[target])
+        # A plain swap lands next to the Swirl, which reaches both sides, and the corner leaves nowhere else.
+        plain = make_state(hero_cell=0, enemies=[enemy(1, hp=1, queue=[SWIRL])])
         self.assertEqual(unanswerable_damage(plain), 2)
-        self.assertEqual(unanswerable_damage(self._swap_at(enemy(1, hp=1, queue=[SWIRL]))) if False else 0, 0)
         killing = make_state(hero_cell=0, enemies=[enemy(1, hp=1, queue=[SWIRL])])
         killing.swap_damage = 1
         self.assertEqual(unanswerable_damage(killing), 0)

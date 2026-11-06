@@ -6,6 +6,7 @@ press without restarting the game.
 Output is line based:
     VERSION <evaluator version>
     BEST <depth> <game action> <deck index or -1> <score> <label>
+    ORDER <depth> <deck indexes to fire, in order>  (only when firing needs queue edits first)
     ANALYSIS <one line of JSON for the log>
     REPORT
     <the readable report, through to the end>
@@ -19,6 +20,7 @@ from review import board
 from rules import MODELED, state_from_log
 
 DEPTHS = (1, 2, 3, 4)
+MAX_TABLE_ROWS = 8
 
 
 def game_action(state, action):
@@ -59,17 +61,21 @@ def build_report(row, state, by_depth):
         "",
         f"==== Analysis ({VERSION}): turn {row['turn']} | HP {state.hero.hp}/{state.hero.max_hp}{wave_text}",
         "  " + board(row),
-        f"  Tiles: {', '.join(tiles)} | Swap {state.swap_charge}/{state.swap_cooldown} (not used by the solver yet)",
+        f"  Tiles: {', '.join(tiles)} | Swap {state.swap_charge}/{state.swap_cooldown}",
     ]
 
     unknown = sorted({a.name for e in state.enemies for a in e.queue} - MODELED)
     if unknown:
         lines.append(f"  WARNING: attacks the rules don't model: {', '.join(unknown)}")
 
-    # One row per move, ordered by the deepest search, with a * on each depth's choice.
-    labels = [line.labels[0] for line in by_depth[DEPTHS[-1]]]
+    # One row per move, ordered by depth 1, with a * on each depth's choice. Each depth's choice is
+    # always shown, but there can be many ways to fire a full queue, so the rest are cut off.
+    ranked_labels = [line.labels[0] for line in by_depth[DEPTHS[0]]]
+    picks = {by_depth[depth][0].labels[0] for depth in DEPTHS}
+    labels = [l for i, l in enumerate(ranked_labels) if i < MAX_TABLE_ROWS or l in picks]
     width = max(len(label) for label in labels)
     lines.append("  " + "Move".ljust(width) + "".join(f"{'D' + str(d):>10}" for d in DEPTHS))
+    hidden = len(ranked_labels) - len(labels)
     for label in labels:
         row_text = "  " + label.ljust(width)
         for depth in DEPTHS:
@@ -78,6 +84,8 @@ def build_report(row, state, by_depth):
             mark = "*" if line is ranked[0] else " "
             row_text += f"{line.score:>9.1f}{mark}"
         lines.append(row_text)
+    if hidden:
+        lines.append(f"  ...and {hidden} lower-scoring moves")
 
     for depth in DEPTHS:
         best = by_depth[depth][0]
@@ -99,6 +107,8 @@ def main():
         action = best.actions[0]
         deck_index = action.tile if action.tile is not None else -1
         print(f"BEST {depth} {game_action(state, action)} {deck_index} {best.score:.1f} {' -> '.join(best.labels)}")
+        if action.order is not None:
+            print(f"ORDER {depth} {','.join(str(i) for i in action.order)}")
 
     analysis = {
         "evaluatorVersion": VERSION,

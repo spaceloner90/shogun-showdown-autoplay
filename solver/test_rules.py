@@ -10,6 +10,7 @@ from rules import Action, Agent, Attack, State, Tile, legal_actions, step
 SWIRL = Attack("Swirl", 2, [-1, 1])
 ARROW = Attack("Arrow", 2, list(range(1, 11)))
 KATANA = Attack("Katana", 2, [1])
+TETSUBO = Attack("Tetsubo", 4, [1])
 
 
 def make_state(hero_cell=2, facing=1, enemies=(), swap_charge=4, queue=()):
@@ -69,9 +70,10 @@ class RulesTest(unittest.TestCase):
         wrong_way = make_state(facing=-1, enemies=[enemy(3)])
         self.assertNotIn(Action("MoveRight"), legal_actions(wrong_way, allow_swap=True))
 
-    def test_swap_is_off_by_default_for_v0(self):
+    def test_swap_is_considered_and_labelled(self):
         state = make_state(enemies=[enemy(3)])
-        self.assertNotIn(Action("MoveRight"), legal_actions(state))
+        self.assertIn(Action("MoveRight"), legal_actions(state))
+        self.assertEqual(Action("MoveRight").label(state), "MoveRight (swap)")
 
     def test_swap_cooldown_skips_the_turn_it_was_used(self):
         state = make_state(enemies=[enemy(3)])
@@ -111,8 +113,62 @@ class RulesTest(unittest.TestCase):
         self.assertEqual(outcome.kills, 1)
         self.assertEqual(outcome.wasted_attacks, 1)
 
+    def test_a_full_queue_can_fire_fifteen_ways_starting_as_it_stands(self):
+        state = make_state(queue=["Swirl", "Arrow"])
+        third = Tile(TETSUBO, cooldown=7, charge=7, in_queue=True)
+        state.tiles.append(third)
+        state.queue_tiles.append(third)
+        state.hero.queue.append(TETSUBO)
+        attacks = [a for a in legal_actions(state) if a.kind == "Attack"]
+        self.assertEqual(len(attacks), 15)
+        self.assertEqual(attacks[0], Action("Attack"))
+        self.assertEqual(len(set(attacks)), 15)
+
+    def test_firing_one_tile_sends_the_other_back_charged(self):
+        state = make_state(enemies=[enemy(3)], queue=["Swirl", "Arrow"])
+        after, outcome = step(state, Action("Attack", order=(0,)))
+        self.assertEqual(outcome.enemy_damage, 2)
+        self.assertEqual(after.hero.queue, [])
+        self.assertEqual(after.tiles[0].charge, 0)
+        self.assertTrue(after.tiles[1].ready)
+        self.assertFalse(after.tiles[1].in_queue)
+
+    def test_firing_order_can_change_the_result(self):
+        # Swirl first kills the 2hp enemy ahead, leaving Arrow nothing to hit. Arrow first does the
+        # same kill, and Swirl still hits the enemy behind, so neither attack is wasted.
+        behind = enemy(1, facing=1)
+        state = make_state(enemies=[behind, enemy(3, hp=2)], queue=["Swirl", "Arrow"])
+        _, swirl_first = step(state, Action("Attack"))
+        _, arrow_first = step(state, Action("Attack", order=(1, 0)))
+        self.assertEqual(swirl_first.wasted_attacks, 1)
+        self.assertEqual(arrow_first.wasted_attacks, 0)
+        self.assertEqual(arrow_first.kills, 1)
+        self.assertEqual(arrow_first.enemy_damage, 4)
+
+    def test_attack_labels_describe_the_edits(self):
+        state = make_state(enemies=[enemy(3)], queue=["Swirl", "Arrow"])
+        self.assertEqual(Action("Attack").label(state), "Attack")
+        self.assertEqual(Action("Attack", order=(1, 0)).label(state), "Attack Arrow > Swirl")
+        self.assertEqual(Action("Attack", order=(1,)).label(state), "Attack Arrow (Swirl to hand)")
+
 
 class EvaluatorTest(unittest.TestCase):
+    def test_loads_a_ready_tile_rather_than_walking_with_an_empty_queue(self):
+        state = make_state(hero_cell=0, facing=1, enemies=[enemy(4)])
+        self.assertEqual(rank_actions(state, depth=1)[0].actions[0].kind, "PlayTile")
+
+    def test_does_not_fire_a_tile_that_would_miss(self):
+        # Only Swirl reaches the enemy behind, so Arrow should stay charged instead of being wasted.
+        state = make_state(enemies=[enemy(1, facing=1, hp=2)], queue=["Swirl", "Arrow"])
+        best = rank_actions(state, depth=1)[0].actions[0]
+        self.assertEqual((best.kind, best.order), ("Attack", (0,)))
+
+    def test_swaps_past_an_attacker_when_cornered(self):
+        # The only way out of a telegraphed attack from a corner is through the attacker.
+        state = make_state(hero_cell=0, facing=1, enemies=[enemy(1, action="Attack", queue=[KATANA])])
+        best = rank_actions(state, depth=1)[0].actions[0]
+        self.assertEqual(best.kind, "MoveRight")
+
     def test_kills_an_attacker_it_can_reach(self):
         state = make_state(enemies=[enemy(3, hp=2, action="Attack", queue=[KATANA])], queue=["Swirl"])
         self.assertEqual(rank_actions(state)[0].actions[0].kind, "Attack")

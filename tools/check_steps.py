@@ -56,6 +56,21 @@ def main():
         previous = r["turn"]
     print(f"numbering problems: {problems}")
 
+    # Every turn the hero acted on should have a state line showing the position.
+    print("\n--- turns with no state ---")
+    fight = 0
+    with_state = set()
+    acted = []
+    for r in rows:
+        if r["type"] == "event" and r["event"] == "combat_start":
+            fight += 1
+        elif r["type"] == "state":
+            with_state.add((fight, r["turn"]))
+        elif r["type"] == "event" and r["event"] == "hero_action":
+            acted.append((fight, r["turn"]))
+    missing = [key for key in acted if key not in with_state]
+    print(f"turns acted on: {len(acted)}, missing a state: {missing or 'none'}")
+
     print("\n--- timeline ---")
     for r in rows:
         if r["type"] == "event":

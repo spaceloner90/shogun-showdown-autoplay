@@ -1,4 +1,4 @@
-"""Simulates one combat turn of the first battle. See research/rules.md for the rules.
+"""Simulates one combat turn. See research/rules.md for the rules.
 
 Only uses what a player can see: enemies do what they telegraphed this turn, and after that their
 actions are unknown, so they're treated as waiting. New enemies and wave spawns aren't predicted.
@@ -6,14 +6,15 @@ actions are unknown, so they're treated as waiting. New enemies and wave spawns 
 from __future__ import annotations
 
 import copy
+import itertools
 from dataclasses import dataclass, field
 
 QUEUE_CAP = 3
 ONE_ENEMY_WAVE_CAP = 6
 
 # Attacks that hit only the first agent in range. Anything else in MODELED hits everyone in range.
-SINGLE_TARGET = {"Arrow", "Katana"}
-MODELED = {"Arrow", "Katana", "Swirl"}
+SINGLE_TARGET = {"Arrow", "Katana", "Tetsubo"}
+MODELED = {"Arrow", "Katana", "Swirl", "Tetsubo"}
 
 # An enemy tile being played. Its identity isn't visible until it lands in the queue.
 UNKNOWN_TILE = "Unknown"
@@ -96,9 +97,23 @@ class Outcome:
 class Action:
     kind: str  # Wait, MoveLeft, MoveRight, Flip, Attack or PlayTile
     tile: int | None = None  # Index into state.tiles for PlayTile.
+    # For Attack: which tiles to fire and in what order, as indexes into state.tiles. Queue edits are
+    # free, so they happen as part of the attack. None fires the whole queue as it stands.
+    order: tuple[int, ...] | None = None
 
     def label(self, state):
-        return f"PlayTile {state.tiles[self.tile].attack.name}" if self.kind == "PlayTile" else self.kind
+        if self.kind == "PlayTile":
+            return f"PlayTile {state.tiles[self.tile].attack.name}"
+        if self.kind == "Attack" and self.order is not None:
+            fired = [state.tiles[i] for i in self.order]
+            kept = [t.attack.name for t in state.queue_tiles if not any(t is f for f in fired)]
+            text = "Attack " + " > ".join(t.attack.name for t in fired)
+            return f"{text} ({', '.join(kept)} to hand)" if kept else text
+        if self.kind in ("MoveLeft", "MoveRight"):
+            direction = -1 if self.kind == "MoveLeft" else 1
+            if state.occupant(state.hero.cell + direction) is not None:
+                return f"{self.kind} (swap)"
+        return self.kind
 
 
 def state_from_log(row):
@@ -162,8 +177,23 @@ def can_swap(state, direction):
     )
 
 
-def legal_actions(state, allow_swap=False):
-    """The actions to consider. Swap is off for v0 because no fight log has shown it working yet."""
+def attack_actions(state):
+    """Every way to fire the queue: any tiles, in any order. The queue as it stands comes first, so
+    that when choices score the same, the one needing no edits wins."""
+    indexes = [next(i for i, t in enumerate(state.tiles) if t is tile) for tile in state.queue_tiles]
+    if not indexes:
+        return []
+    actions = [Action("Attack")]
+    current = tuple(indexes)
+    for size in range(len(indexes), 0, -1):
+        for order in itertools.permutations(indexes, size):
+            if order != current:
+                actions.append(Action("Attack", order=order))
+    return actions
+
+
+def legal_actions(state, allow_swap=True):
+    """The actions to consider."""
     hero = state.hero
     actions = [Action("Wait"), Action("Flip")]
     for kind, direction in (("MoveLeft", -1), ("MoveRight", 1)):
@@ -176,8 +206,7 @@ def legal_actions(state, allow_swap=False):
         for index, tile in enumerate(state.tiles):
             if tile.ready and not tile.in_queue:
                 actions.append(Action("PlayTile", index))
-    if hero.queue:
-        actions.append(Action("Attack"))
+    actions.extend(attack_actions(state))
     return actions
 
 
@@ -220,11 +249,14 @@ def apply_attack(state, attacker, attack, outcome):
                 outcome.kills += 1
 
 
-def fire_hero_queue(state, outcome):
-    for attack, tile in zip(state.hero.queue, state.queue_tiles):
-        apply_attack(state, state.hero, attack, outcome)
+def fire_hero_queue(state, outcome, order=None):
+    """Fires the chosen tiles in order. Any others go back to the hand, still charged."""
+    fired = list(state.queue_tiles) if order is None else [state.tiles[i] for i in order]
+    for tile in fired:
+        apply_attack(state, state.hero, tile.attack, outcome)
         tile.charge = 0
         tile.just_played = True
+    for tile in state.queue_tiles:
         tile.in_queue = False
     state.hero.queue = []
     state.queue_tiles = []
@@ -234,7 +266,7 @@ def hero_action(state, action, outcome):
     hero = state.hero
     swapped = False
     if action.kind == "Attack":
-        fire_hero_queue(state, outcome)
+        fire_hero_queue(state, outcome, action.order)
     elif action.kind == "Flip":
         hero.facing = -hero.facing
     elif action.kind == "PlayTile":

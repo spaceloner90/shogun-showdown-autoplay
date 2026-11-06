@@ -14,6 +14,8 @@ Principles, from how the game plays:
   last moment is a fine way to dodge.
 - Facing the ideal target and not being surrounded matter more than distance.
 - Killing fast matters, because the next wave arrives on a timer and can overload the room.
+- Queue edits are free, so a loaded tile commits to nothing: it can be reordered or taken back when
+  firing. Loading early is an option worth having even with nothing in range yet.
 
 All the weights are first guesses, kept together here so they're easy to change.
 
@@ -24,11 +26,12 @@ and decision in the logs records the version it came from.
 from __future__ import annotations
 
 import copy
+import itertools
 from dataclasses import dataclass, field
 
-from rules import ONE_ENEMY_WAVE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, fire_hero_queue, legal_actions, step
+from rules import ONE_ENEMY_WAVE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, apply_attack, legal_actions, step
 
-VERSION = "v0.1"
+VERSION = "v0.2"
 
 WEIGHTS = {
     # What happens along the line.
@@ -45,6 +48,8 @@ WEIGHTS = {
     "firepower": 0.6,         # Fraction of the value of firing the queue from here.
     "flip_firepower": 0.3,    # The same, for firing after a flip, which costs a turn.
     "ready_tile": 2.0,        # Per tile that's charged, in hand or queue.
+    "loaded_damage": 2.0,     # Per point of damage in the queue, whether or not anything's in range.
+    "swap_ready": 3.0,        # Having Swap charged, so spending it has a cost.
     "facing_ideal": 6.0,      # Facing the enemy we most want to hit.
     "facing_other": 2.0,      # Facing an enemy, but not that one.
     "distance": -2.0,         # Per cell of gap between the hero and the ideal target.
@@ -74,16 +79,26 @@ class Line:
         return round(self.score, 2), self.position_next_turn
 
 
-def _firepower_value(state, flip):
-    """The value of firing the queue now from this position, ignoring any enemy response."""
-    if not state.hero.queue:
-        return 0.0
-    trial = copy.deepcopy(state)
+def _preview_fire(state, attacks, flip=False):
+    """Fires these attacks on a light copy of the board. Returns the copy and what happened."""
+    trial = copy.copy(state)
+    trial.hero = copy.copy(state.hero)
+    trial.enemies = [copy.copy(e) for e in state.enemies]
     if flip:
         trial.hero.facing = -trial.hero.facing
     outcome = Outcome()
-    fire_hero_queue(trial, outcome)
-    return outcome.enemy_damage * WEIGHTS["enemy_damage"] + outcome.kills * WEIGHTS["kill"]
+    for attack in attacks:
+        apply_attack(trial, trial.hero, attack, outcome)
+    return trial, outcome
+
+
+def _firepower_value(state, flip):
+    """The value of firing the queue now, in its best order, ignoring any enemy response."""
+    best = 0.0
+    for attacks in itertools.permutations(state.hero.queue):
+        _, outcome = _preview_fire(state, attacks, flip)
+        best = max(best, outcome.enemy_damage * WEIGHTS["enemy_damage"] + outcome.kills * WEIGHTS["kill"])
+    return best
 
 
 def _threat_damage(state, cell):
@@ -112,9 +127,10 @@ def unanswerable_damage(state):
         cell = state.hero.cell + direction
         if 0 <= cell < state.cells and state.occupant(cell) is None and _threat_damage(state, cell) == 0:
             return 0
-    if state.hero.queue:
-        trial = copy.deepcopy(state)
-        fire_hero_queue(trial, Outcome())
+    for attacks in itertools.permutations(state.hero.queue):
+        if not state.hero.queue:
+            break
+        trial, _ = _preview_fire(state, attacks)
         trial.enemies = [e for e in trial.enemies if e.alive]
         if _threat_damage(trial, trial.hero.cell) == 0:
             return 0
@@ -170,6 +186,8 @@ def leaf_terms(state: State) -> dict[str, float]:
     terms = {
         "firepower": max(forward * WEIGHTS["firepower"], flipped * WEIGHTS["flip_firepower"]),
         "ready_tiles": WEIGHTS["ready_tile"] * sum(t.ready for t in state.tiles),
+        "loaded": WEIGHTS["loaded_damage"] * sum(a.value for a in state.hero.queue),
+        "swap_ready": WEIGHTS["swap_ready"] if state.swap_charge >= state.swap_cooldown else 0.0,
     }
     terms.update(_position_terms(state))
     terms.update(_pressure_terms(state))

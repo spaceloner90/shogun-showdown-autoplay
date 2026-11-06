@@ -15,6 +15,7 @@ public sealed class BestMove
     public int DeckIndex;
     public float Score;
     public string Line;
+    public int[] AttackOrder;
 }
 
 public sealed class SolverResult
@@ -139,6 +140,17 @@ public sealed class SolverBridge
                 move.Score = float.Parse(parts[4], CultureInfo.InvariantCulture);
                 move.Line = parts[5];
                 result.Best[move.Depth] = move;
+            }
+            else if (line.StartsWith("ORDER ", StringComparison.Ordinal))
+            {
+                string[] parts = line.Trim().Split(' ');
+                string[] indexes = parts[2].Split(',');
+                int[] order = new int[indexes.Length];
+                for (int i = 0; i < indexes.Length; i++)
+                {
+                    order[i] = int.Parse(indexes[i], CultureInfo.InvariantCulture);
+                }
+                result.Best[int.Parse(parts[1], CultureInfo.InvariantCulture)].AttackOrder = order;
             }
             else if (line.StartsWith("ANALYSIS ", StringComparison.Ordinal))
             {

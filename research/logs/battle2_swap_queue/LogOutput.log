@@ -1,0 +1,243 @@
+[Message:   BepInEx] BepInEx 5.4.23.6 - ShogunShowdown (9/22/2026 11:59:44 AM)
+[Info   :   BepInEx] Running under Unity v2021.3.45.8976527
+[Info   :   BepInEx] CLR runtime version: 4.0.30319.42000
+[Info   :   BepInEx] Supports SRE: True
+[Info   :   BepInEx] System platform: Bits64, Windows
+[Message:   BepInEx] Preloader started
+[Info   :   BepInEx] Loaded 1 patcher method from [BepInEx.Preloader 5.4.23.6]
+[Info   :   BepInEx] 1 patcher plugin loaded
+[Info   :   BepInEx] Patching [UnityEngine.CoreModule] with [BepInEx.Chainloader]
+[Message:   BepInEx] Preloader finished
+[Message:   BepInEx] Chainloader ready
+[Message:   BepInEx] Chainloader started
+[Info   :   BepInEx] 1 plugin to load
+[Info   :   BepInEx] Loading [Shogun State Logger 0.6.0]
+[Info   :Shogun State Logger] State logger loaded. Writing to C:\Program Files\Epic Games\ShogunShowdown611f6\BepInEx\autoplay\state.jsonl
+[Info   :Shogun State Logger] In combat, press F1-F4 to play the top move for that depth, or F8 to see the scores without playing.
+[Message:   BepInEx] Chainloader startup complete
+[Info   :Shogun State Logger] State logger Update loop is running.
+[Info   :Shogun State Logger]   > Combat begins
+[Info   :Shogun State Logger]   > Wave 1/5 spawns
+[Info   :Shogun State Logger]   [new tile] Swirl L0 None None = Swirl: Strike the cells directly ahead and behind.
+[Info   :Shogun State Logger]   [new tile] Arrow L0 None None = Arrow: Strike the first target ahead.
+[Info   :Shogun State Logger]   [new tile] Tetsubo L0 None None = Tetsubo: Strike the cell directly ahead.
+[Info   :Shogun State Logger]   [new enemy] Charger = Spike Charger: Clad in specially crafted spiked armor, they charge at enemies using their body as a deadly weapon.
+[Info   :Shogun State Logger]   [new enemy] Ashigaru = Ashigaru: A common swordsman, but their dedication to the Shogun's cause should not be underestimated.
+[Info   :Shogun State Logger]   [new hero] Wanderer = Swap: Special ability: can swap position with an enemy in front of her by moving forward.
+[Info   :Shogun State Logger] 
+==== Turn 1 | WaveRoom | wave 1/5, next in 16 turns (blocked: room too crowded) | 12 coins
+  Grid: 0:<Ashigaru  1:.  2:.  3:HERO>  4:Charger>  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Charger: cell 4, facing Right, HP 1/1, next: Wait
+    Ashigaru: cell 0, facing Left, HP 3/3, next: Wait
+    Ashigaru: cell 6, facing Left, HP 3/3, next: Wait
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+    Tetsubo 4 dmg, range 1, cooldown 7, READY
+[Info   :Shogun State Logger]   > HERO queues tile Swirl [from: human]
+[Info   :Shogun State Logger] 
+==== Turn 1 | WaveRoom | wave 1/5, next in 16 turns (blocked: room too crowded) | 12 coins
+  Grid: 0:<Ashigaru  1:.  2:.  3:HERO>  4:Charger>  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Charger: cell 4, facing Right, HP 1/1, next: Wait
+    Ashigaru: cell 0, facing Left, HP 3/3, next: Wait
+    Ashigaru: cell 6, facing Left, HP 3/3, next: Wait
+  Queue: Swirl 2 dmg, range -1,1
+  Tiles:
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+    Tetsubo 4 dmg, range 1, cooldown 7, READY
+[Info   :Shogun State Logger]   > Turn 1 action: HERO PlayTile [from: human]
+[Info   :Shogun State Logger] 
+==== Turn 2 | WaveRoom | wave 1/5, next in 15 turns (blocked: room too crowded) | 12 coins
+  Grid: 0:<Ashigaru  1:.  2:.  3:HERO>  4:Charger>  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 0, facing Left, HP 3/3, next: FlipRight
+    Charger: cell 4, facing Right, HP 1/1, next: FlipLeft
+    Ashigaru: cell 6, facing Left, HP 3/3, next: PlayTile Katana
+  Queue: Swirl 2 dmg, range -1,1
+  Tiles:
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+    Tetsubo 4 dmg, range 1, cooldown 7, READY
+[Info   :Shogun State Logger]   > HERO queues tile Tetsubo [from: human]
+[Info   :Shogun State Logger]   > Turn 2 action: HERO PlayTile [from: human]
+[Info   :Shogun State Logger]   > Ashigaru@6 queues tile Katana
+[Info   :Shogun State Logger]   [new tile] Katana L0 None None = Katana: Strike the cell directly ahead.
+[Info   :Shogun State Logger] 
+==== Turn 3 | WaveRoom | wave 1/5, next in 14 turns (blocked: room too crowded) | 12 coins
+  Grid: 0:Ashigaru>  1:.  2:.  3:HERO>  4:<Charger  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 0, facing Right, HP 3/3, next: PlayTile Katana
+    Charger: cell 4, facing Left, HP 1/1, next: PlayTile Charge
+    Ashigaru: cell 6, facing Left, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+  Queue: Tetsubo 4 dmg, range 1 | Swirl 2 dmg, range -1,1
+  Tiles:
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+[Info   :Shogun State Logger] 
+==== Turn 3 | WaveRoom | wave 1/5, next in 14 turns (blocked: room too crowded) | 12 coins
+  Grid: 0:Ashigaru>  1:.  2:.  3:HERO>  4:<Charger  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 0, facing Right, HP 3/3, next: PlayTile Katana
+    Charger: cell 4, facing Left, HP 1/1, next: PlayTile Charge
+    Ashigaru: cell 6, facing Left, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+  Queue: Swirl 2 dmg, range -1,1 | Tetsubo 4 dmg, range 1
+  Tiles:
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+[Info   :Shogun State Logger] 
+==== Turn 3 | WaveRoom | wave 1/5, next in 14 turns (blocked: room too crowded) | 12 coins
+  Grid: 0:Ashigaru>  1:.  2:.  3:HERO>  4:<Charger  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 0, facing Right, HP 3/3, next: PlayTile Katana
+    Charger: cell 4, facing Left, HP 1/1, next: PlayTile Charge
+    Ashigaru: cell 6, facing Left, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+  Queue: Tetsubo 4 dmg, range 1 | Swirl 2 dmg, range -1,1
+  Tiles:
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+[Info   :Shogun State Logger] 
+==== Turn 3 | WaveRoom | wave 1/5, next in 14 turns (blocked: room too crowded) | 12 coins
+  Grid: 0:Ashigaru>  1:.  2:.  3:HERO>  4:<Charger  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 0, facing Right, HP 3/3, next: PlayTile Katana
+    Charger: cell 4, facing Left, HP 1/1, next: PlayTile Charge
+    Ashigaru: cell 6, facing Left, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+  Queue: Swirl 2 dmg, range -1,1 | Tetsubo 4 dmg, range 1
+  Tiles:
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+[Info   :Shogun State Logger] 
+==== Turn 3 | WaveRoom | wave 1/5, next in 14 turns (blocked: room too crowded) | 12 coins
+  Grid: 0:Ashigaru>  1:.  2:.  3:HERO>  4:<Charger  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 0, facing Right, HP 3/3, next: PlayTile Katana
+    Charger: cell 4, facing Left, HP 1/1, next: PlayTile Charge
+    Ashigaru: cell 6, facing Left, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+  Queue: Swirl 2 dmg, range -1,1
+  Tiles:
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+    Tetsubo 4 dmg, range 1, cooldown 7, READY
+[Info   :Shogun State Logger] 
+==== Turn 3 | WaveRoom | wave 1/5, next in 14 turns (blocked: room too crowded) | 12 coins
+  Grid: 0:Ashigaru>  1:.  2:.  3:HERO>  4:<Charger  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 0, facing Right, HP 3/3, next: PlayTile Katana
+    Charger: cell 4, facing Left, HP 1/1, next: PlayTile Charge
+    Ashigaru: cell 6, facing Left, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+    Tetsubo 4 dmg, range 1, cooldown 7, READY
+[Info   :Shogun State Logger]   > HERO queues tile Swirl [from: human]
+[Info   :Shogun State Logger]   > Turn 3 action: HERO PlayTile [from: human]
+[Info   :Shogun State Logger]   > Ashigaru@0 queues tile Katana
+[Info   :Shogun State Logger]   > Charger@4 queues tile Charge
+[Info   :Shogun State Logger]   [new tile] Charge L0 None None = Charge: Dash forward and strike the first target ahead.
+[Info   :Shogun State Logger] 
+==== Turn 4 | WaveRoom | wave 1/5, next in 13 turns (blocked: room too crowded) | 12 coins
+  Grid: 0:Ashigaru>  1:.  2:.  3:HERO>  4:<Charger  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 0, facing Right, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+    Charger: cell 4, facing Left, HP 1/1, next: Wait, queue: Charge 1 dmg, range 1..10
+    Ashigaru: cell 6, facing Left, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+  Queue: Swirl 2 dmg, range -1,1
+  Tiles:
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+    Tetsubo 4 dmg, range 1, cooldown 7, READY
+[Info   :Shogun State Logger]   > Turn 4 action: HERO Attack [from: human]
+[Info   :Shogun State Logger]   > HERO@3 attacks with Swirl
+[Info   :Shogun State Logger]   > Charger@4 dies
+[Info   :Shogun State Logger]   > HERO@3 hits Charger@4: 1 damage, HP 1 -> 0
+[Info   :Shogun State Logger] 
+==== Turn 5 | WaveRoom | wave 1/5, next in 12 turns (blocked: room too crowded) | 12 coins
+  Grid: 0:Ashigaru>  1:.  2:.  3:HERO>  4:.  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 0, facing Right, HP 3/3, next: MoveRight, queue: Katana 2 dmg, range 1
+    Ashigaru: cell 6, facing Left, HP 3/3, next: MoveLeft, queue: Katana 2 dmg, range 1
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, charging 3 more turns
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+    Tetsubo 4 dmg, range 1, cooldown 7, READY
+[Info   :Shogun State Logger]   > Turn 5 action: HERO MoveRight [from: human]
+[Info   :Shogun State Logger]   [new potion] Edamame = edamame brew: heal 3 hp.
+[Info   :Shogun State Logger] 
+==== Turn 6 | WaveRoom | wave 1/5, next in 11 turns (blocked: room too crowded) | 13 coins
+  Grid: 0:.  1:Ashigaru>  2:.  3:.  4:HERO>  5:<Ashigaru  6:.
+  Hero: cell 4, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 1, facing Right, HP 3/3, next: MoveRight, queue: Katana 2 dmg, range 1
+    Ashigaru: cell 5, facing Left, HP 3/3, next: Attack #1 -> cells 4, queue: Katana 2 dmg, range 1
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, charging 2 more turns
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+    Tetsubo 4 dmg, range 1, cooldown 7, READY
+  Potions: Edamame
+[Info   :Shogun State Logger]   > Turn 6 action: HERO MoveRight [from: human]
+[Info   :Shogun State Logger]   > Ashigaru@4 attacks with Katana
+[Info   :Shogun State Logger]   > HERO queues tile Tetsubo [from: human]
+[Info   :Shogun State Logger]   > Turn 7 action: HERO PlayTile [from: human]
+[Info   :Shogun State Logger] 
+==== Turn 8 | WaveRoom | wave 1/5, next in 9 turns (blocked: room too crowded) | 13 coins
+  Grid: 0:.  1:.  2:Ashigaru>  3:.  4:Ashigaru>  5:HERO>  6:.
+  Hero: cell 5, facing Right, HP 10/10, special SwapSpecialMove 1/4
+  Enemies (in acting order):
+    Ashigaru: cell 2, facing Right, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+    Ashigaru: cell 4, facing Right, HP 3/3, next: PlayTile Katana
+  Queue: Tetsubo 4 dmg, range 1
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+  Potions: Edamame
+[Info   :Shogun State Logger]   > HERO queues tile Arrow [from: human]
+[Info   :Shogun State Logger]   > Turn 8 action: HERO PlayTile [from: human]
+[Info   :Shogun State Logger]   > Ashigaru@4 queues tile Katana
+[Info   :Shogun State Logger] 
+==== Turn 9 | WaveRoom | wave 1/5, next in 8 turns (blocked: room too crowded) | 13 coins
+  Grid: 0:.  1:.  2:Ashigaru>  3:.  4:Ashigaru>  5:HERO>  6:.
+  Hero: cell 5, facing Right, HP 10/10, special SwapSpecialMove 2/4
+  Enemies (in acting order):
+    Ashigaru: cell 2, facing Right, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+    Ashigaru: cell 4, facing Right, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+  Queue: Tetsubo 4 dmg, range 1 | Arrow 2 dmg, range 1..10
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+  Potions: Edamame
+[Info   :Shogun State Logger] 
+==== Turn 9 | WaveRoom | wave 1/5, next in 8 turns (blocked: room too crowded) | 13 coins
+  Grid: 0:.  1:.  2:Ashigaru>  3:.  4:Ashigaru>  5:HERO>  6:.
+  Hero: cell 5, facing Right, HP 10/10, special SwapSpecialMove 2/4
+  Enemies (in acting order):
+    Ashigaru: cell 2, facing Right, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+    Ashigaru: cell 4, facing Right, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+  Queue: Arrow 2 dmg, range 1..10 | Tetsubo 4 dmg, range 1
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+  Potions: Edamame
+[Info   :Shogun State Logger]   > Turn 9 action: HERO Attack [from: human]
+[Info   :Shogun State Logger]   > HERO@5 attacks with Arrow
+[Info   :Shogun State Logger]   > HERO@5 attacks with Tetsubo
+[Info   :Shogun State Logger] 
+==== Turn 10 | WaveRoom | wave 1/5, next in 7 turns (blocked: room too crowded) | 13 coins
+  Grid: 0:.  1:.  2:Ashigaru>  3:.  4:Ashigaru>  5:HERO>  6:.
+  Hero: cell 5, facing Right, HP 10/10, special SwapSpecialMove 3/4
+  Enemies (in acting order):
+    Ashigaru: cell 2, facing Right, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+    Ashigaru: cell 4, facing Right, HP 3/3, next: Attack #1 -> cells 5, queue: Katana 2 dmg, range 1
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 5 more turns
+    Tetsubo 4 dmg, range 1, cooldown 7, charging 7 more turns
+  Potions: Edamame

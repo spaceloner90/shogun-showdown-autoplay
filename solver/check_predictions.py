@@ -68,7 +68,8 @@ def compare(predicted, actual_row, spawned):
     check("hero cell", predicted.hero.cell, hero["cell"])
     check("hero facing", "Left" if predicted.hero.facing < 0 else "Right", hero["facing"])
     check("hero hp", predicted.hero.hp, hero["hp"])
-    check("hero queue", [a.name for a in predicted.hero.queue], [a["name"] for a in hero["queue"]])
+    # Compared without order: dragging a tile can pick its slot, and reordering is free anyway.
+    check("hero queue", sorted(a.name for a in predicted.hero.queue), sorted(a["name"] for a in hero["queue"]))
     check("swap charge", predicted.swap_charge, hero["special"]["charge"])
 
     for tile, logged in zip(predicted.tiles, actual_row["tiles"]):
@@ -106,10 +107,15 @@ def main():
     rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
     total = 0
     failed = 0
+    skipped = []
     fields = Counter()
     actions = Counter()
     for action_name, before, tile_name, after, spawned in turns_from_log(rows):
         if before["room"] == "CampRoom":
+            continue
+        # A turn with no state line leaves nothing to compare this one's result with.
+        if after["turn"] != before["turn"] + 1:
+            skipped.append(before["turn"])
             continue
         state = state_from_log(before)
         predicted, _ = step(state, to_action(state, action_name, tile_name))
@@ -124,6 +130,8 @@ def main():
                 fields[field] += 1
                 print(f"    {field}: predicted {expected}, game had {actual}")
     print(f"\n{total - failed}/{total} turns predicted exactly. Actions covered: {dict(actions)}")
+    if skipped:
+        print(f"Skipped, because the next turn has no state line: {skipped}")
     if fields:
         print("Mismatches by field:", dict(fields))
 

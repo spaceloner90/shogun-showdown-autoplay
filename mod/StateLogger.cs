@@ -26,7 +26,7 @@ using BepInEx;
 using HarmonyLib;
 using UnityEngine;
 
-[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.6.0")]
+[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.7.0")]
 public class StateLoggerPlugin : BaseUnityPlugin
 {
     private const float PollIntervalSeconds = 0.1f;
@@ -65,6 +65,8 @@ public class StateLoggerPlugin : BaseUnityPlugin
     // The depth to play once the running analysis finishes, or 0. A single value rather than a list,
     // so extra presses while waiting can't add up to extra moves.
     private int pendingDepth;
+    // The turn the latest state line belongs to, so every turn can be made to get at least one.
+    private int lastStateTurn;
     private string pendingActionSource;
     private int pendingActionFrame;
 
@@ -234,7 +236,7 @@ public class StateLoggerPlugin : BaseUnityPlugin
         string reason = "score " + Num(move.Score) + ", plan: " + move.Line;
         string source = "Evaluator " + analysis.EvaluatorVersion + " depth " + depth;
         analysis = null;
-        Execute(new Decision(action, tile, reason), source);
+        Execute(new Decision(action, tile, reason, move.AttackOrder), source);
     }
 
     // Plays exactly one move through the game's own input calls, and logs where it came from.
@@ -276,8 +278,82 @@ public class StateLoggerPlugin : BaseUnityPlugin
             return;
         }
 
+        if (decision.AttackOrder != null)
+        {
+            string problem = ApplyAttackOrder(decision.AttackOrder, source);
+            if (problem != null)
+            {
+                LogEvent("step_refused", "Refused " + actionText + ": " + problem,
+                    "\"action\":" + Str(decision.Action.ToString()) + ",\"why\":" + Str(problem));
+                return;
+            }
+            // Log the edited queue, since that's the state the attack fires from.
+            Poll();
+        }
+
         // Not "sticky": real key presses can queue during a turn, but one press must be one move.
         combat.PlayerInputsCombatAction(decision.Action, false);
+    }
+
+    // Makes the free queue edits a chosen attack needs: tiles not firing go back to the hand, through
+    // the same call a click on them uses, and the rest are put in firing order. Returns what went
+    // wrong, or null. Reads the result back rather than assuming the edits worked.
+    private string ApplyAttackOrder(int[] order, string source)
+    {
+        List<Tile> tiles = GetTiles();
+        List<Tile> wanted = new List<Tile>();
+        List<string> wantedNames = new List<string>();
+        foreach (int index in order)
+        {
+            if (index < 0 || index >= tiles.Count) return "the order named a tile that doesn't exist";
+            Tile tile = tiles[index];
+            if (!(tile.TileContainer is AttackQueueTileContainer)) return TileName(tile) + " isn't in the queue";
+            wanted.Add(tile);
+            wantedNames.Add(TileName(tile));
+        }
+
+        string before = QueueNames();
+        foreach (Tile tile in tiles)
+        {
+            if (tile.TileContainer is AttackQueueTileContainer && !wanted.Contains(tile)) tile.TileContainer.Submit();
+        }
+        for (int position = 0; position < wanted.Count; position++)
+        {
+            List<Tile> current = QueueTiles();
+            if (position >= current.Count) break;
+            if (current[position] != wanted[position])
+            {
+                wanted[position].TileContainer.SwapTiles(current[position].TileContainer);
+            }
+        }
+
+        string after = QueueNames();
+        LogEvent("queue_edit", "Queue edit: " + before + " -> " + after + " [from: " + source + "]",
+            "\"before\":" + Str(before) + ",\"after\":" + Str(after) + ",\"source\":" + Str(source));
+        string expected = string.Join(", ", wantedNames.ToArray());
+        return after == expected ? null : "the queue ended up as " + after + " instead of " + expected;
+    }
+
+    // The hero's queued tiles in firing order.
+    private static List<Tile> QueueTiles()
+    {
+        List<Tile> tiles = GetTiles();
+        List<Tile> result = new List<Tile>();
+        foreach (Attack attack in Globals.Hero.AttackQueue.Attacks)
+        {
+            foreach (Tile tile in tiles)
+            {
+                if (attack != null && tile.Attack == attack) result.Add(tile);
+            }
+        }
+        return result;
+    }
+
+    private static string QueueNames()
+    {
+        List<string> names = new List<string>();
+        foreach (Tile tile in QueueTiles()) names.Add(TileName(tile));
+        return string.Join(", ", names.ToArray());
     }
 
     // Who started the action happening now. The game starts a tile-play turn on a later update, so
@@ -341,12 +417,15 @@ public class StateLoggerPlugin : BaseUnityPlugin
         CombatSceneManager scene = CombatSceneManager.Instance;
         if (hero == null || scene == null || scene.Room == null || scene.Room.Grid == null) return;
 
-        // A tile being dragged belongs to no container. Wait until it lands.
+        // A tile being dragged belongs to no container, so its edits are logged once it lands. The
+        // turn's first state can't wait for that, because the tile may land as the turn's action.
         List<Tile> tiles = GetTiles();
+        bool tileInTransit = false;
         foreach (Tile tile in tiles)
         {
-            if (tile.TileContainer == null) return;
+            if (tile.TileContainer == null) tileInTransit = true;
         }
+        if (tileInTransit && lastStateTurn == DisplayTurn) return;
 
         string combatState = BuildCombatJson(combat, hero, scene.Room);
         string tileState = BuildTilesJson(tiles);
@@ -357,6 +436,7 @@ public class StateLoggerPlugin : BaseUnityPlugin
 
         WriteLine("state", combatState + "," + tileState);
         lastStateSequence = sequence;
+        lastStateTurn = DisplayTurn;
         RecordCatalog(combat, hero, tiles);
 
         if (combatChanged) Logger.LogInfo(BuildTurnText(combat, hero, scene.Room, tiles));
@@ -515,7 +595,7 @@ public class StateLoggerPlugin : BaseUnityPlugin
         {
             if (!first) sb.Append(",");
             first = false;
-            sb.Append("{\"where\":").Append(Str(tile.TileContainer.GetType().Name));
+            sb.Append("{\"where\":").Append(Str(tile.TileContainer != null ? tile.TileContainer.GetType().Name : "InTransit"));
             sb.Append(",\"charged\":").Append(Bool(tile.FullyCharged));
             sb.Append(",\"turnsBeforeCharged\":").Append(tile.TurnsBeforeCharged);
             sb.Append(",\"interactable\":").Append(Bool(tile.Interactable));
@@ -603,7 +683,7 @@ public class StateLoggerPlugin : BaseUnityPlugin
         sb.Append("  Tiles:");
         foreach (Tile tile in tiles)
         {
-            if (tile.Attack == null || tile.TileContainer.GetType().Name.Contains("AttackQueue")) continue;
+            if (tile.Attack == null || (tile.TileContainer != null && tile.TileContainer.GetType().Name.Contains("AttackQueue"))) continue;
             sb.Append("\n    ").Append(AttackText(tile.Attack));
             sb.Append(", cooldown ").Append(tile.Attack.Cooldown);
             sb.Append(tile.FullyCharged ? ", READY" : ", charging " + tile.TurnsBeforeCharged + " more turns");
@@ -904,6 +984,8 @@ public class StateLoggerPlugin : BaseUnityPlugin
         // A prefix, because TriggerTurn runs the start of the turn (including attacks) before returning.
         Patch(harmony, typeof(CombatManager), "TriggerTurn", "OnTriggerTurn", null);
         Patch(harmony, typeof(CombatManager), "HeroPlayedTile", null, "OnHeroPlayedTile");
+        // Also a prefix, so a tile played the moment a turn opens can't beat the turn's state line.
+        Patch(harmony, typeof(HandTileContainer), "TryMovingTileToHeroAttackQueue", "BeforeTileLeavesHand", null);
         Patch(harmony, typeof(CombatSceneManager), "EndOfCombat", null, "OnEndOfCombat");
         Patch(harmony, typeof(Agent), "ReceiveAttack", "BeforeReceiveAttack", "AfterReceiveAttack");
         Patch(harmony, typeof(Agent), "Die", null, "OnDie");
@@ -941,6 +1023,7 @@ public class StateLoggerPlugin : BaseUnityPlugin
         {
             instance.turn = 0;
             instance.turnOpen = false;
+            instance.lastStateTurn = 0;
             instance.LogEvent("combat_start", "Combat begins" + (campMode ? " (camp)" : ""), "");
         });
     }
@@ -950,8 +1033,18 @@ public class StateLoggerPlugin : BaseUnityPlugin
         SafeEvent(delegate { instance.LogEvent("combat_end", "Combat ended", ""); });
     }
 
+    public static void BeforeTileLeavesHand()
+    {
+        SafeEvent(delegate { instance.Poll(); });
+    }
+
     public static void OnTriggerTurn(CombatEnums.ActionEnum heroAction)
     {
+        // An action the game held back during the last turn can start before the next poll.
+        SafeEvent(delegate
+        {
+            if (instance.lastStateTurn != instance.turn + 1) instance.Poll();
+        });
         SafeEvent(delegate
         {
             instance.turn++;

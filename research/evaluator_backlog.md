@@ -127,6 +127,12 @@ Next idea to test: raise what a stack's damage is worth while holding what its k
   them. F1 can see this one move ahead, but won't set it up.
 - **Wave pressure** may need revisiting, since holding a stack delays kills.
 
+## The run that confirmed v1 (`logs/run5_full`)
+
+This log holds two runs. Fights 1 to 7 are an earlier run on v0.11, the same fights as `logs/run4`. The
+winning run starts from the camp at fight 8: fights 9 to 30, all on v0.12, with 926 moves by F1. Fight
+numbers in these notes are the log's own.
+
 ## Baseline for comparing versions (`logs/run2_complete`)
 
 Across the 310 positions of run 2, top choices only, not played fights:

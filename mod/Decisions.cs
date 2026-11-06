@@ -11,7 +11,8 @@ public sealed class Decision
     // Why this action was chosen, in plain words. It goes straight into the log.
     public readonly string Reason;
 
-    // For Attack: the tiles to fire in order, by position in the deck. Null fires the queue as it is.
+    // For Attack: the tiles to fire in order, by position in the deck, which can include Free Play
+    // tiles still in hand. Null fires the queue as it is.
     public readonly int[] AttackOrder;
 
     public Decision(ActionEnum action, Tile tile, string reason, int[] attackOrder = null)

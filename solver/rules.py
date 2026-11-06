@@ -41,7 +41,7 @@ class Tile:
     charge: int
     in_queue: bool = False
     just_played: bool = False
-    free_play: bool = False  # Loading this tile doesn't use the turn.
+    free_play: bool = False  # Loading this tile doesn't use the turn, so it can join any attack.
 
     @property
     def ready(self):
@@ -114,18 +114,19 @@ def _tile_name(state, tile):
 class Action:
     kind: str  # Wait, MoveLeft, MoveRight, Flip, Attack or PlayTile
     tile: int | None = None  # Index into state.tiles for PlayTile.
-    # For Attack: which tiles to fire and in what order, as indexes into state.tiles. Queue edits are
-    # free, so they happen as part of the attack. None fires the whole queue as it stands.
+    # For Attack: which tiles to fire and in what order, as indexes into state.tiles. Queue edits and
+    # Free Play tiles from hand cost nothing, so they happen as part of the attack. None fires the
+    # whole queue as it stands.
     order: tuple[int, ...] | None = None
 
     def label(self, state):
         if self.kind == "PlayTile":
-            tile = state.tiles[self.tile]
-            return f"PlayTile {_tile_name(state, tile)}{' (free)' if tile.free_play else ''}"
+            return f"PlayTile {_tile_name(state, state.tiles[self.tile])}"
         if self.kind == "Attack" and self.order is not None:
             fired = [state.tiles[i] for i in self.order]
             kept = [_tile_name(state, t) for t in state.queue_tiles if not any(t is f for f in fired)]
-            text = "Attack " + " > ".join(_tile_name(state, t) for t in fired)
+            text = "Attack " + " > ".join(
+                _tile_name(state, t) + ("" if t.in_queue else " (free)") for t in fired)
             return f"{text} ({', '.join(kept)} to hand)" if kept else text
         if self.kind in ("MoveLeft", "MoveRight"):
             direction = -1 if self.kind == "MoveLeft" else 1
@@ -247,17 +248,31 @@ def can_swap(state, direction):
     )
 
 
+def free_hand_tiles(state):
+    """Tiles that can join an attack from hand at no cost."""
+    return [t for t in state.tiles if t.free_play and t.ready and not t.in_queue]
+
+
+def fireable_attacks(state):
+    """Every attack the hero could fire next, without spending a turn on loading it."""
+    return [t.attack for t in state.queue_tiles] + [t.attack for t in free_hand_tiles(state)]
+
+
 def attack_actions(state):
-    """Every way to fire the queue: any tiles, in any order. The queue as it stands comes first, so
-    that when choices score the same, the one needing no edits wins."""
-    indexes = [next(i for i, t in enumerate(state.tiles) if t is tile) for tile in state.queue_tiles]
-    if not indexes:
-        return []
-    actions = [Action("Attack")]
-    current = tuple(indexes)
-    for size in range(len(indexes), 0, -1):
-        for order in itertools.permutations(indexes, size):
-            if order != current:
+    """Every way to attack: any queued or Free Play tiles, in any order, up to what the queue holds.
+
+    The queue as it stands comes first, so that when choices score the same, the one needing no
+    edits wins.
+    """
+    def index_of(tile):
+        return next(i for i, t in enumerate(state.tiles) if t is tile)
+
+    queued = tuple(index_of(t) for t in state.queue_tiles)
+    pool = list(queued) + [index_of(t) for t in free_hand_tiles(state)]
+    actions = [Action("Attack")] if queued else []
+    for size in range(min(len(pool), QUEUE_CAP), 0, -1):
+        for order in itertools.permutations(pool, size):
+            if order != queued:
                 actions.append(Action("Attack", order=order))
     return actions
 
@@ -274,7 +289,8 @@ def legal_actions(state, allow_swap=True):
             actions.append(Action(kind))
     if len(hero.queue) < QUEUE_CAP:
         for index, tile in enumerate(state.tiles):
-            if tile.ready and not tile.in_queue:
+            # A Free Play tile is never worth loading ahead of time: it can join any attack instead.
+            if tile.ready and not tile.in_queue and not tile.free_play:
                 actions.append(Action("PlayTile", index))
     actions.extend(attack_actions(state))
     return actions
@@ -372,7 +388,7 @@ def fire_hero_queue(state, outcome, order=None):
         apply_attack(state, state.hero, tile.attack, outcome)
         tile.charge = 0
         tile.just_played = True
-    outcome.sent_back += len(state.queue_tiles) - len(fired)
+    outcome.sent_back += sum(not any(t is f for f in fired) for t in state.queue_tiles)
     for tile in state.queue_tiles:
         tile.in_queue = False
     state.hero.queue = []
@@ -468,21 +484,11 @@ def end_turn(state, swapped):
         enemy.action = "Wait"  # What it does next isn't known until the game shows it.
 
 
-def is_free_action(state, action):
-    return action.kind == "PlayTile" and state.tiles[action.tile].free_play
-
-
 def step(state, action):
-    """Returns the state after the action, and what happened. The input isn't changed.
-
-    That's one full turn, unless the action is free: then nothing else happens, and it's still the
-    hero's turn.
-    """
+    """Returns the state after one full turn, and what happened. The input isn't changed."""
     next_state = copy.deepcopy(state)
     outcome = Outcome()
     swapped = hero_action(next_state, action, outcome)
-    if is_free_action(state, action):
-        return next_state, outcome
     resolve_enemies(next_state, outcome)
     end_turn(next_state, swapped)
     return next_state, outcome

@@ -82,6 +82,18 @@ class ShadowDash(unittest.TestCase):
         self.assertEqual([(e.kind, e.cell, e.hp) for e in after.enemies], [("IwaoBoss", 4, 7)])
 
 
+class FreePlay(unittest.TestCase):
+    """Run 3's fight 7, where one Swirl had Free Play, and v0.4 loaded it and sent it back."""
+
+    def test_never_loads_the_free_tile_on_its_own(self):
+        for turn in range(1, 29):
+            state = position(7, turn, "run3_v03")
+            best = rank_actions(state, depth=1)[0]
+            action = best.actions[0]
+            if action.kind == "PlayTile":
+                self.assertFalse(state.tiles[action.tile].free_play, turn)
+
+
 class GoodPlaysToKeep(unittest.TestCase):
     def test_lines_up_the_double_kill(self):
         # Fight 7, turn 2: Swirl clears the Archer, so Arrow reaches the TwinTachi behind it.

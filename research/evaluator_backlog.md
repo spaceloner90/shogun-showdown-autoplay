@@ -12,7 +12,7 @@ Enemy AI code is for offline simulation and tuning only.
 - "Can I respond?" is graded: an answer counts for the damage it removes, even when it can't remove it all.
 - Threats are played out, so first-target attacks can be blocked and a dash brings its next attack into range.
 - Charge, BackCharge, Dash, ShadowDash and BackShadowDash move their user. First-target attacks stop.
-- Free Play tiles load without using the turn.
+- Free Play tiles are only played as part of an attack (v0.5), and count toward a stack from the hand.
 - The report warns about any attack, effect, skill or status the solver doesn't model.
 
 `solver/test_positions.py` keeps these real positions from going backwards.

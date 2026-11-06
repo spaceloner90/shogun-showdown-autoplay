@@ -6047,3 +6047,1204 @@
 [Info   :Shogun State Logger]   > IwaoBoss@4 dies
 [Info   :Shogun State Logger]   > HERO@5 hits IwaoBoss@4: 3 damage, HP 3 -> 0
 [Info   :Shogun State Logger]   > Combat ended
+[Info   :Shogun State Logger]   > Combat begins
+[Info   :Shogun State Logger]   > Wave 1/5 spawns
+[Info   :Shogun State Logger]   [new tile] Arrow L3 None None = Arrow: Strike the first target ahead.
+[Info   :Shogun State Logger]   [new tile] Swirl L1 None FreePlay = Swirl: Strike the cells directly ahead and behind.
+[Info   :Shogun State Logger]   [new enemy] Archer = Ashigaru Archer: Lurking behind enemy lines, the Archer patiently waits for the perfect moment to strike.
+[Info   :Shogun State Logger] 
+==== Turn 1 | WaveRoom | wave 1/5, next in 11 turns | 0 coins
+  Grid: 0:.  1:<Archer  2:.  3:HERO>  4:.  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 1, facing Left, HP 2/2, next: Wait
+    Ashigaru: cell 6, facing Left, HP 3/3, next: Wait
+  Queue: (empty)
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, READY
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 1 | HP 10/10 | wave 1/5, next in 11
+  0:.  1:<Archer[2hp Wait]  2:.  3:HERO>  4:.  5:.  6:<Ashigaru[3hp Wait]
+  Tiles: Swirl (ready), Arrow (ready), Swirl (ready), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                             D1
+  PlayTile Swirl (2) (free)     60.8*
+  PlayTile Arrow                38.2 
+  PlayTile Swirl (3)            22.9 
+  PlayTile ShadowDash           -7.2 
+  Flip                          -9.3 
+  MoveLeft                     -11.1 
+  Wait                         -12.8 
+  MoveRight                    -14.5 
+  F1 PlayTile Swirl (2) (free) -> PlayTile Arrow
+     beats PlayTile Arrow by 22.5: stack +19.1, loaded +3.4
+[Info   :Shogun State Logger]   > Decision: PlayTile Swirl | from: Evaluator v0.4 depth 1 | why: score 60.80, plan: PlayTile Swirl (2) (free) -> PlayTile Arrow
+[Info   :Shogun State Logger]   > HERO queues tile Swirl [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 1 | WaveRoom | wave 1/5, next in 11 turns | 0 coins
+  Grid: 0:.  1:<Archer  2:.  3:HERO>  4:.  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 1, facing Left, HP 2/2, next: Wait
+    Ashigaru: cell 6, facing Left, HP 3/3, next: Wait
+  Queue: Swirl L1 2 dmg, range -1,1, tile effect FreePlay
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 1 | HP 10/10 | wave 1/5, next in 11
+  0:.  1:<Archer[2hp Wait]  2:.  3:HERO>  4:.  5:.  6:<Ashigaru[3hp Wait]
+  Tiles: Swirl (ready), Arrow (ready), Swirl (queued), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  PlayTile Arrow          60.8*
+  MoveLeft                33.1 
+  PlayTile Swirl (3)      26.3 
+  Flip                    24.6 
+  PlayTile ShadowDash     22.9 
+  Wait                    21.2 
+  MoveRight               12.8 
+  Attack                 -19.4 
+  F1 PlayTile Arrow
+     beats MoveLeft by 27.6: stack +24.2, loaded +5.1, distance -1.7
+[Info   :Shogun State Logger]   > Decision: PlayTile Arrow | from: Evaluator v0.4 depth 1 | why: score 60.80, plan: PlayTile Arrow
+[Info   :Shogun State Logger]   > HERO queues tile Arrow [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > Turn 1 action: HERO PlayTile [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 2 | WaveRoom | wave 1/5, next in 10 turns | 0 coins
+  Grid: 0:.  1:<Archer  2:.  3:HERO>  4:.  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 1, facing Left, HP 2/2, next: FlipRight
+    Ashigaru: cell 6, facing Left, HP 3/3, next: PlayTile Katana
+  Queue: Swirl L1 2 dmg, range -1,1, tile effect FreePlay | Arrow L3 3 dmg, range 1..10
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 2 | HP 10/10 | wave 1/5, next in 10
+  0:.  1:<Archer[2hp FlipRight]  2:.  3:HERO>  4:.  5:.  6:<Ashigaru[3hp PlayTile]
+  Tiles: Swirl (ready), Arrow (queued), Swirl (queued), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                                    D1
+  Attack Arrow (Swirl (2) to hand)     84.3*
+  MoveLeft                             84.2 
+  Attack                               81.6 
+  Attack Arrow > Swirl (2)             81.6 
+  PlayTile Swirl (3)                   65.9 
+  PlayTile ShadowDash                  62.5 
+  Wait                                 60.8 
+  Flip                                 49.7 
+  ...and 2 lower-scoring moves
+  F1 Attack Arrow (Swirl (2) to hand)
+     beats MoveLeft by 0.1: stack -86.7, kills +60.0, enemy_damage +30.0
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.4 depth 1 | why: score 84.30, plan: Attack Arrow (Swirl (2) to hand)
+[Info   :Shogun State Logger]   > Queue edit: Swirl, Arrow -> Arrow [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 2 | WaveRoom | wave 1/5, next in 10 turns | 0 coins
+  Grid: 0:.  1:<Archer  2:.  3:HERO>  4:.  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 1, facing Left, HP 2/2, next: FlipRight
+    Ashigaru: cell 6, facing Left, HP 3/3, next: PlayTile Katana
+  Queue: Arrow L3 3 dmg, range 1..10
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, READY
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger]   > Turn 2 action: HERO Attack [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > HERO@3 attacks with Arrow
+[Info   :Shogun State Logger]   > Ashigaru@6 dies
+[Info   :Shogun State Logger]   > HERO@3 hits Ashigaru@6: 3 damage, HP 3 -> 0
+[Info   :Shogun State Logger] 
+==== Turn 3 | WaveRoom | wave 1/5, next in 5 turns | 0 coins
+  Grid: 0:.  1:Archer>  2:.  3:HERO>  4:.  5:.  6:.
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 1, facing Right, HP 2/2, next: PlayTile Arrow
+  Queue: (empty)
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Arrow L3 3 dmg, range 1..10, cooldown 1, charging 1 more turns
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, READY
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 3 | HP 10/10 | wave 1/5, next in 5
+  0:.  1:Archer>[2hp PlayTile]  2:.  3:HERO>  4:.  5:.  6:.
+  Tiles: Swirl (ready), Arrow (ready in 1), Swirl (ready), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                             D1
+  PlayTile Swirl (2) (free)     45.0*
+  PlayTile Swirl (3)            34.8 
+  PlayTile ShadowDash            4.7 
+  Flip                           4.2 
+  MoveLeft                       0.8 
+  Wait                          -0.9 
+  MoveRight                     -2.6 
+  F1 PlayTile Swirl (2) (free) -> MoveLeft
+     beats PlayTile Swirl (3) by 10.2: stack +10.2, distance +1.7, loaded -1.7
+[Info   :Shogun State Logger]   > Decision: PlayTile Swirl | from: Evaluator v0.4 depth 1 | why: score 45.00, plan: PlayTile Swirl (2) (free) -> MoveLeft
+[Info   :Shogun State Logger]   > HERO queues tile Swirl [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 3 | WaveRoom | wave 1/5, next in 5 turns | 0 coins
+  Grid: 0:.  1:Archer>  2:.  3:HERO>  4:.  5:.  6:.
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 1, facing Right, HP 2/2, next: PlayTile Arrow
+  Queue: Swirl L1 2 dmg, range -1,1, tile effect FreePlay
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Arrow L3 3 dmg, range 1..10, cooldown 1, charging 1 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 3 | HP 10/10 | wave 1/5, next in 5
+  0:.  1:Archer>[2hp PlayTile]  2:.  3:HERO>  4:.  5:.  6:.
+  Tiles: Swirl (ready), Arrow (ready in 1), Swirl (queued), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  MoveLeft                45.0*
+  Flip                    38.2 
+  PlayTile Swirl (3)      38.2 
+  PlayTile ShadowDash     34.8 
+  Wait                    33.1 
+  MoveRight               24.6 
+  Attack                  -7.6 
+  F1 MoveLeft
+     beats Flip by 6.8: stack +10.2, facing -5.1, distance +1.7
+[Info   :Shogun State Logger]   > Decision: MoveLeft | from: Evaluator v0.4 depth 1 | why: score 45.00, plan: MoveLeft
+[Info   :Shogun State Logger]   > Turn 3 action: HERO MoveLeft [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > Archer@1 queues tile Arrow
+[Info   :Shogun State Logger] 
+==== Turn 4 | WaveRoom | wave 1/5, next in 4 turns | 0 coins
+  Grid: 0:.  1:Archer>  2:HERO>  3:.  4:.  5:.  6:.
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 1, facing Right, HP 2/2, next: Wait, queue: Arrow 2 dmg, range 1..10
+  Queue: Swirl L1 2 dmg, range -1,1, tile effect FreePlay
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 4 | HP 10/10 | wave 1/5, next in 4
+  0:.  1:Archer>[2hp Wait q:Arrow]  2:HERO>  3:.  4:.  5:.  6:.
+  Tiles: Swirl (ready), Arrow (ready), Swirl (queued), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  Attack                  87.6*
+  Flip                    49.3 
+  PlayTile Swirl (3)      49.3 
+  PlayTile Arrow          49.3 
+  PlayTile ShadowDash     45.9 
+  Wait                    44.2 
+  MoveRight              -69.7 
+  F1 Attack
+     beats Flip by 38.3: kills +60.0, stack -40.8, enemy_damage +20.0
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.4 depth 1 | why: score 87.60, plan: Attack
+[Info   :Shogun State Logger]   > Turn 4 action: HERO Attack [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > HERO@2 attacks with Swirl
+[Info   :Shogun State Logger]   > Archer@1 dies
+[Info   :Shogun State Logger]   > HERO@2 hits Archer@1: 2 damage, HP 2 -> 0
+[Info   :Shogun State Logger]   > Wave 2/5 spawns
+[Info   :Shogun State Logger]   > Key ignored: the current turn is still resolving
+[Info   :Shogun State Logger] 
+==== Turn 5 | WaveRoom | wave 2/5, next in 11 turns (blocked: room too crowded) | 0 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:<Archer  5:<TwinTachi  6:.
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 4, facing Left, HP 2/2, next: Wait
+    TwinTachi: cell 5, facing Left, HP 2/2, next: Wait
+  Queue: (empty)
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 6 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 5 | HP 10/10 | wave 2/5, next in 11
+  0:.  1:.  2:HERO>  3:.  4:<Archer[2hp Wait]  5:<TwinTachi[2hp Wait]  6:.
+  Tiles: Swirl (ready), Arrow (ready), Swirl (ready in 6), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  PlayTile Arrow          43.3*
+  PlayTile Swirl (3)      33.1 
+  PlayTile ShadowDash      9.3 
+  MoveRight               -0.8 
+  Wait                    -2.5 
+  MoveLeft                -4.2 
+  Flip                    -7.7 
+  F1 PlayTile Arrow
+     beats PlayTile Swirl (3) by 10.2: stack +10.2
+[Info   :Shogun State Logger]   > Decision: PlayTile Arrow | from: Evaluator v0.4 depth 1 | why: score 43.30, plan: PlayTile Arrow
+[Info   :Shogun State Logger]   > HERO queues tile Arrow [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > Turn 5 action: HERO PlayTile [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 6 | WaveRoom | wave 2/5, next in 10 turns (blocked: room too crowded) | 0 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:<Archer  5:<TwinTachi  6:.
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 4, facing Left, HP 2/2, next: PlayTile Arrow
+    TwinTachi: cell 5, facing Left, HP 2/2, next: PlayTile Swirl
+  Queue: Arrow L3 3 dmg, range 1..10
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 5 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 6 | HP 10/10 | wave 2/5, next in 10
+  0:.  1:.  2:HERO>  3:.  4:<Archer[2hp PlayTile]  5:<TwinTachi[2hp PlayTile]  6:.
+  Tiles: Swirl (ready), Arrow (queued), Swirl (ready in 5), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  Attack                  80.0*
+  PlayTile Swirl (3)      68.8 
+  PlayTile ShadowDash     50.1 
+  MoveRight               45.0 
+  Wait                    43.3 
+  MoveLeft                41.6 
+  Flip                    28.0 
+  F1 Attack
+     beats PlayTile Swirl (3) by 11.2: stack -61.2, kills +60.0, enemy_damage +20.0
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.4 depth 1 | why: score 80.00, plan: Attack
+[Info   :Shogun State Logger]   > Turn 6 action: HERO Attack [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > HERO@2 attacks with Arrow
+[Info   :Shogun State Logger]   > Archer@4 dies
+[Info   :Shogun State Logger]   > HERO@2 hits Archer@4: 2 damage, HP 2 -> 0
+[Info   :Shogun State Logger]   > TwinTachi@5 queues tile Swirl
+[Info   :Shogun State Logger] 
+==== Turn 7 | WaveRoom | wave 2/5, next in 5 turns | 0 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:.  5:<TwinTachi  6:.
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 5, facing Left, HP 2/2, next: Wait, queue: Swirl 2 dmg, range -1,1
+  Queue: (empty)
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Arrow L3 3 dmg, range 1..10, cooldown 1, charging 1 more turns
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 4 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 7 | HP 10/10 | wave 2/5, next in 5
+  0:.  1:.  2:HERO>  3:.  4:.  5:<TwinTachi[2hp Wait q:Swirl]  6:.
+  Tiles: Swirl (ready), Arrow (ready in 1), Swirl (ready in 4), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  PlayTile Swirl (3)      29.8*
+  PlayTile ShadowDash      7.6 
+  MoveRight                2.6 
+  Wait                     0.8 
+  MoveLeft                -0.8 
+  Flip                    -4.2 
+  F1 PlayTile Swirl (3)
+     beats PlayTile ShadowDash by 22.1: stack +18.7, loaded +3.4
+[Info   :Shogun State Logger]   > Decision: PlayTile Swirl | from: Evaluator v0.4 depth 1 | why: score 29.80, plan: PlayTile Swirl (3)
+[Info   :Shogun State Logger]   > HERO queues tile Swirl [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > Turn 7 action: HERO PlayTile [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 8 | WaveRoom | wave 2/5, next in 4 turns | 0 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:.  5:<TwinTachi  6:.
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 5, facing Left, HP 2/2, next: MoveLeft, queue: Swirl 2 dmg, range -1,1
+  Queue: Swirl L1 3 dmg, range -1,1
+  Tiles:
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 3 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 8 | HP 10/10 | wave 2/5, next in 4
+  0:.  1:.  2:HERO>  3:.  4:.  5:<TwinTachi[2hp MoveLeft q:Swirl]  6:.
+  Tiles: Swirl (queued), Arrow (ready), Swirl (ready in 3), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  PlayTile Arrow          52.7*
+  MoveRight               49.3 
+  PlayTile ShadowDash     49.3 
+  Wait                    37.4 
+  Flip                    32.3 
+  MoveLeft                28.9 
+  Attack                  -5.0 
+  F1 PlayTile Arrow
+     beats MoveRight by 3.4: loaded +5.1, distance -1.7
+[Info   :Shogun State Logger]   > Decision: PlayTile Arrow | from: Evaluator v0.4 depth 1 | why: score 52.70, plan: PlayTile Arrow
+[Info   :Shogun State Logger]   > HERO queues tile Arrow [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > Turn 8 action: HERO PlayTile [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 9 | WaveRoom | wave 2/5, next in 3 turns | 0 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:<TwinTachi  5:.  6:.
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 4, facing Left, HP 2/2, next: MoveLeft, queue: Swirl 2 dmg, range -1,1
+  Queue: Swirl L1 3 dmg, range -1,1 | Arrow L3 3 dmg, range 1..10
+  Tiles:
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 2 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 9 | HP 10/10 | wave 2/5, next in 3
+  0:.  1:.  2:HERO>  3:.  4:<TwinTachi[2hp MoveLeft q:Swirl]  5:.  6:.
+  Tiles: Swirl (queued), Arrow (queued), Swirl (ready in 2), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                                    D1
+  Attack Arrow (Swirl (3) to hand)     82.0*
+  Attack                               79.2 
+  Attack Arrow > Swirl (3)             79.2 
+  PlayTile ShadowDash                  55.2 
+  Wait                                 53.5 
+  MoveRight                            53.5 
+  MoveLeft                             51.8 
+  Flip                                 48.4 
+  ...and 1 lower-scoring moves
+  F1 Attack Arrow (Swirl (3) to hand)
+     beats Attack by 2.7: wasted_attacks +5.0, sent_back -4.0, ready_tiles +1.7
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.4 depth 1 | why: score 82.00, plan: Attack Arrow (Swirl (3) to hand)
+[Info   :Shogun State Logger]   > Queue edit: Swirl, Arrow -> Arrow [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 9 | WaveRoom | wave 2/5, next in 3 turns | 0 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:<TwinTachi  5:.  6:.
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 4, facing Left, HP 2/2, next: MoveLeft, queue: Swirl 2 dmg, range -1,1
+  Queue: Arrow L3 3 dmg, range 1..10
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 2 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger]   > Turn 9 action: HERO Attack [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > HERO@2 attacks with Arrow
+[Info   :Shogun State Logger]   > TwinTachi@4 dies
+[Info   :Shogun State Logger]   > HERO@2 hits TwinTachi@4: 2 damage, HP 2 -> 0
+[Info   :Shogun State Logger]   > Wave 3/5 spawns
+[Info   :Shogun State Logger]   > Key ignored: the current turn is still resolving
+[Info   :Shogun State Logger] 
+==== Turn 10 | WaveRoom | wave 3/5, next in 15 turns (blocked: room too crowded) | 0 coins
+  Grid: 0:Archer>  1:.  2:HERO>  3:<YariMaster  4:.  5:.  6:Ashigaru>
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 0, facing Right, HP 2/2, next: Wait
+    YariMaster: cell 3, facing Left, HP 4/4, next: Wait
+    Ashigaru: cell 6, facing Right, HP 3/3, next: Wait
+  Queue: (empty)
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Arrow L3 3 dmg, range 1..10, cooldown 1, charging 1 more turns
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 1 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 10 | HP 10/10 | wave 3/5, next in 15
+  0:Archer>[2hp Wait]  1:.  2:HERO>  3:<YariMaster[4hp Wait]  4:.  5:.  6:Ashigaru>[3hp Wait]
+  Tiles: Swirl (ready), Arrow (ready in 1), Swirl (ready in 1), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  PlayTile Swirl (3)       9.3*
+  PlayTile ShadowDash    -19.5 
+  Flip                   -22.9 
+  MoveLeft               -24.6 
+  Wait                   -26.3 
+  MoveRight (swap)       -30.6 
+  F1 PlayTile Swirl (3)
+     beats PlayTile ShadowDash by 28.9: stack +25.5, loaded +3.4
+[Info   :Shogun State Logger]   > Decision: PlayTile Swirl | from: Evaluator v0.4 depth 1 | why: score 9.30, plan: PlayTile Swirl (3)
+[Info   :Shogun State Logger]   > HERO queues tile Swirl [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > Turn 10 action: HERO PlayTile [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 11 | WaveRoom | wave 3/5, next in 14 turns (blocked: room too crowded) | 0 coins
+  Grid: 0:Archer>  1:.  2:HERO>  3:<YariMaster  4:.  5:.  6:Ashigaru>
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 0, facing Right, HP 2/2, next: PlayTile Arrow
+    YariMaster: cell 3, facing Left, HP 4/4, next: PlayTile Spear
+    Ashigaru: cell 6, facing Right, HP 3/3, next: FlipLeft
+  Queue: Swirl L1 3 dmg, range -1,1
+  Tiles:
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, READY
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 11 | HP 10/10 | wave 3/5, next in 14
+  0:Archer>[2hp PlayTile]  1:.  2:HERO>  3:<YariMaster[4hp PlayTile]  4:.  5:.  6:Ashigaru>[3hp FlipLeft]
+  Tiles: Swirl (queued), Arrow (ready), Swirl (ready), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                             D1
+  PlayTile Swirl (2) (free)     84.1*
+  PlayTile Arrow                34.9 
+  PlayTile ShadowDash           31.4 
+  MoveLeft                      21.2 
+  Attack                        17.2 
+  Wait                           9.3 
+  MoveRight (swap)               1.3 
+  Flip                         -89.3 
+  F1 PlayTile Swirl (2) (free) -> PlayTile Arrow
+     beats PlayTile Arrow by 49.3: stack +45.9, loaded +3.4
+[Info   :Shogun State Logger]   > Decision: PlayTile Swirl | from: Evaluator v0.4 depth 1 | why: score 84.10, plan: PlayTile Swirl (2) (free) -> PlayTile Arrow
+[Info   :Shogun State Logger]   > HERO queues tile Swirl [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 11 | WaveRoom | wave 3/5, next in 14 turns (blocked: room too crowded) | 0 coins
+  Grid: 0:Archer>  1:.  2:HERO>  3:<YariMaster  4:.  5:.  6:Ashigaru>
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 0, facing Right, HP 2/2, next: PlayTile Arrow
+    YariMaster: cell 3, facing Left, HP 4/4, next: PlayTile Spear
+    Ashigaru: cell 6, facing Right, HP 3/3, next: FlipLeft
+  Queue: Swirl L1 3 dmg, range -1,1 | Swirl L1 2 dmg, range -1,1, tile effect FreePlay
+  Tiles:
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 11 | HP 10/10 | wave 3/5, next in 14
+  0:Archer>[2hp PlayTile]  1:.  2:HERO>  3:<YariMaster[4hp PlayTile]  4:.  5:.  6:Ashigaru>[3hp FlipLeft]
+  Tiles: Swirl (queued), Arrow (ready), Swirl (queued), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                                D1
+  PlayTile Arrow                   84.1*
+  Attack                           83.9 
+  Attack Swirl (2) > Swirl (3)     83.9 
+  PlayTile ShadowDash              52.7 
+  Flip                             36.5 
+  Wait                             33.1 
+  MoveRight (swap)                 28.9 
+  MoveLeft                         24.6 
+  ...and 2 lower-scoring moves
+  F1 PlayTile Arrow
+     beats Attack by 0.3: stack +96.9, kills -60.0, enemy_damage -40.0
+[Info   :Shogun State Logger]   > Decision: PlayTile Arrow | from: Evaluator v0.4 depth 1 | why: score 84.10, plan: PlayTile Arrow
+[Info   :Shogun State Logger]   > HERO queues tile Arrow [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > Turn 11 action: HERO PlayTile [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > Archer@0 queues tile Arrow
+[Info   :Shogun State Logger]   > YariMaster@3 queues tile Spear
+[Info   :Shogun State Logger] 
+==== Turn 12 | WaveRoom | wave 3/5, next in 13 turns (blocked: room too crowded) | 0 coins
+  Grid: 0:Archer>  1:.  2:HERO>  3:<YariMaster  4:.  5:.  6:<Ashigaru
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 0, facing Right, HP 2/2, next: Wait, queue: Arrow 2 dmg, range 1..10
+    YariMaster: cell 3, facing Left, HP 4/4, next: Wait, queue: Spear 2 dmg, range 1,2
+    Ashigaru: cell 6, facing Left, HP 3/3, next: PlayTile Katana
+  Queue: Swirl L1 3 dmg, range -1,1 | Swirl L1 2 dmg, range -1,1, tile effect FreePlay | Arrow L3 3 dmg, range 1..10
+  Tiles:
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 12 | HP 10/10 | wave 3/5, next in 13
+  0:Archer>[2hp Wait q:Arrow]  1:.  2:HERO>  3:<YariMaster[4hp Wait q:Spear]  4:.  5:.  6:<Ashigaru[3hp PlayTile]
+  Tiles: Swirl (queued), Arrow (queued), Swirl (queued), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                                               D1
+  Wait                                            84.1*
+  Attack                                          82.9 
+  Attack Swirl (2) > Swirl (3) > Arrow            82.9 
+  Flip                                            82.4 
+  MoveRight (swap)                                79.9 
+  Attack Swirl (3) (Swirl (2), Arrow to hand)      9.2 
+  Attack Arrow (Swirl (3), Swirl (2) to hand)      9.2 
+  Attack Swirl (2) (Swirl (3), Arrow to hand)     -4.2 
+  ...and 11 lower-scoring moves
+  F1 Wait
+     beats Attack by 1.2: kills -120.0, no_response +102.0, stack +96.9
+[Info   :Shogun State Logger]   > Decision: Wait | from: Evaluator v0.4 depth 1 | why: score 84.10, plan: Wait
+[Info   :Shogun State Logger]   > Turn 12 action: HERO Wait [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > Ashigaru@6 queues tile Katana
+[Info   :Shogun State Logger] 
+==== Turn 13 | WaveRoom | wave 3/5, next in 12 turns (blocked: room too crowded) | 0 coins
+  Grid: 0:Archer>  1:.  2:HERO>  3:<YariMaster  4:.  5:.  6:<Ashigaru
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 0, facing Right, HP 2/2, next: Attack #1 -> cells 1,2,3,4,5,6, queue: Arrow 2 dmg, range 1..10
+    YariMaster: cell 3, facing Left, HP 4/4, next: Attack #2 -> cells 1,2, queue: Spear 2 dmg, range 1,2
+    Ashigaru: cell 6, facing Left, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+  Queue: Swirl L1 3 dmg, range -1,1 | Swirl L1 2 dmg, range -1,1, tile effect FreePlay | Arrow L3 3 dmg, range 1..10
+  Tiles:
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 13 | HP 10/10 | wave 3/5, next in 12
+  0:Archer>[2hp Attack q:Arrow]  1:.  2:HERO>  3:<YariMaster[4hp Attack q:Spear]  4:.  5:.  6:<Ashigaru[3hp Wait q:Katana]
+  Tiles: Swirl (queued), Arrow (queued), Swirl (queued), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                                                D1
+  MoveRight (swap)                                178.7*
+  Attack                                          -15.1 
+  Attack Swirl (2) > Swirl (3) > Arrow            -15.1 
+  Attack Swirl (3) > Swirl (2) (Arrow to hand)   -120.1 
+  Attack Swirl (3) > Arrow (Swirl (2) to hand)   -120.1 
+  Attack Swirl (2) > Swirl (3) (Arrow to hand)   -120.1 
+  Attack Swirl (2) > Arrow (Swirl (3) to hand)   -120.1 
+  Attack Arrow > Swirl (3) (Swirl (2) to hand)   -120.1 
+  ...and 11 lower-scoring moves
+  F1 MoveRight (swap)
+     beats Attack by 193.8: hp_lost +200.0, stack +86.7, enemy_damage -70.0
+[Info   :Shogun State Logger]   > Decision: MoveRight | from: Evaluator v0.4 depth 1 | why: score 178.70, plan: MoveRight (swap)
+[Info   :Shogun State Logger]   > Turn 13 action: HERO MoveRight [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > Archer@0 attacks with Arrow
+[Info   :Shogun State Logger]   > Archer@0 hits YariMaster@2: 2 damage, HP 4 -> 2
+[Info   :Shogun State Logger]   > YariMaster@2 attacks with Spear
+[Info   :Shogun State Logger]   > Archer@0 dies
+[Info   :Shogun State Logger]   > YariMaster@2 hits Archer@0: 2 damage, HP 2 -> 0
+[Info   :Shogun State Logger] 
+==== Turn 14 | WaveRoom | wave 3/5, next in 11 turns (blocked: room too crowded) | 0 coins
+  Grid: 0:.  1:.  2:<YariMaster  3:HERO>  4:.  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove 0/4
+  Enemies (in acting order):
+    YariMaster: cell 2, facing Left, HP 2/4, next: FlipRight
+    Ashigaru: cell 6, facing Left, HP 3/3, next: MoveLeft, queue: Katana 2 dmg, range 1
+  Queue: Swirl L1 3 dmg, range -1,1 | Swirl L1 2 dmg, range -1,1, tile effect FreePlay | Arrow L3 3 dmg, range 1..10
+  Tiles:
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 14 | HP 10/10 | wave 3/5, next in 11
+  0:.  1:.  2:<YariMaster[2hp FlipRight]  3:HERO>  4:.  5:.  6:<Ashigaru[3hp MoveLeft q:Katana]
+  Tiles: Swirl (queued), Arrow (queued), Swirl (queued), ShadowDash (ready) | Swap 0/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                                                D1
+  Attack Swirl (3) > Arrow (Swirl (2) to hand)    169.4*
+  Attack Swirl (2) > Arrow (Swirl (3) to hand)    169.4 
+  Attack Arrow > Swirl (3) (Swirl (2) to hand)    169.4 
+  Attack Arrow > Swirl (2) (Swirl (3) to hand)    169.4 
+  Attack                                          166.7 
+  Attack Swirl (3) > Arrow > Swirl (2)            166.7 
+  Attack Swirl (2) > Swirl (3) > Arrow            166.7 
+  Attack Swirl (2) > Arrow > Swirl (3)            166.7 
+  ...and 10 lower-scoring moves
+  F1 Attack Swirl (3) > Arrow (Swirl (2) to hand)
+     tied with Attack Swirl (2) > Arrow (Swirl (3) to hand), but its position improves sooner
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.4 depth 1 | why: score 169.40, plan: Attack Swirl (3) > Arrow (Swirl (2) to hand)
+[Info   :Shogun State Logger]   > Queue edit: Swirl, Swirl, Arrow -> Swirl, Arrow [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 14 | WaveRoom | wave 3/5, next in 11 turns (blocked: room too crowded) | 0 coins
+  Grid: 0:.  1:.  2:<YariMaster  3:HERO>  4:.  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove 0/4
+  Enemies (in acting order):
+    YariMaster: cell 2, facing Left, HP 2/4, next: FlipRight
+    Ashigaru: cell 6, facing Left, HP 3/3, next: MoveLeft, queue: Katana 2 dmg, range 1
+  Queue: Swirl L1 3 dmg, range -1,1 | Arrow L3 3 dmg, range 1..10
+  Tiles:
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, READY
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger]   > Turn 14 action: HERO Attack [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > HERO@3 attacks with Swirl
+[Info   :Shogun State Logger]   > YariMaster@2 dies
+[Info   :Shogun State Logger]   > HERO@3 hits YariMaster@2: 2 damage, HP 2 -> 0
+[Info   :Shogun State Logger]   > HERO@3 attacks with Arrow
+[Info   :Shogun State Logger]   > Ashigaru@6 dies
+[Info   :Shogun State Logger]   > HERO@3 hits Ashigaru@6: 3 damage, HP 3 -> 0
+[Info   :Shogun State Logger]   > Wave 4/5 spawns
+[Info   :Shogun State Logger] 
+==== Turn 15 | WaveRoom | wave 4/5, next in 15 turns (blocked: room too crowded) | 0 coins
+  Grid: 0:Archer>  1:.  2:<TwinTachi  3:HERO>  4:.  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove 1/4
+  Enemies (in acting order):
+    Archer: cell 0, facing Right, HP 2/2, next: Wait
+    TwinTachi: cell 2, facing Left, HP 2/2, next: Wait
+    Ashigaru: cell 6, facing Left, HP 3/3, next: Wait
+  Queue: (empty)
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, charging 3 more turns
+    Arrow L3 3 dmg, range 1..10, cooldown 1, charging 1 more turns
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, READY
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 15 | HP 10/10 | wave 4/5, next in 15
+  0:Archer>[2hp Wait]  1:.  2:<TwinTachi[2hp Wait]  3:HERO>  4:.  5:.  6:<Ashigaru[3hp Wait]
+  Tiles: Swirl (ready in 3), Arrow (ready in 1), Swirl (ready), ShadowDash (ready) | Swap 1/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                             D1
+  PlayTile Swirl (2) (free)     59.6*
+  PlayTile ShadowDash          -16.6 
+  Flip                         -18.7 
+  Wait                         -22.1 
+  MoveRight                    -23.8 
+  F1 PlayTile Swirl (2) (free) -> Attack
+     beats PlayTile ShadowDash by 76.2: kills +60.0, enemy_damage +20.0, enemy_hp_left +6.8
+[Info   :Shogun State Logger]   > Decision: PlayTile Swirl | from: Evaluator v0.4 depth 1 | why: score 59.60, plan: PlayTile Swirl (2) (free) -> Attack
+[Info   :Shogun State Logger]   > HERO queues tile Swirl [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 15 | WaveRoom | wave 4/5, next in 15 turns (blocked: room too crowded) | 0 coins
+  Grid: 0:Archer>  1:.  2:<TwinTachi  3:HERO>  4:.  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove 1/4
+  Enemies (in acting order):
+    Archer: cell 0, facing Right, HP 2/2, next: Wait
+    TwinTachi: cell 2, facing Left, HP 2/2, next: Wait
+    Ashigaru: cell 6, facing Left, HP 3/3, next: Wait
+  Queue: Swirl L1 2 dmg, range -1,1, tile effect FreePlay
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, charging 3 more turns
+    Arrow L3 3 dmg, range 1..10, cooldown 1, charging 1 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 15 | HP 10/10 | wave 4/5, next in 15
+  0:Archer>[2hp Wait]  1:.  2:<TwinTachi[2hp Wait]  3:HERO>  4:.  5:.  6:<Ashigaru[3hp Wait]
+  Tiles: Swirl (ready in 3), Arrow (ready in 1), Swirl (queued), ShadowDash (ready) | Swap 1/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  Attack                  59.6*
+  PlayTile ShadowDash     44.2 
+  Flip                    25.5 
+  Wait                    22.1 
+  MoveRight               10.2 
+  F1 Attack
+     beats PlayTile ShadowDash by 15.4: stack -61.2, kills +60.0, enemy_damage +20.0
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.4 depth 1 | why: score 59.60, plan: Attack
+[Info   :Shogun State Logger]   > Turn 15 action: HERO Attack [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > HERO@3 attacks with Swirl
+[Info   :Shogun State Logger]   > TwinTachi@2 dies
+[Info   :Shogun State Logger]   > HERO@3 hits TwinTachi@2: 2 damage, HP 2 -> 0
+[Info   :Shogun State Logger] 
+==== Turn 16 | WaveRoom | wave 4/5, next in 14 turns (blocked: room too crowded) | 0 coins
+  Grid: 0:Archer>  1:.  2:.  3:HERO>  4:.  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove 2/4
+  Enemies (in acting order):
+    Archer: cell 0, facing Right, HP 2/2, next: PlayTile Arrow
+    Ashigaru: cell 6, facing Left, HP 3/3, next: PlayTile Katana
+  Queue: (empty)
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, charging 2 more turns
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 6 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 16 | HP 10/10 | wave 4/5, next in 14
+  0:Archer>[2hp PlayTile]  1:.  2:.  3:HERO>  4:.  5:.  6:<Ashigaru[3hp PlayTile]
+  Tiles: Swirl (ready in 2), Arrow (ready), Swirl (ready in 6), ShadowDash (ready) | Swap 2/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  PlayTile Arrow          30.6*
+  Flip                   -17.0 
+  MoveLeft               -18.7 
+  PlayTile ShadowDash    -18.7 
+  Wait                   -20.4 
+  MoveRight              -22.1 
+  F1 PlayTile Arrow
+     beats Flip by 47.6: stack +45.9, loaded +5.1, facing -3.4
+[Info   :Shogun State Logger]   > Decision: PlayTile Arrow | from: Evaluator v0.4 depth 1 | why: score 30.60, plan: PlayTile Arrow
+[Info   :Shogun State Logger]   > HERO queues tile Arrow [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 16 | WaveRoom | wave 4/5, next in 14 turns (blocked: room too crowded) | 0 coins
+  Grid: 0:Archer>  1:.  2:.  3:HERO>  4:.  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove 2/4
+  Enemies (in acting order):
+    Archer: cell 0, facing Right, HP 2/2, next: PlayTile Arrow
+    Ashigaru: cell 6, facing Left, HP 3/3, next: PlayTile Katana
+  Queue: Arrow L3 3 dmg, range 1..10
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, charging 2 more turns
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 6 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger]   > Turn 16 action: HERO PlayTile [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > Archer@0 queues tile Arrow
+[Info   :Shogun State Logger]   > Ashigaru@6 queues tile Katana
+[Info   :Shogun State Logger] 
+==== Turn 17 | WaveRoom | wave 4/5, next in 13 turns (blocked: room too crowded) | 0 coins
+  Grid: 0:Archer>  1:.  2:.  3:HERO>  4:.  5:.  6:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove 3/4
+  Enemies (in acting order):
+    Archer: cell 0, facing Right, HP 2/2, next: Wait, queue: Arrow 2 dmg, range 1..10
+    Ashigaru: cell 6, facing Left, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+  Queue: Arrow L3 3 dmg, range 1..10
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, charging 1 more turns
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 5 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 17 | HP 10/10 | wave 4/5, next in 13
+  0:Archer>[2hp Wait q:Arrow]  1:.  2:.  3:HERO>  4:.  5:.  6:<Ashigaru[3hp Wait q:Katana]
+  Tiles: Swirl (ready in 1), Arrow (queued), Swirl (ready in 5), ShadowDash (ready) | Swap 3/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  Flip                    33.1*
+  Attack                 -17.1 
+  MoveLeft               -65.5 
+  PlayTile ShadowDash    -65.5 
+  Wait                   -67.2 
+  MoveRight              -68.8 
+  F1 Flip
+     beats Attack by 50.2: no_response +102.0, kills -60.0, stack +40.8
+[Info   :Shogun State Logger]   > Decision: FlipLeft | from: Evaluator v0.4 depth 1 | why: score 33.10, plan: Flip
+[Info   :Shogun State Logger]   > Turn 17 action: HERO FlipLeft [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 18 | WaveRoom | wave 4/5, next in 12 turns (blocked: room too crowded) | 0 coins
+  Grid: 0:Archer>  1:.  2:.  3:<HERO  4:.  5:.  6:<Ashigaru
+  Hero: cell 3, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 0, facing Right, HP 2/2, next: Attack #1 -> cells 1,2,3,4,5,6, queue: Arrow 2 dmg, range 1..10
+    Ashigaru: cell 6, facing Left, HP 3/3, next: MoveLeft, queue: Katana 2 dmg, range 1
+  Queue: Arrow L3 3 dmg, range 1..10
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 4 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 18 | HP 10/10 | wave 4/5, next in 12
+  0:Archer>[2hp Attack q:Arrow]  1:.  2:.  3:<HERO  4:.  5:.  6:<Ashigaru[3hp MoveLeft q:Katana]
+  Tiles: Swirl (ready), Arrow (queued), Swirl (ready in 4), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  Attack                  72.8*
+  PlayTile Swirl (3)    -137.5 
+  Flip                  -165.2 
+  MoveLeft              -165.1 
+  PlayTile ShadowDash   -165.1 
+  Wait                  -166.8 
+  MoveRight             -168.5 
+  F1 Attack
+     beats PlayTile Swirl (3) by 210.3: hp_lost +200.0, stack -65.0, kills +60.0
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.4 depth 1 | why: score 72.80, plan: Attack
+[Info   :Shogun State Logger]   > Turn 18 action: HERO Attack [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > HERO@3 attacks with Arrow
+[Info   :Shogun State Logger]   > Archer@0 dies
+[Info   :Shogun State Logger]   > HERO@3 hits Archer@0: 2 damage, HP 2 -> 0
+[Info   :Shogun State Logger] 
+==== Turn 19 | WaveRoom | wave 4/5, next in 5 turns | 0 coins
+  Grid: 0:.  1:.  2:.  3:<HERO  4:.  5:<Ashigaru  6:.
+  Hero: cell 3, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 5, facing Left, HP 3/3, next: MoveLeft, queue: Katana 2 dmg, range 1
+  Queue: (empty)
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Arrow L3 3 dmg, range 1..10, cooldown 1, charging 1 more turns
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 3 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 19 | HP 10/10 | wave 4/5, next in 5
+  0:.  1:.  2:.  3:<HERO  4:.  5:<Ashigaru[3hp MoveLeft q:Katana]  6:.
+  Tiles: Swirl (ready), Arrow (ready in 1), Swirl (ready in 3), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  PlayTile Swirl (3)      45.9*
+  PlayTile ShadowDash      0.4 
+  Flip                     0.0 
+  Wait                    -5.1 
+  MoveRight               -5.1 
+  MoveLeft                -6.8 
+  F1 PlayTile Swirl (3)
+     beats PlayTile ShadowDash by 45.5: stack +42.1, loaded +3.4
+[Info   :Shogun State Logger]   > Decision: PlayTile Swirl | from: Evaluator v0.4 depth 1 | why: score 45.90, plan: PlayTile Swirl (3)
+[Info   :Shogun State Logger]   > HERO queues tile Swirl [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 19 | WaveRoom | wave 4/5, next in 5 turns | 0 coins
+  Grid: 0:.  1:.  2:.  3:<HERO  4:.  5:<Ashigaru  6:.
+  Hero: cell 3, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 5, facing Left, HP 3/3, next: MoveLeft, queue: Katana 2 dmg, range 1
+  Queue: Swirl L1 3 dmg, range -1,1
+  Tiles:
+    Arrow L3 3 dmg, range 1..10, cooldown 1, charging 1 more turns
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 3 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger]   > Turn 19 action: HERO PlayTile [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 20 | WaveRoom | wave 4/5, next in 4 turns | 0 coins
+  Grid: 0:.  1:.  2:.  3:<HERO  4:<Ashigaru  5:.  6:.
+  Hero: cell 3, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 4, facing Left, HP 3/3, next: Attack #1 -> cells 3, queue: Katana 2 dmg, range 1
+  Queue: Swirl L1 3 dmg, range -1,1
+  Tiles:
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 2 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 20 | HP 10/10 | wave 4/5, next in 4
+  0:.  1:.  2:.  3:<HERO  4:<Ashigaru[3hp Attack q:Katana]  5:.  6:.
+  Tiles: Swirl (queued), Arrow (ready), Swirl (ready in 2), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  Attack                  96.0*
+  MoveLeft                31.4 
+  Flip                  -150.3 
+  PlayTile Arrow        -150.3 
+  PlayTile ShadowDash   -153.7 
+  Wait                  -155.4 
+  F1 Attack
+     beats MoveLeft by 64.5: kills +60.0, stack -34.4, enemy_damage +30.0
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.4 depth 1 | why: score 96.00, plan: Attack
+[Info   :Shogun State Logger]   > Turn 20 action: HERO Attack [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > HERO@3 attacks with Swirl
+[Info   :Shogun State Logger]   > Ashigaru@4 dies
+[Info   :Shogun State Logger]   > HERO@3 hits Ashigaru@4: 3 damage, HP 3 -> 0
+[Info   :Shogun State Logger]   > Wave 5/5 spawns
+[Info   :Shogun State Logger] 
+==== Turn 21 | WaveRoom | wave 5/5 (final) | 0 coins
+  Grid: 0:Archer>  1:.  2:.  3:<HERO  4:.  5:<Ashigaru  6:YariMaster>
+  Hero: cell 3, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 0, facing Right, HP 2/2, next: Wait
+    Ashigaru: cell 5, facing Left, HP 3/3, next: Wait
+    YariMaster: cell 6, facing Right, HP 4/4, next: Wait
+  Queue: (empty)
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, charging 3 more turns
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 1 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 21 | HP 10/10 | wave 5/5 (final)
+  0:Archer>[2hp Wait]  1:.  2:.  3:<HERO  4:.  5:<Ashigaru[3hp Wait]  6:YariMaster>[4hp Wait]
+  Tiles: Swirl (ready in 3), Arrow (ready), Swirl (ready in 1), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  PlayTile Arrow          19.6*
+  MoveLeft               -24.6 
+  PlayTile ShadowDash    -24.6 
+  Wait                   -26.3 
+  MoveRight              -28.0 
+  Flip                   -29.8 
+  F1 PlayTile Arrow
+     beats MoveLeft by 44.2: stack +40.8, loaded +5.1, distance -1.7
+[Info   :Shogun State Logger]   > Decision: PlayTile Arrow | from: Evaluator v0.4 depth 1 | why: score 19.60, plan: PlayTile Arrow
+[Info   :Shogun State Logger]   > HERO queues tile Arrow [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 21 | WaveRoom | wave 5/5 (final) | 0 coins
+  Grid: 0:Archer>  1:.  2:.  3:<HERO  4:.  5:<Ashigaru  6:YariMaster>
+  Hero: cell 3, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 0, facing Right, HP 2/2, next: Wait
+    Ashigaru: cell 5, facing Left, HP 3/3, next: Wait
+    YariMaster: cell 6, facing Right, HP 4/4, next: Wait
+  Queue: Arrow L3 3 dmg, range 1..10
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, charging 3 more turns
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 1 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger]   > Turn 21 action: HERO PlayTile [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 22 | WaveRoom | wave 5/5 (final) | 0 coins
+  Grid: 0:Archer>  1:.  2:.  3:<HERO  4:.  5:<Ashigaru  6:YariMaster>
+  Hero: cell 3, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Archer: cell 0, facing Right, HP 2/2, next: PlayTile Arrow
+    Ashigaru: cell 5, facing Left, HP 3/3, next: PlayTile Katana
+    YariMaster: cell 6, facing Right, HP 4/4, next: FlipLeft
+  Queue: Arrow L3 3 dmg, range 1..10
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, charging 2 more turns
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, READY
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 22 | HP 10/10 | wave 5/5 (final)
+  0:Archer>[2hp PlayTile]  1:.  2:.  3:<HERO  4:.  5:<Ashigaru[3hp PlayTile]  6:YariMaster>[4hp FlipLeft]
+  Tiles: Swirl (ready in 2), Arrow (queued), Swirl (ready), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                             D1
+  Attack                        60.5*
+  PlayTile Swirl (2) (free)     56.5 
+  Flip                          21.3 
+  MoveLeft                      21.2 
+  PlayTile ShadowDash           21.2 
+  Wait                          19.6 
+  MoveRight                     17.8 
+  F1 Attack
+     beats PlayTile Swirl (2) (free) by 4.0: sent_back +4.0
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.4 depth 1 | why: score 60.50, plan: Attack
+[Info   :Shogun State Logger]   > Turn 22 action: HERO Attack [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > HERO@3 attacks with Arrow
+[Info   :Shogun State Logger]   > Archer@0 dies
+[Info   :Shogun State Logger]   > HERO@3 hits Archer@0: 2 damage, HP 2 -> 0
+[Info   :Shogun State Logger]   > Ashigaru@5 queues tile Katana
+[Info   :Shogun State Logger]   > Key ignored: the current turn is still resolving
+[Info   :Shogun State Logger] 
+==== Turn 23 | WaveRoom | wave 5/5 (final) | 0 coins
+  Grid: 0:.  1:.  2:.  3:<HERO  4:.  5:<Ashigaru  6:<YariMaster
+  Hero: cell 3, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 5, facing Left, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+    YariMaster: cell 6, facing Left, HP 4/4, next: PlayTile Spear
+  Queue: (empty)
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, charging 1 more turns
+    Arrow L3 3 dmg, range 1..10, cooldown 1, charging 1 more turns
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, READY
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 23 | HP 10/10 | wave 5/5 (final)
+  0:.  1:.  2:.  3:<HERO  4:.  5:<Ashigaru[3hp Wait q:Katana]  6:<YariMaster[4hp PlayTile]
+  Tiles: Swirl (ready in 1), Arrow (ready in 1), Swirl (ready), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                             D1
+  PlayTile Swirl (2) (free)      0.0*
+  Flip                         -11.1 
+  MoveRight                    -14.5 
+  PlayTile ShadowDash          -14.4 
+  Wait                         -16.2 
+  MoveLeft                     -17.9 
+  F1 PlayTile Swirl (2) (free) -> Flip
+     beats Flip by 11.1: stack +7.6, loaded +3.4
+[Info   :Shogun State Logger]   > Decision: PlayTile Swirl | from: Evaluator v0.4 depth 1 | why: score 0.00, plan: PlayTile Swirl (2) (free) -> Flip
+[Info   :Shogun State Logger]   > HERO queues tile Swirl [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 23 | WaveRoom | wave 5/5 (final) | 0 coins
+  Grid: 0:.  1:.  2:.  3:<HERO  4:.  5:<Ashigaru  6:<YariMaster
+  Hero: cell 3, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 5, facing Left, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+    YariMaster: cell 6, facing Left, HP 4/4, next: PlayTile Spear
+  Queue: Swirl L1 2 dmg, range -1,1, tile effect FreePlay
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, charging 1 more turns
+    Arrow L3 3 dmg, range 1..10, cooldown 1, charging 1 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 23 | HP 10/10 | wave 5/5 (final)
+  0:.  1:.  2:.  3:<HERO  4:.  5:<Ashigaru[3hp Wait q:Katana]  6:<YariMaster[4hp PlayTile]
+  Tiles: Swirl (ready in 1), Arrow (ready in 1), Swirl (queued), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  Flip                     0.0*
+  MoveRight               -0.9 
+  PlayTile ShadowDash     -3.4 
+  Wait                    -5.1 
+  MoveLeft                -8.5 
+  Attack                 -22.9 
+  F1 Flip
+     beats MoveRight by 0.9: facing +5.1, stack -2.5, distance -1.7
+[Info   :Shogun State Logger]   > Decision: FlipRight | from: Evaluator v0.4 depth 1 | why: score 0.00, plan: Flip
+[Info   :Shogun State Logger]   > Turn 23 action: HERO FlipRight [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > YariMaster@6 queues tile Spear
+[Info   :Shogun State Logger] 
+==== Turn 24 | WaveRoom | wave 5/5 (final) | 0 coins
+  Grid: 0:.  1:.  2:.  3:HERO>  4:.  5:<Ashigaru  6:<YariMaster
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 5, facing Left, HP 3/3, next: MoveLeft, queue: Katana 2 dmg, range 1
+    YariMaster: cell 6, facing Left, HP 4/4, next: Wait, queue: Spear 2 dmg, range 1,2
+  Queue: Swirl L1 2 dmg, range -1,1, tile effect FreePlay
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+    ShadowDash 1 dmg, range 1..10, cooldown 5, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 24 | HP 10/10 | wave 5/5 (final)
+  0:.  1:.  2:.  3:HERO>  4:.  5:<Ashigaru[3hp MoveLeft q:Katana]  6:<YariMaster[4hp Wait q:Spear]
+  Tiles: Swirl (ready), Arrow (ready), Swirl (queued), ShadowDash (ready) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                       D1
+  PlayTile ShadowDash     51.8*
+  PlayTile Swirl (3)      45.0 
+  PlayTile Arrow          45.0 
+  Wait                     4.2 
+  MoveRight                4.2 
+  MoveLeft                 0.0 
+  Flip                    -0.9 
+  Attack                 -16.1 
+  F1 PlayTile ShadowDash
+     beats PlayTile Swirl (3) by 6.8: stack +10.2, loaded -3.4
+[Info   :Shogun State Logger]   > Decision: PlayTile ShadowDash | from: Evaluator v0.4 depth 1 | why: score 51.80, plan: PlayTile ShadowDash
+[Info   :Shogun State Logger]   > HERO queues tile ShadowDash [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > Turn 24 action: HERO PlayTile [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 25 | WaveRoom | wave 5/5 (final) | 0 coins
+  Grid: 0:.  1:.  2:.  3:HERO>  4:<Ashigaru  5:.  6:<YariMaster
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 4, facing Left, HP 3/3, next: Attack #1 -> cells 3, queue: Katana 2 dmg, range 1
+    YariMaster: cell 6, facing Left, HP 4/4, next: Wait, queue: Spear 2 dmg, range 1,2
+  Queue: Swirl L1 2 dmg, range -1,1, tile effect FreePlay | ShadowDash 1 dmg, range 1..10
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 25 | HP 10/10 | wave 5/5 (final)
+  0:.  1:.  2:.  3:HERO>  4:<Ashigaru[3hp Attack q:Katana]  5:.  6:<YariMaster[4hp Wait q:Spear]
+  Tiles: Swirl (ready), Arrow (ready), Swirl (queued), ShadowDash (queued) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                                         D1
+  Attack ShadowDash > Swirl (2)            114.2*
+  Attack                                    87.5 
+  MoveLeft                                  50.1 
+  Attack ShadowDash (Swirl (2) to hand)    -22.1 
+  MoveRight (swap)                         -82.9 
+  PlayTile Swirl (3)                      -102.3 
+  PlayTile Arrow                          -102.3 
+  Wait                                    -148.2 
+  ...and 2 lower-scoring moves
+  F1 Attack ShadowDash > Swirl (2)
+     beats Attack by 26.8: enemy_damage +20.0, enemy_hp_left +6.8
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.4 depth 1 | why: score 114.20, plan: Attack ShadowDash > Swirl (2)
+[Info   :Shogun State Logger]   > HERO queues tile ShadowDash [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > Queue edit: Swirl, ShadowDash -> ShadowDash, Swirl [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 25 | WaveRoom | wave 5/5 (final) | 0 coins
+  Grid: 0:.  1:.  2:.  3:HERO>  4:<Ashigaru  5:.  6:<YariMaster
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 4, facing Left, HP 3/3, next: Attack #1 -> cells 3, queue: Katana 2 dmg, range 1
+    YariMaster: cell 6, facing Left, HP 4/4, next: Wait, queue: Spear 2 dmg, range 1,2
+  Queue: ShadowDash 1 dmg, range 1..10 | Swirl L1 2 dmg, range -1,1, tile effect FreePlay
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger]   > Turn 25 action: HERO Attack [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > HERO@3 attacks with ShadowDash
+[Info   :Shogun State Logger]   > HERO@5 hits Ashigaru@4: 1 damage, HP 3 -> 2
+[Info   :Shogun State Logger]   > HERO@5 attacks with Swirl
+[Info   :Shogun State Logger]   > Ashigaru@4 dies
+[Info   :Shogun State Logger]   > HERO@5 hits Ashigaru@4: 2 damage, HP 2 -> 0
+[Info   :Shogun State Logger]   > HERO@5 hits YariMaster@6: 2 damage, HP 4 -> 2
+[Info   :Shogun State Logger] 
+==== Turn 26 | WaveRoom | wave 5/5 (final) | 2 coins
+  Grid: 0:.  1:.  2:.  3:.  4:.  5:HERO>  6:<YariMaster
+  Hero: cell 5, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    YariMaster: cell 6, facing Left, HP 2/4, next: Attack #1 -> cells 4,5, queue: Spear 2 dmg, range 1,2
+  Queue: (empty)
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 6 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, charging 5 more turns
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 26 | HP 10/10 | wave 5/5 (final)
+  0:.  1:.  2:.  3:.  4:.  5:HERO>  6:<YariMaster[2hp Attack q:Spear]
+  Tiles: Swirl (ready), Arrow (ready), Swirl (ready in 6), ShadowDash (ready in 5) | Swap 4/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                      D1
+  MoveRight (swap)       -3.4*
+  PlayTile Swirl (3)   -149.8 
+  PlayTile Arrow       -149.8 
+  Wait                 -195.8 
+  MoveLeft             -197.4 
+  Flip                 -200.8 
+  F1 MoveRight (swap)
+     beats PlayTile Swirl (3) by 146.4: hp_lost +200.0, stack -40.8, loaded -5.1
+[Info   :Shogun State Logger]   > Decision: MoveRight | from: Evaluator v0.4 depth 1 | why: score -3.40, plan: MoveRight (swap)
+[Info   :Shogun State Logger]   > Turn 26 action: HERO MoveRight [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > YariMaster@5 attacks with Spear
+[Info   :Shogun State Logger]   [new potion] MassCurse = mass curse: Curse all enemies. Cursed enemies take double damage on the next hit.
+[Info   :Shogun State Logger] 
+==== Turn 27 | WaveRoom | wave 5/5 (final) | 2 coins
+  Grid: 0:.  1:.  2:.  3:.  4:.  5:<YariMaster  6:HERO>
+  Hero: cell 6, facing Right, HP 10/10, special SwapSpecialMove 0/4
+  Enemies (in acting order):
+    YariMaster: cell 5, facing Left, HP 2/4, next: FlipRight
+  Queue: (empty)
+  Tiles:
+    Swirl L1 3 dmg, range -1,1, cooldown 3, READY
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 5 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, charging 4 more turns
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame, MassCurse
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 27 | HP 10/10 | wave 5/5 (final)
+  0:.  1:.  2:.  3:.  4:.  5:<YariMaster[2hp FlipRight]  6:HERO>
+  Tiles: Swirl (ready), Arrow (ready), Swirl (ready in 5), ShadowDash (ready in 4) | Swap 0/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                      D1
+  PlayTile Swirl (3)     42.5*
+  PlayTile Arrow         32.3 
+  Flip                    1.7 
+  Wait                   -3.4 
+  F1 PlayTile Swirl (3)
+     beats PlayTile Arrow by 10.2: stack +10.2
+[Info   :Shogun State Logger]   > Decision: PlayTile Swirl | from: Evaluator v0.4 depth 1 | why: score 42.50, plan: PlayTile Swirl (3)
+[Info   :Shogun State Logger]   > HERO queues tile Swirl [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > Turn 27 action: HERO PlayTile [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 28 | WaveRoom | wave 5/5 (final) | 2 coins
+  Grid: 0:.  1:.  2:.  3:.  4:.  5:YariMaster>  6:HERO>
+  Hero: cell 6, facing Right, HP 10/10, special SwapSpecialMove 1/4
+  Enemies (in acting order):
+    YariMaster: cell 5, facing Right, HP 2/4, next: PlayTile Spear
+  Queue: Swirl L1 3 dmg, range -1,1
+  Tiles:
+    Arrow L3 3 dmg, range 1..10, cooldown 1, READY
+    Swirl L1 2 dmg, range -1,1, tile effect FreePlay, cooldown 6, charging 4 more turns
+    ShadowDash 1 dmg, range 1..10, cooldown 5, charging 3 more turns
+  Skills: BigPockets L1
+  Potions: Edamame, Edamame, MassCurse
+[Info   :Shogun State Logger] 
+==== Analysis (v0.4): turn 28 | HP 10/10 | wave 5/5 (final)
+  0:.  1:.  2:.  3:.  4:.  5:YariMaster>[2hp PlayTile]  6:HERO>
+  Tiles: Swirl (queued), Arrow (ready), Swirl (ready in 4), ShadowDash (ready in 3) | Swap 1/4
+  WARNING: the solver doesn't model: skill BigPockets
+  Move                  D1
+  Attack             81.7*
+  Flip               47.6 
+  PlayTile Arrow     47.6 
+  Wait               42.5 
+  F1 Attack
+     beats Flip by 34.1: kills +60.0, stack -40.8, enemy_damage +20.0
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.4 depth 1 | why: score 81.70, plan: Attack
+[Info   :Shogun State Logger]   > Turn 28 action: HERO Attack [from: Evaluator v0.4 depth 1]
+[Info   :Shogun State Logger]   > HERO@6 attacks with Swirl
+[Info   :Shogun State Logger]   > YariMaster@5 dies
+[Info   :Shogun State Logger]   > HERO@6 hits YariMaster@5: 2 damage, HP 2 -> 0
+[Info   :Shogun State Logger]   > Combat ended
+[Info   :Shogun State Logger]   > Key ignored: no combat in progress

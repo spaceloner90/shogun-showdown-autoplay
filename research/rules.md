@@ -121,9 +121,14 @@ The second boss in `logs/run3_v03` showed:
   the first free cell behind it, hitting everyone it passed. With no free cell behind, it does nothing
   and still goes on cooldown. A stack fires from wherever the dash lands.
 
+Fight 7 of the same log showed:
+
+- **Free Play tiles load without using the turn.** They can also be sent back for free, so the solver
+  only ever plays one as part of an attack.
+
 ## Not confirmed yet
 
-- Free Play tiles haven't appeared in a log, so that rule comes from the code alone.
+- Mod 0.8.0 plays Free Play tiles from hand in the same key press as the attack. That hasn't run yet.
 - Whether an enemy can refuse a swap isn't modeled. The game would refuse the move, and the mod would
   log that.
 - The saved fight log never has Swirl hitting two agents at once. An earlier log did show it, but

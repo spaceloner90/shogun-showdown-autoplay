@@ -217,15 +217,51 @@ class RulesTest(unittest.TestCase):
         self.assertEqual(Action("PlayTile", 1).label(state), "PlayTile Swirl (3)")
         self.assertNotEqual(Action("PlayTile", 0).label(state), Action("PlayTile", 1).label(state))
 
-    def test_free_play_tile_does_not_end_the_turn(self):
-        state = make_state(enemies=[enemy(3, action="Attack", queue=[KATANA])])
+    def test_a_free_play_tile_is_not_loaded_ahead_of_time(self):
+        state = make_state(enemies=[enemy(3)])
         state.tiles[0].free_play = True
-        state.turns_until_wave = 5
-        after, outcome = step(state, Action("PlayTile", 0))
-        self.assertEqual(outcome.hp_lost, 0)
-        self.assertEqual(after.turns_until_wave, 5)
-        self.assertEqual(after.enemies[0].action, "Attack")
-        self.assertTrue(after.tiles[0].in_queue)
+        kinds = [(a.kind, a.tile) for a in legal_actions(state)]
+        self.assertNotIn(("PlayTile", 0), kinds)
+        self.assertIn(("PlayTile", 1), kinds)
+
+    def test_a_free_play_tile_can_attack_from_hand_with_an_empty_queue(self):
+        state = make_state(enemies=[enemy(3)])
+        state.tiles[0].free_play = True
+        attacks = [a for a in legal_actions(state) if a.kind == "Attack"]
+        self.assertEqual(attacks, [Action("Attack", order=(0,))])
+        self.assertEqual(attacks[0].label(state), "Attack Swirl (free)")
+        after, outcome = step(state, attacks[0])
+        self.assertEqual(outcome.enemy_damage, 2)
+        self.assertEqual(after.tiles[0].charge, 0)
+        self.assertEqual(outcome.sent_back, 0)
+
+    def test_a_free_play_tile_joins_a_queued_attack_in_any_order(self):
+        state = make_state(enemies=[enemy(3)], queue=["Arrow"])
+        state.tiles[0].free_play = True
+        orders = {a.order for a in legal_actions(state) if a.kind == "Attack"}
+        self.assertEqual(orders, {None, (1, 0), (0, 1), (0,)})
+        self.assertEqual(Action("Attack", order=(0, 1)).label(state), "Attack Swirl (free) > Arrow")
+        _, outcome = step(state, Action("Attack", order=(0, 1)))
+        self.assertEqual(outcome.enemy_damage, 3)  # The 3hp enemy has only 3 to lose.
+        self.assertEqual(outcome.kills, 1)
+
+    def test_a_full_queue_can_trade_a_tile_for_a_free_one(self):
+        state = make_state(enemies=[enemy(3)], queue=["Swirl", "Arrow"])
+        third = Tile(TETSUBO, cooldown=7, charge=7, in_queue=True)
+        fourth = Tile(KATANA, cooldown=0, charge=0, free_play=True)
+        state.tiles += [third, fourth]
+        state.queue_tiles.append(third)
+        state.hero.queue.append(TETSUBO)
+        orders = [a.order for a in legal_actions(state) if a.kind == "Attack"]
+        self.assertTrue(all(o is None or len(o) <= 3 for o in orders))
+        _, outcome = step(state, Action("Attack", order=(3, 0, 1)))
+        self.assertEqual(outcome.sent_back, 1)
+
+    def test_a_free_play_tile_on_cooldown_cannot_join(self):
+        state = make_state(enemies=[enemy(3)], queue=["Arrow"])
+        state.tiles[0].free_play = True
+        state.tiles[0].charge = 1
+        self.assertEqual({a.order for a in legal_actions(state) if a.kind == "Attack"}, {None, })
 
     def test_attack_labels_describe_the_edits(self):
         state = make_state(enemies=[enemy(3)], queue=["Swirl", "Arrow"])
@@ -305,15 +341,24 @@ class EvaluatorTest(unittest.TestCase):
             tile.charge = 0
         self.assertLess(leaf_terms(armed)["distance"], leaf_terms(unarmed)["distance"])
 
-    def test_loads_a_free_play_tile_and_then_acts(self):
-        # Loading is free, so it should come before stepping out of a telegraphed attack.
-        state = make_state(enemies=[enemy(3, action="Attack", queue=[KATANA])])
-        state.tiles[1].free_play = True
-        line = rank_actions(state, depth=1)[0]
-        self.assertEqual(line.actions[0], Action("PlayTile", 1))
-        self.assertEqual(line.labels[0], "PlayTile Arrow (free)")
-        self.assertGreater(len(line.actions), 1)
-        self.assertEqual(line.terms.get("hp_lost", 0), 0)
+    def test_a_free_play_tile_in_hand_counts_toward_the_stack(self):
+        in_hand = make_state(hero_cell=2, facing=1, enemies=[enemy(3, hp=2)])
+        in_hand.tiles[0].free_play = True
+        empty = make_state(hero_cell=2, facing=1, enemies=[enemy(3, hp=2)])
+        self.assertGreater(leaf_terms(in_hand)["stack"], leaf_terms(empty)["stack"])
+
+    def test_a_free_play_tile_in_hand_is_an_answer_to_a_threat(self):
+        state = make_state(hero_cell=0, facing=1, swap_charge=0, enemies=[enemy(1, hp=2, queue=[KATANA])])
+        self.assertEqual(unanswerable_damage(state), 2)
+        state.tiles[0].free_play = True
+        self.assertEqual(unanswerable_damage(state), 0)
+
+    def test_fires_a_free_play_tile_to_kill_an_attacker(self):
+        state = make_state(enemies=[enemy(3, hp=2, action="Attack", queue=[KATANA])])
+        state.tiles[0].free_play = True
+        best = rank_actions(state, depth=1)[0]
+        self.assertEqual(best.actions[0], Action("Attack", order=(0,)))
+        self.assertEqual(best.terms.get("hp_lost", 0), 0)
 
     def test_cornered_but_able_to_kill_has_an_answer(self):
         state = make_state(hero_cell=0, facing=1, enemies=[enemy(1, hp=2, queue=[KATANA])], queue=["Swirl"])

@@ -26,7 +26,7 @@ using BepInEx;
 using HarmonyLib;
 using UnityEngine;
 
-[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.7.0")]
+[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.8.0")]
 public class StateLoggerPlugin : BaseUnityPlugin
 {
     private const float PollIntervalSeconds = 0.1f;
@@ -254,7 +254,8 @@ public class StateLoggerPlugin : BaseUnityPlugin
             ",\"reason\":" + Str(decision.Reason) +
             ",\"basedOnStateSeq\":" + lastStateSequence);
 
-        string refused = WhyActionRefused(combat, decision);
+        // An attack's free edits can fill an empty queue, so it's only checked once they're done.
+        string refused = decision.AttackOrder != null ? null : WhyActionRefused(combat, decision);
         if (refused != null)
         {
             LogEvent("step_refused", "Refused " + actionText + ": " + refused,
@@ -289,15 +290,23 @@ public class StateLoggerPlugin : BaseUnityPlugin
             }
             // Log the edited queue, since that's the state the attack fires from.
             Poll();
+
+            refused = WhyActionRefused(combat, decision);
+            if (refused != null)
+            {
+                LogEvent("step_refused", "Refused " + actionText + ": " + refused,
+                    "\"action\":" + Str(decision.Action.ToString()) + ",\"why\":" + Str(refused));
+                return;
+            }
         }
 
         // Not "sticky": real key presses can queue during a turn, but one press must be one move.
         combat.PlayerInputsCombatAction(decision.Action, false);
     }
 
-    // Makes the free queue edits a chosen attack needs: tiles not firing go back to the hand, through
-    // the same call a click on them uses, and the rest are put in firing order. Returns what went
-    // wrong, or null. Reads the result back rather than assuming the edits worked.
+    // Makes the free edits a chosen attack needs: tiles not firing go back to the hand, Free Play tiles
+    // come from the hand, through the same call a click on them uses, and everything is put in firing
+    // order. Returns what went wrong, or null. Reads the result back rather than assuming it worked.
     private string ApplyAttackOrder(int[] order, string source)
     {
         List<Tile> tiles = GetTiles();
@@ -307,7 +316,10 @@ public class StateLoggerPlugin : BaseUnityPlugin
         {
             if (index < 0 || index >= tiles.Count) return "the order named a tile that doesn't exist";
             Tile tile = tiles[index];
-            if (!(tile.TileContainer is AttackQueueTileContainer)) return TileName(tile) + " isn't in the queue";
+            bool queued = tile.TileContainer is AttackQueueTileContainer;
+            bool freeFromHand = tile.TileContainer is HandTileContainer && tile.TileIsEnabled
+                && tile.Attack.TileEffect == TileEnums.TileEffectEnum.FreePlay;
+            if (!queued && !freeFromHand) return TileName(tile) + " isn't in the queue or free to play";
             wanted.Add(tile);
             wantedNames.Add(TileName(tile));
         }
@@ -316,6 +328,10 @@ public class StateLoggerPlugin : BaseUnityPlugin
         foreach (Tile tile in tiles)
         {
             if (tile.TileContainer is AttackQueueTileContainer && !wanted.Contains(tile)) tile.TileContainer.Submit();
+        }
+        foreach (Tile tile in wanted)
+        {
+            if (tile.TileContainer is HandTileContainer) tile.TileContainer.Submit();
         }
         for (int position = 0; position < wanted.Count; position++)
         {

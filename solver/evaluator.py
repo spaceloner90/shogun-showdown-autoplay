@@ -18,6 +18,8 @@ Principles, from how the game plays:
 - Killing fast matters, because the next wave arrives on a timer and can overload the room.
 - Queue edits are free, so a loaded tile commits to nothing: it can be reordered or taken back when
   firing. Loading early is an option worth having even with nothing in range yet.
+- A Free Play tile in hand is as good as loaded, since it can join any attack for free. So it's only
+  ever played as part of an attack, and it counts toward a stack from the hand.
 - A kill is worth far more than the same damage as a wound, and one volley doing the work of several
   saves turns. So what a stack could do counts even when it needs a step or a flip to get there.
   Bosses need no special handling: when no stack can reach a kill, there's no kill to value.
@@ -34,10 +36,10 @@ import copy
 import itertools
 from dataclasses import dataclass, field
 
-from rules import (ONE_ENEMY_WAVE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, apply_attack, can_swap,
-                   is_free_action, legal_actions, step)
+from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, apply_attack,
+                   can_swap, fireable_attacks, legal_actions, step)
 
-VERSION = "v0.4"
+VERSION = "v0.5"
 
 WEIGHTS = {
     # What happens along the line.
@@ -117,12 +119,12 @@ def _stack_value(state):
 
     Firing order is free, so every order is tried. Only the hero moves here: enemies stay put.
     """
-    queue = state.hero.queue
-    if not queue:
+    attacks_available = fireable_attacks(state)
+    if not attacks_available:
         return 0.0
     fractions = WEIGHTS["stack_fractions"]
     best = 0.0
-    orders = list(itertools.permutations(queue))
+    orders = list(itertools.permutations(attacks_available, min(len(attacks_available), QUEUE_CAP)))
     for direction in (0, -1, 1):
         for steps in range(0 if direction == 0 else 1, 1 if direction == 0 else len(fractions)):
             cell = state.hero.cell + direction * steps
@@ -186,11 +188,13 @@ def unanswerable_damage(state):
                 best = min(best, _threat_damage(state, cell))
             elif can_swap(state, direction):
                 best = min(best, _threat_after_swap(state, direction))
-    if hero.queue:
-        for attacks in itertools.permutations(hero.queue):
-            trial, _ = _preview_fire(state, attacks)
-            trial.enemies = [e for e in trial.enemies if e.alive]
-            best = min(best, _threat_damage(trial, trial.hero.cell))
+    attacks_available = fireable_attacks(state)
+    for attacks in itertools.permutations(attacks_available, min(len(attacks_available), QUEUE_CAP)):
+        if not attacks:
+            break
+        trial, _ = _preview_fire(state, attacks)
+        trial.enemies = [e for e in trial.enemies if e.alive]
+        best = min(best, _threat_damage(trial, trial.hero.cell))
     return best
 
 
@@ -253,7 +257,7 @@ def leaf_terms(state: State) -> dict[str, float]:
     terms = {
         "stack": _stack_value(state),
         "ready_tiles": WEIGHTS["ready_tile"] * sum(t.ready for t in state.tiles),
-        "loaded": WEIGHTS["loaded_damage"] * sum(a.value for a in state.hero.queue),
+        "loaded": WEIGHTS["loaded_damage"] * sum(a.value for a in fireable_attacks(state)),
         "swap_ready": WEIGHTS["swap_ready"] if state.swap_charge >= state.swap_cooldown else 0.0,
     }
     terms.update(_position_terms(state))
@@ -281,11 +285,6 @@ def _merge(total, terms, scale=1.0):
 def _evaluate_action(state, action, depth, scale):
     """Scores taking `action` now and then playing the best line for the remaining depth."""
     next_state, outcome = step(state, action)
-    if is_free_action(state, action):
-        # The turn isn't over, so this is only worth what the rest of the turn can do with it.
-        best = _best_line(next_state, depth, scale)
-        return Line([action] + best.actions, best.score, [action.label(state)] + best.labels,
-                    best.terms, best.position_next_turn)
     dead = not next_state.hero.alive
     terms = {}
     _merge(terms, outcome_terms(outcome, dead), scale)

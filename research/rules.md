@@ -159,12 +159,35 @@ The 9-cell fight with mass ice, also in that log, showed:
 - **The Curse attack goes through a shield.** On turn 25 it cursed a shielded Yari Master. Shadow Dash then
   broke the shield without using up the curse, and Swirl's 2 was doubled to 4 for the kill.
 - **Two Free Play tiles work in one key press** (turns 25, 34 and 40).
-- **Perfect Strike recharges its tile on an exact kill** (turns 34 and 53). The simulator doesn't model
-  this, so each shows as one prediction miss.
+- **Perfect Strike recharges its tile on an exact kill** (turns 34 and 53), counting a curse's doubling.
+  Simulated as of v0.11.
 - **Frozen enemies telegraph Wait and don't act.** Ice counted 4, 3, 2, 1 from a potion that says 3 turns.
 - **A flip potion changes facing at once,** without using a turn.
 
+Later bosses in that log, with the rules read from the game's code (simulated as of v0.11):
+
+- **Corrupted Barrage** (final boss) hits the cells beside its user at once, then spreads one cell further
+  each way per turn, from where it was fired, even if the user moves. On turn 37 it fired from cell 3, and on
+  turn 39 it hit the hero on cell 0 for 3. The cells next in line show warnings in the game, and the mod
+  logs them as `hazards`. It heals a boss standing on a struck cell, and a shield blocks it.
+- **A boss dying kills everyone else in the room.** The final boss's first phase then turns into the next.
+- **The Twins:** damage to the Side twin also comes off the Main twin, and the Main twin dying kills the
+  Side twin. Damage to the Main twin doesn't reach the Side twin, whose own HP never matters.
+- **Smoke Bomb** trades places with the first target in range, then hits it. It does nothing to an
+  immovable target. Kowa's "teleport" is this tile.
+- **Swap Toss** trades the contents of the cells on either side of its user. Both cells must exist, and
+  neither occupant can be immovable.
+- **Mirror** moves its user across the room's middle (the left of the two on an even room), trading places
+  with anyone there. Both turn around.
+- **Origin of Symmetry** moves its user to the centre, trading places with anyone there. Nobody turns.
+- **Dragon Punch** hits, then pushes the target as far as it goes. If someone stops it, they each take 1.
+
 ## Not confirmed yet
+
+- **The Corrupted Barrage warnings** are read from the game's task object. The rule above comes from the
+  code and two logged hits, and no log has the new `hazards` field yet.
+- **Mirror on an even room's last cell** would land off the board. The simulator treats that as doing nothing.
+- **Unfriendly Fire** is assumed to add its level to enemy-on-enemy hits, except collisions.
 
 - **Damaging Move** comes from the code alone. A swap makes a normal hit on the enemy passed through, for
   damage equal to the skill's level. A shield blocks it, a curse doubles it, and it can kill.

@@ -29,6 +29,8 @@ Principles, from how the game plays:
   Spending it on a hit that could have been dodged has a cost.
 - An enemy's shield is different: it has to be removed anyway, so it counts as extra HP, equal to the
   hero's weakest tile, since that's the cheapest way to remove it. Breaking one earns that credit.
+- When a boss dies, everyone else dies too. Ordinary summons are still real threats worth killing, but
+  the Shogun's statues are only there to get in the way, so the boss comes first.
 
 All the weights are first guesses, kept together here so they're easy to change.
 
@@ -43,15 +45,16 @@ import itertools
 from dataclasses import dataclass, field
 
 from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, apply_attack,
-                   can_swap, fireable_attacks, land_hit, legal_actions, step)
+                   can_swap, fireable_attacks, is_tank, land_hit, legal_actions, step, strike_cell)
 
-VERSION = "v0.10"
+VERSION = "v0.11"
 
 WEIGHTS = {
     # What happens along the line.
     "hp_lost": -100.0,        # Per HP. The goal is to clear the battle without losing any.
     "death": -10000.0,
     "enemy_damage": 10.0,     # Per enemy HP removed by the hero.
+    "tank_damage": 2.5,       # Per HP removed from a tank that will die with its boss anyway.
     "kill": 60.0,
     "friendly_damage": 8.0,   # Per enemy HP removed by another enemy.
     "wasted_attack": -5.0,    # Per queued attack that fires at nothing.
@@ -126,12 +129,17 @@ def _cheapest_hit(state):
 
 
 def _effective_hp(state, enemy):
-    return enemy.hp + (_cheapest_hit(state) if enemy.shield else 0)
+    hp = enemy.hp
+    # Damage to the Side twin comes off the Main twin, so the Main twin's HP is what it takes to win.
+    if enemy.kind == "TwinSideBoss":
+        hp = next((e.hp for e in state.enemies if e.kind == "TwinMainBoss" and e.alive), hp)
+    return hp + (_cheapest_hit(state) if enemy.shield else 0)
 
 
 def _volley_value(outcome, cheapest_hit):
     broken = outcome.shields_broken * cheapest_hit * WEIGHTS["enemy_damage"]
-    return outcome.enemy_damage * WEIGHTS["enemy_damage"] + outcome.kills * WEIGHTS["kill"] + broken
+    return (outcome.enemy_damage * WEIGHTS["enemy_damage"] + outcome.tank_damage * WEIGHTS["tank_damage"]
+            + outcome.kills * WEIGHTS["kill"] + broken)
 
 
 def _stack_value(state):
@@ -183,7 +191,7 @@ def _curse_value(state):
         return 0.0
     total = 0.0
     for enemy in state.enemies:
-        if not enemy.alive or not enemy.curse:
+        if not enemy.alive or not enemy.curse or is_tank(state, enemy):
             continue
         with_curse = without_curse = 0.0
         for tile in state.tiles:
@@ -211,6 +219,10 @@ def _threat_damage(state, cell):
         for attack in enemy.queue:
             attack = ASSUMED_UNKNOWN if attack.name == UNKNOWN_TILE else attack
             apply_attack(trial, enemy, attack, outcome)
+    # Corruption marked on the cells for the coming turn.
+    for hazard in state.hazards:
+        if trial.hero.cell in hazard["groups"][0]:
+            strike_cell(trial, None, trial.hero.cell, hazard["damage"], outcome)
     return outcome.hp_lost
 
 
@@ -257,6 +269,7 @@ def ideal_target(state):
     enemies = [e for e in state.enemies if e.alive]
     if not enemies:
         return None
+    enemies = [e for e in enemies if not is_tank(state, e)] or enemies
     return min(enemies, key=lambda e: (_effective_hp(state, e), abs(e.cell - state.hero.cell)))
 
 
@@ -298,7 +311,8 @@ def _position_terms(state):
 
 
 def _pressure_terms(state):
-    hp_left = sum(_effective_hp(state, e) for e in state.enemies if e.alive)
+    hp_left = sum(_effective_hp(state, e) for e in state.enemies
+                  if e.alive and e.kind != "TwinSideBoss" and not is_tank(state, e))
     terms = {"enemy_hp_left": WEIGHTS["enemy_hp_left"] * hp_left}
     if state.turns_until_wave is not None and not state.last_wave:
         closeness = 1.0 - max(0, min(state.turns_until_wave, ONE_ENEMY_WAVE_CAP)) / ONE_ENEMY_WAVE_CAP
@@ -325,6 +339,7 @@ def leaf_terms(state: State) -> dict[str, float]:
 def outcome_terms(outcome: Outcome, hero_dead: bool, cheapest_hit: int = 1) -> dict[str, float]:
     return {
         "shields_broken": WEIGHTS["enemy_damage"] * cheapest_hit * outcome.shields_broken,
+        "tank_damage": WEIGHTS["tank_damage"] * outcome.tank_damage,
         "hp_lost": WEIGHTS["hp_lost"] * outcome.hp_lost,
         "death": WEIGHTS["death"] if hero_dead else 0.0,
         "enemy_damage": WEIGHTS["enemy_damage"] * outcome.enemy_damage,

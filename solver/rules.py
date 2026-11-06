@@ -14,17 +14,27 @@ ONE_ENEMY_WAVE_CAP = 6
 
 # Attacks whose behaviour is fully covered by their logged range, damage and first-target flag, plus
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
-MODELED = {"Arrow", "BackCharge", "BackShadowDash", "Charge", "Curse", "Dash", "EarthImpale", "GrapplingHook", "Katana",
-           "Shield", "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Spear", "Swirl", "Tetsubo"}
+MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Charge", "CorruptedBarrage", "Curse", "Dash",
+           "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Mirror", "OriginOfSymmetry", "Shield",
+           "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "SmokeBomb", "Spear", "Summon", "SwapToss",
+           "Swirl", "Tetsubo"}
 
 # Skills the solver handles. Most need no modeling because their effects show up in the logged state,
-# like a shield, max HP or a shorter Swap cooldown. Damaging Move is simulated.
-UNDERSTOOD_SKILLS = {"BigPockets", "DamagingMove", "Fortress", "Healthy", "QuickRecovery"}
+# like a shield, max HP or a shorter Swap cooldown. Damaging Move and Unfriendly Fire are simulated.
+UNDERSTOOD_SKILLS = {"BigPockets", "DamagingMove", "Fortress", "Healthy", "QuickRecovery", "UnfriendlyFire"}
+
+# Enemy traits that need no warning. Heavy is modeled, and the others haven't changed any prediction.
+UNDERSTOOD_TRAITS = {"Aggro", "Heavy", "Quick", "Unfreezable"}
+
+# Not worth fighting while a boss is alive: it dies with the boss anyway. A one-off for the Shogun's
+# statues. Other bosses' summons are real threats, and the game doesn't even show a statue's HP.
+TANKS = {"ShogunSummoner"}
 
 # Attacks that move the attacker. Each value is the direction relative to the attacker's facing.
 CHARGES = {"Charge": 1, "BackCharge": -1}  # Run to the last free cell, and hit whatever is next.
 PLAIN_DASHES = {"Dash": 1}                 # Run to the last free cell, and hit nothing.
 SHADOW_DASHES = {"ShadowDash": 1, "BackShadowDash": -1}  # Land behind a target, hitting all they pass.
+SMOKE_BOMBS = {"SmokeBomb", "BackSmokeBomb"}  # Trade places with the first target, then hit it.
 
 # An enemy tile being played. Its identity isn't visible until it lands in the queue.
 UNKNOWN_TILE = "Unknown"
@@ -88,6 +98,9 @@ class State:
     turns_until_wave: int | None = None
     last_wave: bool = False
     swap_damage: int = 0  # What a swap deals to the enemy passed through, from Damaging Move.
+    friendly_bonus: int = 0  # Extra damage when enemies hit each other, from Unfriendly Fire.
+    # Corruption on its way: each is {"damage", "groups"}, and the first group of cells strikes this turn.
+    hazards: list[dict] = field(default_factory=list)
 
     def occupant(self, cell):
         if self.hero.alive and self.hero.cell == cell:
@@ -108,6 +121,8 @@ class Outcome:
     wasted_attacks: int = 0
     sent_back: int = 0  # Queued tiles returned to hand instead of firing. Each costs a turn to reload.
     shields_broken: int = 0  # Enemy shields removed by the hero.
+    tank_damage: int = 0  # Damage by the hero to a tank while its boss is alive, kept out of enemy_damage.
+    exact_hits: int = 0  # Hits by the hero that dealt exactly the target's remaining HP.
     unmodeled: list[str] = field(default_factory=list)
 
 
@@ -206,6 +221,9 @@ def state_from_log(row):
         last_wave=wave["isLast"] if wave else False,
         swap_damage=next((s["level"] for s in row.get("skills") or []
                           if isinstance(s, dict) and s.get("name") == "DamagingMove"), 0),
+        friendly_bonus=next((s["level"] for s in row.get("skills") or []
+                             if isinstance(s, dict) and s.get("name") == "UnfriendlyFire"), 0),
+        hazards=[{"damage": h["damage"], "groups": [list(g) for g in h["groups"]]} for h in row.get("hazards") or []],
     )
 
 
@@ -220,7 +238,7 @@ def unmodeled_content(row):
     def check_attack(data):
         if data["name"] not in MODELED and data["name"] != UNKNOWN_TILE:
             note(f"attack {data['name']}")
-        if data.get("effect") not in (None, "None", "Curse"):
+        if data["name"] != "Summon" and data.get("effect") not in (None, "None", "Curse", "PerfectStrike"):
             note(f"{data['name']} effect {data['effect']}")
         if data.get("tileEffect") not in (None, "None", "FreePlay"):
             note(f"{data['name']} tile effect {data['tileEffect']}")
@@ -245,7 +263,8 @@ def unmodeled_content(row):
         if enemy.get("elite") not in (None, "None"):
             note(f"elite {enemy['kind']}")
         for trait in enemy.get("traits") or []:
-            note(f"{enemy['kind']} trait {trait}")
+            if trait not in UNDERSTOOD_TRAITS:
+                note(f"{enemy['kind']} trait {trait}")
     for skill in row.get("skills") or []:
         name = skill.get("name", skill) if isinstance(skill, dict) else skill
         if name not in UNDERSTOOD_SKILLS:
@@ -366,7 +385,117 @@ def attack_hits(state, attacker, attack):
         return []
     if attack.name in SHADOW_DASHES:
         return shadow_dash(state, attacker, attack, attacker.facing * SHADOW_DASHES[attack.name])
+    if attack.name in SMOKE_BOMBS:
+        targets = targets_of(state, attacker, attack)
+        if not targets or not targets[0].movable:
+            return []
+        attacker.cell, targets[0].cell = targets[0].cell, attacker.cell
+        return targets[:1]
     return targets_of(state, attacker, attack)
+
+
+def is_boss(agent):
+    return agent.kind.endswith("Boss")
+
+
+def is_tank(state, agent):
+    """An enemy not worth fighting right now, since it dies with the boss."""
+    return agent.kind in TANKS and any(e.alive and is_boss(e) for e in state.enemies)
+
+
+def swap_toss(state, attacker):
+    """Swaps whoever is on the cells directly either side of the attacker, if both cells exist."""
+    left_cell, right_cell = attacker.cell - 1, attacker.cell + 1
+    if not (0 <= left_cell and right_cell < state.cells):
+        return False
+    left, right = state.occupant(left_cell), state.occupant(right_cell)
+    if (left and not left.movable) or (right and not right.movable):
+        return False
+    if left:
+        left.cell = right_cell
+    if right:
+        right.cell = left_cell
+    return bool(left or right)
+
+
+def mirror_cell(cells, cell):
+    middle = cells // 2 - (1 if cells % 2 == 0 else 0)
+    return cell + 2 * (middle - cell)
+
+
+def mirror(state, attacker):
+    """Moves the attacker to the mirrored cell, trading places with anyone there. Both turn around."""
+    start = attacker.cell
+    target_cell = mirror_cell(state.cells, start)
+    if not 0 <= target_cell < state.cells:
+        return False
+    occupant = state.occupant(target_cell) if target_cell != start else None
+    if occupant is not None and not occupant.movable:
+        return False
+    attacker.cell = target_cell
+    attacker.facing = -attacker.facing
+    if occupant is not None:
+        occupant.cell = start
+        occupant.facing = -occupant.facing
+    return True
+
+
+def origin_of_symmetry(state, attacker):
+    """Moves the attacker to the central cell, trading places with anyone there."""
+    start = attacker.cell
+    center = (state.cells - 1) // 2
+    occupant = state.occupant(center) if center != start else None
+    if occupant is not None and not occupant.movable:
+        return False
+    attacker.cell = center
+    if occupant is not None:
+        occupant.cell = start
+    return center != start
+
+
+def push(state, attacker, target, direction, outcome):
+    """Pushes the target as far as it goes. If someone stops it, each of them takes a collision hit."""
+    behind = run_to_last_free_cell(state, target, direction)
+    if behind:
+        land_hit(state, attacker, behind[0], 1, outcome, collision=True)
+        land_hit(state, attacker, target, 1, outcome, collision=True)
+
+
+def strike_cell(state, attacker, cell, damage, outcome):
+    """Corruption damages whoever is on the cell, but heals a boss."""
+    agent = state.occupant(cell)
+    if agent is None:
+        return
+    if is_boss(agent):
+        agent.hp = min(agent.max_hp, agent.hp + damage)
+    else:
+        land_hit(state, attacker, agent, damage, outcome, collision=True)
+
+
+def corrupted_barrage(state, attacker, attack, outcome):
+    """Strikes the cells beside the attacker now, then one cell further out each turn."""
+    origin = attacker.cell
+    for cell in (origin - 1, origin + 1):
+        strike_cell(state, attacker, cell, attack.value, outcome)
+    groups = []
+    for distance in range(2, state.cells):
+        cells = [c for c in (origin - distance, origin + distance) if 0 <= c < state.cells]
+        if cells:
+            groups.append(cells)
+    if groups:
+        state.hazards = state.hazards + [{"damage": attack.value, "groups": groups}]
+
+
+def strike_hazards(state, outcome, count):
+    """The first `count` hazards strike their next group of cells. Any after those were fired this turn."""
+    remaining = []
+    for hazard in state.hazards[:count]:
+        cells, later = hazard["groups"][0], hazard["groups"][1:]
+        for cell in cells:
+            strike_cell(state, None, cell, hazard["damage"], outcome)
+        if later:
+            remaining.append({"damage": hazard["damage"], "groups": later})
+    state.hazards = remaining + state.hazards[count:]
 
 
 def shield_first_ally(state, attacker, attack):
@@ -390,6 +519,17 @@ def apply_attack(state, attacker, attack, outcome):
     if attack.name == "ShieldAllied":
         shield_first_ally(state, attacker, attack)
         return
+    # Where a summon lands is random, so a player can't react to it either. It's ignored on purpose.
+    if attack.name == "Summon":
+        return
+    if attack.name in ("SwapToss", "Mirror", "OriginOfSymmetry"):
+        moves = {"SwapToss": swap_toss, "Mirror": mirror, "OriginOfSymmetry": origin_of_symmetry}
+        if not moves[attack.name](state, attacker) and attacker is state.hero:
+            outcome.wasted_attacks += 1
+        return
+    if attack.name == "CorruptedBarrage":
+        corrupted_barrage(state, attacker, attack, outcome)
+        return
     if attack.name == "Curse":
         # A projectile rather than a hit, so a shield neither stops it nor is used up by it.
         targets = targets_of(state, attacker, attack)
@@ -404,6 +544,9 @@ def apply_attack(state, attacker, attack, outcome):
     if not hits and attacker is state.hero and attacker.cell == start_cell:
         outcome.wasted_attacks += 1
     for target in hits:
+        # A boss killed earlier in this sweep takes everyone else with it.
+        if not target.alive:
+            continue
         land_hit(state, attacker, target, attack.value, outcome)
         # After the hit, so a curse never doubles the attack that applied it.
         if target.alive and attack.effect == "Curse":
@@ -411,26 +554,43 @@ def apply_attack(state, attacker, attack, outcome):
         # A shield blocks the hook's damage, but not its pull.
         if attack.name == "GrapplingHook" and target.alive and target.movable:
             target.cell = attacker.cell + attacker.facing
+        if attack.name == "DragonPunch" and target.alive and target.movable:
+            push(state, attacker, target, attacker.facing, outcome)
 
 
-def land_hit(state, attacker, target, value, outcome):
+def land_hit(state, attacker, target, value, outcome, collision=False):
     # A shield blocks the hit and leaves any curse in place. A tile's effect still lands afterward.
     if target.shield:
         target.shield = False
-        if attacker is state.hero:
+        if attacker is state.hero and not is_tank(state, target):
             outcome.shields_broken += 1
     else:
-        deal_damage(state, attacker, target, value, outcome)
+        deal_damage(state, attacker, target, value, outcome, collision)
 
 
-def deal_damage(state, attacker, target, value, outcome):
+def end_of_boss(state):
+    """When a boss dies, everyone else in the room dies with it."""
+    for enemy in state.enemies:
+        enemy.hp = 0
+
+
+def deal_damage(state, attacker, target, value, outcome, collision=False):
+    enemy_on_enemy = attacker is not None and attacker is not state.hero and target is not state.hero
+    if enemy_on_enemy and not collision:
+        value += state.friendly_bonus
     if target.curse and value > 0:
         value *= 2
         target.curse = False
+    if attacker is state.hero and value == target.hp:
+        outcome.exact_hits += 1
     damage = min(value, target.hp)
+    tank = is_tank(state, target)
     target.hp -= damage
     if target is state.hero:
         outcome.hp_lost += damage
+    elif tank:
+        if attacker is state.hero:
+            outcome.tank_damage += damage
     elif attacker is state.hero:
         outcome.enemy_damage += damage
         if not target.alive:
@@ -440,15 +600,29 @@ def deal_damage(state, attacker, target, value, outcome):
         outcome.friendly_damage += damage
         if not target.alive:
             outcome.kills += 1
+    # Damage to the Side twin also comes off the Main twin, the real HP pool.
+    if target.kind == "TwinSideBoss":
+        main = next((e for e in state.enemies if e.kind == "TwinMainBoss" and e.alive), None)
+        if main is not None:
+            main.hp = max(0, main.hp - damage)
+            if not main.alive:
+                outcome.kills += 1
+                end_of_boss(state)
+    elif is_boss(target) and not target.alive:
+        end_of_boss(state)
 
 
 def fire_hero_queue(state, outcome, order=None):
     """Fires the chosen tiles in order. Any others go back to the hand, still charged."""
     fired = list(state.queue_tiles) if order is None else [state.tiles[i] for i in order]
     for tile in fired:
+        exact_before = outcome.exact_hits
         apply_attack(state, state.hero, tile.attack, outcome)
         tile.charge = 0
         tile.just_played = True
+        # Perfect Strike: an exact kill recharges the tile straight away.
+        if tile.attack.effect == "PerfectStrike" and outcome.exact_hits > exact_before:
+            tile.charge = tile.cooldown
     outcome.sent_back += sum(not any(t is f for f in fired) for t in state.queue_tiles)
     for tile in state.queue_tiles:
         tile.in_queue = False
@@ -552,6 +726,8 @@ def step(state, action):
     next_state = copy.deepcopy(state)
     outcome = Outcome()
     swapped = hero_action(next_state, action, outcome)
+    already_on_the_way = len(next_state.hazards)
     resolve_enemies(next_state, outcome)
+    strike_hazards(next_state, outcome, already_on_the_way)
     end_turn(next_state, swapped)
     return next_state, outcome

@@ -19,26 +19,16 @@ Enemy AI code is for offline simulation and tuning only.
 
 ## Not modeled yet
 
-- **Attacks that displace others:** DragonPunch, KiPush, TwinTessen, Hookblade, SmokeBomb, Mirror,
-  OriginOfSymmetry, Tanegashima. Each needs its rules read first.
-- **Summons:** a Summon's arrival isn't predicted, and summons die with their boss. Both prediction
-  misses in run 2 are Summons.
-- **The Twins (to fix as a one-off):** this appears to always be boss 3, and it's a mechanic a player
-  would understand. Damage to the Side twin also comes off the Main twin, and the Side twin dies with
-  it. F1 sees a 35 HP boss and a separate 100 HP one, so it goes for the Main twin only because it's
-  the lower HP, and hits on the Side twin count for no kill.
-- **Swap Toss (to model):** swaps the contents of the cells directly ahead and behind, moving whoever
-  is there. A standard movement ability, like the dashes. It moved the hero on turn 16 of that fight.
+- **Attacks that displace others:** KiPush, TwinTessen, Hookblade, Tanegashima. Each needs its rules
+  read first, as they come up.
+- **Other corruption patterns:** the game can also send corruption left to right, right to left, or even
+  and odd cells in turn. The mod logs all of them as `hazards`, and only the attack that starts them
+  needs adding, but none has been seen yet.
 - **Heavy enemies:** as of v0.9, the solver assumes the Heavy trait means an enemy can't be swapped or
   pulled. The code shows swap and hook need a movable target, but the link to Heavy is an inference.
-- **Simple swaps (to model):** Smoke Bomb swaps its user with the first target ahead, much like Swap, at
-  any range, and deals 1. Kowa's "teleport" is this tile. On turn 24 of that fight, it swapped the boss and
-  hero across the board, then hit for 1 (blocked by a shield). F1 sees only the 1 damage, not the swap.
 - **Summon (ignoring on purpose):** where a summon appears is random, so a player can't react to it
   either. It will keep causing a prediction miss each time, which is expected.
-- **Perfect Strike:** a tile with this effect recharges fully when its hit deals exactly the target's
-  remaining HP, counting a curse's doubling. Not modeled, and cooldowns aren't valued anyway, so F1
-  won't aim for it. A kill that triggers it just gets read correctly on the next turn.
+- **Perfect Strike:** simulated as of v0.11, but cooldowns aren't valued, so F1 won't aim for it.
 - **Shield refinements:** a shield is worth a flat 1 HP (v0.7). It should be worth less near the end of
   a fight, since it usually expires then, and hitting an enemy's shield still scores nothing.
 - **Frozen enemies with a loaded attack:** the threat check doesn't know a frozen enemy can't fire, so
@@ -90,6 +80,24 @@ From play: Dash plus a free Swirl could work as a gap closer, one of the few way
 threatening a kill when Arrow is down. Today F1 spends these at the first opportunity. A stack is valued
 for what it can do now or within a few moves, so nothing rewards saving a tile for a threat that
 hasn't appeared yet. This likely needs a lot of tuning, which is what simulated fights would be for.
+
+## Firing a free Swirl alone (decision postponed)
+
+From play: once the free Swirl reached 0 cooldown, F1 looked too eager to spend a turn on its 2 damage,
+three turns in a row at one point (fight 13 of run 3, turns 41 to 43). Unresolved, and left as it was in v0.11.
+
+Measured with enemies standing still, on the final deck and the positions of `logs/run3_part2`:
+
+- From beside a single enemy, F1 already matches the fastest kill an exhaustive search finds: 2, 6 and 10
+  turns for 12, 25 and 40 HP. The 40 HP kill includes lone tiles, so firing one isn't wrong by itself.
+- Of 27 positions where F1 fires a free tile alone, it clears as fast as possible in 13, is 1 or 2 turns
+  slower in 8, and the search ran out of time on 6, including turns 41 to 43 above. This doesn't yet
+  show whether the Swirl lost that time or F1's later moves did.
+- Raising the stack values shortens some hunts: 40 HP from any start averaged 13.9 turns, against 12.5 at
+  a share of 0.7. But it also puts off kills: of the choices that killed at 0.6, 9 no longer do at 0.7,
+  21 at 0.8 and 30 at 0.9.
+
+Next idea to test: raise what a stack's damage is worth while holding what its kills are worth.
 
 ## Ideas not yet tried
 

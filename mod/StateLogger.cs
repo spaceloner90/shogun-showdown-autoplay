@@ -26,7 +26,7 @@ using BepInEx;
 using HarmonyLib;
 using UnityEngine;
 
-[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.8.0")]
+[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.9.0")]
 public class StateLoggerPlugin : BaseUnityPlugin
 {
     private const float PollIntervalSeconds = 0.1f;
@@ -490,6 +490,8 @@ public class StateLoggerPlugin : BaseUnityPlugin
         sb.Append(",\"coins\":").Append(Globals.Coins);
         sb.Append(",\"wave\":");
         AppendWave(sb, room as WaveRoom);
+        sb.Append(",\"hazards\":");
+        AppendHazards(sb);
 
         sb.Append(",\"hero\":");
         AppendAgent(sb, hero, hero.HeroEnum.ToString());
@@ -541,6 +543,40 @@ public class StateLoggerPlugin : BaseUnityPlugin
         }
         sb.Append("]");
         return sb.ToString();
+    }
+
+    // Corruption on its way, which the game shows the player as warnings on the cells. Each entry lists
+    // groups of cells in striking order, starting with the group marked for the coming turn.
+    private static void AppendHazards(StringBuilder sb)
+    {
+        sb.Append("[");
+        bool first = true;
+        foreach (CorruptionAttackCombatTask task in UnityEngine.Object.FindObjectsOfType<CorruptionAttackCombatTask>())
+        {
+            Traverse fields = Traverse.Create(task);
+            List<List<Cell>> groups = fields.Field("cellsToStrike").GetValue<List<List<Cell>>>();
+            int next = fields.Field("iCurrentCellGroup").GetValue<int>();
+            if (groups == null) continue;
+            int start = Math.Max(0, next - 1);
+            if (start >= groups.Count) continue;
+
+            if (!first) sb.Append(",");
+            first = false;
+            sb.Append("{\"damage\":").Append(fields.Field("damage").GetValue<int>()).Append(",\"groups\":[");
+            for (int i = start; i < groups.Count; i++)
+            {
+                if (i > start) sb.Append(",");
+                sb.Append("[");
+                for (int j = 0; j < groups[i].Count; j++)
+                {
+                    if (j > 0) sb.Append(",");
+                    sb.Append(groups[i][j].IndexInGrid);
+                }
+                sb.Append("]");
+            }
+            sb.Append("]}");
+        }
+        sb.Append("]");
     }
 
     private static void AppendWave(StringBuilder sb, WaveRoom room)

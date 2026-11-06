@@ -157,5 +157,35 @@ class GoodPlaysToKeep(unittest.TestCase):
             self.assertEqual(choice(fight, turn).terms.get("hp_lost", 0), 0, (fight, turn))
 
 
+def final_boss_rows():
+    """The first state of each turn of the final boss in the winning run."""
+    rows = ROWS["run3_part2"]
+    starts = [i for i, r in enumerate(rows) if r.get("event") == "combat_start"]
+    start = next(i for i in reversed(starts) if rows[i + 1:] and any(
+        r["type"] == "state" and r["room"] == "ShogunBossRoom" for r in rows[i:i + 5]))
+    first = {}
+    for row in rows[start:]:
+        if row["type"] == "state" and row["enemies"]:
+            first.setdefault(row["turn"], row)
+    return first
+
+
+class FinalBoss(unittest.TestCase):
+    def test_steps_off_the_cell_the_ring_is_about_to_reach(self):
+        # Turn 39: fired from cell 3 on turn 37, the ring reached the hero on cell 0 for 3 damage.
+        state = state_from_log(final_boss_rows()[39])
+        state.hazards = [{"damage": 3, "groups": [[0, 6]]}]
+        self.assertEqual(rank_actions(state, depth=1)[0].terms.get("hp_lost", 0), 0)
+
+    def test_the_boss_comes_first_when_it_can_be_hit(self):
+        # In the first phase, whenever an attack reaches both, the line chosen shouldn't favour a statue.
+        for turn, row in final_boss_rows().items():
+            if not any(e["kind"] == "ShogunPhase1Boss" for e in row["enemies"]):
+                continue
+            best = rank_actions(state_from_log(row), depth=1)[0]
+            if best.terms.get("tank_damage", 0) > 0:
+                self.assertGreater(best.terms.get("enemy_damage", 0) + best.terms.get("shields_broken", 0), 0, turn)
+
+
 if __name__ == "__main__":
     unittest.main()

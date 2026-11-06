@@ -921,5 +921,343 @@ class EvaluatorTest(unittest.TestCase):
         self.assertLess(leaf_terms(near)["wave_pressure"], leaf_terms(far)["wave_pressure"])
 
 
+def fire(state, attack, cooldown=3):
+    """The hero fires this attack, then the enemies take their turn."""
+    tile = Tile(attack, cooldown=cooldown, charge=cooldown, in_queue=True)
+    state.tiles.append(tile)
+    state.hero.queue = [attack]
+    state.queue_tiles = [tile]
+    return step(state, Action("Attack"))
+
+
+FAR = list(range(1, 11))
+SMOKE_BOMB = Attack("SmokeBomb", 1, FAR, first_target=True)
+BACK_SMOKE_BOMB = Attack("BackSmokeBomb", 1, [-r for r in FAR], first_target=True)
+SWAP_TOSS = Attack("SwapToss", 0, [-1, 1])
+MIRROR = Attack("Mirror", 0, [])
+ORIGIN = Attack("OriginOfSymmetry", 0, [])
+PUNCH = Attack("DragonPunch", 1, [1], first_target=True)
+BARRAGE = Attack("CorruptedBarrage", 3, [-1, 1])
+
+
+class SwapAndMoveAttackTest(unittest.TestCase):
+    def test_smoke_bomb_trades_places_then_hits(self):
+        after, outcome = fire(make_state(enemies=[enemy(4)]), SMOKE_BOMB)
+        self.assertEqual((after.hero.cell, after.enemies[0].cell), (4, 2))
+        self.assertEqual(outcome.enemy_damage, 1)
+
+    def test_back_smoke_bomb_works_behind_the_hero(self):
+        after, _ = fire(make_state(enemies=[enemy(0)]), BACK_SMOKE_BOMB)
+        self.assertEqual((after.hero.cell, after.enemies[0].cell), (0, 2))
+
+    def test_smoke_bomb_fails_on_a_heavy_target(self):
+        heavy = enemy(4)
+        heavy.movable = False
+        after, outcome = fire(make_state(enemies=[heavy]), SMOKE_BOMB)
+        self.assertEqual((after.hero.cell, after.enemies[0].hp, outcome.wasted_attacks), (2, 3, 1))
+
+    def test_an_enemys_smoke_bomb_moves_the_hero(self):
+        after, outcome = step(make_state(enemies=[enemy(4, action="Attack", queue=[SMOKE_BOMB])]), Action("Wait"))
+        self.assertEqual((after.hero.cell, after.enemies[0].cell, outcome.hp_lost), (4, 2, 1))
+
+    def test_swap_toss_trades_the_cells_either_side(self):
+        tosser = enemy(3, action="Attack", queue=[SWAP_TOSS])
+        after, outcome = step(make_state(enemies=[tosser, enemy(4)]), Action("Wait"))
+        self.assertEqual(after.hero.cell, 4)
+        self.assertEqual(sorted(e.cell for e in after.enemies), [2, 3])
+        self.assertEqual(outcome.hp_lost, 0)
+
+    def test_swap_toss_moves_someone_into_an_empty_cell(self):
+        after, _ = step(make_state(enemies=[enemy(3, action="Attack", queue=[SWAP_TOSS])]), Action("Wait"))
+        self.assertEqual(after.hero.cell, 4)
+
+    def test_swap_toss_needs_both_cells_to_exist(self):
+        after, _ = step(make_state(hero_cell=3, enemies=[enemy(4, action="Attack", queue=[SWAP_TOSS])]), Action("Wait"))
+        self.assertEqual(after.hero.cell, 3)
+
+    def test_swap_toss_fails_on_a_heavy_neighbour(self):
+        heavy = enemy(4)
+        heavy.movable = False
+        after, _ = step(make_state(enemies=[enemy(3, action="Attack", queue=[SWAP_TOSS]), heavy]), Action("Wait"))
+        self.assertEqual(after.hero.cell, 2)
+
+    def test_mirror_reflects_across_the_middle_and_turns_around(self):
+        after, _ = step(make_state(hero_cell=0, enemies=[enemy(3, action="Attack", queue=[MIRROR])]), Action("Wait"))
+        self.assertEqual((after.enemies[0].cell, after.enemies[0].facing), (1, 1))
+
+    def test_mirror_trades_places_and_turns_the_other_around_too(self):
+        after, _ = step(make_state(hero_cell=1, facing=1, enemies=[enemy(3, action="Attack", queue=[MIRROR])]), Action("Wait"))
+        self.assertEqual((after.enemies[0].cell, after.enemies[0].facing), (1, 1))
+        self.assertEqual((after.hero.cell, after.hero.facing), (3, -1))
+
+    def test_mirror_on_the_middle_cell_only_turns_around(self):
+        after, _ = step(make_state(hero_cell=0, enemies=[enemy(2, action="Attack", queue=[MIRROR])]), Action("Wait"))
+        self.assertEqual((after.enemies[0].cell, after.enemies[0].facing), (2, 1))
+
+    def test_mirror_on_an_even_room_uses_the_left_middle(self):
+        state = make_state(hero_cell=0, enemies=[enemy(3, action="Attack", queue=[MIRROR])])
+        state.cells = 6
+        after, _ = step(state, Action("Wait"))
+        self.assertEqual(after.enemies[0].cell, 1)
+
+    def test_origin_of_symmetry_goes_to_the_centre(self):
+        after, _ = step(make_state(hero_cell=0, enemies=[enemy(4, action="Attack", queue=[ORIGIN])]), Action("Wait"))
+        self.assertEqual((after.enemies[0].cell, after.enemies[0].facing, after.hero.cell), (2, -1, 0))
+
+    def test_origin_of_symmetry_trades_places_with_whoever_is_there(self):
+        after, _ = step(make_state(hero_cell=2, enemies=[enemy(4, action="Attack", queue=[ORIGIN])]), Action("Wait"))
+        self.assertEqual((after.enemies[0].cell, after.hero.cell), (2, 4))
+
+    def test_dragon_punch_sends_them_as_far_as_they_go(self):
+        after, outcome = fire(make_state(hero_cell=1, enemies=[enemy(2)]), PUNCH)
+        self.assertEqual((after.enemies[0].cell, after.enemies[0].hp), (4, 2))
+        self.assertEqual(outcome.enemy_damage, 1)
+
+    def test_dragon_punch_into_someone_hurts_them_both(self):
+        after, outcome = fire(make_state(hero_cell=1, enemies=[enemy(2), enemy(4)]), PUNCH)
+        self.assertEqual([(e.cell, e.hp) for e in after.enemies], [(3, 1), (4, 2)])
+        self.assertEqual(outcome.enemy_damage, 3)
+
+    def test_dragon_punch_leaves_a_heavy_target_in_place(self):
+        heavy = enemy(2)
+        heavy.movable = False
+        after, _ = fire(make_state(hero_cell=1, enemies=[heavy]), PUNCH)
+        self.assertEqual((after.enemies[0].cell, after.enemies[0].hp), (2, 2))
+
+
+def shogun(cell=3, hp=30, queue=(), kind="ShogunPhase2Boss"):
+    return Agent(kind, cell, -1, hp, 40, queue=list(queue), action="Attack" if queue else "Wait")
+
+
+class CorruptedBarrageTest(unittest.TestCase):
+    def barrage(self, hero_cell):
+        state = make_state(hero_cell=hero_cell, enemies=[shogun(queue=[BARRAGE])])
+        state.cells = 7
+        return state
+
+    def test_hits_the_cells_beside_the_boss_straight_away(self):
+        after, outcome = step(self.barrage(2), Action("Wait"))
+        self.assertEqual(outcome.hp_lost, 3)
+        self.assertEqual(after.hazards, [{"damage": 3, "groups": [[1, 5], [0, 6]]}])
+
+    def test_spreads_one_cell_a_turn(self):
+        # As played: fired from cell 3 on turn 37, and it hit the hero on cell 0 on turn 39.
+        state, first = step(self.barrage(0), Action("Wait"))
+        state, second = step(state, Action("Wait"))
+        state, third = step(state, Action("Wait"))
+        self.assertEqual((first.hp_lost, second.hp_lost, third.hp_lost), (0, 0, 3))
+        self.assertEqual(state.hazards, [])
+
+    def test_the_ring_starts_from_where_it_was_fired(self):
+        state, _ = step(self.barrage(1), Action("MoveLeft"))
+        state.enemies[0].cell = 6
+        _, outcome = step(state, Action("MoveRight"))
+        self.assertEqual(outcome.hp_lost, 3)
+
+    def test_a_shield_blocks_it(self):
+        state = self.barrage(4)
+        state.hero.shield = True
+        after, outcome = step(state, Action("Wait"))
+        self.assertEqual((outcome.hp_lost, after.hero.shield), (0, False))
+
+    def test_it_heals_a_boss_it_lands_on(self):
+        state = make_state(hero_cell=0, enemies=[shogun(cell=4, hp=39)])
+        state.hazards = [{"damage": 3, "groups": [[4]]}]
+        after, outcome = step(state, Action("Wait"))
+        self.assertEqual(after.enemies[0].hp, 40)
+        self.assertEqual(outcome.friendly_damage, 0)
+
+    def test_it_hurts_other_enemies(self):
+        state = make_state(hero_cell=0, enemies=[enemy(4, hp=3)])
+        state.hazards = [{"damage": 2, "groups": [[4]]}]
+        after, _ = step(state, Action("Wait"))
+        self.assertEqual(after.enemies[0].hp, 1)
+
+    def test_counts_as_a_threat_on_the_marked_cell_only(self):
+        state = make_state(hero_cell=0, enemies=[shogun()])
+        state.hazards = [{"damage": 3, "groups": [[0, 4], [1]]}]
+        self.assertEqual(_threat_damage(state, 0), 3)
+        self.assertEqual(_threat_damage(state, 1), 0)
+        self.assertEqual(unanswerable_damage(state), 0)
+
+    def test_the_hero_steps_off_a_marked_cell(self):
+        state = make_state(hero_cell=0, enemies=[shogun()])
+        state.hazards = [{"damage": 3, "groups": [[0, 4]]}]
+        self.assertEqual(rank_actions(state, depth=1)[0].terms.get("hp_lost", 0), 0)
+
+    def test_the_hero_doesnt_step_onto_the_next_ring(self):
+        state = make_state(hero_cell=1, enemies=[shogun(cell=3)])
+        state.cells = 7
+        state.hazards = [{"damage": 3, "groups": [[0]]}]
+        self.assertNotEqual(rank_actions(state, depth=1)[0].labels[0], "MoveLeft")
+
+
+def twins(main_hp=35):
+    return (Agent("TwinMainBoss", 0, 1, main_hp, 35), Agent("TwinSideBoss", 3, -1, 100, 100))
+
+
+class TwinsTest(unittest.TestCase):
+    def test_damage_to_the_side_twin_comes_off_the_main_twin(self):
+        main, side = twins()
+        after, outcome = fire(make_state(enemies=[main, side]), KATANA)
+        by_kind = {e.kind: e.hp for e in after.enemies}
+        self.assertEqual(by_kind, {"TwinMainBoss": 33, "TwinSideBoss": 98})
+        self.assertEqual(outcome.enemy_damage, 2)
+
+    def test_damage_to_the_main_twin_doesnt_reach_the_side_twin(self):
+        main, side = twins()
+        main.cell = 1
+        state = make_state(facing=-1, enemies=[main, side])
+        after, _ = fire(state, KATANA)
+        by_kind = {e.kind: e.hp for e in after.enemies}
+        self.assertEqual(by_kind, {"TwinMainBoss": 33, "TwinSideBoss": 100})
+
+    def test_a_cursed_side_twin_passes_on_the_doubled_damage(self):
+        main, side = twins()
+        side.curse = True
+        after, _ = fire(make_state(enemies=[main, side]), KATANA)
+        self.assertEqual({e.kind: e.hp for e in after.enemies}["TwinMainBoss"], 31)
+
+    def test_the_last_of_the_main_twins_hp_can_come_through_the_side_twin(self):
+        main, side = twins(main_hp=2)
+        after, outcome = fire(make_state(enemies=[main, side]), KATANA)
+        self.assertEqual((after.enemies, outcome.kills), ([], 1))
+
+    def test_the_main_twin_dying_takes_the_side_twin_along(self):
+        main, side = twins(main_hp=2)
+        main.cell = 1
+        after, outcome = fire(make_state(facing=-1, enemies=[main, side]), KATANA)
+        self.assertEqual((after.enemies, outcome.kills), ([], 1))
+
+    def test_the_side_twins_hp_isnt_counted_as_what_is_left_to_do(self):
+        main, side = twins()
+        self.assertEqual(leaf_terms(make_state(enemies=[main, side]))["enemy_hp_left"], -4 * 35)
+
+    def test_either_twin_will_do_so_the_closer_one_is_the_target(self):
+        main, side = twins()
+        self.assertIs(ideal_target(make_state(enemies=[main, side])), side)
+
+
+class BossDeathTest(unittest.TestCase):
+    def test_everyone_dies_with_the_boss(self):
+        state = make_state(enemies=[shogun(cell=3, hp=2), enemy(0)])
+        after, outcome = fire(state, KATANA)
+        self.assertEqual((after.enemies, outcome.kills), ([], 1))
+
+    def test_a_sweep_gets_no_credit_for_those_who_die_with_the_boss(self):
+        state = make_state(enemies=[shogun(cell=1, hp=2), enemy(3)])
+        after, outcome = fire(state, SWIRL)
+        self.assertEqual((after.enemies, outcome.kills, outcome.enemy_damage), ([], 1, 2))
+
+    def test_their_attacks_die_with_them(self):
+        state = make_state(enemies=[shogun(cell=3, hp=2), enemy(1, facing=1, action="Attack", queue=[KATANA])])
+        _, outcome = fire(state, KATANA)
+        self.assertEqual(outcome.hp_lost, 0)
+
+
+def statue(cell=3, hp=30):
+    return Agent("ShogunSummoner", cell, -1, hp, 30, movable=False)
+
+
+class StatueTest(unittest.TestCase):
+    def test_damage_to_a_statue_barely_counts(self):
+        _, outcome = fire(make_state(enemies=[shogun(cell=0), statue()]), KATANA)
+        self.assertEqual((outcome.enemy_damage, outcome.tank_damage), (0, 2))
+
+    def test_killing_a_statue_isnt_a_kill(self):
+        _, outcome = fire(make_state(enemies=[shogun(cell=0), statue(hp=2)]), KATANA)
+        self.assertEqual((outcome.kills, outcome.tank_damage), (0, 2))
+
+    def test_breaking_a_statues_shield_earns_nothing(self):
+        guarded = statue()
+        guarded.shield = True
+        _, outcome = fire(make_state(enemies=[shogun(cell=0), guarded]), KATANA)
+        self.assertEqual(outcome.shields_broken, 0)
+
+    def test_a_statue_isnt_the_target_even_when_closer(self):
+        boss = shogun(cell=0)
+        self.assertIs(ideal_target(make_state(enemies=[boss, statue()])), boss)
+
+    def test_a_statues_hp_isnt_counted_as_what_is_left_to_do(self):
+        state = make_state(enemies=[shogun(cell=0, hp=40), statue()])
+        self.assertEqual(leaf_terms(state)["enemy_hp_left"], -4 * 40)
+
+    def test_another_bosss_summons_still_count(self):
+        summoner = Agent("Summoner", 3, -1, 15, 15)
+        _, outcome = fire(make_state(enemies=[shogun(cell=0, kind="DaisukeBoss"), summoner]), KATANA)
+        self.assertEqual((outcome.enemy_damage, outcome.tank_damage), (2, 0))
+
+    def test_an_enemys_hit_on_a_statue_earns_nothing(self):
+        state = make_state(hero_cell=0, enemies=[shogun(cell=2), statue(cell=3)])
+        state.enemies[0].facing, state.enemies[0].action, state.enemies[0].queue = 1, "Attack", [KATANA]
+        _, outcome = step(state, Action("Wait"))
+        self.assertEqual(outcome.friendly_damage, 0)
+
+
+class PerfectStrikeTest(unittest.TestCase):
+    STRIKE = Attack("Spear", 1, [1], first_target=True, effect="PerfectStrike")
+
+    def fired_tile(self, *enemies):
+        after, _ = fire(make_state(enemies=list(enemies)), self.STRIKE, cooldown=4)
+        return next(t for t in after.tiles if t.attack.name == "Spear")
+
+    def test_an_exact_kill_recharges_the_tile(self):
+        self.assertTrue(self.fired_tile(enemy(3, hp=1)).ready)
+
+    def test_a_wound_doesnt(self):
+        self.assertEqual(self.fired_tile(enemy(3, hp=2)).charge, 0)
+
+    def test_overkill_doesnt(self):
+        strike = Attack("Spear", 3, [1], first_target=True, effect="PerfectStrike")
+        after, _ = fire(make_state(enemies=[enemy(3, hp=1)]), strike, cooldown=4)
+        self.assertEqual(next(t for t in after.tiles if t.attack.name == "Spear").charge, 0)
+
+    def test_a_curse_counts_toward_the_exact_amount(self):
+        cursed = enemy(3, hp=2)
+        cursed.curse = True
+        self.assertTrue(self.fired_tile(cursed).ready)
+
+
+class UnfriendlyFireTest(unittest.TestCase):
+    def test_enemies_hit_each_other_harder(self):
+        state = make_state(hero_cell=0, enemies=[enemy(3, hp=5), enemy(4, action="Attack", queue=[KATANA])])
+        state.friendly_bonus = 1
+        after, outcome = step(state, Action("Wait"))
+        self.assertEqual((after.enemies[0].hp, outcome.friendly_damage), (2, 3))
+
+    def test_the_hero_takes_no_extra(self):
+        state = make_state(enemies=[enemy(3, action="Attack", queue=[KATANA])])
+        state.friendly_bonus = 1
+        _, outcome = step(state, Action("Wait"))
+        self.assertEqual(outcome.hp_lost, 2)
+
+    def test_collisions_arent_affected(self):
+        puncher = enemy(1, facing=1, action="Attack", queue=[PUNCH])
+        state = make_state(hero_cell=0, enemies=[puncher, enemy(2, hp=5), enemy(4, hp=5)])
+        state.friendly_bonus = 1
+        after, _ = step(state, Action("Wait"))
+        # The punch gets the bonus, for 2. The two collision hits are 1 each.
+        self.assertEqual([(e.cell, e.hp) for e in after.enemies], [(1, 3), (3, 2), (4, 4)])
+
+
+class WarningsTest(unittest.TestCase):
+    def notes(self, enemy_row, skills=()):
+        return unmodeled_content({"tiles": [], "hero": {"queue": []}, "enemies": [enemy_row], "skills": list(skills)})
+
+    def test_summon_is_ignored_on_purpose(self):
+        row = {"kind": "X", "queue": [{"name": "Summon", "effect": "DoubleStrike"}], "traits": []}
+        self.assertEqual(self.notes(row), [])
+
+    def test_harmless_traits_raise_no_warning(self):
+        row = {"kind": "X", "queue": [], "traits": ["Aggro", "Heavy", "Quick", "Unfreezable"]}
+        self.assertEqual(self.notes(row), [])
+
+    def test_unfriendly_fire_raises_no_warning(self):
+        self.assertEqual(self.notes({"kind": "X", "queue": [], "traits": []}, ["UnfriendlyFire"]), [])
+
+    def test_unknown_things_still_do(self):
+        self.assertEqual(self.notes({"kind": "X", "queue": [], "traits": ["Odd"]}), ["X trait Odd"])
+
+
 if __name__ == "__main__":
     unittest.main()

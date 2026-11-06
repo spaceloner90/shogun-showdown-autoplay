@@ -26,7 +26,7 @@ using BepInEx;
 using HarmonyLib;
 using UnityEngine;
 
-[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.9.0")]
+[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.10.0")]
 public class StateLoggerPlugin : BaseUnityPlugin
 {
     private const float PollIntervalSeconds = 0.1f;
@@ -491,7 +491,7 @@ public class StateLoggerPlugin : BaseUnityPlugin
         sb.Append(",\"wave\":");
         AppendWave(sb, room as WaveRoom);
         sb.Append(",\"hazards\":");
-        AppendHazards(sb);
+        AppendHazards(sb, room.Grid.NCells);
 
         sb.Append(",\"hero\":");
         AppendAgent(sb, hero, hero.HeroEnum.ToString());
@@ -545,12 +545,35 @@ public class StateLoggerPlugin : BaseUnityPlugin
         return sb.ToString();
     }
 
-    // Corruption on its way, which the game shows the player as warnings on the cells. Each entry lists
-    // groups of cells in striking order, starting with the group marked for the coming turn.
-    private static void AppendHazards(StringBuilder sb)
+    // Damage on its way, which the game shows the player on the cells: corruption and placed bombs. Each
+    // entry lists groups of cells in striking order, starting with the coming turn. An empty group is a
+    // turn of waiting.
+    private static void AppendHazards(StringBuilder sb, int cells)
     {
         sb.Append("[");
         bool first = true;
+        foreach (Bomb bomb in UnityEngine.Object.FindObjectsOfType<Bomb>())
+        {
+            Traverse fields = Traverse.Create(bomb);
+            Cell cell = fields.Field("cell").GetValue<Cell>();
+            int turnsLeft = fields.Field("nTurnsLeft").GetValue<int>();
+            if (cell == null || turnsLeft < 0) continue;
+
+            if (!first) sb.Append(",");
+            first = false;
+            sb.Append("{\"damage\":").Append(fields.Field("damage").GetValue<int>());
+            sb.Append(",\"heals_boss\":false,\"groups\":[");
+            for (int i = 0; i < turnsLeft; i++) sb.Append("[],");
+            sb.Append("[");
+            bool firstCell = true;
+            for (int c = Math.Max(0, cell.IndexInGrid - 1); c <= Math.Min(cells - 1, cell.IndexInGrid + 1); c++)
+            {
+                if (!firstCell) sb.Append(",");
+                firstCell = false;
+                sb.Append(c);
+            }
+            sb.Append("]]}");
+        }
         foreach (CorruptionAttackCombatTask task in UnityEngine.Object.FindObjectsOfType<CorruptionAttackCombatTask>())
         {
             Traverse fields = Traverse.Create(task);

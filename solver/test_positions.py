@@ -14,7 +14,7 @@ from rules import Action, state_from_log, step
 LOGS = Path(__file__).resolve().parent.parent / "research" / "logs"
 ROWS = {
     name: [json.loads(line) for line in (LOGS / name / "state.jsonl").read_text(encoding="utf-8").splitlines()]
-    for name in ("run2_complete", "run3_v03", "run3_part2", "run4")
+    for name in ("run2_complete", "run3_v03", "run3_part2", "run4", "run5_full")
 }
 
 
@@ -181,6 +181,42 @@ class SniperAsPlayed(unittest.TestCase):
         after, outcome = step(state, Action("Wait"))
         self.assertEqual(outcome.hp_lost, 2)
         self.assertEqual(next(e.hp for e in after.enemies if e.kind == "Ashigaru"), 3)
+
+
+class WinningRun(unittest.TestCase):
+    """The run that confirmed v1, with the log's own fight numbers. These replay what the game did."""
+
+    def test_the_bomb_as_played(self):
+        # Fight 28: Hideyoshi threw it on turn 21 and it hit the hero, who stayed on cell 6, on turn 23.
+        state = position(28, 21, "run5_full")
+        state, thrown = step(state, Action("Wait"))
+        self.assertEqual(thrown.hp_lost, 0)
+        for enemy in state.enemies:
+            enemy.queue, enemy.action = [], "Wait"
+        state, waited = step(state, Action("Wait"))
+        state, blast = step(state, Action("Wait"))
+        self.assertEqual((waited.hp_lost, blast.hp_lost), (0, 3))
+
+    def test_leaves_the_blast_given_the_warning(self):
+        # Turn 22 of that fight, with what the mod now logs. The hero has to start moving this turn.
+        state = position(28, 22, "run5_full")
+        state.hazards = [{"damage": 3, "groups": [[], [5, 6]], "heals_boss": False}]
+        self.assertEqual(rank_actions(state, depth=1)[0].labels[0], "MoveLeft")
+
+    def test_poison_as_played(self):
+        # Final boss, turn 11: 26 HP with 2 turns left. It lost 1 and had 1 left on turn 12.
+        state = position(30, 11, "run5_full")
+        boss = next(e for e in state.enemies if e.kind == "ShogunPhase1Boss")
+        self.assertEqual((boss.hp, boss.poison), (26, 2))
+        after, _ = step(state, Action("Wait"))
+        boss = next(e for e in after.enemies if e.kind == "ShogunPhase1Boss")
+        self.assertEqual((boss.hp, boss.poison), (25, 1))
+
+    def test_still_makes_the_dragon_punch_play(self):
+        # Final boss, turn 8: shoves the boss into the Yari Master, then Arrow lands.
+        best = choice(30, 8, "run5_full")
+        self.assertEqual(best.actions[0].kind, "Attack")
+        self.assertEqual(best.terms.get("hp_lost", 0), 0)
 
 
 def final_boss_rows():

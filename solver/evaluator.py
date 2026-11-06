@@ -47,7 +47,7 @@ from dataclasses import dataclass, field
 from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, apply_attack,
                    can_swap, fireable_attacks, is_tank, land_hit, legal_actions, step, strike_cell)
 
-VERSION = "v0.12"
+VERSION = "v1.1"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -55,6 +55,8 @@ WEIGHTS = {
     "death": -10000.0,
     "enemy_damage": 10.0,     # Per enemy HP removed by the hero.
     "tank_damage": 2.5,       # Per HP removed from a tank that will die with its boss anyway.
+    "poison_turn": 8.0,       # Per turn of poison left on an enemy, like damage another enemy deals.
+    "shove_cell": 4.0,        # Per cell an enemy is shoved. Space to load in, but melee wants them close too.
     "kill": 60.0,
     "friendly_damage": 8.0,   # Per enemy HP removed by another enemy.
     "wasted_attack": -5.0,    # Per queued attack that fires at nothing.
@@ -139,7 +141,7 @@ def _effective_hp(state, enemy):
 def _volley_value(outcome, cheapest_hit):
     broken = outcome.shields_broken * cheapest_hit * WEIGHTS["enemy_damage"]
     return (outcome.enemy_damage * WEIGHTS["enemy_damage"] + outcome.tank_damage * WEIGHTS["tank_damage"]
-            + outcome.kills * WEIGHTS["kill"] + broken)
+            + outcome.kills * WEIGHTS["kill"] + broken + outcome.shove_cells * WEIGHTS["shove_cell"])
 
 
 def _stack_value(state):
@@ -152,6 +154,13 @@ def _stack_value(state):
         return 0.0
     fractions = WEIGHTS["stack_fractions"]
     cheapest_hit = _cheapest_hit(state)
+    poison_now = _poison_value(state)
+
+    def volley(attacks, cell, flip):
+        trial, outcome = _preview_fire(state, attacks, cell, flip)
+        # Measured after the whole volley, so poison on an enemy that then dies is worth nothing.
+        return _volley_value(outcome, cheapest_hit) + _poison_value(trial) - poison_now
+
     best = 0.0
     orders = list(itertools.permutations(attacks_available, min(len(attacks_available), QUEUE_CAP)))
     for direction in (0, -1, 1):
@@ -164,13 +173,11 @@ def _stack_value(state):
                 if actions >= len(fractions):
                     continue
                 for attacks in orders:
-                    _, outcome = _preview_fire(state, attacks, cell, flip)
-                    best = max(best, _volley_value(outcome, cheapest_hit) * fractions[actions])
+                    best = max(best, volley(attacks, cell, flip) * fractions[actions])
     # Staying put is covered above only for an occupied-free start, which the hero's own cell isn't.
     for flip in (False, True):
         for attacks in orders:
-            _, outcome = _preview_fire(state, attacks, None, flip)
-            best = max(best, _volley_value(outcome, cheapest_hit) * fractions[int(flip)])
+            best = max(best, volley(attacks, None, flip) * fractions[int(flip)])
     return best
 
 
@@ -214,15 +221,15 @@ def _threat_damage(state, cell):
     trial.hero.hp = 1000  # Only here to count damage, so the hero mustn't fall over midway.
     outcome = Outcome()
     for enemy in trial.enemies:
-        if not enemy.alive:
+        if not enemy.alive or enemy.ice > 0:
             continue
         for attack in enemy.queue:
             attack = ASSUMED_UNKNOWN if attack.name == UNKNOWN_TILE else attack
             apply_attack(trial, enemy, attack, outcome)
-    # Corruption marked on the cells for the coming turn.
+    # Whatever is marked on the cells for the coming turn.
     for hazard in state.hazards:
         if trial.hero.cell in hazard["groups"][0]:
-            strike_cell(trial, None, trial.hero.cell, hazard["damage"], outcome)
+            strike_cell(trial, None, trial.hero.cell, hazard["damage"], outcome, hazard.get("heals_boss", True))
     return outcome.hp_lost
 
 
@@ -320,9 +327,17 @@ def _pressure_terms(state):
     return terms
 
 
+def _poison_value(state):
+    """Poison still to come: good on an enemy, as far as its HP goes, and bad on the hero."""
+    value = sum(min(e.poison, e.hp) * WEIGHTS["poison_turn"] for e in state.enemies
+                if e.alive and e.kind != "TwinSideBoss" and not is_tank(state, e))
+    return value + state.hero.poison * WEIGHTS["hp_lost"]
+
+
 def leaf_terms(state: State) -> dict[str, float]:
     """Scores a position by itself, as named parts so a decision can be explained."""
     terms = {
+        "poison": _poison_value(state),
         "stack": _stack_value(state),
         "curse": _curse_value(state),
         "shield": WEIGHTS["shield"] if state.hero.shield else 0.0,
@@ -340,6 +355,7 @@ def outcome_terms(outcome: Outcome, hero_dead: bool, cheapest_hit: int = 1) -> d
     return {
         "shields_broken": WEIGHTS["enemy_damage"] * cheapest_hit * outcome.shields_broken,
         "tank_damage": WEIGHTS["tank_damage"] * outcome.tank_damage,
+        "shoves": WEIGHTS["shove_cell"] * outcome.shove_cells,
         "hp_lost": WEIGHTS["hp_lost"] * outcome.hp_lost,
         "death": WEIGHTS["death"] if hero_dead else 0.0,
         "enemy_damage": WEIGHTS["enemy_damage"] * outcome.enemy_damage,

@@ -21,23 +21,9 @@ Enemy AI code is for offline simulation and tuning only.
 
 - **Attacks that displace others:** KiPush, TwinTessen, Hookblade, Tanegashima. Each needs its rules
   read first, as they come up.
-- **Bomb (Hideyoshi's tile, seen in run 5):** placed on the cell in front of its user, if there is one, and
-  it explodes at the end of a later turn, hitting that cell and both neighbours. Thrown on turn 21 of fight
-  28, it hit the hero for 3 on turn 23. The simulator treats it as an instant melee hit, then forgets it.
-  It would fit the `hazards` format, with empty groups for the turns it waits. The mod needs to log each
-  `Bomb` object's cell and `nTurnsLeft`, since a placed bomb isn't otherwise in the log.
-- **Copycat Mirror (Kabukai):** not read yet. Each cast causes a queue-length miss in the predictions.
-- **Two Way Move (skill):** lets Swap work backwards as well, but `can_swap` only allows the facing
-  direction, so F1 passes up those swaps. It warns, and it should be a small change.
-- **Dragon Punch's value:** the shove is simulated, and F1 will load it when a preview shows a collision kill
-  (run 5, fight 30, turns 5 to 8). But a shove earns nothing for the distance it creates, so at 1 damage it's
-  rarely worth loading: top choice on 4 of 97 turns it could load, with 2 of those 4 later sent back to hand.
-- **Consumables:** in-battle potions aren't used by F1, and the player expects them to add a lot.
-- **Poison:** still not simulated. It worked well on the final boss without F1 knowing, and shows up as
-  boss HP misses in the predictions.
-- **Barricade (Baru's tile):** spawns a 5 HP inanimate Barricade on the cell in front of its user, if that
-  cell is empty. Its location is predictable, unlike a Summon's, so it could be simulated. For now it only
-  causes a warning and an enemy-count miss, and F1 reads the Barricade correctly once it's on the board.
+- **Consumables:** in-battle potions aren't used by F1, and the player expects them to add a lot. This
+  means valuing each potion and having the mod use them, so it's a project of its own.
+- **Combo skills:** Triple Combo Heal and others. They need "combo" understood first.
 - **Other corruption patterns:** the game can also send corruption left to right, right to left, or even
   and odd cells in turn. The mod logs all of them as `hazards`, and only the attack that starts them
   needs adding, but none has been seen yet.
@@ -48,11 +34,9 @@ Enemy AI code is for offline simulation and tuning only.
 - **Perfect Strike:** simulated as of v0.11, but cooldowns aren't valued, so F1 won't aim for it.
 - **Shield refinements:** a shield is worth a flat 1 HP (v0.7). It should be worth less near the end of
   a fight, since it usually expires then, and hitting an enemy's shield still scores nothing.
-- **Frozen enemies with a loaded attack:** the threat check doesn't know a frozen enemy can't fire, so
-  it would count that attack anyway. It hasn't come up: the enemies frozen so far had nothing loaded.
-- **Status effects:** poison and ice, as tile effects or on agents. Curse is modeled as of v0.6, but
-  being cursed has no direct cost in how the hero's position is scored yet, and the enemy Curse
-  attack still isn't modeled.
+- **Status effects:** ice, as a tile effect or on the hero. Being cursed has no direct cost in how the
+  hero's position is scored yet. Poison is simulated as of v1.1, and what it's worth is a first guess:
+  see `unvetted.md`.
 - **Skills:** 36 exist, by the game's code. See the survey below.
 
 ## Skill survey

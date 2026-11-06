@@ -14,14 +14,21 @@ ONE_ENEMY_WAVE_CAP = 6
 
 # Attacks whose behaviour is fully covered by their logged range, damage and first-target flag, plus
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
-MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Charge", "CorruptedBarrage", "Curse", "Dash",
-           "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Mirror", "OriginOfSymmetry", "Shield",
+MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Barricade", "Bomb", "Charge",
+           "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "SmokeBomb", "Spear", "Summon", "SwapToss",
            "Swirl", "Tetsubo", "Volley"}
 
 # Skills the solver handles. Most need no modeling because their effects show up in the logged state,
-# like a shield, max HP or a shorter Swap cooldown. Damaging Move and Unfriendly Fire are simulated.
-UNDERSTOOD_SKILLS = {"BigPockets", "DamagingMove", "Fortress", "Healthy", "QuickRecovery", "UnfriendlyFire"}
+# like a shield, max HP or a shorter Swap cooldown. Damaging Move, Two Way Move and Unfriendly Fire are
+# simulated.
+UNDERSTOOD_SKILLS = {"BigPockets", "DamagingMove", "Fortress", "Healthy", "QuickRecovery", "TwoWayMove",
+                     "UnfriendlyFire"}
+
+POISON_TURNS = 3  # Applying poison sets this many turns left, and each turn's end deals 1, starting that turn.
+BOMB_FUSE = 2     # Turns a placed bomb waits after the one it's placed on, before it goes off on the next.
+BARRICADE_HP = 5
+MAX_SHOVE_CREDIT = 3  # A shove counts for at most this many cells: further than that gains little.
 
 # Enemy traits that need no warning. Heavy is modeled, and the others haven't changed any prediction.
 UNDERSTOOD_TRAITS = {"Aggro", "Heavy", "Quick", "Unfreezable"}
@@ -46,7 +53,7 @@ class Attack:
     value: int
     range: list[int]
     first_target: bool = False  # Stops at the first agent in range, rather than hitting them all.
-    effect: str = "None"  # Applied to whoever it hits and doesn't kill. Only Curse is modeled.
+    effect: str = "None"  # Applied to whoever it hits and doesn't kill. Curse and Poison are modeled.
     target_cell: int | None = None  # For a Volley: the cell it's locked onto, shown as a warning in the game.
 
 
@@ -77,6 +84,8 @@ class Agent:
     moved: bool = False
     curse: bool = False  # The next hit that deals damage is doubled, and uses up the curse.
     movable: bool = True  # Heavy enemies can't be swapped or pulled.
+    poison: int = 0  # Turns of poison left. Each deals 1 at the end of the turn, and a shield blocks it.
+    ice: int = 0  # Turns of being frozen left. A frozen enemy doesn't act.
 
     @property
     def alive(self):
@@ -100,7 +109,10 @@ class State:
     last_wave: bool = False
     swap_damage: int = 0  # What a swap deals to the enemy passed through, from Damaging Move.
     friendly_bonus: int = 0  # Extra damage when enemies hit each other, from Unfriendly Fire.
-    # Corruption on its way: each is {"damage", "groups"}, and the first group of cells strikes this turn.
+    two_way_swap: bool = False  # Swap works backward as well, from Two Way Move.
+    # Damage on its way to marked cells: each is {"damage", "groups"}, and the first group of cells strikes
+    # this turn. An empty group is a turn of waiting. Corruption heals a boss it lands on, and a bomb's
+    # blast doesn't, which it marks with "heals_boss": False.
     hazards: list[dict] = field(default_factory=list)
 
     def occupant(self, cell):
@@ -124,6 +136,7 @@ class Outcome:
     shields_broken: int = 0  # Enemy shields removed by the hero.
     tank_damage: int = 0  # Damage by the hero to a tank while its boss is alive, kept out of enemy_damage.
     exact_hits: int = 0  # Hits by the hero that dealt exactly the target's remaining HP.
+    shove_cells: int = 0  # Cells the hero shoved enemies worth fighting, up to a few per shove.
     unmodeled: list[str] = field(default_factory=list)
 
 
@@ -184,6 +197,8 @@ def state_from_log(row):
             action=data["action"],
             curse=bool(data.get("curse")),
             movable="Heavy" not in (data.get("traits") or []) and data.get("elite") != "Heavy",
+            poison=data.get("poison") or 0,
+            ice=data.get("ice") or 0,
         )
 
     tiles = [
@@ -235,7 +250,8 @@ def state_from_log(row):
                           if isinstance(s, dict) and s.get("name") == "DamagingMove"), 0),
         friendly_bonus=next((s["level"] for s in row.get("skills") or []
                              if isinstance(s, dict) and s.get("name") == "UnfriendlyFire"), 0),
-        hazards=[{"damage": h["damage"], "groups": [list(g) for g in h["groups"]]} for h in row.get("hazards") or []],
+        two_way_swap=any(isinstance(s, dict) and s.get("name") == "TwoWayMove" for s in row.get("skills") or []),
+        hazards=[dict(h, groups=[list(g) for g in h["groups"]]) for h in row.get("hazards") or []],
     )
 
 
@@ -250,7 +266,7 @@ def unmodeled_content(row):
     def check_attack(data):
         if data["name"] not in MODELED and data["name"] != UNKNOWN_TILE:
             note(f"attack {data['name']}")
-        if data["name"] != "Summon" and data.get("effect") not in (None, "None", "Curse", "PerfectStrike"):
+        if data["name"] != "Summon" and data.get("effect") not in (None, "None", "Curse", "PerfectStrike", "Poison"):
             note(f"{data['name']} effect {data['effect']}")
         if data.get("tileEffect") not in (None, "None", "FreePlay"):
             note(f"{data['name']} tile effect {data['tileEffect']}")
@@ -258,9 +274,8 @@ def unmodeled_content(row):
             note(f"{data['name']} is non-lethal")
 
     def check_status(name, agent):
-        for status in ("poison", "ice"):
-            if agent.get(status):
-                note(f"{name} {status}")
+        if agent.get("ice"):
+            note(f"{name} ice")
 
     for tile in row["tiles"]:
         check_attack(tile["attack"])
@@ -285,10 +300,10 @@ def unmodeled_content(row):
 
 
 def can_swap(state, direction):
-    """Swap only works in the facing direction, when charged, into an occupied cell."""
+    """Swap needs a charge and a movable occupant. It only works in the facing direction, without Two Way Move."""
     occupant = state.occupant(state.hero.cell + direction)
     return (
-        direction == state.hero.facing
+        (direction == state.hero.facing or state.two_way_swap)
         and state.swap_charge >= state.swap_cooldown
         and occupant is not None
         and occupant.movable
@@ -471,18 +486,38 @@ def origin_of_symmetry(state, attacker):
 
 def push(state, attacker, target, direction, outcome):
     """Pushes the target as far as it goes. If someone stops it, each of them takes a collision hit."""
+    start = target.cell
     behind = run_to_last_free_cell(state, target, direction)
+    if attacker is state.hero and not is_tank(state, target):
+        outcome.shove_cells += min(abs(target.cell - start), MAX_SHOVE_CREDIT)
     if behind:
         land_hit(state, attacker, behind[0], 1, outcome, collision=True)
         land_hit(state, attacker, target, 1, outcome, collision=True)
 
 
-def strike_cell(state, attacker, cell, damage, outcome):
-    """Corruption damages whoever is on the cell, but heals a boss."""
+def spawn_barricade(state, attacker):
+    """Puts a Barricade on the cell in front of the attacker, if that cell exists and is free."""
+    cell = attacker.cell + attacker.facing
+    if 0 <= cell < state.cells and state.occupant(cell) is None:
+        facing = 1 if state.hero.cell > cell else -1
+        state.enemies.append(Agent("Barricade", cell, facing, BARRICADE_HP, BARRICADE_HP))
+
+
+def place_bomb(state, attacker, attack):
+    """Puts a bomb on the cell in front of the attacker. It blasts that cell and both neighbours."""
+    cell = attacker.cell + attacker.facing
+    if 0 <= cell < state.cells:
+        blast = [c for c in (cell - 1, cell, cell + 1) if 0 <= c < state.cells]
+        groups = [[] for _ in range(BOMB_FUSE - 1)] + [blast]
+        state.hazards = state.hazards + [{"damage": attack.value, "groups": groups, "heals_boss": False}]
+
+
+def strike_cell(state, attacker, cell, damage, outcome, heals_boss=True):
+    """Damages whoever is on the cell. Corruption heals a boss instead."""
     agent = state.occupant(cell)
     if agent is None:
         return
-    if is_boss(agent):
+    if heals_boss and is_boss(agent):
         agent.hp = min(agent.max_hp, agent.hp + damage)
     else:
         land_hit(state, attacker, agent, damage, outcome, collision=True)
@@ -508,10 +543,18 @@ def strike_hazards(state, outcome, count):
     for hazard in state.hazards[:count]:
         cells, later = hazard["groups"][0], hazard["groups"][1:]
         for cell in cells:
-            strike_cell(state, None, cell, hazard["damage"], outcome)
+            strike_cell(state, None, cell, hazard["damage"], outcome, hazard.get("heals_boss", True))
         if later:
-            remaining.append({"damage": hazard["damage"], "groups": later})
+            remaining.append(dict(hazard, groups=later))
     state.hazards = remaining + state.hazards[count:]
+
+
+def tick_poison(state, outcome):
+    """Each poisoned agent takes 1, starting the turn it was poisoned. It's a hit, so a shield blocks it."""
+    for agent in [state.hero] + list(state.enemies):
+        if agent.alive and agent.poison > 0:
+            land_hit(state, None, agent, 1, outcome)
+            agent.poison -= 1
 
 
 def shield_first_ally(state, attacker, attack):
@@ -536,7 +579,14 @@ def apply_attack(state, attacker, attack, outcome):
         shield_first_ally(state, attacker, attack)
         return
     # Where a summon lands is random, so a player can't react to it either. It's ignored on purpose.
-    if attack.name == "Summon":
+    # Copycat Mirror only gives its user a copy of a hero tile, which resolve_enemies keeps track of.
+    if attack.name in ("Summon", "CopycatMirror"):
+        return
+    if attack.name == "Barricade":
+        spawn_barricade(state, attacker)
+        return
+    if attack.name == "Bomb":
+        place_bomb(state, attacker, attack)
         return
     if attack.name in ("SwapToss", "Mirror", "OriginOfSymmetry"):
         moves = {"SwapToss": swap_toss, "Mirror": mirror, "OriginOfSymmetry": origin_of_symmetry}
@@ -567,6 +617,9 @@ def apply_attack(state, attacker, attack, outcome):
         # After the hit, so a curse never doubles the attack that applied it.
         if target.alive and attack.effect == "Curse":
             target.curse = True
+        # Sets the turns left rather than adding to them, so poisoning again only refreshes it.
+        if target.alive and attack.effect == "Poison":
+            target.poison = POISON_TURNS
         # A shield blocks the hook's damage, but not its pull.
         if attack.name == "GrapplingHook" and target.alive and target.movable:
             target.cell = attacker.cell + attacker.facing
@@ -714,7 +767,9 @@ def resolve_enemies(state, outcome):
             for attack in list(enemy.queue):
                 if enemy.alive:
                     apply_attack(state, enemy, attack, outcome)
-            enemy.queue = []
+            # A Copycat Mirror leaves a copy of a hero tile in the queue, and which one isn't known yet.
+            copies = sum(a.name == "CopycatMirror" for a in enemy.queue)
+            enemy.queue = [Attack(UNKNOWN_TILE, 0, []) for _ in range(copies)]
     for enemy in enemies:
         if enemy.alive and enemy.action == "PlayTile":
             enemy.queue.append(Attack(UNKNOWN_TILE, 0, []))
@@ -734,6 +789,7 @@ def end_turn(state, swapped):
         state.turns_until_wave -= 1
     for enemy in state.enemies:
         enemy.moved = False
+        enemy.ice = max(0, enemy.ice - 1)
         enemy.action = "Wait"  # What it does next isn't known until the game shows it.
         # A loaded Volley will lock onto wherever the hero ends this turn, leaving a turn to step off.
         aim_volleys(enemy, state.hero)
@@ -746,6 +802,7 @@ def step(state, action):
     swapped = hero_action(next_state, action, outcome)
     already_on_the_way = len(next_state.hazards)
     resolve_enemies(next_state, outcome)
+    tick_poison(next_state, outcome)
     strike_hazards(next_state, outcome, already_on_the_way)
     end_turn(next_state, swapped)
     return next_state, outcome

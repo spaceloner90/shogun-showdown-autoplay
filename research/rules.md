@@ -190,7 +190,22 @@ Run 4, the first after beating the game, added new enemies (simulated as of v0.1
   in either direction, as on turns 5 and 41 of fight 4. On turn 15 of fight 7, it hit the hero behind an
   Ashigaru and left the Ashigaru alone.
 
+The run that confirmed v1 showed poison and the bomb, with more rules read from the code (simulated as of
+v1.1, and listed in `unvetted.md` where a log doesn't confirm them):
+
+- **Poison** sets 3 turns left, and each turn's end deals 1, starting on the turn it's applied. On turn 10
+  of the final boss, it took 1 that turn, then had 2 left, then 1. A shield blocks a tick and is used up
+  (turn 24). By the code, poisoning again resets the turns rather than adding them, and a tick can kill.
+- **Bomb** goes on the cell in front of its user, if that cell exists. It waits, then blasts that cell and
+  both neighbours: thrown on turn 21 of fight 28, it hit the hero on cell 6 for 3 on turn 23.
+- **Copycat Mirror** does nothing itself, and the next turn its user's queue holds a copy of a hero tile.
+  Kabukai copied Shuriken, Spear and Dragon Punch in fight 29.
+- **Barricade** puts a 5 HP inanimate enemy on the cell in front of its user, if that cell is free.
+- **Two Way Move** lets Swap work backward. By the code, a swap never turns the hero.
+
 ## Not confirmed yet
+
+See `unvetted.md` for everything since v1. Older items:
 
 - **A Volley hitting an enemy on the locked cell** comes from the code alone, since it has only hit the hero
   in the logs. So does a shield blocking it.

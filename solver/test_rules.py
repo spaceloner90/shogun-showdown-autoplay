@@ -1310,6 +1310,254 @@ class VolleyTest(unittest.TestCase):
         self.assertIsNone(attacks_for("Wait").target_cell)
 
 
+BOMB = Attack("Bomb", 3, [1], first_target=True)
+BARRICADE = Attack("Barricade", 0, [1], first_target=True)
+COPYCAT = Attack("CopycatMirror", 0, [1], first_target=True)
+
+
+class BombTest(unittest.TestCase):
+    def thrown(self, hero_cell=4, boss_cell=2, facing=1):
+        boss = Agent("HideyoshiBoss", boss_cell, facing, 30, 40, queue=[BOMB], action="Attack")
+        state = make_state(hero_cell=hero_cell, enemies=[boss])
+        state.cells = 7
+        return state
+
+    def test_it_does_nothing_on_the_turn_it_lands(self):
+        after, outcome = step(self.thrown(hero_cell=3), Action("Wait"))
+        self.assertEqual(outcome.hp_lost, 0)
+        self.assertEqual(after.hazards[0]["groups"], [[], [2, 3, 4]])
+
+    def test_it_goes_off_two_turns_later_on_three_cells(self):
+        # As played: thrown on turn 21, and it hit the hero for 3 on turn 23.
+        state, first = step(self.thrown(hero_cell=3), Action("Wait"))
+        state, second = step(state, Action("Wait"))
+        state, third = step(state, Action("Wait"))
+        self.assertEqual((first.hp_lost, second.hp_lost, third.hp_lost), (0, 0, 3))
+        self.assertEqual(state.hazards, [])
+
+    def test_two_steps_get_clear_of_the_blast(self):
+        state, _ = step(self.thrown(hero_cell=3), Action("Wait"))
+        state, _ = step(state, Action("MoveRight"))
+        state, outcome = step(state, Action("MoveRight"))
+        self.assertEqual((state.hero.cell, outcome.hp_lost), (5, 0))
+
+    def test_one_step_within_the_blast_isnt_enough(self):
+        state, _ = step(self.thrown(hero_cell=3), Action("Wait"))
+        state, _ = step(state, Action("Wait"))
+        _, outcome = step(state, Action("MoveRight"))
+        self.assertEqual(outcome.hp_lost, 3)
+
+    def test_it_needs_a_cell_in_front(self):
+        after, _ = step(self.thrown(boss_cell=6, facing=1), Action("Wait"))
+        self.assertEqual(after.hazards, [])
+
+    def test_the_blast_hurts_a_boss_rather_than_healing_it(self):
+        state = make_state(hero_cell=0, enemies=[shogun(cell=4, hp=30)])
+        state.hazards = [{"damage": 3, "groups": [[4]], "heals_boss": False}]
+        after, _ = step(state, Action("Wait"))
+        self.assertEqual(after.enemies[0].hp, 27)
+
+    def test_a_fuse_shows_no_threat_until_the_last_turn(self):
+        state = make_state(hero_cell=0, enemies=[shogun()])
+        state.hazards = [{"damage": 3, "groups": [[], [0, 1]], "heals_boss": False}]
+        self.assertEqual(_threat_damage(state, 0), 0)
+        state.hazards = [{"damage": 3, "groups": [[0, 1]], "heals_boss": False}]
+        self.assertEqual(_threat_damage(state, 0), 3)
+
+    def test_standing_in_the_middle_of_a_blast_has_no_answer_next_turn(self):
+        state = make_state(hero_cell=2, enemies=[shogun(cell=4)])
+        state.hazards = [{"damage": 3, "groups": [[1, 2, 3]], "heals_boss": False}]
+        self.assertEqual(unanswerable_damage(state), 3)
+
+    def test_the_hero_leaves_in_time(self):
+        state = make_state(hero_cell=2, enemies=[shogun(cell=4)])
+        state.cells = 7
+        state.hazards = [{"damage": 3, "groups": [[], [1, 2, 3]], "heals_boss": False}]
+        best = rank_actions(state, depth=1)[0]
+        self.assertIn(best.labels[0], ("MoveLeft", "MoveRight"))
+
+
+class BarricadeTest(unittest.TestCase):
+    def test_it_appears_in_front_of_its_user(self):
+        boss = Agent("BaruBoss", 3, -1, 14, 14, queue=[BARRICADE], action="Attack")
+        after, _ = step(make_state(hero_cell=0, enemies=[boss]), Action("Wait"))
+        wall = next(e for e in after.enemies if e.kind == "Barricade")
+        self.assertEqual((wall.cell, wall.hp, wall.facing, wall.action), (2, 5, -1, "Wait"))
+
+    def test_it_needs_a_free_cell(self):
+        boss = Agent("BaruBoss", 3, -1, 14, 14, queue=[BARRICADE], action="Attack")
+        after, _ = step(make_state(hero_cell=2, enemies=[boss]), Action("Wait"))
+        self.assertEqual([e.kind for e in after.enemies], ["BaruBoss"])
+
+    def test_it_stops_a_first_target_shot(self):
+        wall = Agent("Barricade", 3, -1, 5, 5)
+        archer = enemy(4, action="Attack", queue=[Attack("Arrow", 2, FAR, first_target=True)])
+        after, outcome = step(make_state(enemies=[wall, archer]), Action("Wait"))
+        self.assertEqual((outcome.hp_lost, after.enemies[0].hp), (0, 3))
+
+
+class CopycatMirrorTest(unittest.TestCase):
+    def test_it_leaves_an_unknown_copy_in_the_queue(self):
+        kabukai = Agent("Kabukai", 3, -1, 5, 5, queue=[COPYCAT], action="Attack")
+        after, outcome = step(make_state(enemies=[kabukai]), Action("Wait"))
+        self.assertEqual([a.name for a in after.enemies[0].queue], ["Unknown"])
+        self.assertEqual(outcome.hp_lost, 0)
+
+    def test_the_copy_counts_as_a_threat(self):
+        kabukai = Agent("Kabukai", 3, -1, 5, 5, queue=[COPYCAT], action="Attack")
+        after, _ = step(make_state(enemies=[kabukai]), Action("Wait"))
+        self.assertGreater(_threat_damage(after, 2), 0)
+
+
+POISON_SHOT = Attack("Shuriken", 3, FAR, first_target=True, effect="Poison")
+
+
+class PoisonTest(unittest.TestCase):
+    def test_it_ticks_for_three_turns_starting_at_once(self):
+        # As played: the boss went 2, then 1, then clear, losing 1 HP each turn.
+        state, _ = fire(make_state(enemies=[enemy(4, hp=9)]), POISON_SHOT)
+        self.assertEqual((state.enemies[0].hp, state.enemies[0].poison), (5, 2))
+        state, _ = step(state, Action("Wait"))
+        self.assertEqual((state.enemies[0].hp, state.enemies[0].poison), (4, 1))
+        state, _ = step(state, Action("Wait"))
+        self.assertEqual((state.enemies[0].hp, state.enemies[0].poison), (3, 0))
+        state, _ = step(state, Action("Wait"))
+        self.assertEqual(state.enemies[0].hp, 3)
+
+    def test_a_shield_blocks_a_tick_and_is_used_up(self):
+        # As played on turn 24 of the final boss. The turn still counts down.
+        target = enemy(4, hp=9)
+        target.poison, target.shield = 2, True
+        after, _ = step(make_state(enemies=[target]), Action("Wait"))
+        self.assertEqual((after.enemies[0].hp, after.enemies[0].shield, after.enemies[0].poison), (9, False, 1))
+
+    def test_a_tick_can_kill(self):
+        target = enemy(4, hp=1)
+        target.poison = 2
+        after, outcome = step(make_state(enemies=[target]), Action("Wait"))
+        self.assertEqual((after.enemies, outcome.kills), ([], 1))
+
+    def test_a_tick_on_a_boss_ends_the_fight(self):
+        boss = shogun(cell=4, hp=1)
+        boss.poison = 1
+        after, _ = step(make_state(hero_cell=0, enemies=[boss, enemy(2)]), Action("Wait"))
+        self.assertEqual(after.enemies, [])
+
+    def test_poisoning_again_only_refreshes_it(self):
+        target = enemy(4, hp=20)
+        target.poison = 2
+        after, _ = fire(make_state(enemies=[target]), POISON_SHOT)
+        self.assertEqual(after.enemies[0].poison, 2)  # Back up to 3, then one tick.
+
+    def test_poison_counts_for_nothing_if_the_volley_then_kills(self):
+        def stack(hp):
+            state = make_state(hero_cell=3, enemies=[enemy(4, hp=hp)])
+            first = Tile(Attack("Spear", 1, [1], first_target=True, effect="Poison"), cooldown=3, charge=3)
+            second = Tile(Attack("Katana", 2, [1], first_target=True), cooldown=3, charge=3)
+            first.in_queue = second.in_queue = True
+            state.tiles = [first, second]
+            state.queue_tiles = [first, second]
+            state.hero.queue = [first.attack, second.attack]
+            return leaf_terms(state)["stack"]
+        # At 3 HP the volley kills: 3 damage and a kill. At 9 HP it's 3 damage and 3 turns of poison.
+        self.assertAlmostEqual(stack(3), (30 + 60) * 0.6)
+        self.assertAlmostEqual(stack(9), (30 + 24) * 0.6)
+
+    def test_the_hero_is_hurt_by_it_too(self):
+        state = make_state(enemies=[enemy(4)])
+        state.hero.poison = 2
+        after, outcome = step(state, Action("Wait"))
+        self.assertEqual((outcome.hp_lost, after.hero.poison), (1, 1))
+
+    def test_poison_left_on_an_enemy_is_worth_something(self):
+        target = enemy(4, hp=9)
+        target.poison = 2
+        self.assertEqual(leaf_terms(make_state(enemies=[target]))["poison"], 16)
+
+    def test_it_counts_no_further_than_the_enemys_hp(self):
+        target = enemy(4, hp=1)
+        target.poison = 3
+        self.assertEqual(leaf_terms(make_state(enemies=[target]))["poison"], 8)
+
+    def test_it_costs_the_hero(self):
+        state = make_state(enemies=[enemy(4)])
+        state.hero.poison = 2
+        self.assertEqual(leaf_terms(state)["poison"], -200)
+
+    def test_a_loaded_poison_tile_beats_the_same_damage_without_it(self):
+        def load_score(attack):
+            state = make_state(enemies=[enemy(4, hp=9)])
+            tile = Tile(attack, cooldown=3, charge=3)
+            state.tiles = [tile]
+            return rank_actions(state, depth=1)[0].terms["stack"]
+        plain = Attack("Shuriken", 3, FAR, first_target=True)
+        self.assertGreater(load_score(POISON_SHOT), load_score(plain))
+
+
+class TwoWayMoveTest(unittest.TestCase):
+    def test_swap_needs_the_skill_to_work_backward(self):
+        state = make_state(facing=1, enemies=[enemy(1)])
+        self.assertNotIn(Action("MoveLeft"), legal_actions(state))
+        state.two_way_swap = True
+        self.assertIn(Action("MoveLeft"), legal_actions(state))
+
+    def test_a_backward_swap_keeps_the_hero_facing_the_same_way(self):
+        state = make_state(facing=1, enemies=[enemy(1)])
+        state.two_way_swap = True
+        after, _ = step(state, Action("MoveLeft"))
+        self.assertEqual((after.hero.cell, after.hero.facing, after.enemies[0].cell, after.swap_charge), (1, 1, 2, 0))
+
+    def test_it_still_needs_a_charge(self):
+        state = make_state(facing=1, swap_charge=0, enemies=[enemy(1)])
+        state.two_way_swap = True
+        self.assertNotIn(Action("MoveLeft"), legal_actions(state))
+
+    def test_it_counts_as_an_answer_to_a_threat(self):
+        state = make_state(hero_cell=0, facing=-1, enemies=[enemy(1, action="Attack", queue=[KATANA])])
+        self.assertEqual(unanswerable_damage(state), 2)
+        state.two_way_swap = True
+        self.assertEqual(unanswerable_damage(state), 0)
+
+
+class FrozenEnemyTest(unittest.TestCase):
+    def test_a_frozen_enemys_loaded_attack_isnt_a_threat(self):
+        frozen = enemy(3, queue=[KATANA])
+        frozen.ice = 2
+        self.assertEqual(_threat_damage(make_state(enemies=[frozen]), 2), 0)
+
+    def test_it_is_again_once_the_ice_runs_out(self):
+        frozen = enemy(3, queue=[KATANA])
+        frozen.ice = 1
+        after, _ = step(make_state(enemies=[frozen]), Action("Wait"))
+        self.assertEqual(after.enemies[0].ice, 0)
+        self.assertEqual(_threat_damage(after, 2), 2)
+
+
+class ShoveTest(unittest.TestCase):
+    def test_a_shove_earns_credit_for_the_distance(self):
+        _, outcome = fire(make_state(hero_cell=1, enemies=[enemy(2)]), PUNCH)
+        self.assertEqual(outcome.shove_cells, 2)
+
+    def test_the_credit_is_capped(self):
+        state = make_state(hero_cell=0, enemies=[enemy(1)])
+        state.cells = 9
+        _, outcome = fire(state, PUNCH)
+        self.assertEqual(outcome.shove_cells, 3)
+
+    def test_a_statue_earns_none(self):
+        target = statue(cell=2)
+        target.movable = True
+        _, outcome = fire(make_state(hero_cell=1, enemies=[shogun(cell=4), target]), PUNCH)
+        self.assertEqual(outcome.shove_cells, 0)
+
+    def test_it_counts_toward_loading_a_shove(self):
+        state = make_state(hero_cell=1, enemies=[enemy(2, hp=9)])
+        state.tiles = [Tile(PUNCH, cooldown=2, charge=2)]
+        plain = make_state(hero_cell=1, enemies=[enemy(2, hp=9)])
+        plain.tiles = [Tile(Attack("Katana", 1, [1], first_target=True), cooldown=2, charge=2)]
+        self.assertGreater(rank_actions(state, depth=1)[0].terms["stack"], rank_actions(plain, depth=1)[0].terms["stack"])
+
+
 class WarningsTest(unittest.TestCase):
     def notes(self, enemy_row, skills=()):
         return unmodeled_content({"tiles": [], "hero": {"queue": []}, "enemies": [enemy_row], "skills": list(skills)})

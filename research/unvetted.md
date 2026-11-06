@@ -1,0 +1,43 @@
+# What real logs haven't confirmed
+
+`evaluator-v1` is the vetted version: it played the whole winning run in `logs/run5_full`, fights 9 to 30.
+Anything here is newer than that, or never came up in it. Passing tests and replaying old logs doesn't vet
+something, because old logs can't show new behavior. An item leaves this list when a real log shows it working.
+
+## New in v1.1
+
+"Rule" means it comes from the game's code. "Scoring" is a judgment about what something is worth, which
+only real play can test.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Bomb warnings logged by the mod | Rule | Nothing: no log has them yet | `hazards` shows a bomb on the turn after it's thrown, with the right cells |
+| Bomb timing and blast | Rule | One blast in fight 28 fits: thrown turn 21, hit turn 23 | Blast covers 3 cells, and F1 walks clear |
+| Bomb hurting a boss | Rule | Nothing | A boss in its own blast loses HP |
+| Poison ticks | Rule | Replays match all ticks and the shield block on the final boss | Stays exact in new fights |
+| Poison refreshing, and a tick killing | Rule | Nothing | Poisoning twice doesn't add turns |
+| Poison and curse together | Rule | Nothing. A tick is assumed to use up and be doubled by a curse | Hit size when both are on one enemy |
+| **What poison is worth to F1** | **Scoring** | **Nothing. First guess, and the least settled part of v1.1** | **See below** |
+| Copycat Mirror | Rule | Replays match its queue | The copy's threat is a guess: 2 damage at range 1 until it's visible |
+| Barricade | Rule | Replays match its position and HP | Whether it's worth killing or walking around |
+| Two Way Move | Rule | Nothing: F1 never swapped backward in a log, and on the winning run's positions it now would on 26 | A backward swap isn't refused, and the hero keeps facing the same way |
+| Shove credit | Scoring | Nothing. First guess | Whether Dragon Punch gets used well, or just more often |
+| Frozen enemies aren't a threat | Rule | Frozen enemies seen waiting, none with a loaded attack | One with a loaded attack doesn't fire, and when it thaws |
+
+## Poison's value
+
+The simulation follows the game. The scoring follows the curse rules: poison is worth what it adds, capped by
+the enemy's remaining HP, and nothing on an enemy that dies. Each turn left counts for `poison_turn`, currently
+8, against 10 for damage dealt now. Set it to 0 to keep the rules but stop F1 seeking poison out.
+
+Questions it doesn't answer yet:
+
+- Is poison worth more on a long fight? It counts the same on any enemy with HP to spare.
+- It lands 3 damage over 3 turns regardless of who else is around, so should it favor targets out of reach?
+- Re-poisoning before it runs out wastes turns. F1 sees that, but doesn't plan around it.
+
+## Carried over from before v1
+
+- Poison and ice as statuses on the hero: poison is simulated but hasn't come up on the hero, and ice is not modeled.
+- Everything under "Not confirmed yet" in `rules.md`.
+- Unfriendly Fire's extra damage: the winning run didn't have the skill.

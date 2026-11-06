@@ -154,15 +154,26 @@ The 15-wave fight, also in that log, showed:
 - **Grappling Hook pulls even through a shield.** On turn 12, a shield blocked its 1 damage, the hero
   was still pulled next to the Grappler, and the Katana then hit for 2.
 
+The 9-cell fight with mass ice, also in that log, showed:
+
+- **The Curse attack goes through a shield.** On turn 25 it cursed a shielded Yari Master. Shadow Dash then
+  broke the shield without using up the curse, and Swirl's 2 was doubled to 4 for the kill.
+- **Two Free Play tiles work in one key press** (turns 25, 34 and 40).
+- **Perfect Strike recharges its tile on an exact kill** (turns 34 and 53). The simulator doesn't model
+  this, so each shows as one prediction miss.
+- **Frozen enemies telegraph Wait and don't act.** Ice counted 4, 3, 2, 1 from a potion that says 3 turns.
+- **A flip potion changes facing at once,** without using a turn.
+
 ## Not confirmed yet
 
-- The shield rules for curse come from the code alone.
+- **Damaging Move** comes from the code alone. A swap makes a normal hit on the enemy passed through, for
+  damage equal to the skill's level. A shield blocks it, a curse doubles it, and it can kill.
+- **Quick Recovery** lowers Swap's cooldown by 1. It should show up in the logged cooldown.
 - Heavy enemies are assumed to be immovable. Swap and hook check a movable flag in the code, but nothing
   shown links that flag to the Heavy trait.
 - A curse tile re-applying its curse after a doubled hit comes from the code's order of events.
-- **The Curse attack** comes from the code alone. It curses the first target ahead with a projectile
-  rather than a hit, so a shield neither stops it nor is used up. It deals no damage, does nothing to a
-  target already cursed, and goes on cooldown even if it misses.
+- That the Curse attack does nothing to a target already cursed, and goes on cooldown on a miss, comes
+  from the code alone.
 - Whether an enemy can refuse a swap isn't modeled. The game would refuse the move, and the mod would
   log that.
 - The saved fight log never has Swirl hitting two agents at once. An earlier log did show it, but

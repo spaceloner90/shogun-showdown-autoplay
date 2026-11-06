@@ -31,7 +31,9 @@ Enemy AI code is for offline simulation and tuning only.
   is there. A standard movement ability, like the dashes. It moved the hero on turn 16 of that fight.
 - **Heavy enemies:** as of v0.9, the solver assumes the Heavy trait means an enemy can't be swapped or
   pulled. The code shows swap and hook need a movable target, but the link to Heavy is an inference.
-- **Simple swaps (to model):** Smoke Bomb swaps its user with the first target ahead, much like Swap.
+- **Simple swaps (to model):** Smoke Bomb swaps its user with the first target ahead, much like Swap, at
+  any range, and deals 1. Kowa's "teleport" is this tile. On turn 24 of that fight, it swapped the boss and
+  hero across the board, then hit for 1 (blocked by a shield). F1 sees only the 1 damage, not the swap.
 - **Summon (ignoring on purpose):** where a summon appears is random, so a player can't react to it
   either. It will keep causing a prediction miss each time, which is expected.
 - **Perfect Strike:** a tile with this effect recharges fully when its hit deals exactly the target's
@@ -39,6 +41,8 @@ Enemy AI code is for offline simulation and tuning only.
   won't aim for it. A kill that triggers it just gets read correctly on the next turn.
 - **Shield refinements:** a shield is worth a flat 1 HP (v0.7). It should be worth less near the end of
   a fight, since it usually expires then, and hitting an enemy's shield still scores nothing.
+- **Frozen enemies with a loaded attack:** the threat check doesn't know a frozen enemy can't fire, so
+  it would count that attack anyway. It hasn't come up: the enemies frozen so far had nothing loaded.
 - **Status effects:** poison and ice, as tile effects or on agents. Curse is modeled as of v0.6, but
   being cursed has no direct cost in how the hero's position is scored yet, and the enemy Curse
   attack still isn't modeled.

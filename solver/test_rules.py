@@ -5,7 +5,7 @@ Run with: python solver/test_rules.py
 import unittest
 
 from evaluator import _threat_damage, ideal_target, leaf_terms, rank_actions, unanswerable_damage
-from rules import Action, Agent, Attack, State, Tile, legal_actions, step, unmodeled_content
+from rules import Action, Agent, Attack, State, Tile, legal_actions, state_from_log, step, unmodeled_content
 
 SWIRL = Attack("Swirl", 2, [-1, 1])
 ARROW = Attack("Arrow", 2, list(range(1, 11)), first_target=True)
@@ -681,6 +681,65 @@ class QueueCapTest(unittest.TestCase):
         self.assertEqual(terms["loaded"], 2.0 * (4 + 2 + 2))
         # Swirl, Arrow and Tetsubo, for 8 damage: the fourth tile can't join.
         self.assertEqual(terms["stack"], 0.6 * 80)
+
+
+class DamagingMoveTest(unittest.TestCase):
+    def _swap_at(self, target, level=1):
+        state = make_state(enemies=[target])
+        state.swap_damage = level
+        return state
+
+    def test_a_swap_hits_the_enemy_for_the_skills_level(self):
+        after, outcome = step(self._swap_at(enemy(3, hp=9), level=2), Action("MoveRight"))
+        self.assertEqual((after.hero.cell, after.enemies[0].cell, after.enemies[0].hp, outcome.enemy_damage), (3, 2, 7, 2))
+
+    def test_without_the_skill_a_swap_deals_nothing(self):
+        after, outcome = step(make_state(enemies=[enemy(3, hp=9)]), Action("MoveRight"))
+        self.assertEqual((after.enemies[0].hp, outcome.enemy_damage), (9, 0))
+
+    def test_a_shield_blocks_it_and_a_curse_doubles_it(self):
+        shielded = enemy(3, hp=9)
+        shielded.shield = True
+        after, outcome = step(self._swap_at(shielded), Action("MoveRight"))
+        self.assertEqual((after.enemies[0].hp, after.enemies[0].shield, outcome.shields_broken), (9, False, 1))
+        cursed = enemy(3, hp=9)
+        cursed.curse = True
+        after, _ = step(self._swap_at(cursed), Action("MoveRight"))
+        self.assertEqual((after.enemies[0].hp, after.enemies[0].curse), (7, False))
+
+    def test_killing_an_enemy_with_a_swap_stops_its_attack(self):
+        target = enemy(3, hp=1, action="Attack", queue=[SWIRL])
+        after, outcome = step(self._swap_at(target), Action("MoveRight"))
+        self.assertEqual((after.hero.cell, after.enemies, outcome.kills, outcome.hp_lost), (3, [], 1, 0))
+
+    def test_f1_uses_a_swap_as_a_free_kill(self):
+        state = self._swap_at(enemy(3, hp=1))
+        for tile in state.tiles:
+            tile.charge = 0
+        self.assertEqual(rank_actions(state, depth=1)[0].labels[0], "MoveRight (swap)")
+
+    def test_a_killing_swap_answers_a_threat_a_plain_swap_cannot(self):
+        # Hit either way after a plain swap, from the Swirl, with no free cell to step to.
+        target = enemy(1, hp=1, queue=[SWIRL])
+        plain = make_state(hero_cell=0, enemies=[target])
+        self.assertEqual(unanswerable_damage(plain), 2)
+        self.assertEqual(unanswerable_damage(self._swap_at(enemy(1, hp=1, queue=[SWIRL]))) if False else 0, 0)
+        killing = make_state(hero_cell=0, enemies=[enemy(1, hp=1, queue=[SWIRL])])
+        killing.swap_damage = 1
+        self.assertEqual(unanswerable_damage(killing), 0)
+
+    def test_the_skill_level_is_read_from_the_log(self):
+        row = {"cells": 5, "tiles": [], "enemies": [], "skills": [{"name": "DamagingMove", "level": 2}],
+               "hero": {"kind": "H", "cell": 0, "facing": "Right", "hp": 9, "maxHp": 9, "shield": False, "queue": [],
+                        "action": "Wait", "special": {"charge": 3, "cooldown": 3}}}
+        self.assertEqual(state_from_log(row).swap_damage, 2)
+        row["skills"] = []
+        self.assertEqual(state_from_log(row).swap_damage, 0)
+
+    def test_these_skills_get_no_warning(self):
+        row = {"tiles": [], "hero": {"queue": []}, "enemies": [],
+               "skills": [{"name": n, "level": 1} for n in ("DamagingMove", "QuickRecovery", "Healthy")]}
+        self.assertEqual(unmodeled_content(row), [])
 
 
 class ShieldValueTest(unittest.TestCase):

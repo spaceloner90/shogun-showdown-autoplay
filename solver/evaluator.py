@@ -43,9 +43,9 @@ import itertools
 from dataclasses import dataclass, field
 
 from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, apply_attack,
-                   can_swap, fireable_attacks, legal_actions, step)
+                   can_swap, fireable_attacks, land_hit, legal_actions, step)
 
-VERSION = "v0.9"
+VERSION = "v0.10"
 
 WEIGHTS = {
     # What happens along the line.
@@ -217,7 +217,11 @@ def _threat_damage(state, cell):
 def _threat_after_swap(state, direction):
     trial = _light_copy(state)
     cell = trial.hero.cell + direction
-    trial.occupant(cell).cell = trial.hero.cell
+    occupant = trial.occupant(cell)
+    occupant.cell = trial.hero.cell
+    if trial.swap_damage:
+        land_hit(trial, trial.hero, occupant, trial.swap_damage, Outcome())
+    trial.enemies = [e for e in trial.enemies if e.alive]
     return _threat_damage(trial, cell)
 
 

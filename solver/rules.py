@@ -17,9 +17,9 @@ ONE_ENEMY_WAVE_CAP = 6
 MODELED = {"Arrow", "BackCharge", "BackShadowDash", "Charge", "Curse", "Dash", "EarthImpale", "GrapplingHook", "Katana",
            "Shield", "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Spear", "Swirl", "Tetsubo"}
 
-# Skills that need no modeling: a consumable slot, and a shield at the start of each fight, which shows
-# up in the state like any other shield.
-UNDERSTOOD_SKILLS = {"BigPockets", "Fortress"}
+# Skills the solver handles. Most need no modeling because their effects show up in the logged state,
+# like a shield, max HP or a shorter Swap cooldown. Damaging Move is simulated.
+UNDERSTOOD_SKILLS = {"BigPockets", "DamagingMove", "Fortress", "Healthy", "QuickRecovery"}
 
 # Attacks that move the attacker. Each value is the direction relative to the attacker's facing.
 CHARGES = {"Charge": 1, "BackCharge": -1}  # Run to the last free cell, and hit whatever is next.
@@ -87,6 +87,7 @@ class State:
     swap_cooldown: int
     turns_until_wave: int | None = None
     last_wave: bool = False
+    swap_damage: int = 0  # What a swap deals to the enemy passed through, from Damaging Move.
 
     def occupant(self, cell):
         if self.hero.alive and self.hero.cell == cell:
@@ -203,6 +204,8 @@ def state_from_log(row):
         swap_cooldown=special.get("cooldown", 4),
         turns_until_wave=wave["turnsUntilNext"] if wave else None,
         last_wave=wave["isLast"] if wave else False,
+        swap_damage=next((s["level"] for s in row.get("skills") or []
+                          if isinstance(s, dict) and s.get("name") == "DamagingMove"), 0),
     )
 
 
@@ -401,19 +404,23 @@ def apply_attack(state, attacker, attack, outcome):
     if not hits and attacker is state.hero and attacker.cell == start_cell:
         outcome.wasted_attacks += 1
     for target in hits:
-        # A shield blocks the hit and leaves any curse in place, but the effect still lands.
-        if target.shield:
-            target.shield = False
-            if attacker is state.hero:
-                outcome.shields_broken += 1
-        else:
-            deal_damage(state, attacker, target, attack.value, outcome)
+        land_hit(state, attacker, target, attack.value, outcome)
         # After the hit, so a curse never doubles the attack that applied it.
         if target.alive and attack.effect == "Curse":
             target.curse = True
         # A shield blocks the hook's damage, but not its pull.
         if attack.name == "GrapplingHook" and target.alive and target.movable:
             target.cell = attacker.cell + attacker.facing
+
+
+def land_hit(state, attacker, target, value, outcome):
+    # A shield blocks the hit and leaves any curse in place. A tile's effect still lands afterward.
+    if target.shield:
+        target.shield = False
+        if attacker is state.hero:
+            outcome.shields_broken += 1
+    else:
+        deal_damage(state, attacker, target, value, outcome)
 
 
 def deal_damage(state, attacker, target, value, outcome):
@@ -469,6 +476,8 @@ def hero_action(state, action, outcome):
             occupant.cell = hero.cell
             swapped = True
             state.swap_charge = 0
+            if state.swap_damage:
+                land_hit(state, hero, occupant, state.swap_damage, outcome)
         hero.cell = target
     return swapped
 

@@ -1558,6 +1558,110 @@ class ShoveTest(unittest.TestCase):
         self.assertGreater(rank_actions(state, depth=1)[0].terms["stack"], rank_actions(plain, depth=1)[0].terms["stack"])
 
 
+def ronin(hero_cell=2, facing=1, enemies=(), swap_charge=4):
+    state = make_state(hero_cell=hero_cell, facing=facing, enemies=enemies, swap_charge=swap_charge)
+    state.special = "PushSpecialMove"
+    return state
+
+
+class ShoveSpecialMoveTest(unittest.TestCase):
+    def test_it_pushes_the_target_and_the_hero_stays(self):
+        after, outcome = step(ronin(enemies=[enemy(3)]), Action("MoveRight"))
+        self.assertEqual((after.hero.cell, after.hero.facing, after.enemies[0].cell, after.enemies[0].hp), (2, 1, 4, 3))
+        self.assertEqual((after.swap_charge, outcome.enemy_damage), (0, 0))
+
+    def test_the_distance_earns_no_credit_since_stepping_back_makes_the_same_space(self):
+        _, outcome = step(ronin(hero_cell=1, enemies=[enemy(2)]), Action("MoveRight"))
+        self.assertEqual(outcome.shove_cells, 0)
+
+    def test_stepping_back_is_preferred_when_it_dodges_just_as_well(self):
+        state = ronin(hero_cell=2, enemies=[enemy(3, action="Attack", queue=[KATANA])])
+        state.tiles = []
+        self.assertEqual(rank_actions(state, depth=1)[0].labels[0], "MoveLeft")
+
+    def test_it_doesnt_charge_on_the_turn_its_used(self):
+        after, _ = step(ronin(enemies=[enemy(3)]), Action("MoveRight"))
+        self.assertEqual(after.swap_charge, 0)
+
+    def test_someone_behind_the_target_means_a_collision(self):
+        after, outcome = step(ronin(enemies=[enemy(3), enemy(4)]), Action("MoveRight"))
+        self.assertEqual([(e.cell, e.hp) for e in after.enemies], [(3, 2), (4, 2)])
+        self.assertEqual(outcome.enemy_damage, 2)
+
+    def test_it_needs_a_cell_behind_the_target(self):
+        state = ronin(hero_cell=3, enemies=[enemy(4)])
+        self.assertNotIn(Action("MoveRight"), legal_actions(state))
+
+    def test_a_cell_is_enough_even_two_away_from_the_wall(self):
+        state = ronin(hero_cell=2, enemies=[enemy(3)])
+        self.assertIn(Action("MoveRight"), legal_actions(state))
+
+    def test_it_needs_a_movable_target(self):
+        heavy = enemy(3)
+        heavy.movable = False
+        self.assertNotIn(Action("MoveRight"), legal_actions(ronin(enemies=[heavy])))
+
+    def test_it_needs_a_charge(self):
+        self.assertNotIn(Action("MoveRight"), legal_actions(ronin(swap_charge=0, enemies=[enemy(3)])))
+
+    def test_it_only_works_forward_without_two_way_move(self):
+        state = ronin(facing=-1, enemies=[enemy(3)])
+        self.assertNotIn(Action("MoveRight"), legal_actions(state))
+        state.two_way_swap = True
+        self.assertIn(Action("MoveRight"), legal_actions(state))
+
+    def test_it_dodges_a_melee_hit_by_moving_the_attacker(self):
+        _, outcome = step(ronin(enemies=[enemy(3, action="Attack", queue=[KATANA])]), Action("MoveRight"))
+        self.assertEqual(outcome.hp_lost, 0)
+
+    def test_it_doesnt_dodge_a_shot_that_still_reaches(self):
+        arrow = Attack("Arrow", 2, FAR, first_target=True)
+        _, outcome = step(ronin(enemies=[enemy(3, action="Attack", queue=[arrow])]), Action("MoveRight"))
+        self.assertEqual(outcome.hp_lost, 2)
+
+    def test_it_counts_as_an_answer_to_a_melee_threat(self):
+        state = ronin(hero_cell=0, enemies=[enemy(1, queue=[KATANA])])
+        state.occupant(1).action = "Attack"
+        self.assertEqual(unanswerable_damage(state), 0)
+
+    def test_damaging_move_hits_first_and_can_leave_nobody_to_shove(self):
+        state = ronin(enemies=[enemy(3, hp=1)])
+        state.swap_damage = 1
+        after, outcome = step(state, Action("MoveRight"))
+        self.assertEqual((after.enemies, outcome.kills, outcome.shove_cells), ([], 1, 0))
+
+    def test_damaging_move_then_shoves_a_survivor(self):
+        state = ronin(enemies=[enemy(3, hp=3)])
+        state.swap_damage = 1
+        after, _ = step(state, Action("MoveRight"))
+        self.assertEqual((after.enemies[0].cell, after.enemies[0].hp), (4, 2))
+
+    def test_the_label_says_shove(self):
+        state = ronin(enemies=[enemy(3)])
+        self.assertEqual(Action("MoveRight").label(state), "MoveRight (shove)")
+
+    def test_a_swap_still_swaps(self):
+        after, _ = step(make_state(enemies=[enemy(3)]), Action("MoveRight"))
+        self.assertEqual((after.hero.cell, after.enemies[0].cell), (3, 2))
+
+    def test_smoke_bomb_works_for_the_hero_and_turns_nobody(self):
+        after, _ = fire(ronin(enemies=[enemy(4)]), SMOKE_BOMB)
+        self.assertEqual((after.hero.cell, after.hero.facing, after.enemies[0].cell, after.enemies[0].facing), (4, 1, 2, -1))
+
+    def test_an_unknown_special_move_isnt_offered_and_warns(self):
+        state = make_state(enemies=[enemy(3)])
+        state.special = "PhaseSpecialMove"
+        self.assertNotIn(Action("MoveRight"), legal_actions(state))
+        row = {"tiles": [], "hero": {"queue": [], "special": {"name": "PhaseSpecialMove"}}, "enemies": [], "skills": []}
+        self.assertEqual(unmodeled_content(row), ["special move PhaseSpecialMove"])
+
+    def test_the_shove_is_read_from_the_log(self):
+        hero = {"kind": "Ronin", "cell": 2, "facing": "Right", "hp": 10, "maxHp": 10, "shield": False, "queue": [],
+                "action": "Wait", "special": {"name": "PushSpecialMove", "charge": 3, "cooldown": 3}}
+        state = state_from_log({"cells": 7, "hero": hero, "enemies": [], "tiles": []})
+        self.assertEqual((state.special, state.swap_charge, state.swap_cooldown), ("PushSpecialMove", 3, 3))
+
+
 class WarningsTest(unittest.TestCase):
     def notes(self, enemy_row, skills=()):
         return unmodeled_content({"tiles": [], "hero": {"queue": []}, "enemies": [enemy_row], "skills": list(skills)})

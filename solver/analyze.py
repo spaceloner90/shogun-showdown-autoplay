@@ -62,7 +62,7 @@ def build_report(row, state, by_depth):
         "",
         f"==== Analysis ({VERSION}): turn {row['turn']} | HP {state.hero.hp}/{state.hero.max_hp}{wave_text}",
         "  " + board(row),
-        f"  Tiles: {', '.join(tiles)} | Swap {state.swap_charge}/{state.swap_cooldown}",
+        f"  Tiles: {', '.join(tiles)} | Special move {state.swap_charge}/{state.swap_cooldown}",
     ]
 
     unknown = unmodeled_content(row)

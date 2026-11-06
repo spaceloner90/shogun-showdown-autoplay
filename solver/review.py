@@ -57,7 +57,7 @@ def main():
         wave = row.get("wave") or {}
         print(f"\nTurn {turn} | HP {row['hero']['hp']} | wave {wave.get('number')}/{wave.get('total')}"
               f" next={wave.get('turnsUntilNext')} | tiles {', '.join(hand)}"
-              f" | swap {state.swap_charge}/{state.swap_cooldown}")
+              f" | special {state.swap_charge}/{state.swap_cooldown}")
         print("  " + board(row))
         for line in rank_actions(state, depth=args.depth)[: args.top]:
             print(f"    {line.score:8.1f}  {' -> '.join(line.labels)}")

@@ -203,6 +203,15 @@ v1.1, and listed in `unvetted.md` where a log doesn't confirm them):
 - **Barricade** puts a 5 HP inanimate enemy on the cell in front of its user, if that cell is free.
 - **Two Way Move** lets Swap work backward. By the code, a swap never turns the hero.
 
+The Ronin, read from the code (simulated as of v1.2):
+
+- **Shove** is the Ronin's special move, triggered like Swap by moving into an occupied cell. The hero stays
+  put, and the target goes as far as it can, as with Dragon Punch. If someone stops it, they each take 1.
+- It needs a movable target and a cell behind that target, which someone may be standing on. So a target
+  against the wall can't be shoved.
+- The other heroes' special moves (Phase, Swap Toss, Throw) aren't simulated. F1 won't use them, and the
+  report warns.
+
 ## Not confirmed yet
 
 See `unvetted.md` for everything since v1. Older items:

@@ -24,6 +24,18 @@ only real play can test.
 | Shove credit | Scoring | Nothing. First guess | Whether Dragon Punch gets used well, or just more often |
 | Frozen enemies aren't a threat | Rule | Frozen enemies seen waiting, none with a loaded attack | One with a loaded attack doesn't fire, and when it thaws |
 
+## New in v1.2: the Ronin
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Shove: target pushed, hero stays | Rule | The push itself matches Dragon Punch on the final boss (fight 30, turn 8). The Ronin's move has no log yet | The hero really doesn't move, and the charge resets |
+| Shove needs a cell behind the target | Rule | Nothing | F1 is never refused a shove at the wall, and it isn't offered there |
+| Shove counts as an answer to melee | Scoring | Nothing | It's used to dodge when stepping back isn't possible |
+| No distance credit for the shove | Scoring | Nothing. Tried on winning-run boards with a Ronin deck: 51 shoves on 121 chances, 37 for collision damage and 14 saving a hit | Whether it shoves too much for collision damage, spending the charge a dodge needs |
+| Smoke Bomb played by the hero | Rule | Only enemies have used it in a log | Both trade places, and neither turns |
+| Damaging Move with a shove | Rule | Nothing. The hit comes first, then the shove | Only if you pick that skill |
+| Two Way Move with a shove | Rule | Nothing | Only if you pick that skill |
+
 ## Poison's value
 
 The simulation follows the game. The scoring follows the curse rules: poison is worth what it adds, capped by

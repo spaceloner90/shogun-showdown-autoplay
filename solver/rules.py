@@ -30,6 +30,12 @@ BOMB_FUSE = 2     # Turns a placed bomb waits after the one it's placed on, befo
 BARRICADE_HP = 5
 MAX_SHOVE_CREDIT = 3  # A shove counts for at most this many cells: further than that gains little.
 
+# Each hero has one special move, triggered by moving into an occupied cell. Swap is the Wanderer's, and
+# Shove is the Ronin's. The other heroes' moves aren't simulated, so they aren't offered as actions.
+SWAP = "SwapSpecialMove"
+SHOVE = "PushSpecialMove"
+SPECIAL_MOVES = {SWAP, SHOVE}
+
 # Enemy traits that need no warning. Heavy is modeled, and the others haven't changed any prediction.
 UNDERSTOOD_TRAITS = {"Aggro", "Heavy", "Quick", "Unfreezable"}
 
@@ -103,13 +109,14 @@ class State:
     enemies: list[Agent]
     tiles: list[Tile]  # Queue order is kept in hero.queue, by Tile identity in queue_tiles.
     queue_tiles: list[Tile]
-    swap_charge: int
+    swap_charge: int  # The charge and cooldown of the hero's special move, whichever that is.
     swap_cooldown: int
     turns_until_wave: int | None = None
     last_wave: bool = False
     swap_damage: int = 0  # What a swap deals to the enemy passed through, from Damaging Move.
     friendly_bonus: int = 0  # Extra damage when enemies hit each other, from Unfriendly Fire.
-    two_way_swap: bool = False  # Swap works backward as well, from Two Way Move.
+    two_way_swap: bool = False  # The special move works backward as well, from Two Way Move.
+    special: str = SWAP  # The hero's special move.
     # Damage on its way to marked cells: each is {"damage", "groups"}, and the first group of cells strikes
     # this turn. An empty group is a turn of waiting. Corruption heals a boss it lands on, and a bomb's
     # blast doesn't, which it marks with "heals_boss": False.
@@ -169,7 +176,7 @@ class Action:
         if self.kind in ("MoveLeft", "MoveRight"):
             direction = -1 if self.kind == "MoveLeft" else 1
             if state.occupant(state.hero.cell + direction) is not None:
-                return f"{self.kind} (swap)"
+                return f"{self.kind} ({'shove' if state.special == SHOVE else 'swap'})"
         return self.kind
 
 
@@ -251,6 +258,7 @@ def state_from_log(row):
         friendly_bonus=next((s["level"] for s in row.get("skills") or []
                              if isinstance(s, dict) and s.get("name") == "UnfriendlyFire"), 0),
         two_way_swap=any(isinstance(s, dict) and s.get("name") == "TwoWayMove" for s in row.get("skills") or []),
+        special=special.get("name", SWAP),
         hazards=[dict(h, groups=[list(g) for g in h["groups"]]) for h in row.get("hazards") or []],
     )
 
@@ -283,6 +291,9 @@ def unmodeled_content(row):
     for data in hero["queue"]:
         check_attack(data)
     check_status("hero", hero)
+    special_name = (hero.get("special") or {}).get("name")
+    if special_name and special_name not in SPECIAL_MOVES:
+        note(f"special move {special_name}")
     for enemy in row["enemies"]:
         for data in enemy["queue"]:
             check_attack(data)
@@ -299,15 +310,42 @@ def unmodeled_content(row):
     return notes
 
 
-def can_swap(state, direction):
-    """Swap needs a charge and a movable occupant. It only works in the facing direction, without Two Way Move."""
-    occupant = state.occupant(state.hero.cell + direction)
+def can_use_special(state, direction):
+    """A special move needs a charge and a movable occupant, in the facing direction without Two Way Move.
+
+    A shove also needs a cell behind the target, though someone can be standing on it.
+    """
+    target = state.hero.cell + direction
+    occupant = state.occupant(target)
+    if state.special == SHOVE and not 0 <= target + direction < state.cells:
+        return False
     return (
-        (direction == state.hero.facing or state.two_way_swap)
+        state.special in SPECIAL_MOVES
+        and (direction == state.hero.facing or state.two_way_swap)
         and state.swap_charge >= state.swap_cooldown
         and occupant is not None
         and occupant.movable
     )
+
+
+def perform_special(state, direction, outcome):
+    """The hero's special move on the agent next to it. Only for when can_use_special allows it."""
+    hero = state.hero
+    target_cell = hero.cell + direction
+    occupant = state.occupant(target_cell)
+    state.swap_charge = 0
+    if state.special == SHOVE:
+        # The hero stays put. Damaging Move's hit comes first, so it may leave nobody to shove. The distance
+        # earns nothing here, because stepping back makes the same space and keeps the charge.
+        if state.swap_damage:
+            land_hit(state, hero, occupant, state.swap_damage, outcome)
+        if occupant.alive:
+            push(state, hero, occupant, direction, outcome, credit_distance=False)
+        return
+    occupant.cell = hero.cell
+    if state.swap_damage:
+        land_hit(state, hero, occupant, state.swap_damage, outcome)
+    hero.cell = target_cell
 
 
 def free_hand_tiles(state):
@@ -347,7 +385,7 @@ def legal_actions(state, allow_swap=True):
         target = hero.cell + direction
         if not 0 <= target < state.cells:
             continue
-        if state.occupant(target) is None or (allow_swap and can_swap(state, direction)):
+        if state.occupant(target) is None or (allow_swap and can_use_special(state, direction)):
             actions.append(Action(kind))
     if len(hero.queue) < QUEUE_CAP:
         for index, tile in enumerate(state.tiles):
@@ -484,11 +522,11 @@ def origin_of_symmetry(state, attacker):
     return center != start
 
 
-def push(state, attacker, target, direction, outcome):
+def push(state, attacker, target, direction, outcome, credit_distance=True):
     """Pushes the target as far as it goes. If someone stops it, each of them takes a collision hit."""
     start = target.cell
     behind = run_to_last_free_cell(state, target, direction)
-    if attacker is state.hero and not is_tank(state, target):
+    if credit_distance and attacker is state.hero and not is_tank(state, target):
         outcome.shove_cells += min(abs(target.cell - start), MAX_SHOVE_CREDIT)
     if behind:
         land_hit(state, attacker, behind[0], 1, outcome, collision=True)
@@ -714,14 +752,11 @@ def hero_action(state, action, outcome):
     elif action.kind in ("MoveLeft", "MoveRight"):
         direction = -1 if action.kind == "MoveLeft" else 1
         target = hero.cell + direction
-        occupant = state.occupant(target)
-        if occupant is not None:
-            occupant.cell = hero.cell
+        if state.occupant(target) is not None:
+            perform_special(state, direction, outcome)
             swapped = True
-            state.swap_charge = 0
-            if state.swap_damage:
-                land_hit(state, hero, occupant, state.swap_damage, outcome)
-        hero.cell = target
+        else:
+            hero.cell = target
     return swapped
 
 

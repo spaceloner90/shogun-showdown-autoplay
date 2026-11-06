@@ -45,9 +45,9 @@ import itertools
 from dataclasses import dataclass, field
 
 from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, apply_attack,
-                   can_swap, fireable_attacks, is_tank, land_hit, legal_actions, step, strike_cell)
+                   can_use_special, fireable_attacks, is_tank, legal_actions, perform_special, step, strike_cell)
 
-VERSION = "v1.1"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.2"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -69,7 +69,7 @@ WEIGHTS = {
     "stack_fractions": (0.6, 0.45, 0.35, 0.25),
     "ready_tile": 2.0,        # Per tile that's charged, in hand or queue.
     "loaded_damage": 2.0,     # Per point of damage in the queue, whether or not anything's in range.
-    "swap_ready": 3.0,        # Having Swap charged, so spending it has a cost.
+    "swap_ready": 3.0,        # Having the special move charged, so spending it has a cost.
     "curse": 0.5,             # Fraction of what a curse would add to the hero's next hit on that enemy.
     "shield": 100.0,          # Holding a shield, worth about 1 HP. Hits average 1.4, but it may go unused.
     "facing_ideal": 6.0,      # Facing the enemy we most want to hit.
@@ -233,22 +233,18 @@ def _threat_damage(state, cell):
     return outcome.hp_lost
 
 
-def _threat_after_swap(state, direction):
+def _threat_after_special(state, direction):
     trial = _light_copy(state)
-    cell = trial.hero.cell + direction
-    occupant = trial.occupant(cell)
-    occupant.cell = trial.hero.cell
-    if trial.swap_damage:
-        land_hit(trial, trial.hero, occupant, trial.swap_damage, Outcome())
+    perform_special(trial, direction, Outcome())
     trial.enemies = [e for e in trial.enemies if e.alive]
-    return _threat_damage(trial, cell)
+    return _threat_damage(trial, trial.hero.cell)
 
 
 def unanswerable_damage(state):
     """Threatened damage left after the hero's best answer next turn.
 
-    The answers are stepping aside, swapping past an enemy, or firing the queue and removing whoever
-    it kills. When nothing removes the threat entirely, the answer leaving the least still counts.
+    The answers are stepping aside, using the special move on an enemy, or firing the queue and removing
+    whoever it kills. When nothing removes the threat entirely, the answer leaving the least still counts.
     """
     hero = state.hero
     best = _threat_damage(state, hero.cell)
@@ -259,8 +255,8 @@ def unanswerable_damage(state):
         if 0 <= cell < state.cells:
             if state.occupant(cell) is None:
                 best = min(best, _threat_damage(state, cell))
-            elif can_swap(state, direction):
-                best = min(best, _threat_after_swap(state, direction))
+            elif can_use_special(state, direction):
+                best = min(best, _threat_after_special(state, direction))
     attacks_available = fireable_attacks(state)
     for attacks in itertools.permutations(attacks_available, min(len(attacks_available), QUEUE_CAP)):
         if not attacks:

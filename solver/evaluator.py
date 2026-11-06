@@ -25,6 +25,8 @@ Principles, from how the game plays:
   Bosses need no special handling: when no stack can reach a kill, there's no kill to value.
 - A curse doubles the enemy's next hit, so it's worth what that adds to the hero's next attack, which
   is worth more when it turns a wound into a kill. It's worth nothing on an enemy that dies.
+- A hero's shield blocks a whole hit, and most hits can't be dodged, so it's best kept for one of those.
+  Spending it on a hit that could have been dodged has a cost.
 
 All the weights are first guesses, kept together here so they're easy to change.
 
@@ -41,7 +43,7 @@ from dataclasses import dataclass, field
 from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, apply_attack,
                    can_swap, fireable_attacks, legal_actions, step)
 
-VERSION = "v0.6"
+VERSION = "v0.7"
 
 WEIGHTS = {
     # What happens along the line.
@@ -62,6 +64,7 @@ WEIGHTS = {
     "loaded_damage": 2.0,     # Per point of damage in the queue, whether or not anything's in range.
     "swap_ready": 3.0,        # Having Swap charged, so spending it has a cost.
     "curse": 0.5,             # Fraction of what a curse would add to the hero's next hit on that enemy.
+    "shield": 100.0,          # Holding a shield, worth about 1 HP. Hits average 1.4, but it may go unused.
     "facing_ideal": 6.0,      # Facing the enemy we most want to hit.
     "facing_other": 2.0,      # Facing an enemy, but not that one.
     "distance": -2.0,         # Per cell of gap between the hero and the ideal target.
@@ -289,6 +292,7 @@ def leaf_terms(state: State) -> dict[str, float]:
     terms = {
         "stack": _stack_value(state),
         "curse": _curse_value(state),
+        "shield": WEIGHTS["shield"] if state.hero.shield else 0.0,
         "ready_tiles": WEIGHTS["ready_tile"] * sum(t.ready for t in state.tiles),
         "loaded": WEIGHTS["loaded_damage"] * sum(a.value for a in fireable_attacks(state)),
         "swap_ready": WEIGHTS["swap_ready"] if state.swap_charge >= state.swap_cooldown else 0.0,

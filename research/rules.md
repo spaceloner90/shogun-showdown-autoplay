@@ -126,13 +126,22 @@ Fight 7 of the same log showed:
 - **Free Play tiles load without using the turn.** They can also be sent back for free, so the solver
   only ever plays one as part of an attack.
 
+The fight in `logs/run3_part2` showed:
+
+- **Curse pays off within one stack.** On turn 7, Swirl with Curse hit for 3, then Shadow Dash's 1
+  was doubled to 2 for the kill. Curse status was predicted correctly on all 28 turns.
+- **Free Play works in one key press.** On turns 21 and 29, the mod played the tile from hand, edited
+  the queue and attacked together.
+
+The twins boss, later in the same log, showed:
+
+- **A curse doubles exactly one tile.** On turn 8, Swirl hit for 3 and cursed, Arrow's 4 hit for 8, then
+  Swirl's 2 hit for 2 with HP to spare.
+
 ## Not confirmed yet
 
-- Mod 0.8.0 plays Free Play tiles from hand in the same key press as the attack. That hasn't run yet.
-- **Curse** comes from the code alone (`Agent.ReceiveAttack`, `Attack.HitTarget`). It should double one
-  hit that deals damage, meaning one tile against one target, and then be used up. It's applied after
-  the hit that carries it, only if the target survives, and a shield blocks a hit without using it up.
-  It stays on until used, and doesn't stack.
+- The shield rules, for the hero, for enemies and for curse, come from the code alone. No logged hit
+  has landed on a shielded target.
 - Whether an enemy can refuse a swap isn't modeled. The game would refuse the move, and the mod would
   log that.
 - The saved fight log never has Swirl hitting two agents at once. An earlier log did show it, but

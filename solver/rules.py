@@ -17,6 +17,10 @@ ONE_ENEMY_WAVE_CAP = 6
 MODELED = {"Arrow", "BackCharge", "BackShadowDash", "Charge", "Dash", "EarthImpale", "Katana", "ShadowDash",
            "Spear", "Swirl", "Tetsubo"}
 
+# Skills that need no modeling: a consumable slot, and a shield at the start of each fight, which shows
+# up in the state like any other shield.
+UNDERSTOOD_SKILLS = {"BigPockets", "Fortress"}
+
 # Attacks that move the attacker. Each value is the direction relative to the attacker's facing.
 CHARGES = {"Charge": 1, "BackCharge": -1}  # Run to the last free cell, and hit whatever is next.
 PLAIN_DASHES = {"Dash": 1}                 # Run to the last free cell, and hit nothing.
@@ -237,7 +241,9 @@ def unmodeled_content(row):
         for trait in enemy.get("traits") or []:
             note(f"{enemy['kind']} trait {trait}")
     for skill in row.get("skills") or []:
-        note(f"skill {skill.get('name', skill) if isinstance(skill, dict) else skill}")
+        name = skill.get("name", skill) if isinstance(skill, dict) else skill
+        if name not in UNDERSTOOD_SKILLS:
+            note(f"skill {name}")
     return notes
 
 

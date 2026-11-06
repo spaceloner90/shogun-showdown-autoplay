@@ -409,10 +409,50 @@ class CurseTest(unittest.TestCase):
         best = rank_actions(state, depth=1)[0]
         self.assertEqual(best.actions[0], Action("Attack", order=(1, 0)))
 
+    def test_understood_skills_get_no_warning_and_others_do(self):
+        row = {"tiles": [], "hero": {"queue": []}, "enemies": [],
+               "skills": [{"name": "Fortress", "level": 1}, {"name": "BigPockets", "level": 1}, {"name": "Sniper", "level": 1}]}
+        self.assertEqual(unmodeled_content(row), ["skill Sniper"])
+
     def test_curse_gets_no_warning(self):
         row = {"tiles": [{"attack": {"name": "Arrow", "effect": "Curse", "tileEffect": "None"}}],
                "hero": {"queue": [], "curse": True}, "enemies": [], "skills": []}
         self.assertEqual(unmodeled_content(row), [])
+
+
+class ShieldValueTest(unittest.TestCase):
+    def _attacked(self, shield=True, **kwargs):
+        state = make_state(enemies=[enemy(3, action="Attack", queue=[KATANA])], swap_charge=0, **kwargs)
+        state.hero.shield = shield
+        return state
+
+    def test_a_shield_is_worth_about_one_hp(self):
+        with_shield = make_state(enemies=[enemy(4)])
+        with_shield.hero.shield = True
+        without = make_state(enemies=[enemy(4)])
+        self.assertEqual(leaf_terms(with_shield)["shield"] - leaf_terms(without)["shield"], 100)
+
+    def test_dodges_rather_than_spend_a_shield_for_nothing(self):
+        best = rank_actions(self._attacked(), depth=1)[0]
+        self.assertEqual(best.actions[0].kind, "MoveLeft")
+        self.assertEqual(best.terms["shield"], 85)
+
+    def test_spends_a_shield_when_the_hit_cannot_be_dodged(self):
+        # Backed into the corner with Swap charging, so the only question is what else to do.
+        state = make_state(hero_cell=4, facing=-1, swap_charge=0,
+                           enemies=[enemy(3, facing=1, action="Attack", queue=[KATANA])])
+        state.hero.shield = True
+        best = rank_actions(state, depth=1)[0]
+        self.assertEqual(best.terms.get("hp_lost", 0), 0)
+        self.assertEqual(best.terms.get("shield", 0), 0)
+        self.assertNotEqual(best.actions[0].kind, "Wait")
+
+    def test_a_kill_that_removes_the_attacker_keeps_the_shield(self):
+        state = make_state(enemies=[enemy(3, hp=2, action="Attack", queue=[KATANA])], queue=["Swirl"])
+        state.hero.shield = True
+        best = rank_actions(state, depth=1)[0]
+        self.assertEqual(best.actions[0].kind, "Attack")
+        self.assertEqual(best.terms["shield"], 85)
 
 
 class EvaluatorTest(unittest.TestCase):

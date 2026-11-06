@@ -23,6 +23,12 @@ Enemy AI code is for offline simulation and tuning only.
   OriginOfSymmetry, Tanegashima. Each needs its rules read first.
 - **Summons:** a Summon's arrival isn't predicted, and summons die with their boss. Both prediction
   misses in run 2 are Summons.
+- **The Twins:** damage to the Side twin also comes off the Main twin, and the Side twin dies with it.
+  F1 sees them as a 35 HP boss and a separate 100 HP one, so it goes for the Main twin only because
+  it's the lower HP. Hits on the Side twin count for no kill. Their Swap Toss, which moved the hero on
+  turn 16 of that fight, isn't modeled either.
+- **Shield refinements:** a shield is worth a flat 1 HP (v0.7). It should be worth less near the end of
+  a fight, since it usually expires then, and hitting an enemy's shield still scores nothing.
 - **Status effects:** poison and ice, as tile effects or on agents. Curse is modeled as of v0.6, but
   being cursed has no direct cost in how the hero's position is scored yet, and the enemy Curse
   attack still isn't modeled.
@@ -38,6 +44,25 @@ Grouped by the names of their code hooks, not by reading each one, so treat thes
 | Change the special move | 4 | CursingMove, DamagingMove, MamushiMove, TwoWayMove | TwoWayMove and DamagingMove look simple; the others need statuses |
 | Trigger on combo kills | 8 | ComboBoon, ComboCoin, ComboCurse, ComboDeal, ComboRecharge, ChillingCombo, KobushiCombo, TripleComboHeal | Need "combo" understood first |
 | Mostly passive | 15 | BigPockets, ChillingBlood, FenghuangFeather, Fortress, Healthy, Karma, Mindfulness, OddCurse, OverflowGuard, QuickRecovery, ReactiveShield, RogueRetail, SeiryuScale, ShieldRetention, TwoFacedDancer | Many may not affect combat choices at all |
+
+## Prioritizing dangerous enemies
+
+From play: Archers, and to a lesser extent Chargers, need killing at range, or they deal damage that
+can't be avoided. Across runs 2 and 3, played on v0.2 to v0.6:
+
+| Enemy | Appeared | HP lost to it | Hits unavoidable by that turn |
+|---|---|---|---|
+| Charger | 27 | 9 | 8 of 9 |
+| Yari Master | 27 | 7 | 3 of 4 |
+| Archer | 11 | 6 | 3 of 3 |
+| Everything else, including both bosses | 61 | 0 | - |
+
+Today's target choice is simply the lowest HP, then the closest. An enemy's danger only registers once
+its attack is queued, which is often too late to do anything. Options, all from what a player knows:
+
+- Value killing an enemy more when its attack can't be stepped away from.
+- Learn what each enemy type plays from past logs, so an Archer counts as a threat before it loads.
+- Weigh the turn left before it can fire, so Arrow goes on the enemy that's about to be a problem.
 
 ## Ideas not yet tried
 

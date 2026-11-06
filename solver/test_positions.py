@@ -14,7 +14,7 @@ from rules import Action, state_from_log, step
 LOGS = Path(__file__).resolve().parent.parent / "research" / "logs"
 ROWS = {
     name: [json.loads(line) for line in (LOGS / name / "state.jsonl").read_text(encoding="utf-8").splitlines()]
-    for name in ("run2_complete", "run3_v03")
+    for name in ("run2_complete", "run3_v03", "run3_part2")
 }
 
 
@@ -80,6 +80,20 @@ class ShadowDash(unittest.TestCase):
         after, _ = step(position(6, 28, "run3_v03"), Action("Attack"))
         self.assertEqual(after.hero.cell, 5)
         self.assertEqual([(e.kind, e.cell, e.hp) for e in after.enemies], [("IwaoBoss", 4, 7)])
+
+
+class CurseAsPlayed(unittest.TestCase):
+    """The twins boss, where a stack showed exactly how far a curse reaches."""
+
+    def test_a_curse_doubles_exactly_one_tile(self):
+        # Turn 8 in the game: Swirl hit for 3 and cursed, Arrow's 4 hit for 8, then Swirl's 2 hit for 2.
+        state = position(-1, 8, "run3_part2")
+        swirl3 = next(i for i, t in enumerate(state.tiles) if t.attack.name == "Swirl" and t.attack.value == 3)
+        arrow = next(i for i, t in enumerate(state.tiles) if t.attack.name == "Arrow")
+        swirl2 = next(i for i, t in enumerate(state.tiles) if t.attack.name == "Swirl" and t.attack.value == 2)
+        after, outcome = step(state, Action("Attack", order=(swirl3, arrow, swirl2)))
+        self.assertEqual(outcome.enemy_damage, 13)
+        self.assertEqual(next(e.hp for e in after.enemies if e.kind == "TwinMainBoss"), 18)
 
 
 class FreePlay(unittest.TestCase):

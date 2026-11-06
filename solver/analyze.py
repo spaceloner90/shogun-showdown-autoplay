@@ -17,9 +17,10 @@ import time
 
 from evaluator import VERSION, rank_actions
 from review import board
-from rules import MODELED, state_from_log
+from rules import state_from_log, unmodeled_content
 
-DEPTHS = (1, 2, 3, 4)
+# F2-F4 aren't being developed, so only depth 1 is searched. Those keys report no analysis.
+DEPTHS = (1,)
 MAX_TABLE_ROWS = 8
 
 
@@ -64,9 +65,9 @@ def build_report(row, state, by_depth):
         f"  Tiles: {', '.join(tiles)} | Swap {state.swap_charge}/{state.swap_cooldown}",
     ]
 
-    unknown = sorted({a.name for e in state.enemies for a in e.queue} - MODELED)
+    unknown = unmodeled_content(row)
     if unknown:
-        lines.append(f"  WARNING: attacks the rules don't model: {', '.join(unknown)}")
+        lines.append(f"  WARNING: the solver doesn't model: {', '.join(unknown)}")
 
     # One row per move, ordered by depth 1, with a * on each depth's choice. Each depth's choice is
     # always shown, but there can be many ways to fire a full queue, so the rest are cut off.

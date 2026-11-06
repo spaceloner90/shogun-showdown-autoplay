@@ -12,3 +12,6 @@ research/signatures.txt
 
 # The engine's own log, which includes machine and account details
 Player.log
+
+# Snapshots taken during a run. The run's complete log is kept instead.
+research/logs/run2_through_*/

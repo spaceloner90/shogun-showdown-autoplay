@@ -4,13 +4,14 @@ Run with: python solver/test_rules.py
 """
 import unittest
 
-from evaluator import leaf_terms, rank_actions, unanswerable_damage
+from evaluator import _threat_damage, leaf_terms, rank_actions, unanswerable_damage
 from rules import Action, Agent, Attack, State, Tile, legal_actions, step
 
 SWIRL = Attack("Swirl", 2, [-1, 1])
-ARROW = Attack("Arrow", 2, list(range(1, 11)))
-KATANA = Attack("Katana", 2, [1])
-TETSUBO = Attack("Tetsubo", 4, [1])
+ARROW = Attack("Arrow", 2, list(range(1, 11)), first_target=True)
+KATANA = Attack("Katana", 2, [1], first_target=True)
+TETSUBO = Attack("Tetsubo", 4, [1], first_target=True)
+CHARGE = Attack("Charge", 1, list(range(1, 11)), first_target=True)
 
 
 def make_state(hero_cell=2, facing=1, enemies=(), swap_charge=4, queue=()):
@@ -145,6 +146,68 @@ class RulesTest(unittest.TestCase):
         self.assertEqual(arrow_first.kills, 1)
         self.assertEqual(arrow_first.enemy_damage, 4)
 
+    def test_charge_stops_at_the_first_target_and_moves_the_attacker(self):
+        ally = enemy(4, facing=1)
+        state = make_state(hero_cell=2, enemies=[enemy(0, facing=1, action="Attack", queue=[CHARGE]), ally])
+        after, outcome = step(state, Action("Wait"))
+        self.assertEqual(outcome.hp_lost, 1)
+        self.assertEqual(outcome.friendly_damage, 0)
+        self.assertEqual(after.enemies[0].cell, 1)
+
+    def test_charge_hits_an_ally_in_the_way(self):
+        state = make_state(hero_cell=4, facing=-1, enemies=[enemy(0, facing=1, action="Attack", queue=[CHARGE]), enemy(2, facing=1)])
+        _, outcome = step(state, Action("Wait"))
+        self.assertEqual((outcome.hp_lost, outcome.friendly_damage), (0, 1))
+
+    def test_hero_charge_moves_the_hero_next_to_the_target(self):
+        state = make_state(hero_cell=0, facing=1, enemies=[enemy(4)])
+        state.tiles[0].attack = CHARGE
+        state.tiles[0].in_queue = True
+        state.queue_tiles = [state.tiles[0]]
+        state.hero.queue = [CHARGE]
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual((after.hero.cell, outcome.enemy_damage), (3, 1))
+
+    def test_plain_dash_moves_to_the_last_free_cell_and_hits_nothing(self):
+        dash_attack = Attack("Dash", 0, list(range(1, 11)))
+        state = make_state(hero_cell=0, facing=1, enemies=[enemy(4)])
+        state.tiles[0].attack = dash_attack
+        state.tiles[0].in_queue = True
+        state.queue_tiles = [state.tiles[0]]
+        state.hero.queue = [dash_attack]
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual((after.hero.cell, outcome.enemy_damage, outcome.wasted_attacks), (3, 0, 0))
+
+    def test_shadow_dash_passes_through_and_hits_everyone_adjacent_in_a_row(self):
+        shadow = Attack("ShadowDash", 2, [1], first_target=True)
+        state = make_state(hero_cell=1, facing=1, enemies=[enemy(2), enemy(3)])
+        state.tiles[0].attack = shadow
+        state.tiles[0].in_queue = True
+        state.queue_tiles = [state.tiles[0]]
+        state.hero.queue = [shadow]
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual((after.hero.cell, outcome.enemy_damage), (4, 4))
+
+    def test_shadow_dash_needs_a_free_cell_to_land_on(self):
+        shadow = Attack("ShadowDash", 2, [1], first_target=True)
+        state = make_state(hero_cell=3, facing=1, enemies=[enemy(4)])
+        state.tiles[0].attack = shadow
+        state.tiles[0].in_queue = True
+        state.queue_tiles = [state.tiles[0]]
+        state.hero.queue = [shadow]
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual((after.hero.cell, outcome.enemy_damage), (3, 0))
+
+    def test_free_play_tile_does_not_end_the_turn(self):
+        state = make_state(enemies=[enemy(3, action="Attack", queue=[KATANA])])
+        state.tiles[0].free_play = True
+        state.turns_until_wave = 5
+        after, outcome = step(state, Action("PlayTile", 0))
+        self.assertEqual(outcome.hp_lost, 0)
+        self.assertEqual(after.turns_until_wave, 5)
+        self.assertEqual(after.enemies[0].action, "Attack")
+        self.assertTrue(after.tiles[0].in_queue)
+
     def test_attack_labels_describe_the_edits(self):
         state = make_state(enemies=[enemy(3)], queue=["Swirl", "Arrow"])
         self.assertEqual(Action("Attack").label(state), "Attack")
@@ -188,18 +251,59 @@ class EvaluatorTest(unittest.TestCase):
         self.assertEqual(unanswerable_damage(state), 0)
 
     def test_cornered_with_nothing_ready_has_no_answer(self):
-        # Hero in the corner, with the only free neighbour blocked by the enemy itself.
-        state = make_state(hero_cell=0, facing=1, enemies=[enemy(1, queue=[KATANA])])
+        # Hero in the corner, with the only free neighbour blocked by the enemy, and Swap charging.
+        state = make_state(hero_cell=0, facing=1, swap_charge=0, enemies=[enemy(1, queue=[KATANA])])
         self.assertEqual(unanswerable_damage(state), 2)
+
+    def test_swapping_past_the_attacker_is_an_answer(self):
+        state = make_state(hero_cell=0, facing=1, enemies=[enemy(1, queue=[KATANA])])
+        self.assertEqual(unanswerable_damage(state), 0)
+
+    def test_a_partial_answer_counts_for_what_it_removes(self):
+        # A dash can't be dodged, but killing the Spear carrier still removes 2 of the 3 damage.
+        state = make_state(hero_cell=2, facing=1, swap_charge=0, queue=["Swirl"], enemies=[
+            enemy(0, facing=1, queue=[CHARGE]), enemy(3, hp=2, queue=[Attack("Spear", 2, [1, 2])])])
+        self.assertEqual(unanswerable_damage(state), 1)
+
+    def test_an_enemy_in_the_way_blocks_a_first_target_threat(self):
+        state = make_state(hero_cell=4, facing=-1, enemies=[enemy(0, facing=1, queue=[ARROW]), enemy(2, facing=1)])
+        self.assertEqual(_threat_damage(state, 4), 0)
+
+    def test_a_dash_carries_the_next_attack_in_its_queue_into_range(self):
+        state = make_state(hero_cell=4, facing=-1, enemies=[enemy(0, facing=1, queue=[CHARGE, KATANA])])
+        self.assertEqual(_threat_damage(state, 4), 3)
+
+    def test_a_stack_counts_for_a_kill_a_step_away(self):
+        # A 4hp enemy two cells away: Swirl and Arrow together kill it, from the next cell over.
+        near = make_state(hero_cell=2, facing=1, queue=["Swirl", "Arrow"], enemies=[enemy(4, hp=4)])
+        alone = make_state(hero_cell=2, facing=1, queue=["Arrow"], enemies=[enemy(4, hp=4)])
+        self.assertGreater(leaf_terms(near)["stack"], leaf_terms(alone)["stack"] * 2)
+
+    def test_closing_in_matters_less_with_nothing_to_threaten(self):
+        armed = make_state(hero_cell=0, enemies=[enemy(4)])
+        unarmed = make_state(hero_cell=0, enemies=[enemy(4)])
+        for tile in unarmed.tiles:
+            tile.charge = 0
+        self.assertLess(leaf_terms(armed)["distance"], leaf_terms(unarmed)["distance"])
+
+    def test_loads_a_free_play_tile_and_then_acts(self):
+        # Loading is free, so it should come before stepping out of a telegraphed attack.
+        state = make_state(enemies=[enemy(3, action="Attack", queue=[KATANA])])
+        state.tiles[1].free_play = True
+        line = rank_actions(state, depth=1)[0]
+        self.assertEqual(line.actions[0], Action("PlayTile", 1))
+        self.assertEqual(line.labels[0], "PlayTile Arrow (free)")
+        self.assertGreater(len(line.actions), 1)
+        self.assertEqual(line.terms.get("hp_lost", 0), 0)
 
     def test_cornered_but_able_to_kill_has_an_answer(self):
         state = make_state(hero_cell=0, facing=1, enemies=[enemy(1, hp=2, queue=[KATANA])], queue=["Swirl"])
         self.assertEqual(unanswerable_damage(state), 0)
 
-    def test_stepping_into_another_threat_is_not_an_answer(self):
-        state = make_state(hero_cell=2, enemies=[
+    def test_stepping_into_another_threat_is_only_a_partial_answer(self):
+        state = make_state(hero_cell=2, swap_charge=0, enemies=[
             enemy(0, facing=1, queue=[Attack("Long", 2, [1, 2, 3])]), enemy(3, queue=[KATANA])])
-        self.assertEqual(unanswerable_damage(state), 4)
+        self.assertEqual(unanswerable_damage(state), 2)
 
     def test_closes_in_rather_than_running_from_a_loaded_enemy(self):
         # Nothing threatens the hero yet, and an enemy is out of reach with tiles on cooldown.

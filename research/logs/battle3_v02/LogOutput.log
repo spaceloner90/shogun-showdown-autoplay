@@ -1,0 +1,891 @@
+[Message:   BepInEx] BepInEx 5.4.23.6 - ShogunShowdown (9/22/2026 11:59:44 AM)
+[Info   :   BepInEx] Running under Unity v2021.3.45.8976527
+[Info   :   BepInEx] CLR runtime version: 4.0.30319.42000
+[Info   :   BepInEx] Supports SRE: True
+[Info   :   BepInEx] System platform: Bits64, Windows
+[Message:   BepInEx] Preloader started
+[Info   :   BepInEx] Loaded 1 patcher method from [BepInEx.Preloader 5.4.23.6]
+[Info   :   BepInEx] 1 patcher plugin loaded
+[Info   :   BepInEx] Patching [UnityEngine.CoreModule] with [BepInEx.Chainloader]
+[Message:   BepInEx] Preloader finished
+[Message:   BepInEx] Chainloader ready
+[Message:   BepInEx] Chainloader started
+[Info   :   BepInEx] 1 plugin to load
+[Info   :   BepInEx] Loading [Shogun State Logger 0.7.0]
+[Info   :Shogun State Logger] State logger loaded. Writing to C:\Program Files\Epic Games\ShogunShowdown611f6\BepInEx\autoplay\state.jsonl
+[Info   :Shogun State Logger] In combat, press F1-F4 to play the top move for that depth, or F8 to see the scores without playing.
+[Message:   BepInEx] Chainloader startup complete
+[Info   :Shogun State Logger] State logger Update loop is running.
+[Info   :Shogun State Logger]   > Combat begins (camp)
+[Info   :Shogun State Logger]   [new tile] Swirl L0 None None = Swirl: Strike the cells directly ahead and behind.
+[Info   :Shogun State Logger]   [new tile] Arrow L0 None None = Arrow: Strike the first target ahead.
+[Info   :Shogun State Logger]   [new hero] Wanderer = Swap: Special ability: can swap position with an enemy in front of her by moving forward.
+[Info   :Shogun State Logger] 
+==== Turn 1 | CampRoom | 10 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:.
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+[Info   :Shogun State Logger]   > Turn 1 action: HERO MoveRight [from: human]
+[Info   :Shogun State Logger] 
+==== Turn 2 | CampRoom | 10 coins
+  Grid: 0:.  1:.  2:.  3:HERO>  4:.
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+[Info   :Shogun State Logger]   > Turn 2 action: HERO MoveRight [from: human]
+[Info   :Shogun State Logger] 
+==== Turn 3 | CampRoom | 10 coins
+  Grid: 0:.  1:.  2:.  3:.  4:HERO>
+  Hero: cell 4, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+[Info   :Shogun State Logger]   > Combat ended
+[Info   :Shogun State Logger]   > Combat begins
+[Info   :Shogun State Logger]   > Wave 1/4 spawns
+[Info   :Shogun State Logger]   [new enemy] Ashigaru = Ashigaru: A common swordsman, but their dedication to the Shogun's cause should not be underestimated.
+[Info   :Shogun State Logger] 
+==== Turn 1 | WaveRoom | wave 1/4, next in 9 turns | 10 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:Ashigaru>
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 4, facing Right, HP 3/3, next: Wait
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 1 | HP 10/10 | wave 1/4, next in 9
+  0:.  1:.  2:HERO>  3:.  4:Ashigaru>[3hp Wait]
+  Tiles: Swirl (ready), Arrow (ready) | Swap 4/4
+  Move                  D1        D2        D3        D4
+  PlayTile Arrow     11.5*     19.9*     24.9*     38.4*
+  PlayTile Swirl      1.3      11.6      24.9      38.4 
+  MoveRight          -0.4      10.1      24.9      38.4 
+  Wait               -2.1       8.7      16.6      20.4 
+  MoveLeft           -3.8       7.2      15.4      17.1 
+  Flip               -7.2       0.0       6.4      13.8 
+  F1 PlayTile Arrow
+     beats PlayTile Swirl by 10.2: firepower +10.2
+  F2 PlayTile Arrow -> Attack
+     beats PlayTile Swirl by 8.3: enemy_damage +17.0, firepower -8.7, loaded -5.8
+  F3 PlayTile Arrow -> PlayTile Swirl -> MoveRight
+     tied with PlayTile Swirl, but its position improves sooner
+  F4 PlayTile Arrow -> PlayTile Swirl -> MoveRight -> Attack
+     tied with PlayTile Swirl, but its position improves sooner
+[Info   :Shogun State Logger]   > Decision: PlayTile Arrow | from: Evaluator v0.2 depth 1 | why: score 11.50, plan: PlayTile Arrow
+[Info   :Shogun State Logger]   > HERO queues tile Arrow [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > Turn 1 action: HERO PlayTile [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 2 | WaveRoom | wave 1/4, next in 5 turns | 10 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:Ashigaru>
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 4, facing Right, HP 3/3, next: FlipLeft
+  Queue: Arrow 2 dmg, range 1..10
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 2 | HP 10/10 | wave 1/4, next in 5
+  0:.  1:.  2:HERO>  3:.  4:Ashigaru>[3hp FlipLeft]
+  Tiles: Swirl (ready), Arrow (queued) | Swap 4/4
+  Move                  D1        D2        D3        D4
+  Attack             23.4*     25.4      40.3      46.1*
+  PlayTile Swirl     13.6      29.3*     45.2*     44.9 
+  MoveRight          11.9      29.3      45.2      44.9 
+  Wait               10.2      19.5      24.0      38.4 
+  MoveLeft            8.5      18.1      20.1      20.4 
+  Flip                0.0       7.6      16.3      19.6 
+  F1 Attack
+     beats PlayTile Swirl by 9.8: enemy_damage +20.0, firepower -10.2, loaded -6.8
+  F2 PlayTile Swirl -> MoveRight
+     tied with MoveRight, but its position improves sooner
+  F3 PlayTile Swirl -> MoveRight -> Attack
+     tied with MoveRight, but its position improves sooner
+  F4 Attack -> PlayTile Swirl -> MoveRight -> Attack
+     beats PlayTile Swirl by 1.2: enemy_damage +4.5, kills -3.3
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.2 depth 1 | why: score 23.40, plan: Attack
+[Info   :Shogun State Logger]   > Turn 2 action: HERO Attack [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > HERO@2 attacks with Arrow
+[Info   :Shogun State Logger]   > HERO@2 hits Ashigaru@4: 2 damage, HP 3 -> 1
+[Info   :Shogun State Logger] 
+==== Turn 3 | WaveRoom | wave 1/4, next in 4 turns | 10 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:<Ashigaru
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 4, facing Left, HP 1/3, next: PlayTile Katana
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 5 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 3 | HP 10/10 | wave 1/4, next in 4
+  0:.  1:.  2:HERO>  3:.  4:<Ashigaru[1hp PlayTile]
+  Tiles: Swirl (ready), Arrow (ready in 5) | Swap 4/4
+  Move                  D1        D2        D3        D4
+  PlayTile Swirl      6.4*     23.8*     30.7*     30.5*
+  MoveRight           4.7      23.8      30.7      30.5 
+  Wait                3.0       5.1      20.0      26.1 
+  MoveLeft            1.3       3.6       4.0      16.7 
+  Flip               -2.1       2.2      16.3      26.1 
+  F1 PlayTile Swirl
+     beats MoveRight by 1.7: loaded +3.4, distance -1.7
+  F2 PlayTile Swirl -> MoveRight
+     tied with MoveRight, but its position improves sooner
+  F3 PlayTile Swirl -> MoveRight -> Attack
+     tied with MoveRight, but its position improves sooner
+  F4 PlayTile Swirl -> MoveRight -> Attack -> Wait
+     tied with MoveRight, but its position improves sooner
+[Info   :Shogun State Logger]   > Decision: PlayTile Swirl | from: Evaluator v0.2 depth 1 | why: score 6.40, plan: PlayTile Swirl
+[Info   :Shogun State Logger]   > HERO queues tile Swirl [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > Turn 3 action: HERO PlayTile [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > Ashigaru@4 queues tile Katana
+[Info   :Shogun State Logger]   [new tile] Katana L0 None None = Katana: Strike the cell directly ahead.
+[Info   :Shogun State Logger] 
+==== Turn 4 | WaveRoom | wave 1/4, next in 3 turns | 10 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:<Ashigaru
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 4, facing Left, HP 1/3, next: Wait, queue: Katana 2 dmg, range 1
+  Queue: Swirl 2 dmg, range -1,1
+  Tiles:
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 4 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 4 | HP 10/10 | wave 1/4, next in 3
+  0:.  1:.  2:HERO>  3:.  4:<Ashigaru[1hp Wait q:Katana]
+  Tiles: Swirl (queued), Arrow (ready in 4) | Swap 4/4
+  Move             D1        D2        D3        D4
+  MoveRight     28.1*     36.2*     35.8*     36.6*
+  Wait           6.0      23.5      30.7      31.5 
+  MoveLeft       4.2       4.7      19.7      27.2 
+  Flip           0.8      19.1      30.7      31.5 
+  Attack        -4.2      -3.2      -3.8      -1.9 
+  F1 MoveRight
+     beats Wait by 22.1: firepower +20.4, distance +1.7
+  F2 MoveRight -> Attack
+     beats Wait by 12.7: kills +25.5, firepower -17.3, enemy_damage +8.5
+  F3 MoveRight -> Attack -> Wait
+     beats Wait by 5.1: kills +3.8, enemy_damage +1.3
+  F4 MoveRight -> Attack -> Wait -> Wait
+     beats Wait by 5.1: kills +3.8, enemy_damage +1.3
+[Info   :Shogun State Logger]   > Decision: MoveRight | from: Evaluator v0.2 depth 1 | why: score 28.10, plan: MoveRight
+[Info   :Shogun State Logger]   > Turn 4 action: HERO MoveRight [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 5 | WaveRoom | wave 1/4, next in 2 turns | 10 coins
+  Grid: 0:.  1:.  2:.  3:HERO>  4:<Ashigaru
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 4, facing Left, HP 1/3, next: Attack #1 -> cells 3, queue: Katana 2 dmg, range 1
+  Queue: Swirl 2 dmg, range -1,1
+  Tiles:
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 3 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 5 | HP 10/10 | wave 1/4, next in 2
+  0:.  1:.  2:.  3:HERO>  4:<Ashigaru[1hp Attack q:Katana]
+  Tiles: Swirl (queued), Arrow (ready in 3) | Swap 4/4
+  Move                    D1        D2        D3        D4
+  Attack               42.5*     42.2*     43.1*     45.7*
+  MoveRight (swap)     20.0      34.0      35.2      37.1 
+  MoveLeft              5.5      23.1      32.0      33.6 
+  Wait               -172.4    -163.8    -162.9    -161.3 
+  Flip               -177.5    -163.8    -162.9    -161.3 
+  F1 Attack
+     beats MoveRight (swap) by 22.6: kills +30.0, firepower -20.4, enemy_damage +10.0
+  F2 Attack -> Wait
+     beats MoveRight (swap) by 8.2: kills +4.5, swap_ready +2.2, enemy_damage +1.5
+  F3 Attack -> Wait -> Wait
+     beats MoveRight (swap) by 7.8: kills +4.5, swap_ready +1.8, enemy_damage +1.5
+  F4 Attack -> Wait -> Wait -> PlayTile Arrow
+     beats MoveRight (swap) by 8.6: kills +4.5, swap_ready +1.6, enemy_damage +1.5
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.2 depth 1 | why: score 42.50, plan: Attack
+[Info   :Shogun State Logger]   > Turn 5 action: HERO Attack [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > HERO@3 attacks with Swirl
+[Info   :Shogun State Logger]   > Ashigaru@4 dies
+[Info   :Shogun State Logger]   > HERO@3 hits Ashigaru@4: 1 damage, HP 1 -> 0
+[Info   :Shogun State Logger]   > Wave 2/4 spawns
+[Info   :Shogun State Logger]   [new enemy] TwinTachi = Twin Tachi: They stop at nothing to strike down enemies, even at the risk of hitting their allies.
+[Info   :Shogun State Logger] 
+==== Turn 6 | WaveRoom | wave 2/4, next in 9 turns | 10 coins
+  Grid: 0:.  1:<TwinTachi  2:.  3:HERO>  4:.
+  Hero: cell 3, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 1, facing Left, HP 2/2, next: Wait
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, charging 3 more turns
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 2 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 6 | HP 10/10 | wave 2/4, next in 9
+  0:.  1:<TwinTachi[2hp Wait]  2:.  3:HERO>  4:.
+  Tiles: Swirl (ready in 3), Arrow (ready in 2) | Swap 4/4
+  Move             D1        D2        D3        D4
+  Flip          -1.7*      0.7*     22.1*     33.3*
+  MoveLeft      -5.1       0.7      22.1      33.3 
+  Wait          -6.8      -0.7      20.9      33.3 
+  MoveRight     -8.5      -2.2      19.7      33.3 
+  F1 Flip
+     beats MoveLeft by 3.4: facing +5.1, distance -1.7
+  F2 Flip -> MoveLeft
+     tied with MoveLeft, but its position improves sooner
+  F3 Flip -> MoveLeft -> PlayTile Arrow
+     tied with MoveLeft, but its position improves sooner
+  F4 Flip -> MoveLeft -> PlayTile Arrow -> Attack
+     tied with MoveLeft, but its position improves sooner
+[Info   :Shogun State Logger]   > Decision: FlipLeft | from: Evaluator v0.2 depth 1 | why: score -1.70, plan: Flip
+[Info   :Shogun State Logger]   > Turn 6 action: HERO FlipLeft [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 7 | WaveRoom | wave 2/4, next in 5 turns | 10 coins
+  Grid: 0:.  1:<TwinTachi  2:.  3:<HERO  4:.
+  Hero: cell 3, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 1, facing Left, HP 2/2, next: FlipRight
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, charging 2 more turns
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 1 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 7 | HP 10/10 | wave 2/4, next in 5
+  0:.  1:<TwinTachi[2hp FlipRight]  2:.  3:<HERO  4:.
+  Tiles: Swirl (ready in 2), Arrow (ready in 1) | Swap 4/4
+  Move             D1        D2        D3        D4
+  MoveLeft       0.8*     26.0*     39.2*     40.8*
+  Wait          -0.9      24.6      39.2      40.8 
+  MoveRight     -2.6      23.1      39.2      40.8 
+  Flip          -6.0       9.4      20.3      33.3 
+  F1 MoveLeft
+     beats Wait by 1.7: distance +1.7
+  F2 MoveLeft -> PlayTile Arrow
+     beats Wait by 1.4: distance +1.4
+  F3 MoveLeft -> PlayTile Arrow -> Attack
+     tied with Wait, but its position improves sooner
+  F4 MoveLeft -> PlayTile Arrow -> Attack -> PlayTile Swirl
+     tied with Wait, but its position improves sooner
+[Info   :Shogun State Logger]   > Decision: MoveLeft | from: Evaluator v0.2 depth 1 | why: score 0.80, plan: MoveLeft
+[Info   :Shogun State Logger]   > Turn 7 action: HERO MoveLeft [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 8 | WaveRoom | wave 2/4, next in 4 turns | 10 coins
+  Grid: 0:.  1:TwinTachi>  2:<HERO  3:.  4:.
+  Hero: cell 2, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 1, facing Right, HP 2/2, next: PlayTile Swirl
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, charging 1 more turns
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 8 | HP 10/10 | wave 2/4, next in 4
+  0:.  1:TwinTachi>[2hp PlayTile]  2:<HERO  3:.  4:.
+  Tiles: Swirl (ready in 1), Arrow (ready) | Swap 4/4
+  Move                   D1        D2        D3        D4
+  PlayTile Arrow      30.6*     46.1*     48.0*     47.2*
+  Wait                 1.7      25.3      39.2      40.8 
+  MoveRight            0.0      23.8      39.2      40.8 
+  Flip                -3.4      21.0      39.2      40.8 
+  MoveLeft (swap)     -5.9      18.8      37.4      39.3 
+  F1 PlayTile Arrow
+     beats Wait by 28.9: firepower +25.5, loaded +3.4
+  F2 PlayTile Arrow -> Attack
+     beats Wait by 20.8: kills +25.5, firepower -21.7, enemy_damage +17.0
+  F3 PlayTile Arrow -> Attack -> PlayTile Swirl
+     beats Wait by 8.8: kills +3.8, enemy_damage +2.6, loaded +2.5
+  F4 PlayTile Arrow -> Attack -> PlayTile Swirl -> Wait
+     beats Wait by 6.4: kills +3.8, enemy_damage +2.6
+[Info   :Shogun State Logger]   > Decision: PlayTile Arrow | from: Evaluator v0.2 depth 1 | why: score 30.60, plan: PlayTile Arrow
+[Info   :Shogun State Logger]   > HERO queues tile Arrow [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > Turn 8 action: HERO PlayTile [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > TwinTachi@1 queues tile Swirl
+[Info   :Shogun State Logger] 
+==== Turn 9 | WaveRoom | wave 2/4, next in 3 turns | 10 coins
+  Grid: 0:.  1:TwinTachi>  2:<HERO  3:.  4:.
+  Hero: cell 2, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 1, facing Right, HP 2/2, next: Wait, queue: Swirl 2 dmg, range -1,1
+  Queue: Arrow 2 dmg, range 1..10
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 9 | HP 10/10 | wave 2/4, next in 3
+  0:.  1:TwinTachi>[2hp Wait q:Swirl]  2:<HERO  3:.  4:.
+  Tiles: Swirl (ready), Arrow (queued) | Swap 4/4
+  Move                   D1        D2        D3        D4
+  Attack              54.2*     56.5*     55.5*     54.7*
+  PlayTile Swirl      33.1      46.1      48.0      47.2 
+  Wait                29.8      46.1      48.0      47.2 
+  MoveRight           28.0      46.1      48.0      47.2 
+  Flip                11.9      24.6      39.2      40.8 
+  MoveLeft (swap)      9.3      22.4      37.4      39.3 
+  F1 Attack
+     beats PlayTile Swirl by 21.1: kills +30.0, firepower -25.5, enemy_damage +20.0
+  F2 Attack -> PlayTile Swirl
+     beats PlayTile Swirl by 10.4: kills +4.5, enemy_damage +3.0, loaded +2.9
+  F3 Attack -> PlayTile Swirl -> Wait
+     beats PlayTile Swirl by 7.5: kills +4.5, enemy_damage +3.0
+  F4 Attack -> PlayTile Swirl -> Wait -> Wait
+     beats PlayTile Swirl by 7.5: kills +4.5, enemy_damage +3.0
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.2 depth 1 | why: score 54.20, plan: Attack
+[Info   :Shogun State Logger]   > Turn 9 action: HERO Attack [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > HERO@2 attacks with Arrow
+[Info   :Shogun State Logger]   > TwinTachi@1 dies
+[Info   :Shogun State Logger]   > HERO@2 hits TwinTachi@1: 2 damage, HP 2 -> 0
+[Info   :Shogun State Logger]   > Wave 3/4 spawns
+[Info   :Shogun State Logger] 
+==== Turn 10 | WaveRoom | wave 3/4, next in 11 turns (blocked: room too crowded) | 10 coins
+  Grid: 0:TwinTachi>  1:.  2:<HERO  3:.  4:TwinTachi>
+  Hero: cell 2, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 0, facing Right, HP 2/2, next: Wait
+    TwinTachi: cell 4, facing Right, HP 2/2, next: Wait
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 5 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 10 | HP 10/10 | wave 3/4, next in 11
+  0:TwinTachi>[2hp Wait]  1:.  2:<HERO  3:.  4:TwinTachi>[2hp Wait]
+  Tiles: Swirl (ready), Arrow (ready in 5) | Swap 4/4
+  Move                  D1        D2        D3        D4
+  PlayTile Swirl     -7.6*     16.6*     33.7*     34.6*
+  MoveLeft           -9.3      16.6      30.0      33.5 
+  Wait              -11.1      -6.5      14.1      28.6 
+  MoveRight         -12.8      13.7      33.7      34.6 
+  Flip              -14.4      -7.9      14.1      28.6 
+  F1 PlayTile Swirl
+     beats MoveLeft by 1.7: loaded +3.4, distance -1.7
+  F2 PlayTile Swirl -> MoveLeft
+     tied with MoveLeft, but its position improves sooner
+  F3 PlayTile Swirl -> MoveRight -> Attack
+     tied with MoveRight, but its position improves sooner
+  F4 PlayTile Swirl -> MoveRight -> Attack -> MoveLeft
+     tied with MoveRight, but its position improves sooner
+[Info   :Shogun State Logger]   > Decision: PlayTile Swirl | from: Evaluator v0.2 depth 1 | why: score -7.60, plan: PlayTile Swirl
+[Info   :Shogun State Logger]   > HERO queues tile Swirl [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > Turn 10 action: HERO PlayTile [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 11 | WaveRoom | wave 3/4, next in 10 turns (blocked: room too crowded) | 10 coins
+  Grid: 0:TwinTachi>  1:.  2:<HERO  3:.  4:TwinTachi>
+  Hero: cell 2, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 0, facing Right, HP 2/2, next: PlayTile Swirl
+    TwinTachi: cell 4, facing Right, HP 2/2, next: FlipLeft
+  Queue: Swirl 2 dmg, range -1,1
+  Tiles:
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 4 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 11 | HP 10/10 | wave 3/4, next in 10
+  0:TwinTachi>[2hp PlayTile]  1:.  2:<HERO  3:.  4:TwinTachi>[2hp FlipLeft]
+  Tiles: Swirl (queued), Arrow (ready in 4) | Swap 4/4
+  Move             D1        D2        D3        D4
+  MoveLeft      19.5*     35.3      39.4      41.5 
+  MoveRight     16.1      39.6*     40.7*     42.5*
+  Wait          -7.6      16.6      33.7      35.6 
+  Flip         -11.1      16.6      33.7      35.6 
+  Attack       -17.8     -14.4     -13.0      -8.1 
+  F1 MoveLeft
+     beats MoveRight by 3.4: facing +3.4
+  F2 MoveRight -> Attack
+     beats MoveLeft by 4.3: facing +4.3
+  F3 MoveRight -> Attack -> MoveLeft
+     beats MoveLeft by 1.2: distance +1.2
+  F4 MoveRight -> Attack -> MoveLeft -> MoveLeft
+     beats MoveLeft by 1.0: distance +1.0
+[Info   :Shogun State Logger]   > Decision: MoveLeft | from: Evaluator v0.2 depth 1 | why: score 19.50, plan: MoveLeft
+[Info   :Shogun State Logger]   > Turn 11 action: HERO MoveLeft [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > TwinTachi@0 queues tile Swirl
+[Info   :Shogun State Logger] 
+==== Turn 12 | WaveRoom | wave 3/4, next in 9 turns (blocked: room too crowded) | 11 coins
+  Grid: 0:TwinTachi>  1:<HERO  2:.  3:.  4:<TwinTachi
+  Hero: cell 1, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 0, facing Right, HP 2/2, next: Wait, queue: Swirl 2 dmg, range -1,1
+    TwinTachi: cell 4, facing Left, HP 2/2, next: PlayTile Swirl
+  Queue: Swirl 2 dmg, range -1,1
+  Tiles:
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 3 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 12 | HP 10/10 | wave 3/4, next in 9
+  0:TwinTachi>[2hp Wait q:Swirl]  1:<HERO  2:.  3:.  4:<TwinTachi[2hp PlayTile]
+  Tiles: Swirl (queued), Arrow (ready in 3) | Swap 4/4
+  Move                   D1        D2        D3        D4
+  Attack              41.5*     46.4*     48.8*     67.2*
+  Wait                19.5      35.3      40.7      58.2 
+  MoveLeft (swap)     17.0      31.7      37.6      55.6 
+  Flip                16.1      39.6      41.9      59.2 
+  MoveRight           -7.6      16.6      34.9      52.3 
+  F1 Attack
+     beats Wait by 22.0: kills +30.0, firepower -25.5, enemy_damage +20.0
+  F2 Attack -> Flip
+     beats Flip by 6.8: kills +4.5, enemy_damage +3.0, wave_pressure -0.7
+  F3 Attack -> Flip -> MoveRight
+     beats Flip by 6.9: kills +4.5, enemy_damage +3.0, wave_pressure -0.6
+  F4 Attack -> Flip -> MoveRight -> PlayTile Arrow
+     beats Flip by 8.0: kills +4.5, enemy_damage +3.0, ready_tiles +1.0
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.2 depth 1 | why: score 41.50, plan: Attack
+[Info   :Shogun State Logger]   > Turn 12 action: HERO Attack [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > HERO@1 attacks with Swirl
+[Info   :Shogun State Logger]   > TwinTachi@0 dies
+[Info   :Shogun State Logger]   > HERO@1 hits TwinTachi@0: 2 damage, HP 2 -> 0
+[Info   :Shogun State Logger]   > TwinTachi@4 queues tile Swirl
+[Info   :Shogun State Logger] 
+==== Turn 13 | WaveRoom | wave 3/4, next in 5 turns | 11 coins
+  Grid: 0:.  1:<HERO  2:.  3:.  4:<TwinTachi
+  Hero: cell 1, facing Left, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 4, facing Left, HP 2/2, next: Wait, queue: Swirl 2 dmg, range -1,1
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, charging 3 more turns
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 2 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 13 | HP 10/10 | wave 3/4, next in 5
+  0:.  1:<HERO  2:.  3:.  4:<TwinTachi[2hp Wait q:Swirl]
+  Tiles: Swirl (ready in 3), Arrow (ready in 2) | Swap 4/4
+  Move             D1        D2        D3        D4
+  Flip          -4.2*     -1.4*     20.3*     33.3*
+  MoveRight     -7.7      -1.4      20.3      33.3 
+  Wait          -9.3      -2.9      19.0      33.3 
+  MoveLeft     -11.0      -4.3      17.8      33.3 
+  F1 Flip
+     beats MoveRight by 3.4: facing +5.1, distance -1.7
+  F2 Flip -> MoveRight
+     tied with MoveRight, but its position improves sooner
+  F3 Flip -> MoveRight -> PlayTile Arrow
+     tied with MoveRight, but its position improves sooner
+  F4 Flip -> MoveRight -> PlayTile Arrow -> Attack
+     tied with MoveRight, but its position improves sooner
+[Info   :Shogun State Logger]   > Decision: FlipRight | from: Evaluator v0.2 depth 1 | why: score -4.20, plan: Flip
+[Info   :Shogun State Logger]   > Turn 13 action: HERO FlipRight [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 14 | WaveRoom | wave 3/4, next in 4 turns | 11 coins
+  Grid: 0:.  1:HERO>  2:.  3:.  4:<TwinTachi
+  Hero: cell 1, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 4, facing Left, HP 2/2, next: MoveLeft, queue: Swirl 2 dmg, range -1,1
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, charging 2 more turns
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 1 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 14 | HP 10/10 | wave 3/4, next in 4
+  0:.  1:HERO>  2:.  3:.  4:<TwinTachi[2hp MoveLeft q:Swirl]
+  Tiles: Swirl (ready in 2), Arrow (ready in 1) | Swap 4/4
+  Move             D1        D2        D3        D4
+  MoveRight      0.0*     25.3*     39.2*     40.8*
+  Wait          -1.7      23.8      39.2      40.8 
+  MoveLeft      -3.4      22.4      39.2      40.8 
+  Flip          -6.8       8.7      19.7      33.3 
+  F1 MoveRight
+     beats Wait by 1.7: distance +1.7
+  F2 MoveRight -> PlayTile Arrow
+     beats Wait by 1.4: distance +1.4
+  F3 MoveRight -> PlayTile Arrow -> Attack
+     tied with Wait, but its position improves sooner
+  F4 MoveRight -> PlayTile Arrow -> Attack -> PlayTile Swirl
+     tied with Wait, but its position improves sooner
+[Info   :Shogun State Logger]   > Decision: MoveRight | from: Evaluator v0.2 depth 1 | why: score 0.00, plan: MoveRight
+[Info   :Shogun State Logger]   > Turn 14 action: HERO MoveRight [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 15 | WaveRoom | wave 3/4, next in 3 turns | 11 coins
+  Grid: 0:.  1:.  2:HERO>  3:<TwinTachi  4:.
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 3, facing Left, HP 2/2, next: Attack #1 -> cells 2,4, queue: Swirl 2 dmg, range -1,1
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, charging 1 more turns
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 15 | HP 10/10 | wave 3/4, next in 3
+  0:.  1:.  2:HERO>  3:<TwinTachi[2hp Attack q:Swirl]  4:.
+  Tiles: Swirl (ready in 1), Arrow (ready) | Swap 4/4
+  Move                    D1        D2        D3        D4
+  MoveLeft             -0.9*     23.1*     39.2*     40.8*
+  PlayTile Arrow     -170.2    -153.9    -152.0    -152.8 
+  Wait               -199.2    -175.4    -160.8    -159.2 
+  Flip               -204.2    -179.8    -160.8    -159.2 
+  MoveRight (swap)   -206.8    -181.9    -162.6    -160.7 
+  F1 MoveLeft
+     beats PlayTile Arrow by 169.4: hp_lost +200.0, firepower -25.5, loaded -3.4
+  F2 MoveLeft -> PlayTile Arrow
+     beats PlayTile Arrow by 177.0: hp_lost +200.0, kills -25.5, firepower +21.7
+  F3 MoveLeft -> PlayTile Arrow -> Attack
+     beats PlayTile Arrow by 191.2: hp_lost +200.0, kills -3.8, enemy_damage -2.6
+  F4 MoveLeft -> PlayTile Arrow -> Attack -> PlayTile Swirl
+     beats PlayTile Arrow by 193.6: hp_lost +200.0, kills -3.8, enemy_damage -2.6
+[Info   :Shogun State Logger]   > Decision: MoveLeft | from: Evaluator v0.2 depth 1 | why: score -0.90, plan: MoveLeft
+[Info   :Shogun State Logger]   > Turn 15 action: HERO MoveLeft [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > TwinTachi@3 attacks with Swirl
+[Info   :Shogun State Logger] 
+==== Turn 16 | WaveRoom | wave 3/4, next in 2 turns | 11 coins
+  Grid: 0:.  1:HERO>  2:.  3:<TwinTachi  4:.
+  Hero: cell 1, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 3, facing Left, HP 2/2, next: MoveRight
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 16 | HP 10/10 | wave 3/4, next in 2
+  0:.  1:HERO>  2:.  3:<TwinTachi[2hp MoveRight]  4:.
+  Tiles: Swirl (ready), Arrow (ready) | Swap 4/4
+  Move                  D1        D2        D3        D4
+  PlayTile Arrow     25.5*     46.1*     48.0*     47.2*
+  PlayTile Swirl     -0.0      23.8      39.2      40.8 
+  MoveRight          -1.7      22.4      39.2      40.8 
+  Wait               -3.4      21.0      39.2      40.8 
+  MoveLeft           -5.1      19.5      39.2      40.8 
+  Flip               -8.5       5.8      17.8      33.3 
+  F1 PlayTile Arrow
+     beats PlayTile Swirl by 25.5: firepower +25.5
+  F2 PlayTile Arrow -> Attack
+     beats PlayTile Swirl by 22.3: kills +25.5, firepower -21.7, enemy_damage +17.0
+  F3 PlayTile Arrow -> Attack -> PlayTile Swirl
+     beats PlayTile Swirl by 8.8: kills +3.8, enemy_damage +2.6, loaded +2.5
+  F4 PlayTile Arrow -> Attack -> PlayTile Swirl -> Wait
+     beats PlayTile Swirl by 6.4: kills +3.8, enemy_damage +2.6
+[Info   :Shogun State Logger]   > Decision: PlayTile Arrow | from: Evaluator v0.2 depth 1 | why: score 25.50, plan: PlayTile Arrow
+[Info   :Shogun State Logger]   > HERO queues tile Arrow [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > Turn 16 action: HERO PlayTile [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 17 | WaveRoom | wave 3/4, next in 1 turns | 11 coins
+  Grid: 0:.  1:HERO>  2:.  3:.  4:<TwinTachi
+  Hero: cell 1, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 4, facing Left, HP 2/2, next: PlayTile Swirl
+  Queue: Arrow 2 dmg, range 1..10
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 17 | HP 10/10 | wave 3/4, next in 1
+  0:.  1:HERO>  2:.  3:.  4:<TwinTachi[2hp PlayTile]
+  Tiles: Swirl (ready), Arrow (queued) | Swap 4/4
+  Move                  D1        D2        D3        D4
+  Attack             54.2*     56.5*     55.5*     54.7*
+  PlayTile Swirl     28.0      46.1      48.0      47.2 
+  MoveRight          26.3      46.1      48.0      47.2 
+  Wait               24.6      46.1      48.0      47.2 
+  MoveLeft           22.9      46.1      48.0      47.2 
+  Flip                6.8      21.0      39.2      40.8 
+  F1 Attack
+     beats PlayTile Swirl by 26.2: kills +30.0, firepower -25.5, enemy_damage +20.0
+  F2 Attack -> PlayTile Swirl
+     beats PlayTile Swirl by 10.4: kills +4.5, enemy_damage +3.0, loaded +2.9
+  F3 Attack -> PlayTile Swirl -> Wait
+     beats PlayTile Swirl by 7.5: kills +4.5, enemy_damage +3.0
+  F4 Attack -> PlayTile Swirl -> Wait -> Wait
+     beats PlayTile Swirl by 7.5: kills +4.5, enemy_damage +3.0
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.2 depth 1 | why: score 54.20, plan: Attack
+[Info   :Shogun State Logger]   > Turn 17 action: HERO Attack [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > HERO@1 attacks with Arrow
+[Info   :Shogun State Logger]   > TwinTachi@4 dies
+[Info   :Shogun State Logger]   > HERO@1 hits TwinTachi@4: 2 damage, HP 2 -> 0
+[Info   :Shogun State Logger]   > Wave 4/4 spawns
+[Info   :Shogun State Logger] 
+==== Turn 18 | WaveRoom | wave 4/4 (final) | 11 coins
+  Grid: 0:TwinTachi>  1:HERO>  2:.  3:<Ashigaru  4:.
+  Hero: cell 1, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 0, facing Right, HP 2/2, next: Wait
+    Ashigaru: cell 3, facing Left, HP 3/3, next: Wait
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 5 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 18 | HP 10/10 | wave 4/4 (final)
+  0:TwinTachi>[2hp Wait]  1:HERO>  2:.  3:<Ashigaru[3hp Wait]  4:.
+  Tiles: Swirl (ready), Arrow (ready in 5) | Swap 4/4
+  Move                  D1        D2        D3        D4
+  PlayTile Swirl     12.8*     38.9*     40.7*     40.9*
+  Flip              -12.8      13.7      29.4      33.5 
+  Wait              -16.1      10.8      33.1      34.6 
+  MoveRight         -17.9      -3.6       9.2      28.1 
+  F1 PlayTile Swirl
+     beats Flip by 25.5: firepower +25.5, loaded +3.4, facing -3.4
+  F2 PlayTile Swirl -> Attack
+     beats Flip by 25.2: kills +25.5, firepower -21.7, enemy_damage +17.0
+  F3 PlayTile Swirl -> Attack -> MoveRight
+     beats Wait by 7.6: kills +3.8, enemy_damage +2.6, distance +1.2
+  F4 PlayTile Swirl -> Attack -> MoveRight -> Wait
+     beats Wait by 6.4: kills +3.8, enemy_damage +2.6
+[Info   :Shogun State Logger]   > Decision: PlayTile Swirl | from: Evaluator v0.2 depth 1 | why: score 12.80, plan: PlayTile Swirl
+[Info   :Shogun State Logger]   > HERO queues tile Swirl [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 18 | WaveRoom | wave 4/4 (final) | 11 coins
+  Grid: 0:TwinTachi>  1:HERO>  2:.  3:<Ashigaru  4:.
+  Hero: cell 1, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 0, facing Right, HP 2/2, next: Wait
+    Ashigaru: cell 3, facing Left, HP 3/3, next: Wait
+  Queue: Swirl 2 dmg, range -1,1
+  Tiles:
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 5 more turns
+[Info   :Shogun State Logger]   > Turn 18 action: HERO PlayTile [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 19 | WaveRoom | wave 4/4 (final) | 11 coins
+  Grid: 0:TwinTachi>  1:HERO>  2:.  3:<Ashigaru  4:.
+  Hero: cell 1, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    TwinTachi: cell 0, facing Right, HP 2/2, next: PlayTile Swirl
+    Ashigaru: cell 3, facing Left, HP 3/3, next: PlayTile Katana
+  Queue: Swirl 2 dmg, range -1,1
+  Tiles:
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 4 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 19 | HP 10/10 | wave 4/4 (final)
+  0:TwinTachi>[2hp PlayTile]  1:HERO>  2:.  3:<Ashigaru[3hp PlayTile]  4:.
+  Tiles: Swirl (queued), Arrow (ready in 4) | Swap 4/4
+  Move             D1        D2        D3        D4
+  Attack        45.8*     47.8*     48.2*     50.5*
+  Flip          16.1      34.6      39.4      42.0 
+  Wait          12.8      38.9      40.7      42.0 
+  MoveRight   -106.2     -91.2     -68.9     -66.4 
+  F1 Attack
+     beats Flip by 29.6: kills +30.0, firepower -25.5, enemy_damage +20.0
+  F2 Attack -> MoveRight
+     beats Wait by 8.9: kills +4.5, enemy_damage +3.0, distance +1.4
+  F3 Attack -> MoveRight -> Wait
+     beats Wait by 7.5: kills +4.5, enemy_damage +3.0
+  F4 Attack -> MoveRight -> Wait -> Wait
+     beats Flip by 8.5: kills +4.5, enemy_damage +3.0, ready_tiles +1.0
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.2 depth 1 | why: score 45.80, plan: Attack
+[Info   :Shogun State Logger]   > Turn 19 action: HERO Attack [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > HERO@1 attacks with Swirl
+[Info   :Shogun State Logger]   > TwinTachi@0 dies
+[Info   :Shogun State Logger]   > HERO@1 hits TwinTachi@0: 2 damage, HP 2 -> 0
+[Info   :Shogun State Logger]   > Ashigaru@3 queues tile Katana
+[Info   :Shogun State Logger] 
+==== Turn 20 | WaveRoom | wave 4/4 (final) | 11 coins
+  Grid: 0:.  1:HERO>  2:.  3:<Ashigaru  4:.
+  Hero: cell 1, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 3, facing Left, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, charging 3 more turns
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 3 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 20 | HP 10/10 | wave 4/4 (final)
+  0:.  1:HERO>  2:.  3:<Ashigaru[3hp Wait q:Katana]  4:.
+  Tiles: Swirl (ready in 3), Arrow (ready in 3) | Swap 4/4
+  Move             D1        D2        D3        D4
+  MoveRight     -2.5*     -2.2*      0.6*      8.9*
+  Wait          -4.2      -2.2       0.6       8.9 
+  MoveLeft      -5.9      -3.6       0.6       8.9 
+  Flip          -9.3      -3.6       0.6       8.9 
+  F1 MoveRight
+     beats Wait by 1.7: distance +1.7
+  F2 MoveRight -> Wait
+     tied with Wait, but its position improves sooner
+  F3 MoveRight -> Wait -> Wait
+     tied with Wait, but its position improves sooner
+  F4 MoveRight -> Wait -> Wait -> PlayTile Swirl
+     tied with Wait, but its position improves sooner
+[Info   :Shogun State Logger]   > Decision: MoveRight | from: Evaluator v0.2 depth 1 | why: score -2.50, plan: MoveRight
+[Info   :Shogun State Logger]   > Turn 20 action: HERO MoveRight [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 21 | WaveRoom | wave 4/4 (final) | 11 coins
+  Grid: 0:.  1:.  2:HERO>  3:<Ashigaru  4:.
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 3, facing Left, HP 3/3, next: Attack #1 -> cells 2, queue: Katana 2 dmg, range 1
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, charging 2 more turns
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 2 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 21 | HP 10/10 | wave 4/4 (final)
+  0:.  1:.  2:HERO>  3:<Ashigaru[3hp Attack q:Katana]  4:.
+  Tiles: Swirl (ready in 2), Arrow (ready in 2) | Swap 4/4
+  Move                    D1        D2        D3        D4
+  MoveLeft             -4.2*      0.7*     10.4*     23.5*
+  MoveRight (swap)    -10.2      -1.4       8.6      21.9 
+  Wait               -202.5    -199.3    -189.6    -176.5 
+  Flip               -207.6    -199.3    -189.6    -176.5 
+  F1 MoveLeft
+     beats MoveRight (swap) by 5.9: facing +5.1, swap_ready +2.5, distance -1.7
+  F2 MoveLeft -> MoveRight
+     beats MoveRight (swap) by 2.2: swap_ready +2.2
+  F3 MoveLeft -> MoveRight -> PlayTile Swirl
+     beats MoveRight (swap) by 1.8: swap_ready +1.8
+  F4 MoveLeft -> MoveRight -> PlayTile Swirl -> PlayTile Arrow
+     beats MoveRight (swap) by 1.6: swap_ready +1.6
+[Info   :Shogun State Logger]   > Decision: MoveLeft | from: Evaluator v0.2 depth 1 | why: score -4.20, plan: MoveLeft
+[Info   :Shogun State Logger]   > Turn 21 action: HERO MoveLeft [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > Ashigaru@3 attacks with Katana
+[Info   :Shogun State Logger] 
+==== Turn 22 | WaveRoom | wave 4/4 (final) | 11 coins
+  Grid: 0:.  1:HERO>  2:.  3:<Ashigaru  4:.
+  Hero: cell 1, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 3, facing Left, HP 3/3, next: MoveRight
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, charging 1 more turns
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 1 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 22 | HP 10/10 | wave 4/4 (final)
+  0:.  1:HERO>  2:.  3:<Ashigaru[3hp MoveRight]  4:.
+  Tiles: Swirl (ready in 1), Arrow (ready in 1) | Swap 4/4
+  Move             D1        D2        D3        D4
+  MoveRight     -0.8*     10.8*     17.5*     23.5*
+  Wait          -2.6       9.4      16.3      18.1 
+  MoveLeft      -4.2       7.9      15.1      17.1 
+  Flip          -7.7       0.7       8.0      13.8 
+  F1 MoveRight
+     beats Wait by 1.7: distance +1.7
+  F2 MoveRight -> PlayTile Arrow
+     beats Wait by 1.4: distance +1.4
+  F3 MoveRight -> PlayTile Arrow -> Attack
+     beats Wait by 1.2: distance +1.2
+  F4 MoveRight -> PlayTile Arrow -> PlayTile Swirl -> MoveRight
+     beats Wait by 5.4: firepower +18.8, enemy_damage -14.4, enemy_hp_left -4.2
+[Info   :Shogun State Logger]   > Decision: MoveRight | from: Evaluator v0.2 depth 1 | why: score -0.80, plan: MoveRight
+[Info   :Shogun State Logger]   > Turn 22 action: HERO MoveRight [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 23 | WaveRoom | wave 4/4 (final) | 11 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:<Ashigaru
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 4, facing Left, HP 3/3, next: PlayTile Katana
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, READY
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 23 | HP 10/10 | wave 4/4 (final)
+  0:.  1:.  2:HERO>  3:.  4:<Ashigaru[3hp PlayTile]
+  Tiles: Swirl (ready), Arrow (ready) | Swap 4/4
+  Move                  D1        D2        D3        D4
+  PlayTile Arrow     12.8*     20.6*     27.6*     38.4*
+  PlayTile Swirl      2.6      13.7      27.6      38.4 
+  MoveRight           0.8      12.3      27.6      38.4 
+  Wait               -0.8      10.8      17.5      23.5 
+  MoveLeft           -2.6       9.4      16.3      18.1 
+  Flip               -6.0       2.2       9.2      14.9 
+  F1 PlayTile Arrow
+     beats PlayTile Swirl by 10.2: firepower +10.2
+  F2 PlayTile Arrow -> Attack
+     beats PlayTile Swirl by 6.9: enemy_damage +17.0, firepower -8.7, loaded -5.8
+  F3 PlayTile Arrow -> PlayTile Swirl -> MoveRight
+     tied with PlayTile Swirl, but its position improves sooner
+  F4 PlayTile Arrow -> PlayTile Swirl -> MoveRight -> Attack
+     tied with PlayTile Swirl, but its position improves sooner
+[Info   :Shogun State Logger]   > Decision: PlayTile Arrow | from: Evaluator v0.2 depth 1 | why: score 12.80, plan: PlayTile Arrow
+[Info   :Shogun State Logger]   > HERO queues tile Arrow [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 23 | WaveRoom | wave 4/4 (final) | 11 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:<Ashigaru
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 4, facing Left, HP 3/3, next: PlayTile Katana
+  Queue: Arrow 2 dmg, range 1..10
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+[Info   :Shogun State Logger]   > Turn 23 action: HERO PlayTile [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > Ashigaru@4 queues tile Katana
+[Info   :Shogun State Logger] 
+==== Turn 24 | WaveRoom | wave 4/4 (final) | 11 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:<Ashigaru
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 4, facing Left, HP 3/3, next: Wait, queue: Katana 2 dmg, range 1
+  Queue: Arrow 2 dmg, range 1..10
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 24 | HP 10/10 | wave 4/4 (final)
+  0:.  1:.  2:HERO>  3:.  4:<Ashigaru[3hp Wait q:Katana]
+  Tiles: Swirl (ready), Arrow (queued) | Swap 4/4
+  Move                  D1        D2        D3        D4
+  Attack             24.3*     26.5      41.5      46.1*
+  PlayTile Swirl     16.1      32.5*     45.2*     44.9 
+  MoveRight          14.4      32.5      45.2      44.9 
+  Wait               12.8      20.6      27.6      38.4 
+  MoveLeft           11.1      19.2      21.3      23.5 
+  Flip                2.6      10.8      17.5      23.5 
+  F1 Attack
+     beats PlayTile Swirl by 8.1: enemy_damage +20.0, firepower -10.2, loaded -6.8
+  F2 PlayTile Swirl -> MoveRight
+     tied with MoveRight, but its position improves sooner
+  F3 PlayTile Swirl -> MoveRight -> Attack
+     tied with MoveRight, but its position improves sooner
+  F4 Attack -> PlayTile Swirl -> MoveRight -> Attack
+     beats PlayTile Swirl by 1.2: enemy_damage +4.5, kills -3.3
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.2 depth 1 | why: score 24.30, plan: Attack
+[Info   :Shogun State Logger]   > Turn 24 action: HERO Attack [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > HERO@2 attacks with Arrow
+[Info   :Shogun State Logger]   > HERO@2 hits Ashigaru@4: 2 damage, HP 3 -> 1
+[Info   :Shogun State Logger] 
+==== Turn 25 | WaveRoom | wave 4/4 (final) | 11 coins
+  Grid: 0:.  1:.  2:HERO>  3:.  4:<Ashigaru
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 4, facing Left, HP 1/3, next: MoveLeft, queue: Katana 2 dmg, range 1
+  Queue: (empty)
+  Tiles:
+    Swirl 2 dmg, range -1,1, cooldown 3, READY
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 5 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 25 | HP 10/10 | wave 4/4 (final)
+  0:.  1:.  2:HERO>  3:.  4:<Ashigaru[1hp MoveLeft q:Katana]
+  Tiles: Swirl (ready), Arrow (ready in 5) | Swap 4/4
+  Move                  D1        D2        D3        D4
+  PlayTile Swirl     29.8*     36.2*     35.8*     35.6*
+  Wait                5.9      25.3      30.7      30.5 
+  MoveRight           5.9      25.3      30.7      30.5 
+  MoveLeft            4.2       6.5      21.5      26.1 
+  Flip                0.9      21.0      30.7      30.5 
+  F1 PlayTile Swirl
+     beats Wait by 23.8: firepower +20.4, loaded +3.4
+  F2 PlayTile Swirl -> Attack
+     beats Wait by 10.9: kills +25.5, firepower -17.3, enemy_damage +8.5
+  F3 PlayTile Swirl -> Attack -> Wait
+     beats Wait by 5.1: kills +3.8, enemy_damage +1.3
+  F4 PlayTile Swirl -> Attack -> Wait -> Wait
+     beats Wait by 5.1: kills +3.8, enemy_damage +1.3
+[Info   :Shogun State Logger]   > Decision: PlayTile Swirl | from: Evaluator v0.2 depth 1 | why: score 29.80, plan: PlayTile Swirl
+[Info   :Shogun State Logger]   > HERO queues tile Swirl [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > Turn 25 action: HERO PlayTile [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger] 
+==== Turn 26 | WaveRoom | wave 4/4 (final) | 11 coins
+  Grid: 0:.  1:.  2:HERO>  3:<Ashigaru  4:.
+  Hero: cell 2, facing Right, HP 10/10, special SwapSpecialMove READY
+  Enemies (in acting order):
+    Ashigaru: cell 3, facing Left, HP 1/3, next: Attack #1 -> cells 2, queue: Katana 2 dmg, range 1
+  Queue: Swirl 2 dmg, range -1,1
+  Tiles:
+    Arrow 2 dmg, range 1..10, cooldown 5, charging 4 more turns
+[Info   :Shogun State Logger] 
+==== Analysis (v0.2): turn 26 | HP 10/10 | wave 4/4 (final)
+  0:.  1:.  2:HERO>  3:<Ashigaru[1hp Attack q:Katana]  4:.
+  Tiles: Swirl (queued), Arrow (ready in 4) | Swap 4/4
+  Move                    D1        D2        D3        D4
+  Attack               42.5*     42.2*     41.8*     43.7*
+  MoveRight (swap)     22.1      34.0      34.0      35.0 
+  MoveLeft              7.7      25.3      30.7      31.5 
+  Wait               -170.2    -163.8    -164.2    -163.4 
+  Flip               -175.3    -163.8    -164.2    -163.4 
+  F1 Attack
+     beats MoveRight (swap) by 20.4: kills +30.0, firepower -20.4, enemy_damage +10.0
+  F2 Attack -> Wait
+     beats MoveRight (swap) by 8.2: kills +4.5, swap_ready +2.2, enemy_damage +1.5
+  F3 Attack -> Wait -> Wait
+     beats MoveRight (swap) by 7.8: kills +4.5, swap_ready +1.8, enemy_damage +1.5
+  F4 Attack -> Wait -> Wait -> Wait
+     beats MoveRight (swap) by 8.6: kills +4.5, swap_ready +1.6, enemy_damage +1.5
+[Info   :Shogun State Logger]   > Decision: Attack | from: Evaluator v0.2 depth 1 | why: score 42.50, plan: Attack
+[Info   :Shogun State Logger]   > Turn 26 action: HERO Attack [from: Evaluator v0.2 depth 1]
+[Info   :Shogun State Logger]   > HERO@2 attacks with Swirl
+[Info   :Shogun State Logger]   > Ashigaru@3 dies
+[Info   :Shogun State Logger]   > HERO@2 hits Ashigaru@3: 1 damage, HP 1 -> 0
+[Info   :Shogun State Logger]   > Combat ended

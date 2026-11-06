@@ -25,6 +25,9 @@ def main():
     for n, i in enumerate(decisions):
         end = decisions[n + 1] if n + 1 < len(decisions) else len(events)
         stepped = [e for e in events[i + 1:end] if e["event"] == "hero_action" and e["source"] == events[i]["source"]]
+        # A Free Play tile loads without starting a turn, so there's no action to pair it with.
+        if not stepped and events[i]["action"] == "PlayTile" and any(e["event"] == "hero_tile" for e in events[i + 1:end]):
+            continue
         if len(stepped) != 1 or stepped[0]["turn"] != events[i]["turn"] or stepped[0]["action"] != events[i]["action"]:
             bad_pairs += 1
             print("  MISMATCH at decision:", events[i]["text"], "| turn", events[i]["turn"],

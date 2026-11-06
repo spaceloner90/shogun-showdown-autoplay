@@ -5,17 +5,22 @@ the first action of the best line gets played. A queued tile has no fixed target
 is recalculated from the board each time.
 
 Enemies do what they telegraphed on the first simulated turn. After that their actions are unknown,
-so they stay put.
+so they stay put. The enemy AI is never used here: only what a player can see.
+
+Only depth 1 is in use, so everything a plan needs has to show up in how a position is scored.
 
 Principles, from how the game plays:
 - Every attack is telegraphed and the hero acts first, so being in range isn't dangerous by itself.
   It's dangerous when there's no answer: no kill available and nowhere safe to step.
 - The hero is mostly melee and has priority, so closing in is usually right, and backing away at the
-  last moment is a fine way to dodge.
+  last moment is a fine way to dodge. Closing in with nothing to threaten them with isn't.
 - Facing the ideal target and not being surrounded matter more than distance.
 - Killing fast matters, because the next wave arrives on a timer and can overload the room.
 - Queue edits are free, so a loaded tile commits to nothing: it can be reordered or taken back when
   firing. Loading early is an option worth having even with nothing in range yet.
+- A kill is worth far more than the same damage as a wound, and one volley doing the work of several
+  saves turns. So what a stack could do counts even when it needs a step or a flip to get there.
+  Bosses need no special handling: when no stack can reach a kill, there's no kill to value.
 
 All the weights are first guesses, kept together here so they're easy to change.
 
@@ -29,30 +34,33 @@ import copy
 import itertools
 from dataclasses import dataclass, field
 
-from rules import ONE_ENEMY_WAVE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, apply_attack, legal_actions, step
+from rules import (ONE_ENEMY_WAVE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, apply_attack, can_swap,
+                   is_free_action, legal_actions, step)
 
-VERSION = "v0.2"
+VERSION = "v0.3"
 
 WEIGHTS = {
     # What happens along the line.
     "hp_lost": -100.0,        # Per HP. The goal is to clear the battle without losing any.
     "death": -10000.0,
     "enemy_damage": 10.0,     # Per enemy HP removed by the hero.
-    "kill": 30.0,
+    "kill": 60.0,
     "friendly_damage": 8.0,   # Per enemy HP removed by another enemy.
     "wasted_attack": -5.0,    # Per queued attack that fires at nothing.
+    "sent_back": -4.0,        # Per queued tile returned to hand, since it costs a turn to reload.
     "future_discount": 0.85,  # The same result one turn later is worth this fraction.
-    "no_response": -60.0,     # Per point of damage threatening a hero who couldn't answer it.
+    "no_response": -60.0,     # Per point of threatened damage the hero's best answer leaves.
 
     # How good the final position is.
-    "firepower": 0.6,         # Fraction of the value of firing the queue from here.
-    "flip_firepower": 0.3,    # The same, for firing after a flip, which costs a turn.
+    # What firing the stack would be worth, by how many moves and flips it takes to get there.
+    "stack_fractions": (0.6, 0.45, 0.35, 0.25),
     "ready_tile": 2.0,        # Per tile that's charged, in hand or queue.
     "loaded_damage": 2.0,     # Per point of damage in the queue, whether or not anything's in range.
     "swap_ready": 3.0,        # Having Swap charged, so spending it has a cost.
     "facing_ideal": 6.0,      # Facing the enemy we most want to hit.
     "facing_other": 2.0,      # Facing an enemy, but not that one.
     "distance": -2.0,         # Per cell of gap between the hero and the ideal target.
+    "unarmed_distance": 0.25, # The share of that which still applies with nothing to threaten them.
     "surrounded": -20.0,      # Enemies directly on both sides.
     "flanked": -6.0,          # Enemies on both sides, at any distance.
     "enemy_hp_left": -4.0,    # Per enemy HP still in the room.
@@ -60,7 +68,7 @@ WEIGHTS = {
 }
 
 # An enemy's newly played tile isn't identified in the simulation. Assume a short, ordinary attack.
-ASSUMED_UNKNOWN = Attack(UNKNOWN_TILE, 2, [1])
+ASSUMED_UNKNOWN = Attack("Assumed", 2, [1], first_target=True)
 
 
 @dataclass
@@ -79,11 +87,19 @@ class Line:
         return round(self.score, 2), self.position_next_turn
 
 
-def _preview_fire(state, attacks, flip=False):
-    """Fires these attacks on a light copy of the board. Returns the copy and what happened."""
+def _light_copy(state):
+    """A copy of the board that attacks can change. Tiles and the queue are shared, so leave those alone."""
     trial = copy.copy(state)
     trial.hero = copy.copy(state.hero)
     trial.enemies = [copy.copy(e) for e in state.enemies]
+    return trial
+
+
+def _preview_fire(state, attacks, cell=None, flip=False):
+    """Fires these attacks on a copy of the board, from `cell` if given. Returns the copy and the outcome."""
+    trial = _light_copy(state)
+    if cell is not None:
+        trial.hero.cell = cell
     if flip:
         trial.hero.facing = -trial.hero.facing
     outcome = Outcome()
@@ -92,49 +108,90 @@ def _preview_fire(state, attacks, flip=False):
     return trial, outcome
 
 
-def _firepower_value(state, flip):
-    """The value of firing the queue now, in its best order, ignoring any enemy response."""
+def _volley_value(outcome):
+    return outcome.enemy_damage * WEIGHTS["enemy_damage"] + outcome.kills * WEIGHTS["kill"]
+
+
+def _stack_value(state):
+    """What the queue is worth: its best volley from anywhere nearby, less the moves needed to get there.
+
+    Firing order is free, so every order is tried. Only the hero moves here: enemies stay put.
+    """
+    queue = state.hero.queue
+    if not queue:
+        return 0.0
+    fractions = WEIGHTS["stack_fractions"]
     best = 0.0
-    for attacks in itertools.permutations(state.hero.queue):
-        _, outcome = _preview_fire(state, attacks, flip)
-        best = max(best, outcome.enemy_damage * WEIGHTS["enemy_damage"] + outcome.kills * WEIGHTS["kill"])
+    orders = list(itertools.permutations(queue))
+    for direction in (0, -1, 1):
+        for steps in range(0 if direction == 0 else 1, 1 if direction == 0 else len(fractions)):
+            cell = state.hero.cell + direction * steps
+            if not 0 <= cell < state.cells or state.occupant(cell) is not None:
+                break
+            for flip in (False, True):
+                actions = steps + flip
+                if actions >= len(fractions):
+                    continue
+                for attacks in orders:
+                    _, outcome = _preview_fire(state, attacks, cell, flip)
+                    best = max(best, _volley_value(outcome) * fractions[actions])
+    # Staying put is covered above only for an occupied-free start, which the hero's own cell isn't.
+    for flip in (False, True):
+        for attacks in orders:
+            _, outcome = _preview_fire(state, attacks, None, flip)
+            best = max(best, _volley_value(outcome) * fractions[int(flip)])
     return best
 
 
 def _threat_damage(state, cell):
-    """Damage the attacks visible in enemy queues could do to `cell`, from where enemies stand."""
-    total = 0
-    for enemy in state.enemies:
+    """Damage the attacks visible in enemy queues would do to a hero standing at `cell`.
+
+    Plays them out on a copy, so a first-target attack is blocked by anyone in the way, and a dash
+    carries its enemy into range of whatever it fires next.
+    """
+    trial = _light_copy(state)
+    trial.hero.cell = cell
+    trial.hero.hp = 1000  # Only here to count damage, so the hero mustn't fall over midway.
+    outcome = Outcome()
+    for enemy in trial.enemies:
         if not enemy.alive:
             continue
         for attack in enemy.queue:
             attack = ASSUMED_UNKNOWN if attack.name == UNKNOWN_TILE else attack
-            if any(enemy.cell + enemy.facing * offset == cell for offset in attack.range):
-                total += attack.value
-    return total
+            apply_attack(trial, enemy, attack, outcome)
+    return outcome.hp_lost
+
+
+def _threat_after_swap(state, direction):
+    trial = _light_copy(state)
+    cell = trial.hero.cell + direction
+    trial.occupant(cell).cell = trial.hero.cell
+    return _threat_damage(trial, cell)
 
 
 def unanswerable_damage(state):
-    """Threatened damage the hero couldn't answer next turn, or 0 if there's an answer.
+    """Threatened damage left after the hero's best answer next turn.
 
-    An answer is stepping to a free cell nothing reaches, or firing the queue and killing every
-    enemy threatening the hero's cell.
+    The answers are stepping aside, swapping past an enemy, or firing the queue and removing whoever
+    it kills. When nothing removes the threat entirely, the answer leaving the least still counts.
     """
-    threat = _threat_damage(state, state.hero.cell)
-    if threat == 0:
+    hero = state.hero
+    best = _threat_damage(state, hero.cell)
+    if best == 0:
         return 0
     for direction in (-1, 1):
-        cell = state.hero.cell + direction
-        if 0 <= cell < state.cells and state.occupant(cell) is None and _threat_damage(state, cell) == 0:
-            return 0
-    for attacks in itertools.permutations(state.hero.queue):
-        if not state.hero.queue:
-            break
-        trial, _ = _preview_fire(state, attacks)
-        trial.enemies = [e for e in trial.enemies if e.alive]
-        if _threat_damage(trial, trial.hero.cell) == 0:
-            return 0
-    return threat
+        cell = hero.cell + direction
+        if 0 <= cell < state.cells:
+            if state.occupant(cell) is None:
+                best = min(best, _threat_damage(state, cell))
+            elif can_swap(state, direction):
+                best = min(best, _threat_after_swap(state, direction))
+    if hero.queue:
+        for attacks in itertools.permutations(hero.queue):
+            trial, _ = _preview_fire(state, attacks)
+            trial.enemies = [e for e in trial.enemies if e.alive]
+            best = min(best, _threat_damage(trial, trial.hero.cell))
+    return best
 
 
 def ideal_target(state):
@@ -143,6 +200,15 @@ def ideal_target(state):
     if not enemies:
         return None
     return min(enemies, key=lambda e: (e.hp, abs(e.cell - state.hero.cell)))
+
+
+def _threat_presented(state, target):
+    """From 0 to 1, how much of the target's HP the hero could deal soon: loaded, ready or nearly ready."""
+    damage = 0
+    for tile in state.tiles:
+        if tile.in_queue or tile.cooldown - tile.charge <= 1:
+            damage += tile.attack.value
+    return min(1.0, damage / max(1, target.hp))
 
 
 def _position_terms(state):
@@ -163,9 +229,12 @@ def _position_terms(state):
         adjacent = state.occupant(hero.cell - 1) is not None and state.occupant(hero.cell + 1) is not None
         surrounded = WEIGHTS["surrounded"] if adjacent else WEIGHTS["flanked"]
 
+    # Closing in matters less with nothing to threaten them with.
+    floor = WEIGHTS["unarmed_distance"]
+    armed = floor + (1.0 - floor) * _threat_presented(state, target)
     return {
         "facing": facing,
-        "distance": WEIGHTS["distance"] * max(0, abs(target.cell - hero.cell) - 1),
+        "distance": WEIGHTS["distance"] * armed * max(0, abs(target.cell - hero.cell) - 1),
         "surrounded": surrounded,
     }
 
@@ -181,10 +250,8 @@ def _pressure_terms(state):
 
 def leaf_terms(state: State) -> dict[str, float]:
     """Scores a position by itself, as named parts so a decision can be explained."""
-    forward = _firepower_value(state, flip=False)
-    flipped = _firepower_value(state, flip=True)
     terms = {
-        "firepower": max(forward * WEIGHTS["firepower"], flipped * WEIGHTS["flip_firepower"]),
+        "stack": _stack_value(state),
         "ready_tiles": WEIGHTS["ready_tile"] * sum(t.ready for t in state.tiles),
         "loaded": WEIGHTS["loaded_damage"] * sum(a.value for a in state.hero.queue),
         "swap_ready": WEIGHTS["swap_ready"] if state.swap_charge >= state.swap_cooldown else 0.0,
@@ -202,6 +269,7 @@ def outcome_terms(outcome: Outcome, hero_dead: bool) -> dict[str, float]:
         "kills": WEIGHTS["kill"] * outcome.kills,
         "friendly_damage": WEIGHTS["friendly_damage"] * outcome.friendly_damage,
         "wasted_attacks": WEIGHTS["wasted_attack"] * outcome.wasted_attacks,
+        "sent_back": WEIGHTS["sent_back"] * outcome.sent_back,
     }
 
 
@@ -213,6 +281,11 @@ def _merge(total, terms, scale=1.0):
 def _evaluate_action(state, action, depth, scale):
     """Scores taking `action` now and then playing the best line for the remaining depth."""
     next_state, outcome = step(state, action)
+    if is_free_action(state, action):
+        # The turn isn't over, so this is only worth what the rest of the turn can do with it.
+        best = _best_line(next_state, depth, scale)
+        return Line([action] + best.actions, best.score, [action.label(state)] + best.labels,
+                    best.terms, best.position_next_turn)
     dead = not next_state.hero.alive
     terms = {}
     _merge(terms, outcome_terms(outcome, dead), scale)
@@ -238,7 +311,7 @@ def _best_line(state, depth, scale):
                key=lambda line: line.sort_key)
 
 
-def rank_actions(state: State, depth: int = 3) -> list[Line]:
+def rank_actions(state: State, depth: int = 1) -> list[Line]:
     """Every action available now, best first, each with the best continuation found for it."""
     lines = [_evaluate_action(state, action, depth, 1.0) for action in legal_actions(state)]
     lines.sort(key=lambda line: line.sort_key, reverse=True)

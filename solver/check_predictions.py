@@ -30,7 +30,7 @@ def turns_from_log(rows):
                 pending = None
                 spawned = False
                 before_action = None
-            if pending is None and before_action is None:
+            if pending is None:
                 current = row
         elif row["type"] != "event":
             continue
@@ -43,8 +43,14 @@ def turns_from_log(rows):
             tile = row["tile"]
             before_action = current
         elif row["event"] == "hero_action" and current is not None:
-            pending = (row["action"], before_action or current, tile)
+            # A tile play's turn starts from just before the tile moved. After a Free Play tile,
+            # any other action starts from the latest state, which already has that tile queued.
+            if row["action"] == "PlayTile":
+                pending = (row["action"], before_action or current, tile)
+            else:
+                pending = (row["action"], current, None)
             tile = None
+            before_action = None
 
 
 def to_action(state, name, tile_name):

@@ -111,12 +111,12 @@ The fight in `logs/battle2_swap_queue` showed:
   enemies. A removed tile goes back to the hand still charged, and playing it again uses a turn.
 - **The queue fires in the order it's listed.** Only two fights have shown a stack firing.
 - **Swap costs one turn.** Two simulated turns across it matched the log on all 10 values compared,
-  including the charge restarting and the swapped enemy's attack missing.
+  including the charge restarting and the swapped enemy's attack missing. A complete swap in
+  `logs/run2_complete` (turn 20 of battle 2) was then predicted exactly.
+- **Charge moves its user.** It runs to the last free cell and hits whatever is next, allies included.
 
 ## Not confirmed yet
 
-- The swap above is missing its next turn's state, so enemy facing and queues right after it are
-  unchecked. A complete logged swap would settle this.
 - Mod 0.7.0 makes queue edits with `Submit` and `SwapTiles`. Neither has run in the game yet.
 - Whether an enemy can refuse a swap isn't modeled. The game would refuse the move, and the mod would
   log that.

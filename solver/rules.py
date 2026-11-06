@@ -12,9 +12,15 @@ from dataclasses import dataclass, field
 QUEUE_CAP = 3
 ONE_ENEMY_WAVE_CAP = 6
 
-# Attacks that hit only the first agent in range. Anything else in MODELED hits everyone in range.
-SINGLE_TARGET = {"Arrow", "Katana", "Tetsubo"}
-MODELED = {"Arrow", "Katana", "Swirl", "Tetsubo"}
+# Attacks whose behaviour is fully covered by their logged range, damage and first-target flag, plus
+# the dashes below. Anything else may do more than the simulator knows, and gets a warning.
+MODELED = {"Arrow", "BackCharge", "BackShadowDash", "Charge", "Dash", "EarthImpale", "Katana", "ShadowDash",
+           "Spear", "Swirl", "Tetsubo"}
+
+# Attacks that move the attacker. Each value is the direction relative to the attacker's facing.
+CHARGES = {"Charge": 1, "BackCharge": -1}  # Run to the last free cell, and hit whatever is next.
+PLAIN_DASHES = {"Dash": 1}                 # Run to the last free cell, and hit nothing.
+SHADOW_DASHES = {"ShadowDash": 1, "BackShadowDash": -1}  # Pass through adjacent agents, hitting them all.
 
 # An enemy tile being played. Its identity isn't visible until it lands in the queue.
 UNKNOWN_TILE = "Unknown"
@@ -25,6 +31,7 @@ class Attack:
     name: str
     value: int
     range: list[int]
+    first_target: bool = False  # Stops at the first agent in range, rather than hitting them all.
 
 
 @dataclass
@@ -34,6 +41,7 @@ class Tile:
     charge: int
     in_queue: bool = False
     just_played: bool = False
+    free_play: bool = False  # Loading this tile doesn't use the turn.
 
     @property
     def ready(self):
@@ -90,6 +98,7 @@ class Outcome:
     kills: int = 0
     friendly_damage: int = 0
     wasted_attacks: int = 0
+    sent_back: int = 0  # Queued tiles returned to hand instead of firing. Each costs a turn to reload.
     unmodeled: list[str] = field(default_factory=list)
 
 
@@ -103,7 +112,8 @@ class Action:
 
     def label(self, state):
         if self.kind == "PlayTile":
-            return f"PlayTile {state.tiles[self.tile].attack.name}"
+            tile = state.tiles[self.tile]
+            return f"PlayTile {tile.attack.name}{' (free)' if tile.free_play else ''}"
         if self.kind == "Attack" and self.order is not None:
             fired = [state.tiles[i] for i in self.order]
             kept = [t.attack.name for t in state.queue_tiles if not any(t is f for f in fired)]
@@ -119,7 +129,7 @@ class Action:
 def state_from_log(row):
     """Builds a State from a 'state' line of state.jsonl."""
     def attack(data):
-        return Attack(data["name"], data["value"] or 0, list(data["range"]))
+        return Attack(data["name"], data["value"] or 0, list(data["range"]), bool(data["closestTargetOnly"]))
 
     def agent(data):
         return Agent(
@@ -139,6 +149,7 @@ def state_from_log(row):
             cooldown=t["attack"]["cooldown"],
             charge=t["attack"]["cooldown"] - t["turnsBeforeCharged"],
             in_queue="AttackQueue" in t["where"],
+            free_play=t["attack"].get("tileEffect") == "FreePlay",
         )
         for t in row["tiles"]
     ]
@@ -149,8 +160,13 @@ def state_from_log(row):
     available = [t for t in tiles if t.in_queue]
     queue_tiles = []
     for queued in hero.queue:
-        match = next(t for t in available if t.attack.name == queued.name)
-        available.remove(match)
+        match = next((t for t in available if t.attack.name == queued.name), None)
+        if match is None:
+            # Queued, but not from the deck the log shows. Track it anyway, so firing still works.
+            match = Tile(queued, cooldown=0, charge=0, in_queue=True)
+            tiles.append(match)
+        else:
+            available.remove(match)
         queue_tiles.append(match)
 
     special = row["hero"].get("special") or {}
@@ -166,6 +182,50 @@ def state_from_log(row):
         turns_until_wave=wave["turnsUntilNext"] if wave else None,
         last_wave=wave["isLast"] if wave else False,
     )
+
+
+def unmodeled_content(row):
+    """Everything in this position the simulator doesn't fully understand, for the report's warnings."""
+    notes = []
+
+    def note(text):
+        if text not in notes:
+            notes.append(text)
+
+    def check_attack(data):
+        if data["name"] not in MODELED and data["name"] != UNKNOWN_TILE:
+            note(f"attack {data['name']}")
+        if data.get("effect") not in (None, "None"):
+            note(f"{data['name']} effect {data['effect']}")
+        if data.get("tileEffect") not in (None, "None", "FreePlay"):
+            note(f"{data['name']} tile effect {data['tileEffect']}")
+        if data.get("nonLethal"):
+            note(f"{data['name']} is non-lethal")
+
+    def check_status(name, agent):
+        for status in ("poison", "ice"):
+            if agent.get(status):
+                note(f"{name} {status}")
+        if agent.get("curse"):
+            note(f"{name} curse")
+
+    for tile in row["tiles"]:
+        check_attack(tile["attack"])
+    hero = row["hero"]
+    for data in hero["queue"]:
+        check_attack(data)
+    check_status("hero", hero)
+    for enemy in row["enemies"]:
+        for data in enemy["queue"]:
+            check_attack(data)
+        check_status(enemy["kind"], enemy)
+        if enemy.get("elite") not in (None, "None"):
+            note(f"elite {enemy['kind']}")
+        for trait in enemy.get("traits") or []:
+            note(f"{enemy['kind']} trait {trait}")
+    for skill in row.get("skills") or []:
+        note(f"skill {skill.get('name', skill) if isinstance(skill, dict) else skill}")
+    return notes
 
 
 def can_swap(state, direction):
@@ -217,9 +277,50 @@ def targets_of(state, attacker, attack):
         agent = state.occupant(attacker.cell + attacker.facing * offset)
         if agent is not None:
             hits.append(agent)
-            if attack.name in SINGLE_TARGET:
+            if attack.first_target:
                 break
     return hits
+
+
+def run_to_last_free_cell(state, attacker, direction):
+    """Moves the attacker as far as it can go. Returns whatever is next, if anything."""
+    cell = attacker.cell
+    while 0 <= cell + direction < state.cells and state.occupant(cell + direction) is None:
+        cell += direction
+    attacker.cell = cell
+    next_cell = cell + direction
+    target = state.occupant(next_cell) if 0 <= next_cell < state.cells else None
+    return [target] if target is not None else []
+
+
+def shadow_dash(state, attacker, attack, direction):
+    """Passes through the agents in a row beside the attacker, landing just past them, hitting them all.
+
+    Does nothing if nobody is in range, or if there's no free cell to land on.
+    """
+    if not targets_of(state, attacker, attack):
+        return []
+    cell = attacker.cell + direction
+    passed = []
+    while 0 <= cell < state.cells and state.occupant(cell) is not None:
+        passed.append(state.occupant(cell))
+        cell += direction
+    if not 0 <= cell < state.cells:
+        return []
+    attacker.cell = cell
+    return passed
+
+
+def attack_hits(state, attacker, attack):
+    """Who this attack hits, after moving the attacker if it's a moving attack."""
+    if attack.name in CHARGES:
+        return run_to_last_free_cell(state, attacker, attacker.facing * CHARGES[attack.name])
+    if attack.name in PLAIN_DASHES:
+        run_to_last_free_cell(state, attacker, attacker.facing * PLAIN_DASHES[attack.name])
+        return []
+    if attack.name in SHADOW_DASHES:
+        return shadow_dash(state, attacker, attack, attacker.facing * SHADOW_DASHES[attack.name])
+    return targets_of(state, attacker, attack)
 
 
 def apply_attack(state, attacker, attack, outcome):
@@ -227,8 +328,9 @@ def apply_attack(state, attacker, attack, outcome):
         return
     if attack.name not in MODELED and attack.name not in outcome.unmodeled:
         outcome.unmodeled.append(attack.name)
-    hits = targets_of(state, attacker, attack)
-    if not hits and attacker is state.hero:
+    hits = attack_hits(state, attacker, attack)
+    # A plain dash is used for the move, so hitting nothing isn't a waste.
+    if not hits and attacker is state.hero and attack.name not in PLAIN_DASHES:
         outcome.wasted_attacks += 1
     for target in hits:
         if target.shield:
@@ -256,6 +358,7 @@ def fire_hero_queue(state, outcome, order=None):
         apply_attack(state, state.hero, tile.attack, outcome)
         tile.charge = 0
         tile.just_played = True
+    outcome.sent_back += len(state.queue_tiles) - len(fired)
     for tile in state.queue_tiles:
         tile.in_queue = False
     state.hero.queue = []
@@ -351,11 +454,21 @@ def end_turn(state, swapped):
         enemy.action = "Wait"  # What it does next isn't known until the game shows it.
 
 
+def is_free_action(state, action):
+    return action.kind == "PlayTile" and state.tiles[action.tile].free_play
+
+
 def step(state, action):
-    """Returns the state after one full turn, and what happened. The input isn't changed."""
+    """Returns the state after the action, and what happened. The input isn't changed.
+
+    That's one full turn, unless the action is free: then nothing else happens, and it's still the
+    hero's turn.
+    """
     next_state = copy.deepcopy(state)
     outcome = Outcome()
     swapped = hero_action(next_state, action, outcome)
+    if is_free_action(state, action):
+        return next_state, outcome
     resolve_enemies(next_state, outcome)
     end_turn(next_state, swapped)
     return next_state, outcome

@@ -14,8 +14,8 @@ ONE_ENEMY_WAVE_CAP = 6
 
 # Attacks whose behaviour is fully covered by their logged range, damage and first-target flag, plus
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
-MODELED = {"Arrow", "BackCharge", "BackShadowDash", "Charge", "Dash", "EarthImpale", "Katana", "ShadowDash",
-           "ShadowKama", "Shuriken", "Spear", "Swirl", "Tetsubo"}
+MODELED = {"Arrow", "BackCharge", "BackShadowDash", "Charge", "Curse", "Dash", "EarthImpale", "GrapplingHook", "Katana",
+           "Shield", "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Spear", "Swirl", "Tetsubo"}
 
 # Skills that need no modeling: a consumable slot, and a shield at the start of each fight, which shows
 # up in the state like any other shield.
@@ -65,6 +65,7 @@ class Agent:
     action: str = "Wait"  # Only meaningful for enemies.
     moved: bool = False
     curse: bool = False  # The next hit that deals damage is doubled, and uses up the curse.
+    movable: bool = True  # Heavy enemies can't be swapped or pulled.
 
     @property
     def alive(self):
@@ -105,6 +106,7 @@ class Outcome:
     friendly_damage: int = 0
     wasted_attacks: int = 0
     sent_back: int = 0  # Queued tiles returned to hand instead of firing. Each costs a turn to reload.
+    shields_broken: int = 0  # Enemy shields removed by the hero.
     unmodeled: list[str] = field(default_factory=list)
 
 
@@ -158,6 +160,7 @@ def state_from_log(row):
             queue=[attack(a) for a in data["queue"]],
             action=data["action"],
             curse=bool(data.get("curse")),
+            movable="Heavy" not in (data.get("traits") or []) and data.get("elite") != "Heavy",
         )
 
     tiles = [
@@ -249,10 +252,12 @@ def unmodeled_content(row):
 
 def can_swap(state, direction):
     """Swap only works in the facing direction, when charged, into an occupied cell."""
+    occupant = state.occupant(state.hero.cell + direction)
     return (
         direction == state.hero.facing
         and state.swap_charge >= state.swap_cooldown
-        and state.occupant(state.hero.cell + direction) is not None
+        and occupant is not None
+        and occupant.movable
     )
 
 
@@ -361,11 +366,35 @@ def attack_hits(state, attacker, attack):
     return targets_of(state, attacker, attack)
 
 
+def shield_first_ally(state, attacker, attack):
+    """Shields the first ally ahead without one. The hero and shielded allies don't stop it."""
+    for offset in attack.range:
+        agent = state.occupant(attacker.cell + attacker.facing * offset)
+        if agent is None or agent is state.hero or agent.shield or agent.kind == "Thorns":
+            continue
+        agent.shield = True
+        return
+
+
 def apply_attack(state, attacker, attack, outcome):
     if attack.name == UNKNOWN_TILE:
         return
     if attack.name not in MODELED and attack.name not in outcome.unmodeled:
         outcome.unmodeled.append(attack.name)
+    if attack.name == "Shield":
+        attacker.shield = True
+        return
+    if attack.name == "ShieldAllied":
+        shield_first_ally(state, attacker, attack)
+        return
+    if attack.name == "Curse":
+        # A projectile rather than a hit, so a shield neither stops it nor is used up by it.
+        targets = targets_of(state, attacker, attack)
+        if targets:
+            targets[0].curse = True
+        elif attacker is state.hero:
+            outcome.wasted_attacks += 1
+        return
     start_cell = attacker.cell
     hits = attack_hits(state, attacker, attack)
     # An attack that moved the hero still did something, even if it hit nothing.
@@ -375,11 +404,16 @@ def apply_attack(state, attacker, attack, outcome):
         # A shield blocks the hit and leaves any curse in place, but the effect still lands.
         if target.shield:
             target.shield = False
+            if attacker is state.hero:
+                outcome.shields_broken += 1
         else:
             deal_damage(state, attacker, target, attack.value, outcome)
         # After the hit, so a curse never doubles the attack that applied it.
         if target.alive and attack.effect == "Curse":
             target.curse = True
+        # A shield blocks the hook's damage, but not its pull.
+        if attack.name == "GrapplingHook" and target.alive and target.movable:
+            target.cell = attacker.cell + attacker.facing
 
 
 def deal_damage(state, attacker, target, value, outcome):

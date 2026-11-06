@@ -138,13 +138,31 @@ The twins boss, later in the same log, showed:
 - **A curse doubles exactly one tile.** On turn 8, Swirl hit for 3 and cursed, Arrow's 4 hit for 8, then
   Swirl's 2 hit for 2 with HP to spare.
 
+The Shielder fight, later in the same log, showed:
+
+- **Back Charge** runs away from the facing direction without turning, stops at the last free cell, and
+  hits whatever is next. Its uses on turns 7, 27 and 32 were all predicted correctly. Running to the wall
+  with nothing behind, and doing nothing when backed against one, still come from the code alone.
+- **A shield blocks a whole hit and is used up,** for the hero (turn 33) and for enemies (turns 15, 25
+  and 27). The next tile in a stack then hits normally.
+
+- **Shield and Shield Allied** were predicted correctly throughout, once modeled. Shield Allied goes to
+  the first shieldless ally ahead, passing the hero and already shielded allies.
+
+The 15-wave fight, also in that log, showed:
+
+- **Grappling Hook pulls even through a shield.** On turn 12, a shield blocked its 1 damage, the hero
+  was still pulled next to the Grappler, and the Katana then hit for 2.
+
 ## Not confirmed yet
 
-- **Back Charge** comes from the code alone. It runs away from the facing direction without turning,
-  stops at the last free cell, and hits whatever is next. With nothing behind, it runs to the wall.
-  Backed against a wall with no one adjacent, it does nothing, and the tile still goes on cooldown.
-- The shield rules, for the hero, for enemies and for curse, come from the code alone. No logged hit
-  has landed on a shielded target.
+- The shield rules for curse come from the code alone.
+- Heavy enemies are assumed to be immovable. Swap and hook check a movable flag in the code, but nothing
+  shown links that flag to the Heavy trait.
+- A curse tile re-applying its curse after a doubled hit comes from the code's order of events.
+- **The Curse attack** comes from the code alone. It curses the first target ahead with a projectile
+  rather than a hit, so a shield neither stops it nor is used up. It deals no damage, does nothing to a
+  target already cursed, and goes on cooldown even if it misses.
 - Whether an enemy can refuse a swap isn't modeled. The game would refuse the move, and the mod would
   log that.
 - The saved fight log never has Swirl hitting two agents at once. An earlier log did show it, but

@@ -100,6 +100,17 @@ class CurseAsPlayed(unittest.TestCase):
         self.assertEqual(next(e.hp for e in after.enemies if e.kind == "TwinMainBoss"), 18)
 
 
+class GrapplerAsPlayed(unittest.TestCase):
+    """The 15-wave fight, where a shield took the hook, the pull still happened, and the Katana landed."""
+
+    def test_simulates_the_hook_and_katana_as_they_happened(self):
+        rows = ROWS["run3_part2"]
+        hook_row = next(i for i, r in enumerate(rows) if r.get("event") == "attack" and "GrapplingHook" in r["text"])
+        fight = sum(r.get("event") == "combat_start" for r in rows[:hook_row]) - 1
+        after, outcome = step(position(fight, rows[hook_row]["turn"], "run3_part2"), Action("MoveRight"))
+        self.assertEqual((after.hero.cell, after.hero.shield, after.hero.hp, outcome.hp_lost), (3, False, 7, 2))
+
+
 class FreePlay(unittest.TestCase):
     """Run 3's fight 7, where one Swirl had Free Play, and v0.4 loaded it and sent it back."""
 

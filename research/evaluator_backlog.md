@@ -29,14 +29,11 @@ Enemy AI code is for offline simulation and tuning only.
   the lower HP, and hits on the Side twin count for no kill.
 - **Swap Toss (to model):** swaps the contents of the cells directly ahead and behind, moving whoever
   is there. A standard movement ability, like the dashes. It moved the hero on turn 16 of that fight.
-- **Grappling Hook (to model):** deals 1 and pulls the first target to the cell directly ahead of the
-  user, if it survives and can be moved. The simulator counts the 1 but not the pull, so it badly
-  understates a Grappler's Hook and Katana stack, like a dash before it was fixed: it sees 1 damage
-  where the Katana should then land too, and stepping back doesn't escape it. No Grappler has fired
-  one yet, because F1 killed each one first.
-- **Heavy enemies:** the Statue boss has a Heavy trait, which may mean it can't be moved. Swap and the
-  moving attacks don't check for that yet. If so, the game should refuse the swap and the mod logs it.
-- **Other new attacks seen:** Smoke Bomb and Summon still trigger the warning.
+- **Heavy enemies:** as of v0.9, the solver assumes the Heavy trait means an enemy can't be swapped or
+  pulled. The code shows swap and hook need a movable target, but the link to Heavy is an inference.
+- **Simple swaps (to model):** Smoke Bomb swaps its user with the first target ahead, much like Swap.
+- **Summon (ignoring on purpose):** where a summon appears is random, so a player can't react to it
+  either. It will keep causing a prediction miss each time, which is expected.
 - **Perfect Strike:** a tile with this effect recharges fully when its hit deals exactly the target's
   remaining HP, counting a curse's doubling. Not modeled, and cooldowns aren't valued anyway, so F1
   won't aim for it. A kill that triggers it just gets read correctly on the next turn.
@@ -76,6 +73,12 @@ its attack is queued, which is often too late to do anything. Options, all from 
 - Value killing an enemy more when its attack can't be stepped away from.
 - Learn what each enemy type plays from past logs, so an Archer counts as a threat before it loads.
 - Weigh the turn left before it can fire, so Arrow goes on the enemy that's about to be a problem.
+
+## Enemy shields
+
+As of v0.9, Shield and Shield Allied are modeled, and an enemy's shield counts as extra HP equal to the
+weakest tile available. Still open: counting a shield queued on a Shielder as a fraction of that, so
+killing it before it fires is worth more. That belongs with enemy priority.
 
 ## Holding tiles in reserve
 

@@ -4,7 +4,7 @@ Run with: python solver/test_rules.py
 """
 import unittest
 
-from evaluator import _threat_damage, leaf_terms, rank_actions, unanswerable_damage
+from evaluator import _threat_damage, ideal_target, leaf_terms, rank_actions, unanswerable_damage
 from rules import Action, Agent, Attack, State, Tile, legal_actions, step, unmodeled_content
 
 SWIRL = Attack("Swirl", 2, [-1, 1])
@@ -481,6 +481,206 @@ class CurseTest(unittest.TestCase):
         row = {"tiles": [{"attack": {"name": "Arrow", "effect": "Curse", "tileEffect": "None"}}],
                "hero": {"queue": [], "curse": True}, "enemies": [], "skills": []}
         self.assertEqual(unmodeled_content(row), [])
+
+
+HOOK = Attack("GrapplingHook", 1, list(range(1, 11)), first_target=True)
+SPEAR = Attack("Spear", 2, [1, 2])
+ALLY_SHIELD = Attack("ShieldAllied", 0, list(range(1, 11)))
+SELF_SHIELD = Attack("Shield", 0, [], first_target=True)
+
+
+class GrapplingHookTest(unittest.TestCase):
+    def _hooked(self, hero_cell=1, **kwargs):
+        return make_state(hero_cell=hero_cell, swap_charge=0, enemies=[
+            enemy(4, action="Attack", queue=[HOOK, KATANA], **kwargs)])
+
+    def test_the_hook_pulls_the_hero_next_to_the_grappler_for_the_katana(self):
+        after, outcome = step(self._hooked(), Action("Wait"))
+        self.assertEqual((after.hero.cell, outcome.hp_lost), (3, 3))
+
+    def test_a_shield_blocks_the_hooks_damage_but_not_its_pull(self):
+        # As played: the shield took the hook, the pull still happened, and the Katana hit for 2.
+        state = self._hooked()
+        state.hero.shield = True
+        after, outcome = step(state, Action("Wait"))
+        self.assertEqual((after.hero.cell, after.hero.shield, outcome.hp_lost), (3, False, 2))
+
+    def test_stepping_back_does_not_escape_it(self):
+        state = self._hooked()
+        self.assertEqual(_threat_damage(state, 0), 3)
+        self.assertEqual(unanswerable_damage(state), 3)
+
+    def test_an_enemy_in_the_way_takes_the_hook_instead(self):
+        state = make_state(hero_cell=0, swap_charge=0, facing=1, enemies=[
+            enemy(2, facing=1, hp=9), enemy(4, action="Attack", queue=[HOOK, KATANA])])
+        after, outcome = step(state, Action("Wait"))
+        self.assertEqual(outcome.hp_lost, 0)
+        self.assertEqual(sorted(e.cell for e in after.enemies), [3, 4])
+        self.assertEqual(outcome.friendly_damage, 3)
+
+    def test_killing_the_grappler_stops_it(self):
+        state = make_state(hero_cell=3, enemies=[enemy(4, hp=2, action="Attack", queue=[HOOK, KATANA])], queue=["Swirl"])
+        best = rank_actions(state, depth=1)[0]
+        self.assertEqual(best.actions[0].kind, "Attack")
+        self.assertEqual(best.terms.get("hp_lost", 0), 0)
+
+    def test_a_heavy_target_is_not_pulled_or_swapped(self):
+        heavy = enemy(3)
+        heavy.movable = False
+        state = make_state(hero_cell=2, enemies=[heavy])
+        self.assertNotIn(Action("MoveRight"), legal_actions(state))
+        state = make_state(hero_cell=0, facing=1, enemies=[heavy])
+        state.tiles[0].attack = HOOK
+        state.tiles[0].in_queue = True
+        state.queue_tiles = [state.tiles[0]]
+        state.hero.queue = [HOOK]
+        after, _ = step(state, Action("Attack"))
+        self.assertEqual(after.enemies[0].cell, 3)
+
+
+class EnemyShieldTest(unittest.TestCase):
+    def test_shield_protects_the_caster(self):
+        after, _ = step(make_state(enemies=[enemy(4, action="Attack", queue=[SELF_SHIELD])]), Action("Wait"))
+        self.assertTrue(after.enemies[0].shield)
+
+    def test_shield_allied_goes_to_the_first_shieldless_ally_past_the_hero(self):
+        shielded, target = enemy(1, facing=-1), enemy(0, facing=1)
+        shielded.shield = True
+        caster = enemy(4, action="Attack", queue=[ALLY_SHIELD])
+        after, _ = step(make_state(hero_cell=2, enemies=[target, shielded, caster]), Action("Wait"))
+        by_cell = {e.cell: e.shield for e in after.enemies}
+        self.assertEqual(by_cell, {0: True, 1: True, 4: False})
+        self.assertFalse(after.hero.shield)
+
+    def test_shield_allied_with_nobody_to_shield_does_nothing(self):
+        after, _ = step(make_state(enemies=[enemy(4, action="Attack", queue=[ALLY_SHIELD])]), Action("Wait"))
+        self.assertFalse(after.enemies[0].shield)
+
+    def test_a_shield_counts_as_extra_hp_equal_to_the_weakest_tile(self):
+        shielded = make_state(enemies=[enemy(4, hp=3)])
+        shielded.enemies[0].shield = True
+        plain = make_state(enemies=[enemy(4, hp=3)])
+        self.assertEqual(leaf_terms(shielded)["enemy_hp_left"] - leaf_terms(plain)["enemy_hp_left"], -8)
+
+    def test_breaking_a_shield_earns_credit_for_a_lone_tile(self):
+        target = enemy(3, hp=9)
+        target.shield = True
+        state = make_state(enemies=[target], queue=["Swirl"])
+        line = next(l for l in rank_actions(state, depth=1) if l.actions[0].kind == "Attack")
+        self.assertEqual(line.terms["shields_broken"], 20)
+
+    def test_the_weakest_tile_breaks_the_shield_first(self):
+        weak = Attack("Swirl", 1, [-1, 1])
+        strong = Attack("Arrow", 4, [1], first_target=True)
+        target = enemy(3, hp=4)
+        target.shield = True
+        state = make_state(enemies=[target], queue=["Swirl", "Arrow"])
+        state.tiles[0].attack, state.tiles[1].attack = weak, strong
+        state.hero.queue = [strong, weak]
+        state.queue_tiles = [state.tiles[1], state.tiles[0]]
+        best = rank_actions(state, depth=1)[0]
+        self.assertEqual(best.actions[0], Action("Attack", order=(0, 1)))
+        self.assertGreater(best.terms["kills"], 0)
+
+    def test_the_lower_effective_hp_is_the_target(self):
+        shielded = enemy(1, facing=1, hp=2)
+        shielded.shield = True
+        state = make_state(hero_cell=2, enemies=[shielded, enemy(4, hp=3)])
+        self.assertEqual(ideal_target(state).cell, 4)
+
+
+class FreeCurseTileTest(unittest.TestCase):
+    FREE_CURSE = Attack("Pike", 1, [1], first_target=True, effect="Curse")
+    CURSED_SWIRL = Attack("Swirl", 2, [-1, 1], effect="Curse")
+
+    def _state(self, hp=9):
+        state = make_state(enemies=[enemy(3, hp=hp)], queue=["Swirl"])
+        state.tiles[0].attack = self.CURSED_SWIRL
+        state.hero.queue = [self.CURSED_SWIRL]
+        state.tiles[1].attack = self.FREE_CURSE
+        state.tiles[1].free_play = True
+        return state
+
+    def test_a_free_curse_doubles_a_curse_tile_which_re_applies_the_curse(self):
+        after, outcome = step(self._state(), Action("Attack", order=(1, 0)))
+        self.assertEqual(outcome.enemy_damage, 5)  # 1 from the free tile, then Swirl's 2 doubled to 4.
+        self.assertTrue(after.enemies[0].curse)
+
+    def test_a_curse_does_not_stack(self):
+        state = self._state()
+        state.enemies[0].curse = True
+        after, outcome = step(state, Action("Attack", order=(1, 0)))
+        self.assertEqual(outcome.enemy_damage, 6)  # 1 doubled to 2, re-cursed, then Swirl's 2 doubled to 4.
+        self.assertTrue(after.enemies[0].curse)
+
+    def test_it_finds_that_order_on_its_own(self):
+        best = rank_actions(self._state(), depth=1)[0]
+        self.assertEqual(best.actions[0], Action("Attack", order=(1, 0)))
+        self.assertEqual(best.labels[0], "Attack Pike (free) > Swirl")
+
+
+class CurseAttackTest(unittest.TestCase):
+    """The game's own Curse tile: no damage, reaches the first target at range."""
+    CURSE = Attack("Curse", 0, list(range(1, 11)), first_target=True)
+
+    def _with_free_curse(self, enemies, queue=()):
+        state = make_state(enemies=enemies, queue=queue)
+        state.tiles.append(Tile(self.CURSE, 7, 7, free_play=True))
+        return state
+
+    def test_it_curses_the_first_target_only_and_deals_nothing(self):
+        state = self._with_free_curse([enemy(3, hp=9), enemy(4, hp=9)])
+        after, outcome = step(state, Action("Attack", order=(2,)))
+        self.assertEqual(outcome.enemy_damage, 0)
+        self.assertEqual([e.curse for e in after.enemies], [True, False])
+        self.assertEqual(after.tiles[2].charge, 0)
+
+    def test_it_doesnt_touch_a_shield(self):
+        shielded = enemy(3, hp=9)
+        shielded.shield = True
+        after, outcome = step(self._with_free_curse([shielded]), Action("Attack", order=(2,)))
+        self.assertTrue(after.enemies[0].curse)
+        self.assertTrue(after.enemies[0].shield)
+        self.assertEqual(outcome.shields_broken, 0)
+
+    def test_a_miss_goes_on_cooldown_and_counts_as_wasted(self):
+        after, outcome = step(self._with_free_curse([enemy(0, facing=1)]), Action("Attack", order=(2,)))
+        self.assertEqual(outcome.wasted_attacks, 1)
+        self.assertEqual(after.tiles[2].charge, 0)
+
+    def test_it_doubles_the_next_tile_in_the_stack(self):
+        state = self._with_free_curse([enemy(3, hp=9)], queue=["Swirl"])
+        _, outcome = step(state, Action("Attack", order=(2, 0)))
+        self.assertEqual(outcome.enemy_damage, 4)
+
+    def test_f1_adds_it_to_an_attack_that_turns_a_wound_into_a_kill(self):
+        state = self._with_free_curse([enemy(3, hp=4)], queue=["Swirl"])
+        best = rank_actions(state, depth=1)[0]
+        self.assertEqual(best.actions[0], Action("Attack", order=(2, 0)))
+        self.assertEqual(best.labels[0], "Attack Curse (free) > Swirl")
+        self.assertGreater(best.terms["kills"], 0)
+
+    def test_it_gets_no_warning(self):
+        row = {"tiles": [{"attack": {"name": "Curse", "effect": "None", "tileEffect": "FreePlay"}}],
+               "hero": {"queue": []}, "enemies": [], "skills": []}
+        self.assertEqual(unmodeled_content(row), [])
+
+
+class QueueCapTest(unittest.TestCase):
+    def _four_tiles(self):
+        state = make_state(enemies=[enemy(3, hp=20)], queue=["Swirl", "Arrow"])
+        state.tiles += [Tile(TETSUBO, 7, 7, free_play=True), Tile(KATANA, 0, 0, free_play=True)]
+        return state
+
+    def test_an_attack_never_fires_more_than_the_queue_holds(self):
+        orders = [a.order for a in legal_actions(self._four_tiles()) if a.kind == "Attack"]
+        self.assertEqual(max(len(o) for o in orders if o), 3)
+
+    def test_the_stack_counts_only_the_best_three(self):
+        terms = leaf_terms(self._four_tiles())
+        self.assertEqual(terms["loaded"], 2.0 * (4 + 2 + 2))
+        # Swirl, Arrow and Tetsubo, for 8 damage: the fourth tile can't join.
+        self.assertEqual(terms["stack"], 0.6 * 80)
 
 
 class ShieldValueTest(unittest.TestCase):

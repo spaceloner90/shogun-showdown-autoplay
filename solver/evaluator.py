@@ -27,6 +27,8 @@ Principles, from how the game plays:
   is worth more when it turns a wound into a kill. It's worth nothing on an enemy that dies.
 - A hero's shield blocks a whole hit, and most hits can't be dodged, so it's best kept for one of those.
   Spending it on a hit that could have been dodged has a cost.
+- An enemy's shield is different: it has to be removed anyway, so it counts as extra HP, equal to the
+  hero's weakest tile, since that's the cheapest way to remove it. Breaking one earns that credit.
 
 All the weights are first guesses, kept together here so they're easy to change.
 
@@ -43,7 +45,7 @@ from dataclasses import dataclass, field
 from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, UNKNOWN_TILE, Action, Attack, Outcome, State, apply_attack,
                    can_swap, fireable_attacks, legal_actions, step)
 
-VERSION = "v0.8"
+VERSION = "v0.9"
 
 WEIGHTS = {
     # What happens along the line.
@@ -116,8 +118,20 @@ def _preview_fire(state, attacks, cell=None, flip=False):
     return trial, outcome
 
 
-def _volley_value(outcome):
-    return outcome.enemy_damage * WEIGHTS["enemy_damage"] + outcome.kills * WEIGHTS["kill"]
+def _cheapest_hit(state):
+    """The damage of the weakest tile available: what it costs to remove an enemy's shield."""
+    tiles = [t.attack.value for t in state.tiles if t.attack.value > 0]
+    ready = [t.attack.value for t in state.tiles if t.attack.value > 0 and (t.in_queue or t.ready)]
+    return min(ready or tiles or [1])
+
+
+def _effective_hp(state, enemy):
+    return enemy.hp + (_cheapest_hit(state) if enemy.shield else 0)
+
+
+def _volley_value(outcome, cheapest_hit):
+    broken = outcome.shields_broken * cheapest_hit * WEIGHTS["enemy_damage"]
+    return outcome.enemy_damage * WEIGHTS["enemy_damage"] + outcome.kills * WEIGHTS["kill"] + broken
 
 
 def _stack_value(state):
@@ -129,6 +143,7 @@ def _stack_value(state):
     if not attacks_available:
         return 0.0
     fractions = WEIGHTS["stack_fractions"]
+    cheapest_hit = _cheapest_hit(state)
     best = 0.0
     orders = list(itertools.permutations(attacks_available, min(len(attacks_available), QUEUE_CAP)))
     for direction in (0, -1, 1):
@@ -142,12 +157,12 @@ def _stack_value(state):
                     continue
                 for attacks in orders:
                     _, outcome = _preview_fire(state, attacks, cell, flip)
-                    best = max(best, _volley_value(outcome) * fractions[actions])
+                    best = max(best, _volley_value(outcome, cheapest_hit) * fractions[actions])
     # Staying put is covered above only for an occupied-free start, which the hero's own cell isn't.
     for flip in (False, True):
         for attacks in orders:
             _, outcome = _preview_fire(state, attacks, None, flip)
-            best = max(best, _volley_value(outcome) * fractions[int(flip)])
+            best = max(best, _volley_value(outcome, cheapest_hit) * fractions[int(flip)])
     return best
 
 
@@ -238,7 +253,7 @@ def ideal_target(state):
     enemies = [e for e in state.enemies if e.alive]
     if not enemies:
         return None
-    return min(enemies, key=lambda e: (e.hp, abs(e.cell - state.hero.cell)))
+    return min(enemies, key=lambda e: (_effective_hp(state, e), abs(e.cell - state.hero.cell)))
 
 
 def _threat_presented(state, target):
@@ -247,7 +262,7 @@ def _threat_presented(state, target):
     for tile in state.tiles:
         if tile.in_queue or tile.cooldown - tile.charge <= 1:
             damage += tile.attack.value
-    return min(1.0, damage / max(1, target.hp))
+    return min(1.0, damage / max(1, _effective_hp(state, target)))
 
 
 def _position_terms(state):
@@ -279,7 +294,7 @@ def _position_terms(state):
 
 
 def _pressure_terms(state):
-    hp_left = sum(e.hp for e in state.enemies if e.alive)
+    hp_left = sum(_effective_hp(state, e) for e in state.enemies if e.alive)
     terms = {"enemy_hp_left": WEIGHTS["enemy_hp_left"] * hp_left}
     if state.turns_until_wave is not None and not state.last_wave:
         closeness = 1.0 - max(0, min(state.turns_until_wave, ONE_ENEMY_WAVE_CAP)) / ONE_ENEMY_WAVE_CAP
@@ -294,7 +309,8 @@ def leaf_terms(state: State) -> dict[str, float]:
         "curse": _curse_value(state),
         "shield": WEIGHTS["shield"] if state.hero.shield else 0.0,
         "ready_tiles": WEIGHTS["ready_tile"] * sum(t.ready for t in state.tiles),
-        "loaded": WEIGHTS["loaded_damage"] * sum(a.value for a in fireable_attacks(state)),
+        # An attack can only fire what the queue holds, so anything beyond that adds nothing.
+        "loaded": WEIGHTS["loaded_damage"] * sum(sorted((a.value for a in fireable_attacks(state)), reverse=True)[:QUEUE_CAP]),
         "swap_ready": WEIGHTS["swap_ready"] if state.swap_charge >= state.swap_cooldown else 0.0,
     }
     terms.update(_position_terms(state))
@@ -302,8 +318,9 @@ def leaf_terms(state: State) -> dict[str, float]:
     return terms
 
 
-def outcome_terms(outcome: Outcome, hero_dead: bool) -> dict[str, float]:
+def outcome_terms(outcome: Outcome, hero_dead: bool, cheapest_hit: int = 1) -> dict[str, float]:
     return {
+        "shields_broken": WEIGHTS["enemy_damage"] * cheapest_hit * outcome.shields_broken,
         "hp_lost": WEIGHTS["hp_lost"] * outcome.hp_lost,
         "death": WEIGHTS["death"] if hero_dead else 0.0,
         "enemy_damage": WEIGHTS["enemy_damage"] * outcome.enemy_damage,
@@ -324,7 +341,7 @@ def _evaluate_action(state, action, depth, scale):
     next_state, outcome = step(state, action)
     dead = not next_state.hero.alive
     terms = {}
-    _merge(terms, outcome_terms(outcome, dead), scale)
+    _merge(terms, outcome_terms(outcome, dead, _cheapest_hit(state)), scale)
     future_scale = scale * WEIGHTS["future_discount"]
     actions, labels = [action], [action.label(state)]
     position = 0.0

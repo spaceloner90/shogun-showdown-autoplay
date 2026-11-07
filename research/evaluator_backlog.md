@@ -8,7 +8,8 @@ Enemy AI code is for offline simulation and tuning only.
 - Kills are valued over wounds, and one volley doing the work of several is worth more.
 - A stack counts for what it could do after a few moves or a flip, so Arrow is no longer fired eagerly.
 - Closing in matters less with nothing to threaten enemies with.
-- Sending a tile back to hand has a cost.
+- Sending a tile back to hand has a cost. Removed in v1.8: attacking empties the queue anyway, so it only made
+  firing a tile look better than keeping it, even when firing it changed nothing.
 - "Can I respond?" is graded: an answer counts for the damage it removes, even when it can't remove it all.
 - Threats are played out, so first-target attacks can be blocked and a dash brings its next attack into range.
 - Charge, BackCharge, Dash, ShadowDash and BackShadowDash move their user. First-target attacks stop.

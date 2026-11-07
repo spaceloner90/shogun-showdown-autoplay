@@ -281,6 +281,11 @@ class RoninWithLightning(unittest.TestCase):
         after, _ = step(position(4, 8, "run7"), best.actions[0])
         self.assertEqual(([(e.cell, e.hp) for e in after.enemies], best.terms.get("kills", 0)), ([(0, 3)], 120))
 
+    def test_doesnt_fire_the_hook_when_lightning_alone_kills(self):
+        # Fight 5, turn 4: v1.7 fired the hook and Lightning at a 2 HP Archer, putting the hook on cooldown for
+        # nothing, since sending a tile back cost more than firing it.
+        self.assertEqual(choice(5, 4, "run7").labels[0], "Attack Lightning (Spear, GrapplingHook to hand)")
+
     def test_still_puts_baru_in_front_of_the_ashigaru(self):
         # Fight 2, turn 24: Smoke Bomb and the hook moved Baru into the Ashigaru's attack, which killed him.
         best = choice(2, 24, "run7")

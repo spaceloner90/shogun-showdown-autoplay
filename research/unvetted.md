@@ -39,6 +39,23 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.8: sending a tile back costs nothing
+
+Fight 5, turn 4 of `logs/run7` fired the hook and Lightning at a 2 HP Archer that Lightning alone would have killed,
+putting the hook on cooldown for nothing. Sending a tile back to hand cost 4, because it has to be reloaded. But
+attacking always empties the queue, so that cost only ever weighed firing a tile against sending it back, and a fired
+tile has to be reloaded too, after its cooldown. So it always favored firing more. It's gone, and a tile kept ready
+in hand is still worth more than one on cooldown. An extra check for tiles that change nothing was tried as well, and
+made no difference on top.
+
+On the winning run's 926 boards, 11 top choices change: each makes the same kills and damage with fewer tiles, or
+attacks now rather than stepping forward, for 1 more kill and 12 more damage. On the 330 Ronin boards, 2 change, both
+keeping the hook. No kills or HP are lost anywhere, and hunts take as long as before.
+
+| Item | Kind | What replays show | What to look for |
+|---|---|---|---|
+| **No cost for sending a tile back** | **Scoring** | **Fewer tiles fired for the same result** | **Tiles kept ready for the next turn, and no queue loaded then sent back over and over** |
+
 ## New in v1.7: every repositioning move is worth something kept
 
 The player's read: every ability that repositions the hero or others should have some escape value, by how flexible it

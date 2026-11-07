@@ -140,7 +140,9 @@ class Outcome:
     kills: int = 0
     friendly_damage: int = 0
     wasted_attacks: int = 0
-    sent_back: int = 0  # Queued tiles returned to hand instead of firing. Each costs a turn to reload.
+    # Queued tiles returned to hand instead of firing. Not scored: a fired tile has to be reloaded too, after its
+    # cooldown, so charging only these made F1 fire tiles that changed nothing rather than keep them ready.
+    sent_back: int = 0
     shields_broken: int = 0  # Enemy shields removed by the hero.
     tank_damage: int = 0  # Damage by the hero to a tank while its boss is alive, kept out of enemy_damage.
     exact_hits: int = 0  # Hits by the hero that dealt exactly the target's remaining HP.

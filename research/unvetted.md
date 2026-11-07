@@ -39,6 +39,19 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.19: the Swapper is a tank
+
+The player's call: the Swapper has 30 HP the game doesn't show against Ieyasu's 40, dies with him, and its swaps are
+now simulated, so F1 should focus Ieyasu. Damage to it counts 2.5 a point and its death nothing while he lives, as
+with the Shogun's last statues. Moves that act on it, like a Smoke Bomb trading places with it, are still simulated
+and valued for what they do. On fight 5 of `logs/run7_part2`, 14 top choices change: shoves into the Swapper for 2
+become attacks on Ieyasu for 5 (turns 9 and 18), and the Smoke Bomb still gets the hero past it on turn 16. No HP
+lost; the one kill given up is the Swapper's.
+
+| Item | Kind | What replays show | What to look for |
+|---|---|---|---|
+| The Swapper as a tank | Scoring | More damage on Ieyasu, the Swapper left alone | Ieyasu going down faster, and the Swapper not getting in the way |
+
 ## New in v1.18: Ieyasu's Blade of Patience and the Swapper's Boss-Swap
 
 The Ieyasu fight (fight 5 of `logs/run7_part2`) cost 11 HP, 10 of it from two 5-damage Blades. Each traced to

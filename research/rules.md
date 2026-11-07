@@ -216,7 +216,8 @@ Ieyasu, read from the code (simulated as of v1.18):
   starting the turn after it lands: 0 when it shows, up to 9 by turn 45 of fight 5 in `logs/run7_part2`. The log
   shows its current damage. Ieyasu fires it after a Dash, so he runs up to the hero and strikes.
 - **Boss-Swap**, his Swapper's, trades places with the boss wherever each is, and neither turns. It keeps putting
-  Ieyasu in front of the Swapper or behind it. The Swapper has 30 HP, which the game doesn't show.
+  Ieyasu in front of the Swapper or behind it. The Swapper has 30 HP, which the game doesn't show. As of v1.19
+  it's a tank, like the Shogun's last statues: it dies with Ieyasu, so F1 focuses him.
 
 Traps and Combo Curse, read from the code (v1.16):
 

@@ -5,7 +5,7 @@ Run with: python solver/test_rules.py
 import unittest
 
 from evaluator import _has_way_out, _threat_damage, ideal_target, leaf_terms, preferred_distance, rank_actions, unanswerable_damage
-from rules import Action, Agent, Attack, State, Tile, legal_actions, state_from_log, step, unmodeled_content
+from rules import Action, Agent, Attack, State, Tile, is_tank, legal_actions, state_from_log, step, unmodeled_content
 
 SWIRL = Attack("Swirl", 2, [-1, 1])
 ARROW = Attack("Arrow", 2, list(range(1, 11)), first_target=True)
@@ -1874,6 +1874,13 @@ class IeyasuTest(unittest.TestCase):
         # On turn 16 of the Ieyasu fight, this is what F1 missed: behind the Swapper, his Dash was blocked.
         after, _ = step(self.board(), Action("Wait"))
         self.assertEqual(_threat_damage(after, after.hero.cell), 5)
+
+    def test_the_swapper_is_a_tank_while_ieyasu_lives(self):
+        state = self.board()
+        swapper = state.enemies[0]
+        self.assertTrue(is_tank(state, swapper))
+        state.enemies[1].hp = 0
+        self.assertFalse(is_tank(state, swapper))
 
     def test_it_raises_no_warning(self):
         row = {"tiles": [], "hero": {"queue": []}, "skills": [],

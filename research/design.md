@@ -116,6 +116,13 @@ turn of reloading, but a fired tile has to be reloaded too, after its cooldown. 
 anyway, that cost only ever said "fire more", and F1 put the hook on cooldown for nothing. It's gone. So is the
 cost of an attack that hits nothing, which only repeated what its cooldown already costs.
 
+### Tanks are decided one by one
+
+An enemy that dies with its boss and isn't worth fighting while the boss lives is a tank: damage to it counts a
+quarter as much, and its death nothing. That's decided with the player for each enemy, not by a rule like hidden HP:
+so far the Shogun's last two statues and Ieyasu's Swapper. Moves that act on a tank, like trading places with it,
+are still valued for what they do.
+
 ### Kills, and the clock
 
 A kill is worth more than the same damage as a wound, and one volley doing the work of several saves turns. The

@@ -51,9 +51,10 @@ UNDERSTOOD_TRAITS = {"Aggro", "Dash", "Explosive", "Heavy", "Quick", "Unfreezabl
 # FumikoBoss.Move in the code. The Strider's Dash trait is shown for it.
 LEAPERS = {"Strider", "FumikoBoss"}
 
-# Not worth fighting while a boss is alive: it dies with the boss anyway. A one-off for the Shogun's
-# statues. Other bosses' summons are real threats, and the game doesn't even show a statue's HP.
-TANKS = {"ShogunSummoner"}
+# Not worth fighting while a boss is alive: it dies with the boss anyway. Decided one by one with the player:
+# the Shogun's last statues, and Ieyasu's Swapper, which has 30 HP the game doesn't show against his 40, and
+# whose swaps are simulated rather than removed. Other bosses' summons are real threats.
+TANKS = {"ShogunSummoner", "Swapper"}
 
 # Attacks that move the attacker. Each value is the direction relative to the attacker's facing.
 CHARGES = {"Charge": 1, "BackCharge": -1}  # Run to the last free cell, and hit whatever is next.

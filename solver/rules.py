@@ -31,6 +31,7 @@ UNDERSTOOD_SKILLS = {"BigPockets", "ComboCoin", "ComboCurse", "DamagingMove", "D
                      "QuickRecovery", "Sniper", "TripleComboHeal", "TwoWayMove", "UnfriendlyFire"}
 
 POISON_TURNS = 3  # Applying poison sets this many turns left, and each turn's end deals 1, starting that turn.
+ICE_TURNS = 4  # GameParams.iceEffectTurnsDuration: freezing sets this many turns of ice, counting down each turn's end.
 BOMB_FUSE = 2     # Turns a placed bomb waits after the one it's placed on, before it goes off on the next.
 BARRICADE_HP = 5
 MAX_SHOVE_CREDIT = 3  # A shove counts for at most this many cells: further than that gains little.
@@ -113,6 +114,7 @@ class Agent:
     movable: bool = True  # Heavy enemies can't be swapped or pulled.
     poison: int = 0  # Turns of poison left. Each deals 1 at the end of the turn, and a shield blocks it.
     ice: int = 0  # Turns of being frozen left. A frozen enemy doesn't act.
+    freezable: bool = True  # Unfreezable enemies can't be frozen.
 
     @property
     def alive(self):
@@ -236,6 +238,7 @@ def state_from_log(row):
             movable="Heavy" not in (data.get("traits") or []) and data.get("elite") != "Heavy",
             poison=data.get("poison") or 0,
             ice=data.get("ice") or 0,
+            freezable="Unfreezable" not in (data.get("traits") or []),
         )
 
     tiles = [
@@ -310,8 +313,8 @@ def unmodeled_content(row):
     def check_attack(data):
         if data["name"] not in MODELED and data["name"] != UNKNOWN_TILE:
             note(f"attack {data['name']}")
-        if data["name"] != "Summon" and data.get("effect") not in (None, "None", "Curse", "PerfectStrike", "Poison",
-                                                                   "Shockwave"):
+        if data["name"] != "Summon" and data.get("effect") not in (None, "None", "Curse", "Ice", "PerfectStrike",
+                                                                   "Poison", "Shockwave"):
             note(f"{data['name']} effect {data['effect']}")
         if data.get("tileEffect") not in (None, "None", "FreePlay"):
             note(f"{data['name']} tile effect {data['tileEffect']}")
@@ -334,7 +337,6 @@ def unmodeled_content(row):
     for enemy in row["enemies"]:
         for data in enemy["queue"]:
             check_attack(data)
-        check_status(enemy["kind"], enemy)
         if enemy.get("elite") not in (None, "None"):
             note(f"elite {enemy['kind']}")
         for trait in enemy.get("traits") or []:
@@ -749,6 +751,12 @@ def hit_effect(state, attacker, target, effect, outcome):
     # Sets the turns left rather than adding to them, so poisoning again only refreshes it.
     if target.alive and effect == "Poison":
         target.poison = POISON_TURNS
+    # Freezing sets the turns of ice rather than adding to them, and cancels what the enemy telegraphed for this turn:
+    # Enemy.ApplyIceStatusCoroutine. Its queue stays. While it has ice it chooses to do nothing, so it loses this turn
+    # and the next three. A frozen hero isn't simulated.
+    if target.alive and effect == "Ice" and target is not state.hero and target.freezable:
+        target.ice = ICE_TURNS
+        target.action = "Wait"
     # Each target sets off its own, even one that just died, and a shield on the target doesn't stop it.
     if effect == "Shockwave":
         shockwave(state, attacker, target, outcome)

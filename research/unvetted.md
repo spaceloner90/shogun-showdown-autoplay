@@ -39,6 +39,16 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.21: freezing
+
+Read from the game's code, for an Ice tile if one joins the deck. No logged fight had one, so no top choice changes.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| An Ice hit freezes for 4 turns and cancels this turn's action | Rule | Nothing | A frozen enemy's telegraphed attack not landing, and it acting again 4 turns later |
+| **Each turn of ice left is worth 5 per point of the enemy's strongest known attack** | **Scoring** | **A first guess, like poison's 8 a turn** | **Ice saved for the hardest hitters, and not wasted on enemies about to die** |
+| A loaded Ice tile is a 0.5 tiebreak | Scoring | As for Shockwave and Curse | Only if an Ice tile joins the deck |
+
 ## New in v1.20: Dynamic Boost, and loaded Curse tiles
 
 Dynamic Boost is read from the game's code, and confirmed by `logs/run7_part3`: the six hits there that did 1 or 2

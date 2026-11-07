@@ -4,7 +4,7 @@ Run with: python solver/test_rules.py
 """
 import unittest
 
-from evaluator import _has_way_out, _threat_damage, ideal_target, leaf_terms, preferred_distance, rank_actions, unanswerable_damage
+from evaluator import WEIGHTS, _has_way_out, _threat_damage, ideal_target, leaf_terms, preferred_distance, rank_actions, unanswerable_damage
 from rules import Action, Agent, Attack, State, Tile, is_tank, legal_actions, state_from_log, step, unmodeled_content
 
 SWIRL = Attack("Swirl", 2, [-1, 1])
@@ -2022,6 +2022,57 @@ class WardenTest(unittest.TestCase):
         best = rank_actions(make_state(hero_cell=2, enemies=[self.warden(3)], queue=["Swirl"]), depth=1)[0]
         self.assertNotEqual(best.actions[0].kind, "Attack")
         self.assertEqual(best.terms.get("hp_lost", 0), 0)
+
+
+class IceTest(unittest.TestCase):
+    """Freezing, from Attack.ProcessAttackEffects and Enemy.ApplyIceStatusCoroutine in the game's code."""
+    ICE_KATANA = Attack("Katana", 1, [1], first_target=True, effect="Ice")
+
+    def attacker(self, hp=9):
+        return enemy(3, hp=hp, action="Attack", queue=[KATANA])
+
+    def test_it_freezes_for_4_and_cancels_this_turns_attack(self):
+        state = make_state(hero_cell=2, enemies=[self.attacker()])
+        after, outcome = fire(state, self.ICE_KATANA)
+        # 4 turns of ice, less this turn's end. The Katana stays loaded for when it thaws.
+        self.assertEqual((outcome.hp_lost, after.enemies[0].ice, [a.name for a in after.enemies[0].queue]),
+                         (0, 3, ["Katana"]))
+
+    def test_an_unfreezable_enemy_still_attacks(self):
+        target = self.attacker()
+        target.freezable = False
+        _, outcome = fire(make_state(hero_cell=2, enemies=[target]), self.ICE_KATANA)
+        self.assertEqual(outcome.hp_lost, 2)
+
+    def test_the_unfreezable_trait_is_read_from_the_log(self):
+        row = {"cells": 5, "tiles": [], "skills": [],
+               "enemies": [{"kind": "X", "cell": 3, "facing": "Left", "hp": 3, "maxHp": 3, "shield": False,
+                            "queue": [], "action": "Wait", "traits": ["Unfreezable"]}],
+               "hero": {"kind": "H", "cell": 0, "facing": "Right", "hp": 9, "maxHp": 9, "shield": False, "queue": [],
+                        "action": "Wait", "special": {"charge": 3, "cooldown": 3}}}
+        self.assertFalse(state_from_log(row).enemies[0].freezable)
+
+    def test_turns_frozen_are_worth_more_against_a_harder_hitter(self):
+        state = make_state(hero_cell=0, enemies=[enemy(4, hp=9, queue=[KATANA])])
+        state.enemies[0].ice = 3
+        weak = leaf_terms(state)["ice"]
+        state.enemies[0].queue = [Attack("Tetsubo", 4, [1], first_target=True)]
+        self.assertEqual((weak, leaf_terms(state)["ice"]), (30, 60))
+
+    def test_an_enemy_with_nothing_known_loaded_counts_as_2(self):
+        state = make_state(hero_cell=0, enemies=[enemy(4, hp=9)])
+        state.enemies[0].ice = 2
+        self.assertEqual(leaf_terms(state)["ice"], 20)
+
+    def test_loading_an_ice_tile_counts_the_freeze_it_would_land(self):
+        state = make_state(hero_cell=2, enemies=[enemy(3, hp=9, queue=[KATANA])])
+        state.tiles = [Tile(self.ICE_KATANA, cooldown=3, charge=3)]
+        load = next(c for c in rank_actions(state, depth=1) if c.actions[0].kind == "PlayTile")
+        plain = make_state(hero_cell=2, enemies=[enemy(3, hp=9, queue=[KATANA])])
+        plain.tiles = [Tile(KATANA, cooldown=3, charge=3)]
+        plain_load = next(c for c in rank_actions(plain, depth=1) if c.actions[0].kind == "PlayTile")
+        self.assertGreater(load.terms["stack"], plain_load.terms["stack"])
+        self.assertEqual(load.terms["effects"], 0.5 * WEIGHTS["future_discount"])
 
 
 class DynamicBoostTest(unittest.TestCase):

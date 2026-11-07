@@ -50,11 +50,11 @@ import copy
 import itertools
 from dataclasses import dataclass, field
 
-from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_TILE, Action, Attack, Outcome, State,
+from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, Attack, Outcome, State,
                    apply_attack, can_use_special, enemy_cells, fireable_attacks, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v1.20"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.21"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -63,6 +63,8 @@ WEIGHTS = {
     "enemy_damage": 10.0,     # Per enemy HP removed by the hero.
     "tank_damage": 2.5,       # Per HP removed from a tank that will die with its boss anyway.
     "poison_turn": 8.0,       # Per turn of poison left on an enemy, like damage another enemy deals.
+    "ice_turn": 5.0,          # Per turn of ice left on an enemy, per point of its strongest known attack (2 if none
+                              # is known). Freezing a 2-damage enemy is worth about 3 damage now. A first guess.
     "trap_planted": 0.4,      # A trap on the ground, as a share of what its damage is worth. Only enemies set
                               # one off, so it's all upside: the player's read is a third to half.
     "shove_cell": 4.0,        # Per cell an enemy is shoved. Space to load in, but melee wants them close too.
@@ -97,7 +99,7 @@ WEIGHTS = {
     # Tiebreaks: each prefers the version of a tile with the effect over an identical plain one, but never over a
     # tile doing a point more damage. A Shockwave's chains need enemies bunched up. A curse's worth depends on who it
     # lands on, which the stack doesn't score.
-    "loaded_effects": {"Shockwave": 0.5, "Curse": 0.5},
+    "loaded_effects": {"Shockwave": 0.5, "Curse": 0.5, "Ice": 0.5},
     "escape_in_hand": 2 / 3,  # A tile in hand rather than loaded. Loading adds only a little, so it doesn't beat
                               # a high damage tile to the queue, since any attack would spend it.
     "escape_no_target": 1 / 3,  # One that acts on a target, with nobody it can act on.
@@ -194,13 +196,14 @@ def _stack_value(state):
     cheapest_hit = _cheapest_hit(state)
     poison_now = _poison_value(state)
     traps_now = _trap_value(state)
+    ice_now = _ice_value(state)
 
     def volley(attacks, cell, flip):
         trial, outcome = _preview_fire(state, attacks, cell, flip)
         # Measured after the whole volley, so poison on an enemy that then dies is worth nothing. Traps it plants
         # count the same way.
         return (_volley_value(outcome, cheapest_hit) + _poison_value(trial) - poison_now
-                + _trap_value(trial) - traps_now)
+                + _trap_value(trial) - traps_now + _ice_value(trial) - ice_now)
 
     best = 0.0
     orders = list(itertools.permutations(attacks_available, min(len(attacks_available), QUEUE_CAP)))
@@ -478,6 +481,18 @@ def _trap_value(state):
     return WEIGHTS["trap_planted"] * WEIGHTS["enemy_damage"] * sum(t["damage"] for t in state.traps)
 
 
+def _ice_value(state):
+    """Turns an enemy will spend frozen, doing nothing: worth more the harder it hits, and nothing on one that dies.
+    The turn it's frozen on is already played out by the simulation, so this only covers the rest."""
+    total = 0.0
+    for enemy in state.enemies:
+        if not enemy.alive or enemy.ice <= 0 or is_tank(state, enemy):
+            continue
+        known = [a.value for a in enemy.queue if a.name not in (UNKNOWN_TILE, UNKNOWN_COPY) and a.value]
+        total += WEIGHTS["ice_turn"] * enemy.ice * max(known, default=ASSUMED_UNKNOWN.value)
+    return total
+
+
 def _poison_value(state):
     """Poison still to come: good on an enemy, as far as its HP goes, and bad on the hero."""
     value = sum(min(e.poison, e.hp) * WEIGHTS["poison_turn"] for e in state.enemies
@@ -493,6 +508,7 @@ def leaf_terms(state: State) -> dict[str, float]:
     terms = {
         "poison": _poison_value(state),
         "traps": _trap_value(state),
+        "ice": _ice_value(state),
         "escape": _escape_value(state, loaded_can_kill),
         "setup": _setup_value(state, loaded_can_kill),
         "effects": sum(WEIGHTS["loaded_effects"].get(t.attack.effect, 0.0) for t in state.queue_tiles),

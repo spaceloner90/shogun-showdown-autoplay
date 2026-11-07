@@ -7,6 +7,12 @@ ones are unvetted until real play confirms them, as [`research/unvetted.md`](res
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v1.21 — freezing (2026-11-07)
+- **Rule:** an Ice hit sets 4 turns of ice on an enemy that can be frozen, and cancels what it telegraphed this turn.
+  While it has ice it does nothing, so it loses that turn and the next three. Its queue stays.
+- **Scoring:** each turn of ice left is worth 5 per point of the enemy's strongest known attack, 2 if none is known,
+  like poison's turns. The stack counts ice a volley would land, and a loaded Ice tile gets the 0.5 tiebreak.
+
 ## v1.20 — Dynamic Boost, and loaded Curse tiles (2026-11-07)
 - **Rule:** Dynamic Boost adds its level to the hero's hits after an attack that moved or turned it this turn, not
   to that attack's own hit. A Flip, a step or the shove doesn't count.

@@ -210,6 +210,13 @@ Shockwave, read from the code (simulated as of v1.3):
 - The damage is stored in the game's assets. `logs/run7` shows 1, chaining through two touching enemies on turn
   41, and going off even when the tile killed its target.
 
+Freezing, read from the code (simulated as of v1.21):
+
+- **Ice** from a tile sets 4 turns of ice (`GameParams.iceEffectTurnsDuration`), resetting rather than adding, on an
+  enemy that isn't Unfreezable. It cancels the action the enemy telegraphed for this turn, and its queue stays. An
+  enemy with any ice chooses to do nothing, and ice counts down at each turn's end, so it loses this turn and the
+  next three. A frozen hero can't act either, but that isn't simulated.
+
 Dynamic Boost and stacked traps (v1.20):
 
 - **Dynamic Boost** adds its level to the hero's own hits after an attack that moved or turned it this turn: Charge,

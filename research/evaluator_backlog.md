@@ -132,8 +132,8 @@ with, and being surrounded should cost more. v1.4 does a first version of both, 
 - **What a move is worth beyond its damage.** The convention for F1: intrinsic values per move or effect (escape,
   setup, a Shockwave tile's loading), not scoring the board a volley leaves, which is lookahead and belongs to F2.
   Position terms still hold at a deeper horizon: they're only added at the end of a line, and the turns before it
-  are played out, so they only estimate what's beyond it. The one to revisit if F2 comes back is the Shockwave
-  loading bonus, which is added per action and would also count in a line that fires the tile within the horizon.
+  are played out, so they only estimate what's beyond it. Values on moves and tiles stay position terms for that
+  reason, rather than being added for the action.
 - **Escape values are guesses.** As of v1.7 every repositioning move is worth something kept, from how flexible it
   is, and they're first guesses to tune in play. Only Swap and the Smoke Bomb count as a way out when flanked.
 - **The shove for collision damage.** Fight 2, turn 7 spent it for 2 damage, and it was down for 4 turns.

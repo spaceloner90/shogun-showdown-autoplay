@@ -2100,14 +2100,22 @@ class KeepingOtherMovesTest(unittest.TestCase):
         in_hand.tiles.append(spear)
         self.assertAlmostEqual(leaf_terms(in_hand)["setup"], 4 * 2 / 3)
 
-    def test_loading_a_shockwave_tile_is_worth_a_little_more(self):
-        wave = Attack("Spear", 4, [1, 2], effect="Shockwave")
-        state = self.with_tile(wave, [enemy(5, hp=9)], loaded=False)
-        state.tiles.append(Tile(Attack("Spear", 4, [1, 2]), cooldown=3, charge=3))
-        by_effect = {state.tiles[c.actions[0].tile].attack.effect: c
-                     for c in rank_actions(state, depth=1) if c.actions[0].kind == "PlayTile"}
-        self.assertEqual(by_effect["Shockwave"].terms["effects"], 3)
-        self.assertNotIn("effects", by_effect["None"].terms)
+    def load_choice(self, wave_damage, plain_damage):
+        # The plain tile comes first, so a tie would go to it.
+        state = self.with_tile(Attack("Katana", plain_damage, [1, 2]), [enemy(5, hp=9)], loaded=False)
+        state.tiles.append(Tile(Attack("Katana", wave_damage, [1, 2], effect="Shockwave"), cooldown=3, charge=3))
+        best = next(c for c in rank_actions(state, depth=1) if c.actions[0].kind == "PlayTile")
+        return state.tiles[best.actions[0].tile].attack
+
+    def test_the_shockwave_version_of_an_identical_tile_is_loaded_first(self):
+        self.assertEqual(self.load_choice(2, 2).effect, "Shockwave")
+
+    def test_but_not_over_a_point_more_damage(self):
+        self.assertEqual(self.load_choice(2, 3).value, 3)
+
+    def test_it_counts_while_loaded(self):
+        state = self.with_tile(Attack("Spear", 4, [1, 2], effect="Shockwave"), [enemy(5, hp=9)])
+        self.assertEqual(leaf_terms(state)["effects"], 0.5)
 
     def test_a_shadow_dash(self):
         self.assertEqual(leaf_terms(self.with_tile(self.SHADOW_DASH, [enemy(3, hp=9)]))["escape"], 9)

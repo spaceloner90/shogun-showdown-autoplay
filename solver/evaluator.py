@@ -54,7 +54,7 @@ from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, 
                    apply_attack, can_use_special, fireable_attacks, is_tank, legal_actions, perform_special, step,
                    strike_cell, targets_of)
 
-VERSION = "v1.12"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.13"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -92,9 +92,9 @@ WEIGHTS = {
     # in the kit, which can exploit it. On top of its escape value, and with the same modifiers.
     "setup_values": {"GrapplingHook": 1.0},
     "short_reach": 2,         # A tile reaching no farther than this needs enemies brought in.
-    "shockwave_loaded": 3.0,  # For loading a Shockwave tile, for chains it will likely set off once enemies bunch
-                              # up, on top of any the stack already sees from here. Given to the loading itself:
-                              # kept on the tile instead, it made firing it for a kill look like a loss. A guess.
+    "shockwave_loaded": 0.5,  # Per loaded Shockwave tile, for chains it may find once enemies bunch up, beyond any
+                              # the stack sees from here. A tiebreak: it prefers the Shockwave version of a tile
+                              # over an identical plain one, but never over a tile doing a point more damage.
     "escape_in_hand": 2 / 3,  # A tile in hand rather than loaded. Loading adds only a little, so it doesn't beat
                               # a high damage tile to the queue, since any attack would spend it.
     "escape_no_target": 1 / 3,  # One that acts on a target, with nobody it can act on.
@@ -480,6 +480,7 @@ def leaf_terms(state: State) -> dict[str, float]:
         "poison": _poison_value(state),
         "escape": _escape_value(state, loaded_can_kill),
         "setup": _setup_value(state, loaded_can_kill),
+        "effects": WEIGHTS["shockwave_loaded"] * sum(t.attack.effect == "Shockwave" for t in state.queue_tiles),
         "stack": _stack_value(state),
         "curse": _curse_value(state),
         "shield": WEIGHTS["shield"] if state.hero.shield else 0.0,
@@ -518,8 +519,6 @@ def _evaluate_action(state, action, depth, scale):
     dead = not next_state.hero.alive
     terms = {}
     _merge(terms, outcome_terms(outcome, dead, _cheapest_hit(state)), scale)
-    if action.kind == "PlayTile" and state.tiles[action.tile].attack.effect == "Shockwave":
-        _merge(terms, {"effects": WEIGHTS["shockwave_loaded"]}, scale)
     future_scale = scale * WEIGHTS["future_discount"]
     actions, labels = [action], [action.label(state)]
     position = 0.0

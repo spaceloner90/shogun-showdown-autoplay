@@ -70,7 +70,9 @@ intrinsic value, guessed from how flexible it is across situations and scaled by
   in, which almost never helps, so it's worth the least.
 - **Setup:** a move that brings an enemy in is worth more when the kit has a short-reach tile to exploit it, in
   proportion to that tile's damage.
-- **Loading a Shockwave tile:** worth a little more, for chains it will likely find once enemies bunch up.
+- **A loaded Shockwave tile:** worth a little more, for chains it may find once enemies bunch up. It's only a
+  tiebreak: it prefers the Shockwave version of a tile over an identical plain one, never over a tile doing a
+  point more damage.
 
 They all share the same modifiers. A tile in hand is worth 2/3 of one loaded, so loading it adds only a little. A
 move that acts on a target is worth 1/3 with nobody it can act on. A loaded tile that would go off with a kill
@@ -79,15 +81,15 @@ earns nothing, since it's about to be spent. Several escapes count as the best o
 What F1 doesn't do is score the position a loaded volley would leave behind. That's lookahead, which is F2's job.
 These intrinsic values still hold if F2 returns: see Known limits.
 
-### Put a value where the decision is
+### Size a value for the decision it's for
 
-A value has to sit where the choice it's meant to affect gets made. A bonus for having a loaded Shockwave tile
-went away when it fired, so firing it for a kill looked like a loss, and kills were given up. Given to the act of
-loading instead, it raises the tile against other tiles to load and costs nothing when fired.
+Every value on a tile is also given up when the tile is spent, so it has to be sized for the choice it's meant to
+settle. The Shockwave value is only meant to pick the Shockwave version of a tile over an identical one, so it's
+0.5, against 6 to 8 for a point of loaded damage. At 3 it held tiles back from kills.
 
-The same goes for the reverse: keeping something should only cost when spending it really loses something. A
-loaded Smoke Bomb is more available than one in hand, but any attack spends it, so it isn't really held in reserve.
-Valued much higher loaded, it beat a 4-damage Spear to the queue.
+Keeping something should only be worth more when it really is more available. A loaded Smoke Bomb can dodge this
+turn and one in hand can't, but any attack spends it, so it isn't really held in reserve. Valued much higher
+loaded, it beat a 4-damage Spear to the queue, so loading it now adds only a little.
 
 ### No lopsided costs
 
@@ -150,8 +152,8 @@ log gets saved into `logs/` first.
   and lookahead.
 - **Consumables** aren't used by F1. Scenarios for them are saved in the backlog.
 - **Which enemy to kill first** is simply lowest HP, then closest.
-- **If F2 returns,** the position terms carry over as they are. They're only added at the end of a line, and every
-  turn before that is played out by the simulation, so they only ever estimate what's beyond the horizon. Poison
-  that ticks within an F4 line counts as damage dealt, and only what's left at the end is estimated. What would
-  need another look is a term added per action rather than at the end: the bonus for loading a Shockwave tile
-  would also count in a line that fires it within the horizon, where the chain itself already shows.
+- **If F2 returns,** the position terms carry over as they are. A line adds up what each of its turns did, and
+  only adds position terms at its end, so those only ever estimate what's beyond the horizon. Poison that ticks
+  within an F4 line counts as damage dealt, and only what's left at the end is estimated. A value added for an
+  action rather than read from the final position would count even when the line already plays out what it stands
+  for, so values on moves and tiles stay on the position.

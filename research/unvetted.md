@@ -55,7 +55,7 @@ took at most 0.08 s. None of this has been played.
 
 | Item | Kind | What's already confirmed | What to look for |
 |---|---|---|---|
-| The mod using a potion | Mod | Nothing: built, not run | A `potion_use` event, the potion gone, and the next press playing the turn |
+| The mod using a potion | Mod | Confirmed in `logs/run8`: the Shield on turn 10 of the Rei fight, used on its own press, saving 1 of 2 damage as predicted | Each other potion's first use |
 | Each potion's simulated effect | Rule | From the code; no potion has been used by F1 | The board after a potion matching the simulation |
 | **The player's rules for when to use each** | **Scoring** | **Replays above** | **Potions used where the player would, not hoarded or wasted** |
 | Pressure at a best score below -37 | Scoring | The worst 10% of logged boards | Attacking potions and D6 used in hard fights, not easy ones |

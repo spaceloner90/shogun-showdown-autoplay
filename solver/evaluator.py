@@ -9,11 +9,11 @@ so they stay put. The enemy AI is never used here: only what a player can see.
 
 Only depth 1 is in use, so everything a plan needs has to show up in how a position is scored.
 
-Principles, from how the game plays:
+research/design.md has the reasoning behind all of this. Principles, from how the game plays:
 - Every attack is telegraphed and the hero acts first, so being in range isn't dangerous by itself.
   It's dangerous when there's no answer: no kill available and nowhere safe to step.
-- The hero is mostly melee and has priority, so closing in is usually right, and backing away at the
-  last moment is a fine way to dodge. Closing in with nothing to threaten them with isn't.
+- The hero has priority, so backing away at the last moment is a fine way to dodge. Closing in with
+  nothing to threaten them with isn't worth much.
 - Facing the ideal target and not being surrounded matter more than distance.
 - Killing fast matters, because the next wave arrives on a timer and can overload the room.
 - Queue edits are free, so a loaded tile commits to nothing: it can be reordered or taken back when
@@ -29,10 +29,12 @@ Principles, from how the game plays:
   Spending it on a hit that could have been dodged has a cost.
 - An enemy's shield is different: it has to be removed anyway, so it counts as extra HP, equal to the
   hero's weakest tile, since that's the cheapest way to remove it. Breaking one earns that credit.
-- Where to stand depends on the kit. Melee with Swap wants to be adjacent, since it can get out again. A
-  kit without Swap wants the farthest distance its tiles can still hit from, and being flanked or
-  surrounded is much worse with no way out.
-- A Smoke Bomb is a dodge as well as an attack, so firing it for 1 damage gives up more than the tile.
+- Where to stand depends on the kit, the same rule for every hero: the farthest distance its tiles do
+  the most damage from. A melee kit comes out at 1. Being flanked or surrounded is much worse with no
+  way out.
+- A move that repositions the hero or an enemy is worth something kept, by how flexible it is, so
+  firing one for its damage alone gives up more than the tile. These are values on the move itself,
+  not lookahead.
 - When a boss dies, everyone else dies too. Ordinary summons are still real threats worth killing, but
   the Shogun's statues are only there to get in the way, so the boss comes first.
 
@@ -106,7 +108,7 @@ WEIGHTS = {
     "unarmed_distance": 0.25, # The share of that which still applies with nothing to threaten them.
     "surrounded": -20.0,      # Enemies directly on both sides.
     "flanked": -6.0,          # Enemies on both sides, at any distance.
-    "no_way_out": 2.5,        # How much worse those are with no charged Swap and no loaded Smoke Bomb.
+    "no_way_out": 2.5,        # How much worse those are with no charged Swap and no charged Smoke Bomb that reaches.
     "crowding": -3.0,         # Per cell an enemy is closer than the hero's tiles need it to be. -10 stalls fights.
     "max_standoff": 3,        # The furthest a kit prefers to stand off, so it doesn't run to the wall.
     "enemy_hp_left": -4.0,    # Per enemy HP still in the room.

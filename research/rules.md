@@ -210,6 +210,17 @@ Shockwave, read from the code (simulated as of v1.3):
 - The damage is stored in the game's assets. `logs/run7` shows 1, chaining through two touching enemies on turn
   41, and going off even when the tile killed its target.
 
+Traps and Combo Curse, read from the code (v1.16):
+
+- **Trap** puts a trap on the cell ahead, if the cell exists, whoever is standing there. Only an enemy moving onto
+  it sets it off, once, for the tile's damage and effect, with no attacker. So the hero can stand on its own traps.
+  The mod logs traps on the ground as of plugin 0.11.0.
+- **Inferred, not stated in the code:** the trap is thrown to its cell and only armed when it lands, and the game
+  sets it off when an enemy *enters* it. So one placed under an enemy most likely waits for an enemy to move onto
+  it, and an enemy dashing through its cell most likely sets it off. The second isn't simulated.
+- **Combo Curse** curses a random enemy for every kill after the first in a turn, by anyone, except inanimate
+  ones. The kill streak resets at the start of each turn. The target is random, so it isn't simulated.
+
 The Strider, read from the code (simulated as of v1.11):
 
 - **Dash:** its move runs it to the last free cell that way, rather than one cell. Whoever first blocks it moves

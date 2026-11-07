@@ -17,14 +17,16 @@ ONE_ENEMY_WAVE_CAP = 6
 MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Barricade", "Bomb", "Charge",
            "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Lightning", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "SmokeBomb", "Spear", "Summon", "SwapToss",
-           "Swirl", "Tetsubo", "TurnAround", "Volley"}
+           "Swirl", "Tetsubo", "Trap", "TurnAround", "Volley"}
 
 # Skills the solver handles. Most need no modeling because their effects show up in the logged state,
 # like a shield, max HP or a shorter Swap cooldown. Damaging Move, Sniper, Two Way Move and Unfriendly Fire
 # are simulated.
 SNIPER_DISTANCE = 4  # Sniper adds its level to the hero's hits on targets at least this many cells away.
-UNDERSTOOD_SKILLS = {"BigPockets", "DamagingMove", "Fortress", "Healthy", "QuickRecovery", "Sniper", "TwoWayMove",
-                     "UnfriendlyFire"}
+# Combo Curse curses a random enemy on each kill after the first in a turn, by anyone: which one can't be predicted,
+# like where a summon lands, so it isn't simulated.
+UNDERSTOOD_SKILLS = {"BigPockets", "ComboCurse", "DamagingMove", "Fortress", "Healthy", "QuickRecovery", "Sniper",
+                     "TwoWayMove", "UnfriendlyFire"}
 
 POISON_TURNS = 3  # Applying poison sets this many turns left, and each turn's end deals 1, starting that turn.
 BOMB_FUSE = 2     # Turns a placed bomb waits after the one it's placed on, before it goes off on the next.
@@ -130,6 +132,8 @@ class State:
     # this turn. An empty group is a turn of waiting. Corruption heals a boss it lands on, and a bomb's
     # blast doesn't, which it marks with "heals_boss": False.
     hazards: list[dict] = field(default_factory=list)
+    # Traps on the ground: {"cell", "damage", "effect"}. Only an enemy moving onto one sets it off.
+    traps: list[dict] = field(default_factory=list)
 
     def occupant(self, cell):
         if self.hero.alive and self.hero.cell == cell:
@@ -275,6 +279,8 @@ def state_from_log(row):
         two_way_swap=any(isinstance(s, dict) and s.get("name") == "TwoWayMove" for s in row.get("skills") or []),
         special=special.get("name", SWAP),
         hazards=[dict(h, groups=[list(g) for g in h["groups"]]) for h in row.get("hazards") or []],
+        traps=[{"cell": t["cell"], "damage": t["damage"], "effect": t.get("effect") or "None"}
+               for t in row.get("traps") or []],
     )
 
 
@@ -671,6 +677,9 @@ def apply_attack(state, attacker, attack, outcome):
     if attack.name == "Bomb":
         place_bomb(state, attacker, attack)
         return
+    if attack.name == "Trap":
+        place_trap(state, attacker, attack, outcome)
+        return
     if attack.name in ("SwapToss", "Mirror", "OriginOfSymmetry"):
         moves = {"SwapToss": swap_toss, "Mirror": mirror, "OriginOfSymmetry": origin_of_symmetry}
         if not moves[attack.name](state, attacker) and attacker is state.hero:
@@ -697,20 +706,54 @@ def apply_attack(state, attacker, attack, outcome):
         if not target.alive:
             continue
         land_hit(state, attacker, target, attack.value, outcome)
-        # After the hit, so a curse never doubles the attack that applied it.
-        if target.alive and attack.effect == "Curse":
-            target.curse = True
-        # Sets the turns left rather than adding to them, so poisoning again only refreshes it.
-        if target.alive and attack.effect == "Poison":
-            target.poison = POISON_TURNS
-        # Each target sets off its own, even one that just died, and a shield on the target doesn't stop it.
-        if attack.effect == "Shockwave":
-            shockwave(state, attacker, target, outcome)
+        hit_effect(state, attacker, target, attack.effect, outcome)
         # A shield blocks the hook's damage, but not its pull.
         if attack.name == "GrapplingHook" and target.alive and target.movable:
             target.cell = attacker.cell + attacker.facing
         if attack.name == "DragonPunch" and target.alive and target.movable:
             push(state, attacker, target, attacker.facing, outcome)
+
+
+def hit_effect(state, attacker, target, effect, outcome):
+    """A tile's effect on whoever it hit, after the hit: Attack.ProcessAttackEffects in the game's code."""
+    # After the hit, so a curse never doubles the attack that applied it.
+    if target.alive and effect == "Curse":
+        target.curse = True
+    # Sets the turns left rather than adding to them, so poisoning again only refreshes it.
+    if target.alive and effect == "Poison":
+        target.poison = POISON_TURNS
+    # Each target sets off its own, even one that just died, and a shield on the target doesn't stop it.
+    if effect == "Shockwave":
+        shockwave(state, attacker, target, outcome)
+
+
+def place_trap(state, attacker, attack, outcome):
+    """Puts a trap on the cell in front of the attacker, if that cell exists, whoever is on it. TrapAttack in the
+    game's code. It's thrown there and only armed once it lands, so an enemy already on the cell doesn't set it off:
+    an enemy has to move onto it. That's inferred from how the game's triggers work, not stated in its code."""
+    cell = attacker.cell + attacker.facing
+    if 0 <= cell < state.cells:
+        state.traps = state.traps + [{"cell": cell, "damage": attack.value, "effect": attack.effect}]
+    elif attacker is state.hero:
+        outcome.wasted_attacks += 1
+
+
+def enemy_cells(state):
+    """Where each enemy is, to tell afterward who moved onto a trap."""
+    return {id(e): e.cell for e in state.enemies if e.alive}
+
+
+def spring_traps(state, outcome, before):
+    """Sets off each trap an enemy has moved onto since `before`, once, for its damage and effect. Trap in the game's
+    code: only enemies set one off, so the hero can stand on its own. The hit has no attacker, but it's the hero's
+    doing, so it counts as the hero's. Moving through a trap's cell without stopping there isn't simulated."""
+    for trap in list(state.traps):
+        enemy = state.occupant(trap["cell"])
+        if enemy is None or enemy is state.hero or before.get(id(enemy)) == trap["cell"]:
+            continue
+        state.traps = [t for t in state.traps if t is not trap]
+        land_hit(state, state.hero, enemy, trap["damage"], outcome, collision=True)
+        hit_effect(state, state.hero, enemy, trap["effect"], outcome)
 
 
 def land_hit(state, attacker, target, value, outcome, collision=False):
@@ -788,7 +831,9 @@ def fire_hero_queue(state, outcome, order=None):
     fired = list(state.queue_tiles) if order is None else [state.tiles[i] for i in order]
     for tile in fired:
         exact_before = outcome.exact_hits
+        before = enemy_cells(state)
         apply_attack(state, state.hero, tile.attack, outcome)
+        spring_traps(state, outcome, before)
         tile.charge = 0
         tile.just_played = True
         # Perfect Strike: an exact kill recharges the tile straight away.
@@ -817,7 +862,9 @@ def hero_action(state, action, outcome):
         direction = -1 if action.kind == "MoveLeft" else 1
         target = hero.cell + direction
         if state.occupant(target) is not None:
+            before = enemy_cells(state)
             perform_special(state, direction, outcome)
+            spring_traps(state, outcome, before)
             swapped = True
         else:
             hero.cell = target
@@ -870,12 +917,16 @@ def resolve_enemies(state, outcome):
         elif enemy.action == "FlipRight":
             enemy.facing = 1
         elif enemy.move_dir:
+            before = enemy_cells(state)
             enemy_move(state, enemy)
+            spring_traps(state, outcome, before)
     for enemy in enemies:
         if enemy.alive and enemy.action == "Attack" and state.hero.alive:
             for attack in list(enemy.queue):
                 if enemy.alive:
+                    before = enemy_cells(state)
                     apply_attack(state, enemy, attack, outcome)
+                    spring_traps(state, outcome, before)
             # A Copycat Mirror leaves a copy of a hero tile in the queue, and which one isn't known yet.
             copies = sum(a.name == "CopycatMirror" for a in enemy.queue)
             enemy.queue = [Attack(UNKNOWN_TILE, 0, []) for _ in range(copies)]

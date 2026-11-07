@@ -1841,6 +1841,54 @@ class LightningTest(unittest.TestCase):
         self.assertEqual(unmodeled_content({"tiles": [tile], "hero": {"queue": []}, "enemies": [], "skills": []}), [])
 
 
+class TrapTest(unittest.TestCase):
+    """TrapAttack and Trap in the game's code: placed on the cell ahead, set off only by an enemy moving onto it."""
+    TRAP = Attack("Trap", 3, [1])
+    HOOK = Attack("GrapplingHook", 1, [1, 2, 3, 4, 5, 6], first_target=True)
+
+    def board(self, enemies, hero_cell=2, traps=()):
+        state = make_state(hero_cell=hero_cell, enemies=enemies)
+        state.cells = 7
+        state.traps = [{"cell": c, "damage": 3, "effect": "None"} for c in traps]
+        return state
+
+    def test_it_goes_on_the_cell_ahead(self):
+        after, _ = fire(self.board([enemy(6, hp=9)]), self.TRAP)
+        self.assertEqual(after.traps, [{"cell": 3, "damage": 3, "effect": "None"}])
+
+    def test_an_enemy_walking_onto_it_takes_the_damage_once(self):
+        walker = enemy(4, hp=9, action="MoveLeft")
+        after, outcome = step(self.board([walker], traps=[3]), Action("Wait"))
+        self.assertEqual((after.enemies[0].hp, after.traps, outcome.enemy_damage), (6, [], 3))
+
+    def test_the_hero_can_stand_on_it(self):
+        after, outcome = step(self.board([enemy(6, hp=9)], traps=[3]), Action("MoveRight"))
+        self.assertEqual((after.hero.cell, len(after.traps), outcome.hp_lost), (3, 1, 0))
+
+    def test_placed_under_an_enemy_it_waits(self):
+        after, _ = fire(self.board([enemy(3, hp=9)]), self.TRAP)
+        self.assertEqual((after.enemies[0].hp, len(after.traps)), (9, 1))
+
+    def test_the_hook_pulls_an_enemy_onto_it(self):
+        after, outcome = fire(self.board([enemy(6, hp=9)], traps=[3]), self.HOOK)
+        self.assertEqual((after.enemies[0].cell, after.enemies[0].hp, outcome.enemy_damage), (3, 5, 4))
+
+    def test_a_planted_trap_is_worth_part_of_its_damage(self):
+        self.assertAlmostEqual(leaf_terms(self.board([enemy(6, hp=9)], traps=[3]))["traps"], 12)
+
+    def test_loading_a_trap_tile_is_worth_something(self):
+        state = self.board([enemy(6, hp=9)])
+        state.tiles = [Tile(self.TRAP, cooldown=3, charge=3)]
+        load = next(c for c in rank_actions(state, depth=1) if c.actions[0].kind == "PlayTile")
+        self.assertGreater(load.terms.get("stack", 0), 0)
+
+    def test_read_from_the_log(self):
+        row = {"cells": 5, "tiles": [], "enemies": [], "traps": [{"cell": 2, "damage": 3, "effect": "Curse", "armed": True}],
+               "hero": {"kind": "H", "cell": 0, "facing": "Right", "hp": 9, "maxHp": 9, "shield": False, "queue": [],
+                        "action": "Wait", "special": {"charge": 3, "cooldown": 3}}}
+        self.assertEqual(state_from_log(row).traps, [{"cell": 2, "damage": 3, "effect": "Curse"}])
+
+
 class StriderTest(unittest.TestCase):
     """StriderEnemy.Move in the game's code: it runs to the last free cell that way, rather than one cell."""
 

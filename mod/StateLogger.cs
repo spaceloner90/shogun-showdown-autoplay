@@ -26,7 +26,7 @@ using BepInEx;
 using HarmonyLib;
 using UnityEngine;
 
-[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.10.0")]
+[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.11.0")]
 public class StateLoggerPlugin : BaseUnityPlugin
 {
     private const float PollIntervalSeconds = 0.1f;
@@ -492,6 +492,8 @@ public class StateLoggerPlugin : BaseUnityPlugin
         AppendWave(sb, room as WaveRoom);
         sb.Append(",\"hazards\":");
         AppendHazards(sb, room.Grid.NCells);
+        sb.Append(",\"traps\":");
+        AppendTraps(sb, room.Grid);
 
         sb.Append(",\"hero\":");
         AppendAgent(sb, hero, hero.HeroEnum.ToString());
@@ -543,6 +545,35 @@ public class StateLoggerPlugin : BaseUnityPlugin
         }
         sb.Append("]");
         return sb.ToString();
+    }
+
+    // Traps on the ground that haven't gone off. A Trap doesn't keep its cell, so it's the cell nearest to where it
+    // lies. By the code, only an enemy entering it sets it off, once, for its damage and effect.
+    private static void AppendTraps(StringBuilder sb, CombatGrid grid)
+    {
+        sb.Append("[");
+        bool first = true;
+        foreach (Trap trap in UnityEngine.Object.FindObjectsOfType<Trap>())
+        {
+            Traverse fields = Traverse.Create(trap);
+            if (fields.Field("alreadyTriggered").GetValue<bool>()) continue;
+            int nearest = -1;
+            float best = float.MaxValue;
+            foreach (Cell cell in grid.Cells)
+            {
+                if (cell == null) continue;
+                float gap = Math.Abs(cell.transform.position.x - trap.transform.position.x);
+                if (gap < best) { best = gap; nearest = cell.IndexInGrid; }
+            }
+            if (nearest < 0) continue;
+            if (!first) sb.Append(",");
+            first = false;
+            sb.Append("{\"cell\":").Append(nearest);
+            sb.Append(",\"damage\":").Append(fields.Field("damage").GetValue<int>());
+            sb.Append(",\"effect\":").Append(Str(fields.Field("_attackEffect").GetValue<object>().ToString()));
+            sb.Append(",\"armed\":").Append(Bool(fields.Field("armed").GetValue<bool>())).Append("}");
+        }
+        sb.Append("]");
     }
 
     // Damage on its way, which the game shows the player on the cells: corruption and placed bombs. Each

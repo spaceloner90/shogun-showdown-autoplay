@@ -51,10 +51,10 @@ import itertools
 from dataclasses import dataclass, field
 
 from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_TILE, Action, Attack, Outcome, State,
-                   apply_attack, can_use_special, fireable_attacks, is_tank, legal_actions, perform_special, step,
-                   strike_cell, targets_of)
+                   apply_attack, can_use_special, enemy_cells, fireable_attacks, is_tank, legal_actions, perform_special,
+                   spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v1.15"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.16"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -63,6 +63,8 @@ WEIGHTS = {
     "enemy_damage": 10.0,     # Per enemy HP removed by the hero.
     "tank_damage": 2.5,       # Per HP removed from a tank that will die with its boss anyway.
     "poison_turn": 8.0,       # Per turn of poison left on an enemy, like damage another enemy deals.
+    "trap_planted": 0.4,      # A trap on the ground, as a share of what its damage is worth. Only enemies set
+                              # one off, so it's all upside: the player's read is a third to half.
     "shove_cell": 4.0,        # Per cell an enemy is shoved. Space to load in, but melee wants them close too.
     "kill": 60.0,
     "friendly_damage": 8.0,   # Per enemy HP removed by another enemy.
@@ -151,7 +153,9 @@ def _preview_fire(state, attacks, cell=None, flip=False):
         trial.hero.facing = -trial.hero.facing
     outcome = Outcome()
     for attack in attacks:
+        before = enemy_cells(trial)
         apply_attack(trial, trial.hero, attack, outcome)
+        spring_traps(trial, outcome, before)
     return trial, outcome
 
 
@@ -187,11 +191,14 @@ def _stack_value(state):
     fractions = WEIGHTS["stack_fractions"]
     cheapest_hit = _cheapest_hit(state)
     poison_now = _poison_value(state)
+    traps_now = _trap_value(state)
 
     def volley(attacks, cell, flip):
         trial, outcome = _preview_fire(state, attacks, cell, flip)
-        # Measured after the whole volley, so poison on an enemy that then dies is worth nothing.
-        return _volley_value(outcome, cheapest_hit) + _poison_value(trial) - poison_now
+        # Measured after the whole volley, so poison on an enemy that then dies is worth nothing. Traps it plants
+        # count the same way.
+        return (_volley_value(outcome, cheapest_hit) + _poison_value(trial) - poison_now
+                + _trap_value(trial) - traps_now)
 
     best = 0.0
     orders = list(itertools.permutations(attacks_available, min(len(attacks_available), QUEUE_CAP)))
@@ -463,6 +470,12 @@ def _escape_value(state, loaded_can_kill=None):
     return sum(kept[:1]) + WEIGHTS["escape_others"] * sum(kept[1:])
 
 
+def _trap_value(state):
+    """Traps on the ground. Only enemies set them off, so each is worth part of its damage, for the chance one
+    walks or is pulled onto it. Once it goes off it's gone, and the damage itself counts."""
+    return WEIGHTS["trap_planted"] * WEIGHTS["enemy_damage"] * sum(t["damage"] for t in state.traps)
+
+
 def _poison_value(state):
     """Poison still to come: good on an enemy, as far as its HP goes, and bad on the hero."""
     value = sum(min(e.poison, e.hp) * WEIGHTS["poison_turn"] for e in state.enemies
@@ -477,6 +490,7 @@ def leaf_terms(state: State) -> dict[str, float]:
         and _loaded_can_kill(state)
     terms = {
         "poison": _poison_value(state),
+        "traps": _trap_value(state),
         "escape": _escape_value(state, loaded_can_kill),
         "setup": _setup_value(state, loaded_can_kill),
         "effects": WEIGHTS["shockwave_loaded"] * sum(t.attack.effect == "Shockwave" for t in state.queue_tiles),

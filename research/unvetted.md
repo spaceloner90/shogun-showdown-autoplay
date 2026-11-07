@@ -39,6 +39,20 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.16: traps
+
+Read from the game's code for the player's new Trap tile. Nothing in a log yet: the mod logs traps as of plugin
+0.11.0. No top choice changes on any logged board.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| The mod logs traps with the right cell | Logging | Nothing | `traps` in each state, at the cell ahead of where the hero placed it |
+| Only an enemy moving onto a trap sets it off, once, for the tile's damage and effect | Rule | Nothing | The hero standing on one safely, and an enemy walking or pulled onto one |
+| **One placed under an enemy waits** | **Inferred** | **Nothing: from how the game's triggers work** | **Whether it goes off at once, which would make it a 3-damage melee hit** |
+| An enemy dashing through a trap's cell | Inferred, not simulated | Nothing | A Strider or Charger passing over one |
+| **A planted trap is worth 0.4 of its damage's worth** | **Scoring** | **The player's read: a third to half, since only enemies set it off** | **Traps planted when there's nothing better to do, and set up for the hook** |
+| Combo Curse isn't simulated | Rule | Its target is random | Nothing to change, unless F1 should value the curses |
+
 ## New in v1.15: Fumiko's dash
 
 FumikoBoss.Move in the game's code is the Strider's: she runs to the last free cell. Her one move in fight 10 of

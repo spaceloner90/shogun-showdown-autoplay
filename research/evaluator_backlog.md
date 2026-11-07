@@ -116,9 +116,9 @@ with, and being surrounded should cost more. v1.4 does a first version of both, 
 - **Kits other than these.** As of v1.5 every hero uses the same rules, as the player asked: general rules going
   forward, developed further wherever going back shows them worse. Preferred distance has been looked at on the
   Ronin's deck and the Wanderer's winning-run decks, where it comes out at 1 on 894 of 926 boards.
-- **A loaded Smoke Bomb discourages setting up kills.** A Smoke Bomb earns nothing kept when the loaded tiles can
-  kill from here, so loading a tile that makes a kill possible costs its 12. When Swap briefly had the same
-  exemption in testing, F1 loaded Swirl over Arrow on many boards to keep it. For the Ronin it's been so since v1.4.
+- **A loaded Smoke Bomb discourages setting up kills.** A loaded Smoke Bomb earns nothing kept when the loaded
+  tiles can kill from here, so loading a tile that makes a kill possible behind it costs its 12. That's fair, since
+  firing them spends it, but depth 1 may make too much of it. As of v1.6 a bomb in hand isn't affected.
 - **The shove for collision damage.** Fight 2, turn 7 spent it for 2 damage, and it was down for 4 turns.
 - **Facing.** Fight 2, turn 32: Spear killed one TwinTachi while the one behind the hero hit. The answer was to
   flip a turn earlier, which depth 1 only partly sees.

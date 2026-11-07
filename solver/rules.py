@@ -15,7 +15,7 @@ ONE_ENEMY_WAVE_CAP = 6
 # Attacks whose behaviour is fully covered by their logged range, damage and first-target flag, plus
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
 MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Barricade", "Bomb", "Charge",
-           "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Mirror", "OriginOfSymmetry", "Shield",
+           "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Lightning", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "SmokeBomb", "Spear", "Summon", "SwapToss",
            "Swirl", "Tetsubo", "Volley"}
 
@@ -29,7 +29,7 @@ POISON_TURNS = 3  # Applying poison sets this many turns left, and each turn's e
 BOMB_FUSE = 2     # Turns a placed bomb waits after the one it's placed on, before it goes off on the next.
 BARRICADE_HP = 5
 MAX_SHOVE_CREDIT = 3  # A shove counts for at most this many cells: further than that gains little.
-SHOCKWAVE_DAMAGE = 1  # Assumed: it's stored in the game's assets, and no log has shown it yet.
+SHOCKWAVE_DAMAGE = 1  # Stored in the game's assets, not its code. Seen in logs/run7.
 
 # Each hero has one special move, triggered by moving into an occupied cell. Swap is the Wanderer's, and
 # Shove is the Ronin's. The other heroes' moves aren't simulated, so they aren't offered as actions.
@@ -462,6 +462,11 @@ def attack_hits(state, attacker, attack):
             return []
         attacker.cell, targets[0].cell = targets[0].cell, attacker.cell
         return targets[:1]
+    # Lightning strikes the farthest agent in range ahead, passing over any Thorns enemy to the next farthest.
+    if attack.name == "Lightning":
+        in_range = [state.occupant(attacker.cell + attacker.facing * offset) for offset in attack.range]
+        struck = [a for a in in_range if a is not None and a.kind != "Thorns"]
+        return struck[-1:]
     return targets_of(state, attacker, attack)
 
 

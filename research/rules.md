@@ -207,7 +207,13 @@ Shockwave, read from the code (simulated as of v1.3):
 
 - After a tile's hit, it runs both ways from the target through touching agents, stopping at a gap, a wall or
   the hero, who isn't hit. Everyone it reaches is hit. So is the target, but only if it reached someone.
-- The damage is stored in the game's assets, so 1 is an assumption until a log shows it.
+- The damage is stored in the game's assets. `logs/run7` shows 1, chaining through two touching enemies on turn
+  41, and going off even when the tile killed its target.
+
+Lightning, read from the code (simulated as of v1.6):
+
+- It strikes the farthest agent in range ahead. A Thorns enemy is passed over for the next farthest, and with only
+  Thorns enemies in range it hits nothing. The game refuses to let enemies use it.
 
 The Ronin, read from the code (simulated as of v1.2):
 

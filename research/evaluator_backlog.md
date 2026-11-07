@@ -29,7 +29,12 @@ Enemy AI code is for offline simulation and tuning only.
     potion: both turned away, the right one's Katana killed the TwinTachi on 8 instead, and Spear with Sharp Turn
     then took no damage. The log has the board both before (seq 2126) and after (seq 2127) the potion. v1.11 would
     likely have avoided this a turn earlier, as it now sees the left Strider dash in next to the hero.
-- **Combo skills:** Triple Combo Heal and others. They need "combo" understood first.
+- **Combo skills:** Triple Combo Heal, Combo Curse and others. "Combo" is now understood from the code: every
+  kill after the first in a turn, by anyone, except inanimate enemies, with the streak reset at the start of each
+  turn. None are valued yet. Combos may be worth something in general, and Combo Curse in particular: each combo
+  kill curses a random enemy, which is a fraction of a doubled hit later, worth estimating even though the target
+  can't be predicted. With F2+, it may pay to line up kills that are coming anyway into the same turn, to combo
+  them.
 - **Other corruption patterns:** the game can also send corruption left to right, right to left, or even
   and odd cells in turn. The mod logs all of them as `hazards`, and only the attack that starts them
   needs adding, but none has been seen yet.

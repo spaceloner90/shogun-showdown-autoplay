@@ -77,7 +77,7 @@ move that acts on a target is worth 1/3 with nobody it can act on. A loaded tile
 earns nothing, since it's about to be spent. Several escapes count as the best one, plus half of each other.
 
 What F1 doesn't do is score the position a loaded volley would leave behind. That's lookahead, which is F2's job.
-These intrinsic values should still hold if F2 returns, since they estimate what's beyond any horizon.
+These intrinsic values still hold if F2 returns: see Known limits.
 
 ### Put a value where the decision is
 
@@ -150,5 +150,8 @@ log gets saved into `logs/` first.
   and lookahead.
 - **Consumables** aren't used by F1. Scenarios for them are saved in the backlog.
 - **Which enemy to kill first** is simply lowest HP, then closest.
-- **If F2 returns,** a few terms that stand in for lookahead overlap with it: the stack's moves and flip, and the
-  2/3 for a tile in hand. The rest estimate what's beyond the horizon and should stay.
+- **If F2 returns,** the position terms carry over as they are. They're only added at the end of a line, and every
+  turn before that is played out by the simulation, so they only ever estimate what's beyond the horizon. Poison
+  that ticks within an F4 line counts as damage dealt, and only what's left at the end is estimated. What would
+  need another look is a term added per action rather than at the end: the bonus for loading a Shockwave tile
+  would also count in a line that fires it within the horizon, where the chain itself already shows.

@@ -52,7 +52,7 @@ from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SWAP, UNKNOWN_TIL
                    apply_attack, can_use_special, fireable_attacks, is_tank, legal_actions, perform_special, step,
                    strike_cell, targets_of)
 
-VERSION = "v1.4"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.5"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -75,8 +75,9 @@ WEIGHTS = {
     "ready_tile": 2.0,        # Per tile that's charged, in hand or queue.
     "loaded_damage": 2.0,     # Per point of damage in the queue, whether or not anything's in range.
     "swap_ready": 3.0,        # Having the special move charged, so spending it has a cost.
-    "escape_loaded": 12.0,    # A loaded Smoke Bomb with a target: a dodge that's ready to use.
+    "escape_loaded": 12.0,    # A charged Swap, or a loaded Smoke Bomb with a target: a dodge that's ready to use.
     "escape_ready": 4.0,      # One charged in hand or a turn from being usable: a dodge a turn away.
+    "escape_two_way": 1.5,    # A kept Swap with Two Way Move covers both sides, so it's worth this much more.
     "curse": 0.5,             # Fraction of what a curse would add to the hero's next hit on that enemy.
     "shield": 100.0,          # Holding a shield, worth about 1 HP. Hits average 1.4, but it may go unused.
     "facing_ideal": 6.0,      # Facing the enemy we most want to hit.
@@ -85,7 +86,7 @@ WEIGHTS = {
     "unarmed_distance": 0.25, # The share of that which still applies with nothing to threaten them.
     "surrounded": -20.0,      # Enemies directly on both sides.
     "flanked": -6.0,          # Enemies on both sides, at any distance.
-    "no_way_out": 2.5,        # How much worse those are with no Swap and no loaded Smoke Bomb.
+    "no_way_out": 2.5,        # How much worse those are with no charged Swap and no loaded Smoke Bomb.
     "crowding": -3.0,         # Per cell an enemy is closer than the hero's tiles need it to be. -10 stalls fights.
     "max_standoff": 3,        # The furthest a kit prefers to stand off, so it doesn't run to the wall.
     "enemy_hp_left": -4.0,    # Per enemy HP still in the room.
@@ -298,11 +299,9 @@ def _threat_presented(state, target):
 def preferred_distance(state):
     """How far from an enemy the hero wants to stand, from what its tiles can reach.
 
-    Melee with Swap wants to be adjacent, since it can get out again. Any other kit wants the farthest
-    distance where the tiles it will have soon can all still hit, so reach is used to stay out of trouble.
+    The farthest distance where the tiles it will have soon do the most damage, so reach is used to stay
+    out of trouble. A melee kit comes out at 1. The same rule for every hero.
     """
-    if state.special == SWAP:
-        return 1
     soon = [t for t in state.tiles if t.attack.value > 0 and (t.in_queue or t.cooldown - t.charge <= 1)]
     tiles = soon or [t for t in state.tiles if t.attack.value > 0]
     reach = {d: sum(t.attack.value for t in tiles if d in map(abs, t.attack.range))
@@ -311,9 +310,17 @@ def preferred_distance(state):
     return max(d for d, damage in reach.items() if damage == most) if most else 1
 
 
+def _swap_charged(state):
+    """A charged Swap is a way out, whoever is around. It needs nobody adjacent yet, since closing in is what
+    brings enemies next to the hero, and requiring it had F1 walk up to them just so the way out would count.
+    Nor does it need anyone swappable now: that made killing the last one look bad, though more will come."""
+    return state.special == SWAP and state.swap_charge >= state.swap_cooldown
+
+
 def _has_way_out(state):
-    """Whether the hero can get past an enemy on either side: Swap, or a loaded Smoke Bomb that reaches one."""
-    if state.special == SWAP:
+    """Whether the hero can get past enemies that close in: a charged Swap, or a loaded Smoke Bomb that reaches
+    someone."""
+    if _swap_charged(state):
         return True
     return any(t.attack.name in SMOKE_BOMBS and t.ready and t.in_queue
                and any(a.movable for a in targets_of(state, state.hero, t.attack)[:1]) for t in state.tiles)
@@ -364,12 +371,17 @@ def _pressure_terms(state):
 
 
 def _escape_value(state):
-    """A Smoke Bomb trades places with an enemy at range, so it's a dodge as well as 1 damage.
+    """A way out kept: a charged Swap, or a Smoke Bomb, which trades places with an enemy at range.
 
-    Firing it for the damage alone gives that up for several turns, which is worth counting. It's only a
-    dodge while it can reach someone. If the loaded tiles can kill from here, it's going to be fired rather
-    than kept, so it earns nothing: otherwise it could talk the hero out of the kill.
+    Each is a dodge as well as its damage. Spending one for the damage alone gives that up for several turns,
+    which is worth counting, so a Swap with Damaging Move gets used for damage once it hits hard enough. A
+    Swap that can go backward covers both sides, so it's worth more kept. A Smoke Bomb is only a dodge while
+    it can reach someone. If the loaded tiles can kill from here, a loaded Smoke Bomb goes off with them rather
+    than being kept, so it earns nothing: otherwise it could talk the hero out of the kill. Firing tiles never
+    spends a Swap, so that doesn't apply to it.
     """
+    if _swap_charged(state):
+        return WEIGHTS["escape_loaded"] * (WEIGHTS["escape_two_way"] if state.two_way_swap else 1.0)
     attacks_available = fireable_attacks(state)
     for attacks in itertools.permutations(attacks_available, min(len(attacks_available), QUEUE_CAP)):
         if attacks and _preview_fire(state, attacks)[1].kills:

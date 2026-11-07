@@ -1850,8 +1850,41 @@ class KeepingSmokeBombTest(unittest.TestCase):
         best = rank_actions(state, depth=1)[0]
         self.assertEqual(best.terms.get("hp_lost", 0), 0)
 
-    def test_the_wanderers_deck_is_unaffected(self):
-        self.assertEqual(leaf_terms(make_state(enemies=[enemy(3)]))["escape"], 0)
+
+class KeepingSwapTest(unittest.TestCase):
+    def test_a_charged_swap_is_a_way_out_kept(self):
+        self.assertEqual(leaf_terms(make_state(enemies=[enemy(3)]))["escape"], 12)
+
+    def test_one_charging_is_worth_nothing(self):
+        state = make_state(enemies=[enemy(3)])
+        state.swap_charge = state.swap_cooldown - 1
+        self.assertEqual(leaf_terms(state)["escape"], 0)
+
+    def test_going_backward_too_makes_it_worth_more(self):
+        state = make_state(enemies=[enemy(3)])
+        state.two_way_swap = True
+        self.assertEqual(leaf_terms(state)["escape"], 18)
+
+    def test_a_kill_from_here_doesnt_cancel_it(self):
+        # Firing tiles never spends a Swap, unlike a loaded Smoke Bomb.
+        state = make_state(hero_cell=2, enemies=[enemy(3, hp=1)], queue=[KATANA])
+        self.assertEqual(leaf_terms(state)["escape"], 12)
+
+    def test_nobody_to_swap_with_yet_doesnt_cancel_it(self):
+        heavy = enemy(3)
+        heavy.movable = False
+        self.assertEqual(leaf_terms(make_state(enemies=[heavy]))["escape"], 12)
+
+    def swap_damage_board(self, damage):
+        state = make_state(hero_cell=2, enemies=[enemy(3, hp=9)])
+        state.swap_damage = damage
+        return rank_actions(state, depth=1)[0].labels[0]
+
+    def test_two_damage_isnt_worth_spending_it_for(self):
+        self.assertNotIn("(swap)", self.swap_damage_board(2))
+
+    def test_three_damage_is(self):
+        self.assertIn("(swap)", self.swap_damage_board(3))
 
 
 class KitPositionTest(unittest.TestCase):
@@ -1867,8 +1900,9 @@ class KitPositionTest(unittest.TestCase):
         state.tiles = [Tile(attack, cooldown=5, charge=5 - wait) for attack, wait in tiles]
         return state
 
-    def test_the_swap_hero_always_wants_to_be_adjacent(self):
-        self.assertEqual(preferred_distance(self.kit((self.SPEAR, 0), (self.HOOK, 0), swap=True)), 1)
+    def test_the_swap_hero_follows_its_tiles_too(self):
+        self.assertEqual(preferred_distance(self.kit((KATANA, 0), swap=True)), 1)
+        self.assertEqual(preferred_distance(self.kit((self.SPEAR, 0), (self.HOOK, 0), swap=True)), 2)
 
     def test_melee_without_swap_still_has_to_be_adjacent(self):
         self.assertEqual(preferred_distance(self.kit((KATANA, 0))), 1)
@@ -1899,8 +1933,13 @@ class KitPositionTest(unittest.TestCase):
     def test_too_far_still_costs_something(self):
         self.assertLess(leaf_terms(self.kit((self.SPEAR, 0), hero_cell=1, enemies=[enemy(6)]))["distance"], 0)
 
-    def test_the_swap_hero_is_never_crowded(self):
-        self.assertEqual(leaf_terms(self.kit((self.SPEAR, 0), enemies=[enemy(4)], swap=True))["crowding"], 0)
+    def test_the_swap_hero_is_crowded_like_anyone(self):
+        self.assertEqual(leaf_terms(self.kit((self.SPEAR, 0), enemies=[enemy(4)], swap=True))["crowding"], -3)
+
+    def test_a_swap_on_cooldown_is_no_way_out(self):
+        state = self.kit((self.SPEAR, 0), enemies=[enemy(0, facing=1), enemy(6)], swap=True)
+        state.swap_charge = 0
+        self.assertEqual(leaf_terms(state)["surrounded"], -15)
 
     def test_flanked_with_no_way_out_is_much_worse(self):
         enemies = [enemy(0, facing=1), enemy(6)]

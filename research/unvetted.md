@@ -38,10 +38,24 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.5: the same rules for every hero
+
+v1.4 fenced the Swap hero off with the old "close in" rule. Now it goes through the same kit rules as anyone. None of
+this has been played, and the winning run in `logs/run5_full` no longer vets the Wanderer's positioning or Swap use.
+On its 926 boards, 16 top choices change from v1.4: no kills are lost (267 against 266) and no HP, and every change
+either holds a Swap or makes the same kill with a tile instead. The Ronin's 110 boards in `logs/run6` don't change.
+
+| Item | Kind | What replays show | What to look for |
+|---|---|---|---|
+| The Swap hero stands at its tiles' reach too | Scoring | Preferred distance is 1 on 894 of 926 boards, 2 on 10 and 3 on 22 | Standing off when only Arrow is ready, then being slow to close in |
+| A charged Swap is a way out, needing nobody adjacent or swappable yet | Scoring | Requiring an adjacent enemy had F1 walk up to them and pass up a kill (fight 13, turn 3). Requiring a swappable one made killing the last one look bad (fight 22, turn 15) | Flanked or surrounded with Swap on cooldown now costs 2.5 times as much |
+| **A charged Swap kept is worth 12, or 18 with Two Way Move** | **Scoring** | **Swaps for damage alone, by Swap damage: 14 to 12 at 1, 8 to 5 at 2 with Two Way Move, 23 to 20 at 3 with it. The 1-damage ones left all dodge, set up a stack or reposition** | **Swaps for 1 or 2 damage only with a reason. In that run Two Way Move always came with 2 or 3 damage, so the two weren't seen apart** |
+| A loaded tile that can kill doesn't cancel it | Scoring | With that exemption, F1 loaded tiles that couldn't kill just to keep the Swap's value | Stays so |
+
 ## New in v1.4: positioning from the kit, and keeping the Smoke Bomb
 
 None of this has been played. Replays on `logs/run6` only change one choice at a time from boards v1.2 reached, so they
-can't show how a whole fight would go. The Wanderer's choices are unchanged on the winning run's 926 boards.
+can't show how a whole fight would go. v1.4 left the Swap hero unchanged; v1.5 brings it under these rules.
 
 | Item | Kind | What replays show | What to look for |
 |---|---|---|---|

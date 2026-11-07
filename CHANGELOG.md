@@ -1,11 +1,20 @@
 # Changelog
 
 Every evaluator version, newest first: what it changed and why. Each is tagged `evaluator-<version>`, and its commit
-message has the details and the replay numbers. `evaluator-v1` is the version that won day 1 with the Wanderer. Later
-ones are unvetted until real play confirms them, as [`research/unvetted.md`](research/unvetted.md) tracks.
+message has the details and the replay numbers. `evaluator-v1` is the version that won day 1 with the Wanderer, and
+`evaluator-v2.0` the one that finished day 2 with it, killing the Shogun. Each item is unvetted until real play
+confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
+
+## v2.0 — day 2 won (2026-11-08)
+- The same code as v1.28. With it the Wanderer finished day 2 and killed the Shogun: `run8` and `run8_part2`, the
+  last four fights on v1.28 for 4 HP, 1 of it against the Shogun. The player credits much of it to Chilling Combo,
+  and to freezing in general, which matters most in wave fights, more dangerous here than the bosses.
+- What changed from v1 to here is everything from v1.1 to v1.28 below: the Ronin and positioning from the kit,
+  Shockwave, curses and poison, traps, Sniper and Dynamic Boost, the day 2 bosses, elites, freezing, consumables,
+  loading with a swap, and since v1.27 scoring rebuilt on three rules that outrank any term.
 
 ## v1.28 — attacking potions when every slot is full (2026-11-08)
 - **Scoring:** D6 is the last resort against damage no other potion avoids, whenever it comes, as the player put

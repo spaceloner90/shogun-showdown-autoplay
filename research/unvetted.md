@@ -1,7 +1,9 @@
 # What real logs haven't confirmed
 
 Changes to rules and scoring that real play hasn't shown working yet. `evaluator-v1` won day 1 with the Wanderer
-(`logs/run5_full`, fights 9 to 30), and that stands: later versions aren't held to winning it again. Passing tests
+(`logs/run5_full`, fights 9 to 30), and `evaluator-v2.0` day 2 (`logs/run8` and `logs/run8_part2`), and those stand:
+later versions aren't held to winning them again. A win doesn't vet the items below either: each needs a log
+showing that change working. Passing tests
 and replaying old logs doesn't vet a change, because old logs can't show new behavior. An item leaves this list
 when a real log shows it working.
 

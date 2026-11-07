@@ -56,7 +56,7 @@ from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER
                    apply_attack, apply_potion, can_use_special, enemy_cells, fireable_attacks, free_hand_tiles, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v1.28"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.0"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.

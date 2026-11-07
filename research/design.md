@@ -8,8 +8,8 @@ How the autoplay decides, and why it's built the way it is. The other documents 
 ## The goal
 
 An AI that plays Shogun Showdown one turn at a time: each key press plays one turn, and the log says where the
-decision came from. `evaluator-v1` won day 1 with the Wanderer. The aim now is to beat the full game, with other
-heroes and kits, starting with the Ronin.
+decision came from. `evaluator-v1` won day 1 with the Wanderer, and `evaluator-v2.0` day 2, killing the Shogun. The
+aim now is to beat the full game, with other heroes and kits.
 
 ## Ground rules
 

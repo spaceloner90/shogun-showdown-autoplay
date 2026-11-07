@@ -30,6 +30,12 @@ Enemy AI code is for offline simulation and tuning only.
     potion: both turned away, the right one's Katana killed the TwinTachi on 8 instead, and Spear with Sharp Turn
     then took no damage. The log has the board both before (seq 2126) and after (seq 2127) the potion. v1.11 would
     likely have avoided this a turn earlier, as it now sees the left Strider dash in next to the hero.
+- **Juggling tiles of different reach (deck choice, not play).** In `logs/run8` the Wanderer had Shadow Kama, which
+  strikes 2 cells ahead, and Swirl, which strikes beside it. F1 spent a lot of turns shuffling between the two
+  distances, often wastefully, since they're hard to use together, though it sometimes paid off. The player's read:
+  more a problem of picking the tile than of using it. Picking rewards isn't something F1 does.
+- **Attacking potions rarely get used.** Even at 20% pressure, Mass Poison, Mass Curse and Cool Up come up on 2 of
+  2,100 logged boards with potions held, because they must also make a kill this turn.
 - **Key presses are slow because Python starts each time.** A press takes about 0.5 s in game, of which the search
   is about 0.02 s: the rest is starting a new Python process. A solver process that stays running, reloading when its
   code changes, would cut most of it. That's a new mechanism, to raise with the player before building.

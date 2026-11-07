@@ -39,6 +39,19 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.24: elites, and potion pressure at 20%
+
+The Archer's Double Strike on turn 10 of fight 7 in `logs/run8` is now exact. That log's only other misses are summons
+and one Twins turn: on turn 14 of fight 10 the Main twin's loaded Dash vanished as it flipped, unexplained, at no cost.
+At 20%, attacking potions still only come up on 2 of 2,100 boards with potions held, since they also need to make a
+kill this turn.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Double Strike plays an attack twice | Rule | The Archer's two Arrows, replayed | A hero tile with it, and a second strike finding a new target |
+| Reactive Shield gains a shield when hurt | Rule | Nothing: no logged hit showed it, though Reactive Shield TwinTachis appeared | The enemy shielded after a hit, and the next hit blocked |
+| Pressure at a best score below -3 | Scoring | The worst 20% of logged boards | Attacking potions and D6 used more often |
+
 ## New in v1.23: Shadow Kama for the hero
 
 | Item | Kind | What's already confirmed | What to look for |

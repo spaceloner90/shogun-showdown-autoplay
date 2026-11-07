@@ -2075,6 +2075,47 @@ class IceTest(unittest.TestCase):
         self.assertEqual(load.terms["effects"], 0.5 * WEIGHTS["future_discount"])
 
 
+class EliteTest(unittest.TestCase):
+    """Elite types in the game's code: Double Strike plays an attack twice, Reactive Shield shields itself when hit."""
+
+    def test_double_strike_hits_twice(self):
+        # As the Archer did on turn 10 of fight 7 in logs/run8: two Arrows for 2 each.
+        archer = enemy(5, hp=4, action="Attack", queue=[Attack("Arrow", 2, list(range(1, 11)), first_target=True,
+                                                               effect="DoubleStrike")])
+        _, outcome = step(make_state(hero_cell=3, enemies=[archer]), Action("Wait"))
+        self.assertEqual(outcome.hp_lost, 4)
+
+    def test_the_second_strike_targets_afresh(self):
+        # The first Katana kills the enemy in front, so the second finds nobody there.
+        _, outcome = fire(make_state(hero_cell=2, enemies=[enemy(3, hp=2)]),
+                          Attack("Katana", 2, [1], first_target=True, effect="DoubleStrike"))
+        self.assertEqual((outcome.kills, outcome.enemy_damage), (1, 2))
+
+    def reactive(self, shield=False):
+        target = enemy(3, hp=9)
+        target.elite = "ReactiveShield"
+        target.shield = shield
+        return target
+
+    def test_reactive_shield_gains_one_when_hurt(self):
+        after, _ = fire(make_state(hero_cell=2, enemies=[self.reactive()]), KATANA)
+        self.assertEqual((after.enemies[0].hp, after.enemies[0].shield), (7, True))
+
+    def test_not_when_its_shield_took_the_hit(self):
+        after, _ = fire(make_state(hero_cell=2, enemies=[self.reactive(shield=True)]), KATANA)
+        self.assertEqual((after.enemies[0].hp, after.enemies[0].shield), (9, False))
+
+    def test_a_second_hit_in_the_volley_meets_the_new_shield(self):
+        after, _ = fire(make_state(hero_cell=2, enemies=[self.reactive()]),
+                        Attack("Katana", 2, [1], first_target=True, effect="DoubleStrike"))
+        self.assertEqual((after.enemies[0].hp, after.enemies[0].shield), (7, False))
+
+    def test_known_elites_raise_no_warning(self):
+        row = {"tiles": [], "hero": {"queue": []}, "skills": [],
+               "enemies": [{"kind": "X", "queue": [], "elite": e} for e in ("ReactiveShield", "DoubleStrike", "Quick")]}
+        self.assertEqual(unmodeled_content(row), [])
+
+
 class ShadowKamaTest(unittest.TestCase):
     """ShadowKamaAttack in the game's code: the first agent its range finds, and nobody else."""
 

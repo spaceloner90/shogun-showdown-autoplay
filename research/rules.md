@@ -210,6 +210,14 @@ Shockwave, read from the code (simulated as of v1.3):
 - The damage is stored in the game's assets. `logs/run7` shows 1, chaining through two touching enemies on turn
   41, and going off even when the tile killed its target.
 
+Elites, read from the code (simulated as of v1.24):
+
+- **Double Strike:** the elite's attacks carry the Double Strike effect, and any attack with it plays twice in a row,
+  targeting afresh: the Archer on turn 10 of fight 7 in `logs/run8` hit for 2 twice.
+- **Reactive Shield:** after a hit that hurts it while it has no shield, and that it survives, it gains one. Any hit
+  counts, collisions too.
+- **Heavy:** can't be pushed or pulled. **Quick:** only changes the enemy's AI, how soon it chooses to attack.
+
 Potions, read from the code (simulated as of v1.22):
 
 - **Using one** is free, doesn't end the turn, and is only allowed between turns (`Potion.CanBeUsed`).

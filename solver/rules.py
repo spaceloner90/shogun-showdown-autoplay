@@ -48,6 +48,11 @@ SPECIAL_MOVES = {SWAP, SHOVE}
 # others haven't changed any prediction.
 UNDERSTOOD_TRAITS = {"Aggro", "Dash", "Explosive", "Heavy", "Quick", "Unfreezable"}
 
+# Elite types that need no warning. Heavy can't be pushed or pulled, Reactive Shield gains a shield when hit, and
+# Double Strike gives its attacks the Double Strike effect: all simulated. Quick only changes the enemy's AI, how soon
+# it chooses to attack, so what it telegraphs plays out as usual.
+KNOWN_ELITES = ("Heavy", "ReactiveShield", "DoubleStrike", "Quick")
+
 # Enemies whose move runs them to the last free cell that way, rather than one cell: StriderEnemy.Move and
 # FumikoBoss.Move in the code. The Strider's Dash trait is shown for it.
 LEAPERS = {"Strider", "FumikoBoss"}
@@ -115,6 +120,7 @@ class Agent:
     poison: int = 0  # Turns of poison left. Each deals 1 at the end of the turn, and a shield blocks it.
     ice: int = 0  # Turns of being frozen left. A frozen enemy doesn't act.
     freezable: bool = True  # Unfreezable enemies can't be frozen.
+    elite: str = "None"  # The game's elite type. Heavy, Reactive Shield and Double Strike change the rules.
 
     @property
     def alive(self):
@@ -240,6 +246,7 @@ def state_from_log(row):
             poison=data.get("poison") or 0,
             ice=data.get("ice") or 0,
             freezable="Unfreezable" not in (data.get("traits") or []),
+            elite=data.get("elite") or "None",
         )
 
     tiles = [
@@ -315,7 +322,8 @@ def unmodeled_content(row):
     def check_attack(data):
         if data["name"] not in MODELED and data["name"] != UNKNOWN_TILE:
             note(f"attack {data['name']}")
-        if data["name"] != "Summon" and data.get("effect") not in (None, "None", "Curse", "Ice", "PerfectStrike",
+        if data["name"] != "Summon" and data.get("effect") not in (None, "None", "Curse", "DoubleStrike", "Ice",
+                                                                   "PerfectStrike",
                                                                    "Poison", "Shockwave"):
             note(f"{data['name']} effect {data['effect']}")
         if data.get("tileEffect") not in (None, "None", "FreePlay"):
@@ -340,7 +348,7 @@ def unmodeled_content(row):
         for data in enemy["queue"]:
             check_attack(data)
         # A Heavy elite is simulated: it can't be pushed or pulled. Others would warn.
-        if enemy.get("elite") not in (None, "None", "Heavy"):
+        if enemy.get("elite") not in (None, "None") + KNOWN_ELITES:
             note(f"elite {enemy['kind']}")
         for trait in enemy.get("traits") or []:
             if trait not in UNDERSTOOD_TRAITS:
@@ -683,6 +691,9 @@ def shield_first_ally(state, attacker, attack):
 def apply_attack(state, attacker, attack, outcome):
     start = (attacker.cell, attacker.facing)
     _apply_attack(state, attacker, attack, outcome)
+    # Double Strike plays the whole attack again straight after, targeting afresh: Agent.ExecuteAttacksInQueue.
+    if attack.effect == "DoubleStrike" and attacker.alive:
+        _apply_attack(state, attacker, attack, outcome)
     # The game raises its move-attack event after the attack's own hits, so Dynamic Boost only helps later ones.
     if attacker is state.hero and attack.name in MOVE_ATTACKS and (attacker.cell, attacker.facing) != start:
         state.boosted = True
@@ -859,7 +870,11 @@ def land_hit(state, attacker, target, value, outcome, collision=False):
         if attacker is state.hero and not is_tank(state, target):
             outcome.shields_broken += 1
     else:
+        hp_before = target.hp
         deal_damage(state, attacker, target, value, outcome, collision)
+        # A Reactive Shield elite that had no shield, took damage and lived gains one: Enemy.ReceiveAttack.
+        if target.elite == "ReactiveShield" and target.alive and target.hp < hp_before:
+            target.shield = True
 
 
 def end_of_boss(state):

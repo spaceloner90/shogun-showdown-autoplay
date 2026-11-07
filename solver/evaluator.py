@@ -54,7 +54,7 @@ from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, 
                    apply_attack, apply_potion, can_use_special, enemy_cells, fireable_attacks, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v1.23"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.24"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -67,8 +67,8 @@ WEIGHTS = {
                               # is known). Freezing a 2-damage enemy is worth about 3 damage now. A first guess.
     # Potions. Each is used on a key press of its own, and the next press analyzes the board it leaves.
     "heal_at_missing": 3,     # Use Edamame once the hero is missing at least this much HP, so none of its 3 is wasted.
-    "pressure": -37.0,        # Below this best score, the hardest 10% of logged boards, as the player asked: any
-                              # fewer and they'd never get used. Only then are attacking potions and D6 used.
+    "pressure": -3.0,         # Below this best score, the hardest 20% of logged boards, as the player asked: at 10%
+                              # they were hardly ever used. Only then are attacking potions and D6 used.
     "trap_planted": 0.4,      # A trap on the ground, as a share of what its damage is worth. Only enemies set
                               # one off, so it's all upside: the player's read is a third to half.
     "shove_cell": 4.0,        # Per cell an enemy is shoved. Space to load in, but melee wants them close too.

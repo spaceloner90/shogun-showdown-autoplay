@@ -7,6 +7,12 @@ ones are unvetted until real play confirms them, as [`research/unvetted.md`](res
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v1.24 — elites, and potion pressure at 20% (2026-11-07)
+- **Rule:** Double Strike plays an attack twice, targeting afresh, for any agent; the Double Strike elite gives its
+  attacks the effect. Reactive Shield elites gain a shield after a hit that hurts them while unshielded. Quick only
+  changes enemy AI, so it needs nothing.
+- **Scoring:** pressure for attacking potions and D6 is now the worst 20% of boards, a best score below -3.
+
 ## v1.23 — Shadow Kama for the hero (2026-11-07)
 - **Rule:** Shadow Kama strikes only the first agent its range finds. With the statue's range of the cell 2 ahead,
   that's what the simulation already did; it matters only if a tile's range is wider.

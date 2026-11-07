@@ -339,7 +339,8 @@ def unmodeled_content(row):
     for enemy in row["enemies"]:
         for data in enemy["queue"]:
             check_attack(data)
-        if enemy.get("elite") not in (None, "None"):
+        # A Heavy elite is simulated: it can't be pushed or pulled. Others would warn.
+        if enemy.get("elite") not in (None, "None", "Heavy"):
             note(f"elite {enemy['kind']}")
         for trait in enemy.get("traits") or []:
             if trait not in UNDERSTOOD_TRAITS:

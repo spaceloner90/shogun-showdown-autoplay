@@ -7,6 +7,7 @@ Output is line based:
     VERSION <evaluator version>
     BEST <depth> <game action> <deck index or -1> <score> <label>
     ORDER <depth> <deck indexes to fire, in order>  (only when firing needs queue edits first)
+    REPLACE <depth> <deck index>  (only when loading needs a queued tile sent back to hand first)
     POTION <potion> <why>  (only when a potion should be used first: the key press uses it instead of acting)
     ANALYSIS <one line of JSON for the log>
     REPORT
@@ -116,6 +117,8 @@ def main():
         print(f"BEST {depth} {game_action(state, action)} {deck_index} {best.score:.1f} {' -> '.join(best.labels)}")
         if action.order is not None:
             print(f"ORDER {depth} {','.join(str(i) for i in action.order)}")
+        if action.replace is not None:
+            print(f"REPLACE {depth} {action.replace}")
     if potion:
         print(f"POTION {potion} {potion_reason}")
 

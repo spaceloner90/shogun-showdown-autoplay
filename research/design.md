@@ -114,7 +114,10 @@ loaded, it beat a 4-damage Spear to the queue, so loading it now adds only a lit
 A cost applied to one option but not to the equivalent one tilts every choice. Sending a tile back to hand cost a
 turn of reloading, but a fired tile has to be reloaded too, after its cooldown. Since attacking empties the queue
 anyway, that cost only ever said "fire more", and F1 put the hook on cooldown for nothing. It's gone. So is the
-cost of an attack that hits nothing, which only repeated what its cooldown already costs.
+cost of an attack that hits nothing, which only repeated what its cooldown already costs. Such an attack isn't
+considered at all instead: sending the tile back is free and leaves the same board with the tile still ready, so it
+is never the better choice. Without that, a weaker kit could score better: a tile on cooldown drops out of where the
+hero wants to stand, so firing Shadow Kama at nothing removed the penalty for standing closer than it reaches.
 
 ### Tanks are decided one by one
 

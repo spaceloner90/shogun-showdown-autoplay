@@ -37,6 +37,8 @@ Enemy AI code is for offline simulation and tuning only.
   stays. Ideas considered and not taken yet: remembering this fight's boards from the log to spot a repeat, then
   either not repeating the same choice (could just wander between other poor moves, taking damage) or requiring
   progress (there may be no progress to make that turn). Neither is satisfying yet: see how often it comes up.
+  That one was kept going by something F1 couldn't see: with the queue full, it couldn't send a tile back to load
+  another. v1.26 can, and on that board loads Shadow Dash in place of Swirl, then kills both.
 - **Juggling tiles of different reach (deck choice, not play).** In `logs/run8` the Wanderer had Shadow Kama, which
   strikes 2 cells ahead, and Swirl, which strikes beside it. F1 spent a lot of turns shuffling between the two
   distances, often wastefully, since they're hard to use together, though it sometimes paid off. The player's read:
@@ -195,6 +197,12 @@ with, and being surrounded should cost more. v1.4 does a first version of both, 
   about 10 for the Wanderer's final deck, so fights last longer and each mistake costs more.
 
 ## Ideas not yet tried
+
+- **The position terms read a kit on cooldown as needing less.** Where the hero wants to stand, and how much being
+  far from the target costs, come from tiles ready soon. A tile put on cooldown drops out, which can lower those
+  penalties, so firing a tile can look better than it is. v1.26 rules out firing one at nothing; firing one for a
+  point of damage just to shed a penalty could still happen. Counting the whole deck instead fixed two of the three
+  logged cases and changed 19 choices.
 
 - **Cooldowns aren't valued.** Which tile to load depends on damage and reach. Changing a cooldown
   changed no choices on run 2's positions.

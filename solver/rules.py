@@ -202,10 +202,16 @@ class Action:
     # Free Play tiles from hand cost nothing, so they happen as part of the attack. None fires the
     # whole queue as it stands.
     order: tuple[int, ...] | None = None
+    # For PlayTile with a full queue: the queued tile to send back to hand first, as an index into state.tiles.
+    # Sending one back is a free queue edit, so it's part of the same action.
+    replace: int | None = None
 
     def label(self, state):
         if self.kind == "PlayTile":
-            return f"PlayTile {_tile_name(state, state.tiles[self.tile])}"
+            text = f"PlayTile {_tile_name(state, state.tiles[self.tile])}"
+            if self.replace is not None:
+                text += f" ({_tile_name(state, state.tiles[self.replace])} to hand)"
+            return text
         if self.kind == "Attack" and self.order is not None:
             fired = [state.tiles[i] for i in self.order]
             kept = [_tile_name(state, t) for t in state.queue_tiles if not any(t is f for f in fired)]
@@ -437,11 +443,14 @@ def legal_actions(state, allow_swap=True):
             continue
         if state.occupant(target) is None or (allow_swap and can_use_special(state, direction)):
             actions.append(Action(kind))
+    # A Free Play tile is never worth loading ahead of time: it can join any attack instead.
+    loadable = [i for i, t in enumerate(state.tiles) if t.ready and not t.in_queue and not t.free_play]
     if len(hero.queue) < QUEUE_CAP:
-        for index, tile in enumerate(state.tiles):
-            # A Free Play tile is never worth loading ahead of time: it can join any attack instead.
-            if tile.ready and not tile.in_queue and not tile.free_play:
-                actions.append(Action("PlayTile", index))
+        actions.extend(Action("PlayTile", index) for index in loadable)
+    else:
+        # With the queue full, a queued tile can go back to hand for free to make room.
+        queued = [i for i, t in enumerate(state.tiles) if any(t is q for q in state.queue_tiles)]
+        actions.extend(Action("PlayTile", index, replace=out) for index in loadable for out in queued)
     actions.extend(attack_actions(state))
     return actions
 
@@ -967,6 +976,13 @@ def hero_action(state, action, outcome):
     elif action.kind == "Flip":
         hero.facing = -hero.facing
     elif action.kind == "PlayTile":
+        if action.replace is not None:
+            out = state.tiles[action.replace]
+            position = next(i for i, t in enumerate(state.queue_tiles) if t is out)
+            out.in_queue = False
+            del state.queue_tiles[position]
+            del hero.queue[position]
+            outcome.sent_back += 1
         tile = state.tiles[action.tile]
         tile.in_queue = True
         hero.queue.append(tile.attack)

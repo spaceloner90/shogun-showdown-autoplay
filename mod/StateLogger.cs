@@ -26,7 +26,7 @@ using BepInEx;
 using HarmonyLib;
 using UnityEngine;
 
-[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.12.0")]
+[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.13.0")]
 public class StateLoggerPlugin : BaseUnityPlugin
 {
     private const float PollIntervalSeconds = 0.1f;
@@ -245,10 +245,11 @@ public class StateLoggerPlugin : BaseUnityPlugin
 
         CombatEnums.ActionEnum action = (CombatEnums.ActionEnum)Enum.Parse(typeof(CombatEnums.ActionEnum), move.Action);
         Tile tile = move.DeckIndex >= 0 ? GetTiles()[move.DeckIndex] : null;
+        Tile replace = move.ReplaceIndex >= 0 ? GetTiles()[move.ReplaceIndex] : null;
         string reason = "score " + Num(move.Score) + ", plan: " + move.Line;
         string source = "Evaluator " + analysis.EvaluatorVersion + " depth " + depth;
         analysis = null;
-        Execute(new Decision(action, tile, reason, move.AttackOrder), source);
+        Execute(new Decision(action, tile, reason, move.AttackOrder, replace), source);
     }
 
     // Uses a held potion the way clicking it does, and logs it. Potion.Submit refuses one that can't be used now.
@@ -282,9 +283,22 @@ public class StateLoggerPlugin : BaseUnityPlugin
             "\"action\":" + Str(decision.Action.ToString()) +
             ",\"tile\":" + (decision.Tile != null ? Str(tileName) : "null") +
             ",\"deckIndex\":" + (decision.Tile != null ? GetTiles().IndexOf(decision.Tile).ToString() : "null") +
+            ",\"replace\":" + (decision.ReplaceTile != null ? Str(TileName(decision.ReplaceTile)) : "null") +
             ",\"source\":" + Str(source) +
             ",\"reason\":" + Str(decision.Reason) +
             ",\"basedOnStateSeq\":" + lastStateSequence);
+
+        // A tile sent back to make room is a free queue edit, made first, since the queue is full until then.
+        if (decision.ReplaceTile != null)
+        {
+            string problem = SendBackToHand(decision.ReplaceTile, source);
+            if (problem != null)
+            {
+                LogEvent("step_refused", "Refused " + actionText + ": " + problem,
+                    "\"action\":\"PlayTile\",\"why\":" + Str(problem));
+                return;
+            }
+        }
 
         // An attack's free edits can fill an empty queue, so it's only checked once they're done.
         string refused = decision.AttackOrder != null ? null : WhyActionRefused(combat, decision);
@@ -334,6 +348,19 @@ public class StateLoggerPlugin : BaseUnityPlugin
 
         // Not "sticky": real key presses can queue during a turn, but one press must be one move.
         combat.PlayerInputsCombatAction(decision.Action, false);
+    }
+
+    // Sends a queued tile back to the hand through the same call a click on it uses, and logs the edit. Returns
+    // what went wrong, or null. Reads the result back rather than assuming it worked.
+    private string SendBackToHand(Tile tile, string source)
+    {
+        if (!(tile.TileContainer is AttackQueueTileContainer)) return TileName(tile) + " isn't in the queue to send back";
+        string before = QueueNames();
+        tile.TileContainer.Submit();
+        string after = QueueNames();
+        LogEvent("queue_edit", "Queue edit: " + before + " -> " + after + " [from: " + source + "]",
+            "\"before\":" + Str(before) + ",\"after\":" + Str(after) + ",\"source\":" + Str(source));
+        return tile.TileContainer is HandTileContainer ? null : "the game didn't send " + TileName(tile) + " back to the hand";
     }
 
     // Makes the free edits a chosen attack needs: tiles not firing go back to the hand, Free Play tiles

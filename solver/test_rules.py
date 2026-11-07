@@ -827,10 +827,12 @@ class EvaluatorTest(unittest.TestCase):
         self.assertNotEqual(rank_actions(state)[0].actions[0].kind, "Wait")
 
     def test_plans_for_a_target_behind_the_hero(self):
-        # With a queued Arrow and an enemy only behind, flipping beats firing into empty cells.
+        # With a queued Arrow and an enemy only behind, firing into empty cells isn't even considered, and the
+        # flip that turns the Arrow onto it comes first.
         state = make_state(enemies=[enemy(0, facing=1, hp=2)], queue=["Arrow"])
         ranked = [line.actions[0].kind for line in rank_actions(state, depth=2)]
-        self.assertLess(ranked.index("Flip"), ranked.index("Attack"))
+        self.assertNotIn("Attack", ranked)
+        self.assertEqual(ranked[0], "Flip")
 
     def test_in_range_is_fine_when_the_hero_can_step_away(self):
         state = make_state(enemies=[enemy(3, queue=[KATANA])])
@@ -2052,17 +2054,32 @@ class IceTest(unittest.TestCase):
                         "action": "Wait", "special": {"charge": 3, "cooldown": 3}}}
         self.assertFalse(state_from_log(row).enemies[0].freezable)
 
-    def test_turns_frozen_are_worth_more_against_a_harder_hitter(self):
+    def test_loading_with_a_full_queue_sends_a_tile_back_first(self):
+        state = make_state(enemies=[enemy(4)], queue=["Swirl", "Arrow"])
+        katana, spear = Tile(KATANA, cooldown=3, charge=3), Tile(Attack("Spear", 3, [1, 2]), cooldown=3, charge=3)
+        katana.in_queue = True
+        state.tiles += [katana, spear]
+        state.queue_tiles.append(katana)
+        state.hero.queue.append(KATANA)
+        loads = {(a.tile, a.replace) for a in legal_actions(state) if a.kind == "PlayTile"}
+        self.assertEqual(loads, {(3, 0), (3, 1), (3, 2)})
+        after, _ = step(state, Action("PlayTile", 3, replace=0))
+        self.assertEqual([t.attack.name for t in after.queue_tiles], ["Arrow", "Katana", "Spear"])
+        self.assertEqual([a.name for a in after.hero.queue], ["Arrow", "Katana", "Spear"])
+        self.assertFalse(after.tiles[0].in_queue)
+        self.assertTrue(after.tiles[0].ready)
+        self.assertEqual(Action("PlayTile", 3, replace=0).label(state), "PlayTile Spear (Swirl to hand)")
+
+    def test_a_fresh_freeze_is_worth_half_a_kill(self):
+        # The turn it's frozen on is played out, so a fresh freeze shows 3 turns left: half of 60 + 10 per HP.
         state = make_state(hero_cell=0, enemies=[enemy(4, hp=9, queue=[KATANA])])
         state.enemies[0].ice = 3
-        weak = leaf_terms(state)["ice"]
-        state.enemies[0].queue = [Attack("Tetsubo", 4, [1], first_target=True)]
-        self.assertEqual((weak, leaf_terms(state)["ice"]), (30, 60))
+        self.assertEqual(leaf_terms(state)["ice"], 75)
 
-    def test_an_enemy_with_nothing_known_loaded_counts_as_2(self):
+    def test_a_freeze_is_worth_less_as_its_ice_runs_out(self):
         state = make_state(hero_cell=0, enemies=[enemy(4, hp=9)])
-        state.enemies[0].ice = 2
-        self.assertEqual(leaf_terms(state)["ice"], 20)
+        state.enemies[0].ice = 1
+        self.assertEqual(leaf_terms(state)["ice"], 25)
 
     def test_loading_an_ice_tile_counts_the_freeze_it_would_land(self):
         state = make_state(hero_cell=2, enemies=[enemy(3, hp=9, queue=[KATANA])])

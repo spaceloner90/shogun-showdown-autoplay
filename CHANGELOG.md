@@ -7,6 +7,16 @@ ones are unvetted until real play confirms them, as [`research/unvetted.md`](res
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v1.26 — loading with a swap, no tile fired at nothing, and freezing at half a kill (2026-11-07)
+- **Rule:** with the queue full, loading can send a queued tile back to hand first, a free queue edit, as one action.
+  F1 never saw this, which is what kept the stalemate in fight 11 of `logs/run8` going. **Mod 0.13.0** makes the edit
+  before loading.
+- **Scoring:** an attack that fires a tile at nothing is left out, since sending that tile back instead is free and
+  leaves the same board with the tile still ready. Firing Shadow Kama at nothing had won by taking it out of the
+  tiles the position terms read, and with it the penalty for standing closer than the Kama reaches.
+- **Scoring:** a freshly frozen enemy is worth half of killing it, 60 plus 10 per HP, as the player asked, falling
+  as its ice runs out. It was 5 per turn of ice per point of its strongest attack.
+
 ## v1.25 — potion pressure at 30%, and Cool Up to avoid damage (2026-11-07)
 - **Scoring:** pressure is now the worst 30% of boards, a best score below 11.
 - **Scoring:** Cool Up also counts as a damage-avoiding potion, since recharging the special move or an escape tile

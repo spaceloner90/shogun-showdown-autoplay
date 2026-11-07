@@ -39,6 +39,19 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.26: loading with a swap, no tile fired at nothing, and freezing at half a kill
+
+Replayed on every logged board against v1.25: 34 choices change, no HP lost and no wasted attacks (3 before). 28 load
+with a swap; in two Ronin fights that gives up a kill or 4 damage now for a bigger stack next turn, by under 2 points.
+Played forward, the run8 stalemate board kills both enemies in two turns, and no board swapped tiles back and forth.
+The freeze value changes two near-tied choices, since few logged boards had a freeze on offer.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Loading with a swap when the queue is full | Mod | Nothing: mod 0.13.0 sends the tile back, then loads | No refusals, the queue in the order the solver expects, and no tiles juggled back and forth |
+| An attack firing a tile at nothing is left out | Scoring | Replays: none fired now, 3 before | Tiles sent back rather than fired into empty cells |
+| **A fresh freeze is worth half a kill** | **Scoring** | **The player's read from run8: freezing is very strong** | **Freezes landed on the enemies that matter, and not traded for kills** |
+
 ## New in v1.24: elites, and potion pressure at 20%
 
 The Archer's Double Strike on turn 10 of fight 7 in `logs/run8` is now exact. That log's only other misses are summons
@@ -69,7 +82,7 @@ took at most 0.08 s. None of this has been played.
 | Item | Kind | What's already confirmed | What to look for |
 |---|---|---|---|
 | The mod using a potion | Mod | Confirmed in `logs/run8`: the Shield on turn 10 of the Rei fight, used on its own press, saving 1 of 2 damage as predicted | Each other potion's first use |
-| Each potion's simulated effect | Rule | From the code; no potion has been used by F1 | The board after a potion matching the simulation |
+| Each potion's simulated effect | Rule | From the code. In `logs/run8` F1 has used Edamame, the Shield, and Mass Poison in a boss fight, making the kill it predicted | The board after a potion matching the simulation |
 | **The player's rules for when to use each** | **Scoring** | **Replays above** | **Potions used where the player would, not hoarded or wasted** |
 | Pressure at a best score below -37 | Scoring | The worst 10% of logged boards | Attacking potions and D6 used in hard fights, not easy ones |
 
@@ -79,8 +92,8 @@ Read from the game's code, for an Ice tile if one joins the deck. No logged figh
 
 | Item | Kind | What's already confirmed | What to look for |
 |---|---|---|---|
-| An Ice hit freezes for 4 turns and cancels this turn's action | Rule | Nothing | A frozen enemy's telegraphed attack not landing, and it acting again 4 turns later |
-| **Each turn of ice left is worth 5 per point of the enemy's strongest known attack** | **Scoring** | **A first guess, like poison's 8 a turn** | **Ice saved for the hardest hitters, and not wasted on enemies about to die** |
+| An Ice hit freezes for 4 turns and cancels this turn's action | Rule | `logs/run8`'s Ice Shadow Dash froze enemies on 14 logged boards, with no prediction misses from it | A frozen enemy's telegraphed attack not landing, and it acting again 4 turns later |
+| Each turn of ice left is worth 5 per point of the enemy's strongest known attack | Scoring | Replaced in v1.26 | |
 | A loaded Ice tile is a 0.5 tiebreak | Scoring | As for Shockwave and Curse | Only if an Ice tile joins the deck |
 
 ## New in v1.20: Dynamic Boost, and loaded Curse tiles

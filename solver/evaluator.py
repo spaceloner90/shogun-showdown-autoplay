@@ -50,11 +50,11 @@ import copy
 import itertools
 from dataclasses import dataclass, field
 
-from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, Attack, Outcome, State,
+from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, Attack, Outcome, State,
                    apply_attack, apply_potion, can_use_special, enemy_cells, fireable_attacks, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v1.25"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.26"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -63,8 +63,8 @@ WEIGHTS = {
     "enemy_damage": 10.0,     # Per enemy HP removed by the hero.
     "tank_damage": 2.5,       # Per HP removed from a tank that will die with its boss anyway.
     "poison_turn": 8.0,       # Per turn of poison left on an enemy, like damage another enemy deals.
-    "ice_turn": 5.0,          # Per turn of ice left on an enemy, per point of its strongest known attack (2 if none
-                              # is known). Freezing a 2-damage enemy is worth about 3 damage now. A first guess.
+    "ice_vs_kill": 0.5,       # A freshly frozen enemy is worth this share of killing it, as the player asked: it does
+                              # nothing for 4 turns, which in practice is nearly as good. Less as its ice runs out.
     # Potions. Each is used on a key press of its own, and the next press analyzes the board it leaves.
     "heal_at_missing": 3,     # Use Edamame once the hero is missing at least this much HP, so none of its 3 is wasted.
     "pressure": 11.0,         # Below this best score, the hardest 30% of logged boards, as the player asked: at 10%
@@ -138,6 +138,9 @@ class Line:
     # How good the position is right after the first action. Only used to break ties, so that of
     # two lines ending in the same place, the one improving things sooner wins.
     position_next_turn: float = 0.0
+    # Whether the first action fires a tile that does nothing. Sending it back instead is a free queue edit that
+    # leaves the board the same and the tile ready, so such a line is never the better one, and it's left out.
+    wasted: bool = False
 
     @property
     def sort_key(self):
@@ -486,14 +489,15 @@ def _trap_value(state):
 
 
 def _ice_value(state):
-    """Turns an enemy will spend frozen, doing nothing: worth more the harder it hits, and nothing on one that dies.
-    The turn it's frozen on is already played out by the simulation, so this only covers the rest."""
+    """Frozen enemies, doing nothing: each worth a share of killing it, by the ice it has left. The turn it's frozen
+    on is already played out by the simulation, so a fresh freeze shows ICE_TURNS - 1 turns left, and counts in
+    full. Nothing on one that dies, since the kill then counts instead."""
     total = 0.0
     for enemy in state.enemies:
         if not enemy.alive or enemy.ice <= 0 or is_tank(state, enemy):
             continue
-        known = [a.value for a in enemy.queue if a.name not in (UNKNOWN_TILE, UNKNOWN_COPY) and a.value]
-        total += WEIGHTS["ice_turn"] * enemy.ice * max(known, default=ASSUMED_UNKNOWN.value)
+        kill = WEIGHTS["kill"] + WEIGHTS["enemy_damage"] * enemy.hp
+        total += WEIGHTS["ice_vs_kill"] * kill * min(1.0, enemy.ice / (ICE_TURNS - 1))
     return total
 
 
@@ -567,12 +571,13 @@ def _evaluate_action(state, action, depth, scale):
             _merge(terms, best.terms)
         else:
             _merge(terms, leaf_terms(next_state), future_scale)
-    return Line(actions, sum(terms.values()), labels, terms, position)
+    wasted = action.kind == "Attack" and outcome.wasted_attacks > 0
+    return Line(actions, sum(terms.values()), labels, terms, position, wasted)
 
 
 def _best_line(state, depth, scale):
-    return max((_evaluate_action(state, a, depth, scale) for a in legal_actions(state)),
-               key=lambda line: line.sort_key)
+    lines = [_evaluate_action(state, a, depth, scale) for a in legal_actions(state)]
+    return max((line for line in lines if not line.wasted), key=lambda line: line.sort_key)
 
 
 # In order of preference when they save as much. Cool Up recharges the special move and escape tiles, so it can avoid
@@ -640,5 +645,6 @@ def potion_plan(state, ranked):
 def rank_actions(state: State, depth: int = 1) -> list[Line]:
     """Every action available now, best first, each with the best continuation found for it."""
     lines = [_evaluate_action(state, action, depth, 1.0) for action in legal_actions(state)]
+    lines = [line for line in lines if not line.wasted]
     lines.sort(key=lambda line: line.sort_key, reverse=True)
     return lines

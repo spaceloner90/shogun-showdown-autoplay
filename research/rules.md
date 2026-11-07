@@ -108,7 +108,8 @@ have the free version the code allows (`TurnAroundIsFree`).
 The fight in `logs/battle2_swap_queue` showed:
 
 - **Queue edits are free.** Reordering or removing queued tiles doesn't use the turn or change the
-  enemies. A removed tile goes back to the hand still charged, and playing it again uses a turn.
+  enemies. A removed tile goes back to the hand still charged, and playing it again uses a turn. So with the queue
+  full, a tile can be sent back to make room and another loaded, for the one turn the loading takes.
 - **The queue fires in the order it's listed.** Only two fights have shown a stack firing.
 - **Swap costs one turn.** Two simulated turns across it matched the log on all 10 values compared,
   including the charge restarting and the swapped enemy's attack missing. A complete swap in

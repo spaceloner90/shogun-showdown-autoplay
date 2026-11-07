@@ -14,7 +14,7 @@ from rules import Action, state_from_log, step
 LOGS = Path(__file__).resolve().parent.parent / "research" / "logs"
 ROWS = {
     name: [json.loads(line) for line in (LOGS / name / "state.jsonl").read_text(encoding="utf-8").splitlines()]
-    for name in ("run2_complete", "run3_v03", "run3_part2", "run4", "run5_full", "run6", "run7")
+    for name in ("run2_complete", "run3_v03", "run3_part2", "run4", "run5_full", "run6", "run7", "run8")
 }
 
 
@@ -30,6 +30,28 @@ def position(fight, turn, log="run2_complete"):
 
 def choice(fight, turn, log="run2_complete"):
     return rank_actions(position(fight, turn, log), depth=1)[0]
+
+
+def at_seq(seq, log):
+    """The logged state with this sequence number."""
+    return state_from_log(next(r for r in ROWS[log] if r.get("seq") == seq))
+
+
+class QueueEdits(unittest.TestCase):
+    def test_loads_with_a_swap_to_break_a_stalemate(self):
+        # Run 8, fight 11: the queue full with Swirl, Shadow Kama and Arrow, and F1 waited every turn since it couldn't
+        # load anything. Sending Swirl back to load Shadow Dash sets up killing both.
+        best = rank_actions(at_seq(4651, "run8"), depth=1)[0]
+        self.assertEqual(best.labels[0], "PlayTile ShadowDash (Swirl to hand)")
+
+    def test_never_fires_shadow_kama_at_nothing(self):
+        # Run 8, fight 14: Shadow Kama loaded with nobody 2 cells ahead. It used to fire anyway, as that took it out of
+        # where the hero wants to stand. It goes back to hand instead.
+        for seq in (5818, 3570, 1269):
+            for line in rank_actions(at_seq(seq, "run8"), depth=1):
+                self.assertFalse(line.wasted, line.labels[0])
+            best = rank_actions(at_seq(seq, "run8"), depth=1)[0]
+            self.assertIn("ShadowKama to hand", best.labels[0])
 
 
 class MistakesToAvoid(unittest.TestCase):

@@ -11,7 +11,7 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from rules import UNKNOWN_COPY, UNKNOWN_TILE, Action, state_from_log, step
+from rules import QUEUE_CAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, state_from_log, step
 
 DEFAULT_LOG = Path(__file__).resolve().parent.parent / "research" / "logs" / "first_battle_tiletest.jsonl"
 
@@ -62,7 +62,13 @@ def to_action(state, name, tile_name, after):
     # which one went into the queue.
     candidates = [i for i, t in enumerate(state.tiles) if t.attack.name == tile_name and not t.in_queue]
     moved = [i for i in candidates if i < len(after["tiles"]) and "AttackQueue" in after["tiles"][i]["where"]]
-    return Action("PlayTile", (moved or candidates)[0])
+    # Loading into a full queue sends a queued tile back first: the one the next state shows in hand.
+    replace = None
+    if len(state.queue_tiles) >= QUEUE_CAP:
+        out = [i for i, t in enumerate(state.tiles)
+               if t.in_queue and i < len(after["tiles"]) and "AttackQueue" not in after["tiles"][i]["where"]]
+        replace = out[0] if out else None
+    return Action("PlayTile", (moved or candidates)[0], replace=replace)
 
 
 def compare(predicted, actual_row, spawned):

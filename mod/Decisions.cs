@@ -15,11 +15,15 @@ public sealed class Decision
     // tiles still in hand. Null fires the queue as it is.
     public readonly int[] AttackOrder;
 
-    public Decision(ActionEnum action, Tile tile, string reason, int[] attackOrder = null)
+    // For PlayTile with a full queue: the queued tile to send back to hand first, a free queue edit. Null if none.
+    public readonly Tile ReplaceTile;
+
+    public Decision(ActionEnum action, Tile tile, string reason, int[] attackOrder = null, Tile replaceTile = null)
     {
         Action = action;
         Tile = tile;
         Reason = reason;
         AttackOrder = attackOrder;
+        ReplaceTile = replaceTile;
     }
 }

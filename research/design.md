@@ -194,10 +194,12 @@ too.
 
 ## Checking a change
 
-- **Replay real logs.** Run the top choice on every logged board before and after: the Wanderer's 926 winning-run
-  boards, and every Ronin board since. Count what changes, kills, HP lost and damage dealt, and look at each changed
-  choice that matters.
-- **Run the principle test,** `test_principles.py`: rule 1 on every logged board. It takes several minutes.
+- **Replay real logs.** `tools/replay.py` runs the top choice on every logged board, in parallel, in about 17 s, and
+  saves it to `research/replays/<version>.json`; `--tag` replays a tagged version from git. `tools/compare.py` then
+  counts what changes, kills, HP lost and damage dealt, and `--show` lists each changed choice to look at. The boards
+  are listed in `solver/logged_boards.py`: add each new log there. `tools/choices.py` shows one board's top choices
+  with every term, and `tools/potions.py` which potion F1 would use on every board holding one.
+- **Run the principle test,** `test_principles.py`: rule 1 on every logged board, in a few seconds.
 - **Run the stall check.** Hunt a still enemy from many starts, to catch fights that would drag on.
 - **Look at the turns that prompted it,** and make sure each one now picks what it should, for the right reason.
 - **Keep real positions as tests** (`test_positions.py`), so later changes can't quietly undo them.

@@ -43,10 +43,9 @@ Enemy AI code is for offline simulation and tuning only.
   strikes 2 cells ahead, and Swirl, which strikes beside it. F1 spent a lot of turns shuffling between the two
   distances, often wastefully, since they're hard to use together, though it sometimes paid off. The player's read:
   more a problem of picking the tile than of using it. Picking rewards isn't something F1 does.
-- **Attacking potions rarely get used.** At 30% pressure, on the 2,100 logged boards with potions held, Mass Curse
-  comes up 4 times and Mass Poison once. Given each one hypothetically on all 366 pressured boards, Mass Poison adds a
-  kill this turn on 57, Mass Curse on 14 and Cool Up on 6: curse and Cool Up need something to fire this turn, which
-  only 187 had. So they're rare mostly because they're seldom held when it counts.
+- **Attacking potions only with every slot full (since v1.28).** The pressure cutoff is gone, as the player asked.
+  On the 2,470 logged boards with potions held, v2.0 would use Mass Poison on 17 and Mass Curse on 16, and D6 on 4
+  (`tools/potions.py`). Whether a fight that needs one ever comes with a slot free is for real play to show.
 - **Key presses are slow because Python starts each time.** A press takes about 0.5 s in game, of which the search
   is about 0.02 s: the rest is starting a new Python process. A solver process that stays running, reloading when its
   code changes, would cut most of it. That's a new mechanism, to raise with the player before building.
@@ -172,9 +171,8 @@ with, and being surrounded should cost more. v1.4 does a first version of both, 
 - **Kits other than these.** As of v1.5 every hero uses the same rules, as the player asked: general rules going
   forward, developed further wherever going back shows them worse. Preferred distance has been looked at on the
   Ronin's deck and the Wanderer's winning-run decks, where it comes out at 1 on 894 of 926 boards.
-- **A loaded Smoke Bomb discourages setting up kills.** A loaded Smoke Bomb earns nothing kept when the loaded
-  tiles can kill from here, so loading a tile that makes a kill possible behind it costs its 12. That's fair, since
-  firing them spends it, but depth 1 may make too much of it. As of v1.6 a bomb in hand isn't affected.
+- **A loaded Smoke Bomb discouraged setting up kills (fixed in v1.27).** It earned nothing kept when the loaded tiles
+  could kill. Since v1.27 the stack weighs that, scoring a volley with the board it leaves.
 - **Loading the Smoke Bomb ahead of an Archer (out of scope for now).** Fight 3 of `logs/run7` lost 4 HP to two
   Archer shots (turns 17 and 21). A better player would have loaded the bomb ahead of time to step out of them.
   F1 only sees an attack once it's queued, so valuing the bomb loaded in that case needs knowing what each enemy
@@ -215,15 +213,14 @@ with, and being surrounded should cost more. v1.4 does a first version of both, 
   next turn counts at 60% and a turn's discount, while an enemy left alive costs only 4 per HP. Two real boards
   pull opposite ways: Rei (`logs/run6`, fight 3, turn 36), where killing is right, and lining up a double kill on
   the winning run (`logs/run2_complete`, fight 7, turn 2). Left as is, to see how it plays.
-- **Test and replay time.** v1.27's stack makes a decision about 5 times slower, and the slow checks run on every
-  logged board. The player's idea: don't keep adding every experienced board to the tests, and don't run them all
-  every time.
+- **Test and replay time (partly done).** The full replay and the principle test now run in parallel, in about 17 s
+  and 4 s, from about 4 and 4.5 minutes, and each version's replay is kept in `research/replays/`. Still to do, as the
+  player suggested: a smaller everyday set of boards chosen by meaning (every board a test names, close calls,
+  coverage of each mechanic, a cap per fight), the full set only for releases, and adding a position test only
+  when a board shows something no test covers.
 
-- **The position terms read a kit on cooldown as needing less.** Where the hero wants to stand, and how much being
-  far from the target costs, come from tiles ready soon. A tile put on cooldown drops out, which can lower those
-  penalties, so firing a tile can look better than it is. v1.26 rules out firing one at nothing; firing one for a
-  point of damage just to shed a penalty could still happen. Counting the whole deck instead fixed two of the three
-  logged cases and changed 19 choices.
+- **The position terms read a kit on cooldown as needing less (fixed in v1.27).** Distance and crowding are
+  replaced by reach and stand-off, which only give credit, by the three rules.
 
 - **Cooldowns aren't valued.** Which tile to load depends on damage and reach. Changing a cooldown
   changed no choices on run 2's positions.

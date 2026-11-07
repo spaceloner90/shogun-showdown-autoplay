@@ -4,41 +4,21 @@ Having a tile never scores lower than not having it: if it did, F1 would be bett
 throw it away to get there, as when Shadow Kama was fired at nothing to shed a positioning penalty. And a loaded
 tile never scores lower than the same tile in hand, since sending it back is a free queue edit.
 
-Each logged board is checked as it stands and as F1's choice leaves it.
+Each logged board is checked as it stands. The boards come from solver/logged_boards.py, and include the board
+each real choice left, since that's the next turn's board in the log. The checks run in parallel.
 
 Run with: python solver/test_principles.py
 """
 import copy
-import json
+import os
 import unittest
-from pathlib import Path
+from concurrent.futures import ProcessPoolExecutor
 
-from evaluator import leaf_terms, rank_actions
-from rules import state_from_log, step
+from evaluator import leaf_terms
+from logged_boards import logged_boards
+from rules import state_from_log
 
-LOGS = Path(__file__).resolve().parent.parent / "research" / "logs"
-RUNS = (("run5_full", 9), ("run6", 0), ("run7", 0), ("run7_part2", 0), ("run7_part3", 0), ("run8", 0))
 TOLERANCE = 0.01
-
-
-def logged_positions():
-    """(where, state) for every logged board's first state of a turn, and the position F1's choice leaves."""
-    for log, first in RUNS:
-        rows = [json.loads(l) for l in (LOGS / log / "state.jsonl").read_text(encoding="utf-8").splitlines()]
-        starts = [i for i, r in enumerate(rows) if r.get("event") == "combat_start"] + [len(rows)]
-        for fight, (a, b) in enumerate(zip(starts, starts[1:])):
-            if fight < first:
-                continue
-            seen = {}
-            for row in rows[a:b]:
-                if row["type"] == "state" and row["enemies"] and row["room"] != "CampRoom":
-                    seen.setdefault(row["turn"], row)
-            for turn, row in seen.items():
-                state = state_from_log(row)
-                yield f"{log} fight {fight} turn {turn}", state
-                after, _ = step(state, rank_actions(state, depth=1)[0].actions[0])
-                if after.hero.alive:
-                    yield f"{log} fight {fight} turn {turn}, after F1's choice", after
 
 
 def score(state):
@@ -64,28 +44,39 @@ def differences(before, after):
     return {k: round(b.get(k, 0) - a.get(k, 0), 1) for k in set(a) | set(b) if abs(b.get(k, 0) - a.get(k, 0)) > 0.05}
 
 
+def broken_on(item):
+    """Every way one board breaks the two checks, as (check, text)."""
+    where, row = item
+    state = state_from_log(row)
+    base = score(state)
+    broken = []
+    for index, tile in enumerate(state.tiles):
+        if tile.ready:
+            changed = without_tile(state, index, on_cooldown=True)
+            if score(changed) > base + TOLERANCE:
+                broken.append(("cooldown", f"{where}: {tile.attack.name} on cooldown gains {differences(state, changed)}"))
+        if tile.in_queue:
+            changed = without_tile(state, index, on_cooldown=False)
+            if score(changed) > base + TOLERANCE:
+                broken.append(("hand", f"{where}: {tile.attack.name} sent back gains {differences(state, changed)}"))
+    return broken
+
+
 class Principles(unittest.TestCase):
-    def test_having_a_tile_never_scores_lower(self):
-        broken = []
-        for where, state in logged_positions():
-            base = score(state)
-            for index, tile in enumerate(state.tiles):
-                if tile.ready:
-                    changed = without_tile(state, index, on_cooldown=True)
-                    if score(changed) > base + TOLERANCE:
-                        broken.append(f"{where}: {tile.attack.name} on cooldown gains {differences(state, changed)}")
+    @classmethod
+    def setUpClass(cls):
+        with ProcessPoolExecutor(max_workers=os.cpu_count()) as pool:
+            cls.broken = [b for found in pool.map(broken_on, logged_boards(), chunksize=8) for b in found]
+
+    def check(self, kind):
+        broken = [text for k, text in self.broken if k == kind]
         self.assertEqual(broken, [], f"{len(broken)} cases, first ones:\n" + "\n".join(broken[:15]))
 
+    def test_having_a_tile_never_scores_lower(self):
+        self.check("cooldown")
+
     def test_a_loaded_tile_never_scores_lower_than_in_hand(self):
-        broken = []
-        for where, state in logged_positions():
-            base = score(state)
-            for index, tile in enumerate(state.tiles):
-                if tile.in_queue:
-                    changed = without_tile(state, index, on_cooldown=False)
-                    if score(changed) > base + TOLERANCE:
-                        broken.append(f"{where}: {tile.attack.name} sent back gains {differences(state, changed)}")
-        self.assertEqual(broken, [], f"{len(broken)} cases, first ones:\n" + "\n".join(broken[:15]))
+        self.check("hand")
 
 
 if __name__ == "__main__":

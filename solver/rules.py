@@ -27,8 +27,9 @@ SNIPER_DISTANCE = 4  # Sniper adds its level to the hero's hits on targets at le
 # Combo Curse curses a random enemy on each kill after the first in a turn, by anyone: which one can't be predicted,
 # like where a summon lands, so it isn't simulated. Combo Coin and Triple Combo Heal also trigger on combos, and
 # aren't simulated or valued either: the player's call is there's no reason to yet. So is Combo Recharge, which
-# takes 4 a level off the cooldown of a tile making a kill after the first in a turn (ComboRechargeSkill.OnComboKill).
-UNDERSTOOD_SKILLS = {"BigPockets", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "DynamicBoost", "Fortress", "Healthy",
+# takes 4 a level off the cooldown of a tile making a kill after the first in a turn (ComboRechargeSkill.OnComboKill),
+# and Chilling Combo, which freezes enemies on a combo kill.
+UNDERSTOOD_SKILLS = {"BigPockets", "ChillingCombo", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "DynamicBoost", "Fortress", "Healthy",
                      "QuickRecovery", "Sniper", "TripleComboHeal", "TwoWayMove", "UnfriendlyFire"}
 
 POISON_TURNS = 3  # Applying poison sets this many turns left, and each turn's end deals 1, starting that turn.

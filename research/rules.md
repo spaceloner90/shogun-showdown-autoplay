@@ -236,7 +236,10 @@ Freezing, read from the code (simulated as of v1.21):
 
 - **Ice lasts the full 4 turns, bosses included.** In `logs/run8` and `logs/run8_part2`, every frozen enemy showed
   ice 3, 2, 1 over the three turns after the hit, waiting each turn with any loaded attack kept, and Kowa did the
-  same both times it was frozen. The hit turn is the fourth, its action cancelled.
+  same both times it was frozen. The hit turn is the fourth, its action cancelled. Some bosses can't be frozen at
+  all: Hideyoshi has the Unfreezable trait, and the Ice Shadow Dash hitting him in `logs/run8_part2` (fight 5, turn
+  13) did nothing beyond its damage. The solver reads the trait.
+- **Chilling Combo** freezes enemies on a combo kill. Not simulated, as the player asked, like Combo Curse.
 - **Potion slots:** 3, the most held in any log, and Big Pockets adds one (`BigPocketsSkill.PickUp`).
 - **Combo Recharge** takes 4 a level off the cooldown of the tile making a combo kill, any kill after the first in a
   turn (`ComboRechargeSkill.OnComboKill`, `CombatManager.OnEnemyDied`). Not simulated, as the player asked.

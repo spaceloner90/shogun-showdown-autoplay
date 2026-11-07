@@ -29,6 +29,11 @@ Enemy AI code is for offline simulation and tuning only.
     potion: both turned away, the right one's Katana killed the TwinTachi on 8 instead, and Spear with Sharp Turn
     then took no damage. The log has the board both before (seq 2126) and after (seq 2127) the potion. v1.11 would
     likely have avoided this a turn earlier, as it now sees the left Strider dash in next to the hero.
+- **Sharp Turn used just to face a better way (left on purpose).** F1 sometimes adds a free Sharp Turn to the end
+  of a volley only to face better (`logs/run7_part2`, fight 2, turns 3 and 20), when keeping it to aim a later
+  attack is usually worth more. Scoring facing as free while one is ready was considered and dropped: facing
+  matters beyond attacks, for a shove without Two Way Move for one, so turning early is sometimes right, and a rule
+  shaped around how one Free Play tile gets used wouldn't carry over to anything else.
 - **What a point of damage is worth.** Every point counts 10, but taking an enemy from 2 HP to 1 is worth little
   when almost nothing that would kill it later does only 1. Damage should be worth what it saves later: the hits
   or turns it takes off the kill, given the kit. This came up comparing a 2-damage shove against loading a Trap

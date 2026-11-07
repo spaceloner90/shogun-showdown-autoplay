@@ -501,6 +501,10 @@ def attack_hits(state, attacker, attack):
             return []
         attacker.cell, targets[0].cell = targets[0].cell, attacker.cell
         return targets[:1]
+    # Shadow Kama strikes only the first agent its range finds: ShadowKamaAttack.ApplyEffect. The Shogun statue's
+    # reaches just the cell 2 ahead, past anyone in between.
+    if attack.name == "ShadowKama":
+        return targets_of(state, attacker, attack)[:1]
     # Sharp Turn turns its user around first, then strikes what's in range in the new direction.
     if attack.name == "TurnAround":
         attacker.facing = -attacker.facing

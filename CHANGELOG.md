@@ -7,6 +7,10 @@ ones are unvetted until real play confirms them, as [`research/unvetted.md`](res
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v1.23 — Shadow Kama for the hero (2026-11-07)
+- **Rule:** Shadow Kama strikes only the first agent its range finds. With the statue's range of the cell 2 ahead,
+  that's what the simulation already did; it matters only if a tile's range is wider.
+
 ## v1.22 — consumables (2026-11-07)
 - **Rule:** each combat potion's effect, from the game's code. Using one is free and doesn't end the turn.
 - **Scoring:** the player's rules. Edamame once the hero is missing 3 HP. Shield, Freeze Time and Rain of Mirrors

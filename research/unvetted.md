@@ -39,6 +39,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.23: Shadow Kama for the hero
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| The hero's Shadow Kama strikes the first agent its range finds | Rule | The Shogun statue's, in `logs/run3_part2` | The hit landing 2 cells ahead, past anyone in between |
+
 ## New in v1.22: consumables
 
 One potion per key press: the mod (plugin 0.12.0) uses it instead of acting, and the next press analyzes the board it

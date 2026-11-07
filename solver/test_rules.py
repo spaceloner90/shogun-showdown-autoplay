@@ -2075,6 +2075,18 @@ class IceTest(unittest.TestCase):
         self.assertEqual(load.terms["effects"], 0.5 * WEIGHTS["future_discount"])
 
 
+class ShadowKamaTest(unittest.TestCase):
+    """ShadowKamaAttack in the game's code: the first agent its range finds, and nobody else."""
+
+    def test_it_strikes_2_ahead_past_anyone_between(self):
+        after, _ = fire(make_state(hero_cell=0, enemies=[enemy(1, hp=9), enemy(2, hp=9)]), Attack("ShadowKama", 3, [2]))
+        self.assertEqual([e.hp for e in after.enemies], [9, 6])
+
+    def test_with_a_wider_range_only_the_first_found(self):
+        after, _ = fire(make_state(hero_cell=0, enemies=[enemy(2, hp=9), enemy(3, hp=9)]), Attack("ShadowKama", 3, [2, 3]))
+        self.assertEqual([e.hp for e in after.enemies], [6, 9])
+
+
 class PotionTest(unittest.TestCase):
     """Each potion's Effect in the game's code, and the player's rules for when F1 uses one."""
 

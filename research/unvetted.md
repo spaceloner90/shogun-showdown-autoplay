@@ -39,6 +39,24 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.7: every repositioning move is worth something kept
+
+The player's read: every ability that repositions the hero or others should have some escape value, by how flexible it
+is across situations, guessed now and tuned later. Before, only Swap and the Smoke Bomb had one, and spending the
+shove cost just 3. The Smoke Bomb's rules now apply to every move: a tile in hand is worth 2/3 of one loaded, one
+that acts on a target is worth 1/3 with nobody it can act on, and loaded tiles that would go off with a kill earn
+nothing. Several escapes count as the best one plus half of each other. None of this has been played.
+
+On the winning run's 926 boards, 11 top choices change and 7 of those load Shadow Dash instead of another tile,
+by 0.5 to 1.3 points. On the 243 Ronin boards, 2 change: one fires for a kill instead of shoving (fight 3, turn 31 of
+`logs/run7`). No kills or HP are lost anywhere, and hunts take as long as before.
+
+| Item | Kind | What replays show | What to look for |
+|---|---|---|---|
+| **Kept values: Swap and Smoke Bomb 12, Shadow Dash 9, Shove and Dash 6, Dragon Punch and Charge 4, the hook 3** | **Scoring** | **First guesses. Few choices change** | **The shove and Dragon Punch kept for when they're needed, rather than spent for collision damage** |
+| Each escape beyond the best counts for half | Scoring | A guess | Whether F1 hoards several at once |
+| Shadow Dash loaded ahead of other tiles | Scoring | 7 Wanderer boards, by small margins, mostly far from enemies | Whether it closes the gap well, or delays damage |
+
 ## New in v1.6: the Smoke Bomb in hand, and Lightning
 
 `logs/run7` showed F1 loading the Smoke Bomb aggressively: 6 times in one fight, once over the 3-damage Spear, and

@@ -52,7 +52,7 @@ from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SWAP, UNKNOWN_TIL
                    apply_attack, can_use_special, fireable_attacks, is_tank, legal_actions, perform_special, step,
                    strike_cell, targets_of)
 
-VERSION = "v1.6"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.7"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -75,11 +75,23 @@ WEIGHTS = {
     "ready_tile": 2.0,        # Per tile that's charged, in hand or queue.
     "loaded_damage": 2.0,     # Per point of damage in the queue, whether or not anything's in range.
     "swap_ready": 3.0,        # Having the special move charged, so spending it has a cost.
-    "escape_kept": 12.0,      # A charged Swap, or a loaded Smoke Bomb with a target: a dodge usable this turn.
-    "escape_in_hand": 8.0,    # A charged Smoke Bomb in hand with a target. Loading it adds only a little, so it
-                              # doesn't beat a high damage tile to the queue, since any attack would spend it.
-    "escape_no_target": 4.0,  # A charged Smoke Bomb with nobody in reach to trade places with.
-    "escape_two_way": 1.5,    # A kept Swap with Two Way Move covers both sides, so it's worth this much more.
+    # What keeping each repositioning move is worth, charged and loaded. First guesses from how flexible each is,
+    # to tune later.
+    "escape_values": {
+        "SwapSpecialMove": 12.0,                    # Past an adjacent enemy, any time, without a tile.
+        "SmokeBomb": 12.0, "BackSmokeBomb": 12.0,   # Past the first target, at any range.
+        "ShadowDash": 9.0, "BackShadowDash": 9.0,   # Behind a target, past everyone in between.
+        "PushSpecialMove": 6.0,                     # Pushes an adjacent enemy away, without a tile. Not past it.
+        "Dash": 6.0,                                # Away to the last free cell, but only into open space.
+        "DragonPunch": 4.0,                         # Pushes the target away, as a tile.
+        "Charge": 4.0, "BackCharge": 4.0,           # To the last free cell, but next to whoever is there.
+        "GrapplingHook": 3.0,                       # Moves the target, but toward the hero.
+    },
+    "escape_in_hand": 2 / 3,  # A tile in hand rather than loaded. Loading adds only a little, so it doesn't beat
+                              # a high damage tile to the queue, since any attack would spend it.
+    "escape_no_target": 1 / 3,  # One that acts on a target, with nobody it can act on.
+    "escape_others": 0.5,     # Each escape beyond the best, which helps less.
+    "escape_two_way": 1.5,    # A special move with Two Way Move covers both sides, so it's worth this much more.
     "curse": 0.5,             # Fraction of what a curse would add to the hero's next hit on that enemy.
     "shield": 100.0,          # Holding a shield, worth about 1 HP. Hits average 1.4, but it may go unused.
     "facing_ideal": 6.0,      # Facing the enemy we most want to hit.
@@ -378,32 +390,45 @@ def _pressure_terms(state):
     return terms
 
 
-def _escape_value(state):
-    """A way out kept: a charged Swap, or a Smoke Bomb, which trades places with an enemy at range.
+# Repositioning tiles that act on their first target ahead, and only do so if it's there and movable.
+_MOVES_TARGET = SMOKE_BOMBS | {"DragonPunch", "GrapplingHook"}
 
-    Each is a dodge as well as its damage. Spending one for the damage alone gives that up for several turns,
-    which is worth counting, so a Swap with Damaging Move gets used for damage once it hits hard enough. A
-    Swap that can go backward covers both sides, so it's worth more kept. A loaded Smoke Bomb can dodge this
-    turn and one in hand can't, but it's never fully relied on until it's fired: any attack would spend it.
-    So loading it adds only a little, and it's only a dodge while it can reach someone. If the
-    loaded tiles can kill from here, a loaded Smoke Bomb goes off with them rather than being kept, so it
-    earns nothing: otherwise it could talk the hero out of the kill. One in hand isn't spent by that, and
-    neither is a Swap, since firing tiles never spends one.
+
+def _escape_value(state):
+    """Repositioning moves kept, of the hero or of others: each is a way to get out of trouble later.
+
+    Each move is worth what `escape_values` guesses from its flexibility: whether it gets the hero past an
+    enemy, away, or only moves the enemy, and in how many situations it works. Spending one for its damage
+    alone gives that up for several turns, which is worth counting, so a Swap with Damaging Move gets used for
+    damage once it hits hard enough. A special move that can go backward covers both sides, so it's worth
+    more. A loaded tile can be used this turn and one in hand can't, but it's never fully relied on until it's
+    fired: any attack would spend it. So loading one adds only a little. A move that acts on a target is
+    worth little with nobody it can act on. If the loaded tiles can kill from here, the loaded ones go off
+    with them rather than being kept, so they earn nothing: otherwise they could talk the hero out of the
+    kill. Firing tiles never spends a special move. Having several helps, but each beyond the best counts for
+    only part of its value.
     """
-    if _swap_charged(state):
-        return WEIGHTS["escape_kept"] * (WEIGHTS["escape_two_way"] if state.two_way_swap else 1.0)
-    bombs = _ready_smoke_bombs(state)
-    if any(tile.in_queue for tile, _ in bombs):
+    values = WEIGHTS["escape_values"]
+    kept = []
+    if state.special in values and state.swap_charge >= state.swap_cooldown:
+        kept.append(values[state.special] * (WEIGHTS["escape_two_way"] if state.two_way_swap else 1.0))
+    tiles = [t for t in state.tiles if t.attack.name in values and t.ready]
+    if any(t.in_queue for t in tiles):
         attacks_available = fireable_attacks(state)
         for attacks in itertools.permutations(attacks_available, min(len(attacks_available), QUEUE_CAP)):
             if attacks and _preview_fire(state, attacks)[1].kills:
-                bombs = [(tile, reaches) for tile, reaches in bombs if not tile.in_queue]
+                tiles = [t for t in tiles if not t.in_queue]
                 break
-    def kept(tile, reaches):
-        if not reaches:
-            return WEIGHTS["escape_no_target"]
-        return WEIGHTS["escape_kept"] if tile.in_queue else WEIGHTS["escape_in_hand"]
-    return max((kept(tile, reaches) for tile, reaches in bombs), default=0.0)
+    for tile in tiles:
+        value = values[tile.attack.name]
+        if not tile.in_queue:
+            value *= WEIGHTS["escape_in_hand"]
+        if tile.attack.name in _MOVES_TARGET \
+                and not any(a.movable for a in targets_of(state, state.hero, tile.attack)[:1]):
+            value *= WEIGHTS["escape_no_target"]
+        kept.append(value)
+    kept.sort(reverse=True)
+    return sum(kept[:1]) + WEIGHTS["escape_others"] * sum(kept[1:])
 
 
 def _poison_value(state):

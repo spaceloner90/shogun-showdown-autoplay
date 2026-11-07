@@ -119,6 +119,12 @@ with, and being surrounded should cost more. v1.4 does a first version of both, 
 - **A loaded Smoke Bomb discourages setting up kills.** A loaded Smoke Bomb earns nothing kept when the loaded
   tiles can kill from here, so loading a tile that makes a kill possible behind it costs its 12. That's fair, since
   firing them spends it, but depth 1 may make too much of it. As of v1.6 a bomb in hand isn't affected.
+- **Loading the Smoke Bomb ahead of an Archer (out of scope for now).** Fight 3 of `logs/run7` lost 4 HP to two
+  Archer shots (turns 17 and 21). A better player would have loaded the bomb ahead of time to step out of them.
+  F1 only sees an attack once it's queued, so valuing the bomb loaded in that case needs knowing what each enemy
+  will do, and lookahead. Belongs with enemy priority and F2.
+- **Escape values are guesses.** As of v1.7 every repositioning move is worth something kept, from how flexible it
+  is, and they're first guesses to tune in play. Only Swap and the Smoke Bomb count as a way out when flanked.
 - **The shove for collision damage.** Fight 2, turn 7 spent it for 2 damage, and it was down for 4 turns.
 - **Facing.** Fight 2, turn 32: Spear killed one TwinTachi while the one behind the hero hit. The answer was to
   flip a turn earlier, which depth 1 only partly sees.

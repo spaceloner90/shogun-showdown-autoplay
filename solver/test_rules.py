@@ -1840,6 +1840,7 @@ class KeepingSmokeBombTest(unittest.TestCase):
     def with_smoke(self, enemies, hero_cell=0, loaded=True, charge=5):
         state = ronin(hero_cell=hero_cell, enemies=enemies)
         state.cells = 7
+        state.swap_charge = 0  # Leaves the shove out of it: see KeepingOtherMovesTest.
         tile = Tile(self.SMOKE, cooldown=5, charge=charge, in_queue=loaded)
         state.tiles = [tile]
         state.queue_tiles = [tile] if loaded else []
@@ -1895,6 +1896,52 @@ class KeepingSmokeBombTest(unittest.TestCase):
         state.hero.facing = 1
         best = rank_actions(state, depth=1)[0]
         self.assertEqual(best.terms.get("hp_lost", 0), 0)
+
+
+class KeepingOtherMovesTest(unittest.TestCase):
+    """Every move that repositions the hero or an enemy is worth something kept, by how flexible it is."""
+    HOOK = Attack("GrapplingHook", 1, [1, 2, 3, 4, 5, 6], first_target=True)
+    SHADOW_DASH = Attack("ShadowDash", 1, [1, 2, 3, 4, 5, 6])
+
+    def with_tile(self, attack, enemies, loaded=True, shove_charged=False):
+        state = ronin(hero_cell=0, enemies=enemies)
+        state.cells = 7
+        if not shove_charged:
+            state.swap_charge = 0
+        tile = Tile(attack, cooldown=3, charge=3, in_queue=loaded)
+        state.tiles = [tile]
+        state.queue_tiles = [tile] if loaded else []
+        state.hero.queue = [attack] if loaded else []
+        return state
+
+    def test_a_charged_shove(self):
+        state = self.with_tile(self.HOOK, [enemy(3, hp=9)], shove_charged=True)
+        state.tiles[0].charge = 0
+        self.assertEqual(leaf_terms(state)["escape"], 6)
+
+    def test_with_two_way_move_it_covers_both_sides(self):
+        state = self.with_tile(self.HOOK, [enemy(3, hp=9)], shove_charged=True)
+        state.tiles[0].charge = 0
+        state.two_way_swap = True
+        self.assertEqual(leaf_terms(state)["escape"], 9)
+
+    def test_a_hook_loaded_in_hand_and_with_nobody_to_pull(self):
+        self.assertEqual(leaf_terms(self.with_tile(self.HOOK, [enemy(3, hp=9)]))["escape"], 3)
+        self.assertEqual(leaf_terms(self.with_tile(self.HOOK, [enemy(3, hp=9)], loaded=False))["escape"], 2)
+        heavy = enemy(3, hp=9)
+        heavy.movable = False
+        self.assertEqual(leaf_terms(self.with_tile(self.HOOK, [heavy]))["escape"], 1)
+
+    def test_a_shadow_dash(self):
+        self.assertEqual(leaf_terms(self.with_tile(self.SHADOW_DASH, [enemy(3, hp=9)]))["escape"], 9)
+
+    def test_each_beyond_the_best_counts_for_half(self):
+        state = self.with_tile(self.SHADOW_DASH, [enemy(3, hp=9)], shove_charged=True)
+        self.assertEqual(leaf_terms(state)["escape"], 12)
+
+    def test_a_kill_from_here_cancels_the_loaded_tile_but_not_the_shove(self):
+        state = self.with_tile(self.HOOK, [enemy(3, hp=1)], shove_charged=True)
+        self.assertEqual(leaf_terms(state)["escape"], 6)
 
 
 class KeepingSwapTest(unittest.TestCase):

@@ -29,6 +29,12 @@ Enemy AI code is for offline simulation and tuning only.
     potion: both turned away, the right one's Katana killed the TwinTachi on 8 instead, and Spear with Sharp Turn
     then took no damage. The log has the board both before (seq 2126) and after (seq 2127) the potion. v1.11 would
     likely have avoided this a turn earlier, as it now sees the left Strider dash in next to the hero.
+- **The Copycat Mirror (ignored on purpose for now).** By the code, it copies a pseudorandom tile from the hero's
+  hand, avoiding the last one it copied, wherever the hero stands, so it can't be dodged, and loaded tiles can't
+  be copied. Until the copy shows, it's treated as a 2-damage, 1-cell attack, so F1 keeps clear of the copier, and
+  once it shows it's dodged like any attack. In `logs/run7_part2` the copy was a Smoke Bomb from the end of the
+  row, which nothing could avoid by then. Keeping strong tiles loaded while a mirror is queued would deny them,
+  but the player's call is that reacting to what it copies is fine for now.
 - **Combo skills:** Triple Combo Heal, Combo Curse and others. "Combo" is now understood from the code: every
   kill after the first in a turn, by anyone, except inanimate enemies, with the streak reset at the start of each
   turn. None are valued yet. Combos may be worth something in general, and Combo Curse in particular: each combo

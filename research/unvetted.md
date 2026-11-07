@@ -41,17 +41,20 @@ enemies appeared, and the player confirmed the hook looks right.
 
 ## New in v1.16: traps
 
-Read from the game's code for the player's new Trap tile. Nothing in a log yet: the mod logs traps as of plugin
-0.11.0. No top choice changes on any logged board.
+Read from the game's code for the player's new Trap tile. No top choice changes on any logged board.
+
+Confirmed by `logs/run7_part2`, one fight on v1.16 with every turn predicted exactly but one random Combo Curse:
+the mod logs traps at the cell ahead of the hero (turns 6 and 15), and an enemy walking onto one takes its damage
+once, the Kabukai on turn 10 and a Guardian, killed, on turn 22.
 
 | Item | Kind | What's already confirmed | What to look for |
 |---|---|---|---|
-| The mod logs traps with the right cell | Logging | Nothing | `traps` in each state, at the cell ahead of where the hero placed it |
-| Only an enemy moving onto a trap sets it off, once, for the tile's damage and effect | Rule | Nothing | The hero standing on one safely, and an enemy walking or pulled onto one |
+| The hero standing on its own trap doesn't set it off | Rule | Nothing: not seen | The hero on a trap's cell, and the trap still there |
+| An enemy pulled onto a trap sets it off | Rule | Nothing: both triggers were walks | The hook pulling an enemy onto one |
 | **One placed under an enemy waits** | **Inferred** | **Nothing: from how the game's triggers work** | **Whether it goes off at once, which would make it a 3-damage melee hit** |
 | An enemy dashing through a trap's cell | Inferred, not simulated | Nothing | A Strider or Charger passing over one |
 | **A planted trap is worth 0.4 of its damage's worth** | **Scoring** | **The player's read: a third to half, since only enemies set it off** | **Traps planted when there's nothing better to do, and set up for the hook** |
-| Combo Curse isn't simulated | Rule | Its target is random | Nothing to change, unless F1 should value the curses |
+| Combo Curse isn't simulated | Rule | Its target is random. It cursed the Yari Master on turn 22 of `logs/run7_part2`, the one miss | Nothing to change, unless F1 should value the curses |
 
 ## New in v1.15: Fumiko's dash
 

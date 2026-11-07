@@ -50,12 +50,21 @@ On the 155 boards of `logs/run6` and `logs/run7`, Smoke Bomb loads go from 22 to
 Spear when both are in hand (3 times before). Damage dealt goes from 76 to 81 and kills from 35 to 36, with no extra
 HP lost, and hunts take as long as before. The Wanderer's 926 winning-run boards don't change.
 
+Played in fights 1 and 2 of `logs/run7`, the second against Baru, with no HP lost in either. The player judged the
+Smoke Bomb much better used. Confirmed:
+
+- **The Smoke Bomb in hand at 8 kept, against 12 loaded.** It was loaded 6 times, never while the Spear was ready in
+  hand, and never fired alone without a kill.
+- **One in hand counting as a way out when flanked.** The hero was flanked with the bomb only in hand on 7 boards, and
+  took no damage on any.
+- **Lightning.** It struck the farthest agent ahead every time, past a closer enemy (fight 1, turn 23) and past the
+  Barricade to Baru (fight 2, turns 11 and 21). Predictions were exact on every turn of both fights, except one
+  where Baru summoned, which is ignored on purpose.
+
 | Item | Kind | What replays show | What to look for |
 |---|---|---|---|
-| **A charged Smoke Bomb in hand is worth 8 kept, against 12 loaded** | **Scoring** | **At 4 or 6 it was still loaded over the Spear once. 8 to 12 all give the same choices** | **The Spear goes in first, and the bomb is loaded when a dodge is needed rather than ahead of time** |
-| A charged Smoke Bomb in hand counts as a way out when flanked | Scoring | Turn 29 of `logs/run7` loads a tile that kills instead | Whether being flanked with the bomb only in hand gets punished in practice |
 | Tiles that can kill only cancel a loaded Smoke Bomb's value | Scoring | Loading a killing tile no longer costs an in-hand bomb's value | Kills get set up as before |
-| Lightning strikes the farthest agent in range ahead, passing over Thorns enemies | Rule | Nothing: read from the game's code, and no log has it yet | Who it hits, and that a Thorns enemy is skipped |
+| Lightning passing over Thorns enemies | Rule | Read from the game's code. No Thorns enemy has come up | A Thorns enemy is skipped for the next farthest |
 
 ## New in v1.5: the same rules for every hero
 
@@ -73,27 +82,26 @@ either holds a Swap or makes the same kill with a tile instead. The Ronin's 110 
 ## New in v1.4: positioning from the kit, and keeping the Smoke Bomb
 
 Replays on `logs/run6` only change one choice at a time from boards v1.2 reached, so they can't show how a whole fight
-would go. v1.4 left the Swap hero unchanged; v1.5 brings it under these rules. First played in `logs/run7`, one fight
-on v1.5: no damage taken, and no Smoke Bomb fired alone without a kill. One fight doesn't show that's these changes
-working, so the items stay.
+would go. v1.4 left the Swap hero unchanged; v1.5 brings it under these rules.
+
+Confirmed by `logs/run7`, 3 fights on v1.5 and v1.6 including the boss, with no HP lost, where the first Ronin run
+took damage in a chapter that usually costs none:
+
+- **Standing at the tiles' reach, with -3 per cell of crowding.** No backing into walls or fights dragging on: 45, 29
+  and 24 turns.
+- **Keeping the Smoke Bomb.** It was never fired alone without a kill, and holding it didn't let enemies walk in.
 
 | Item | Kind | What replays show | What to look for |
 |---|---|---|---|
-| **Heroes without Swap stand at their tiles' reach, up to 3 cells, with -3 per cell of crowding** | **Scoring** | **Top choices ending adjacent go from 49 to 40 of 110 boards, with no extra hits or lost kills. -10 stalls fights** | **Less damage in chapter 1. Backing into a wall and getting pinned, or fights dragging on** |
-| Flanked and surrounded cost 2.5 times as much with no way out | Scoring | Barely changes single choices (28 flanked to 27), so only real fights can test it | Whether Smoke Bomb still lands the hero between enemies |
-| A kept Smoke Bomb is worth 12 loaded, or 4 in hand (8 as of v1.6) | Scoring | Firing it alone with no kill goes from 7 to 3 of 110 boards. Above 16, fights stall | Whether holding it lets enemies walk in freely |
-| It's fired when it dodges | Scoring | A replay of fight 3, turn 28 with the bomb held picks the dodge | Whether it actually gets kept until needed |
+| Flanked and surrounded cost 2.5 times as much with no way out | Scoring | Barely changes single choices (28 flanked to 27), so only real fights can test it. `logs/run7` never had the hero flanked with no way out | Whether Smoke Bomb still lands the hero between enemies |
+| It's fired when it dodges | Scoring | A replay of fight 3, turn 28 with the bomb held picks the dodge. `logs/run7` never needed a dodge | Whether it actually gets kept until needed |
 | Immediate damage is lower | Trade-off | About 17% less damage across those boards (58 to 48) | Whether fights take longer, which brings more waves |
 
 ## New in v1.3: Shockwave
 
-Confirmed by `logs/run7`: the damage of 1, the chain through touching enemies (two of them on turn 41), and a killed
-target still setting it off (turns 16, 24 and 41).
-
-| Item | Kind | What's already confirmed | What to look for |
-|---|---|---|---|
-| The target is hit again if the chain reaches anyone | Rule | The log shows that second hit, but only on targets already killed, so for 0 | A surviving target's HP drops by the tile's damage plus 1 |
-| Each target of a multi-target tile sets off its own | Rule | Nothing. Every Spear firing in `logs/run7` hit one target | A Spear hitting two touching enemies: each should lose 4 |
+All confirmed by `logs/run7`: the damage of 1, the chain through touching enemies (two of them in fight 0, turn
+41), and a killed target still setting it off (fight 0, turns 16, 24 and 41). In fight 2, turn 21, the Spear hit the
+Barricade and Baru, each set off its own chain, and the Barricade survived the extra hit on itself: 5, then 2, then 1.
 
 ## Poison's value
 

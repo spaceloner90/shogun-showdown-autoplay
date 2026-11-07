@@ -14,7 +14,7 @@ from rules import Action, state_from_log, step
 LOGS = Path(__file__).resolve().parent.parent / "research" / "logs"
 ROWS = {
     name: [json.loads(line) for line in (LOGS / name / "state.jsonl").read_text(encoding="utf-8").splitlines()]
-    for name in ("run2_complete", "run3_v03", "run3_part2", "run4", "run5_full", "run6")
+    for name in ("run2_complete", "run3_v03", "run3_part2", "run4", "run5_full", "run6", "run7")
 }
 
 
@@ -259,6 +259,25 @@ class RoninAsPlayed(unittest.TestCase):
         # Fight 2, turn 45: the hook pulled the Ashigaru next to the hero, as predicted.
         after, _ = step(position(2, 45, "run6"), Action("Attack"))
         self.assertTrue(any(abs(e.cell - after.hero.cell) == 1 for e in after.enemies))
+
+
+class RoninWithLightning(unittest.TestCase):
+    """The second Ronin run, on v1.5 and v1.6: three fights with no HP lost, the last against Baru."""
+
+    def test_lightning_strikes_past_the_closer_enemy(self):
+        # Fight 1, turn 23: Lightning killed the TwinTachi on cell 4, and Spear the Ashigaru on cell 2.
+        after, outcome = step(position(1, 23, "run7"), Action("Attack"))
+        self.assertEqual((after.enemies, outcome.kills), ([], 2))
+
+    def test_lightning_strikes_past_the_barricade(self):
+        # Fight 2, turn 21: Spear and its Shockwave left Baru on 6, and Lightning finished at 4, as played.
+        after, _ = step(position(2, 21, "run7"), Action("Attack"))
+        self.assertEqual([(e.kind, e.hp) for e in after.enemies if e.kind == "BaruBoss"], [("BaruBoss", 4)])
+
+    def test_still_puts_baru_in_front_of_the_ashigaru(self):
+        # Fight 2, turn 24: Smoke Bomb and the hook moved Baru into the Ashigaru's attack, which killed him.
+        best = choice(2, 24, "run7")
+        self.assertEqual((best.terms.get("kills", 0), best.terms.get("hp_lost", 0)), (60, 0))
 
 
 def final_boss_rows():

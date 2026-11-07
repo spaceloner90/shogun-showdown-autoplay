@@ -39,6 +39,21 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.12: setup value, and loading Shockwave tiles
+
+The player's read: a loaded hook is worth something beyond its damage when the kit has short-reach tiles to exploit
+an enemy brought in, while its escape value is poor, since bringing enemies closer almost never helps. That's an
+intrinsic value of the move, like its escape value, rather than F1 scoring the board a volley leaves, which would be
+doing F2's job. Likewise, a Shockwave tile was only worth more when the stack could see a chain from here.
+
+| Item | Kind | What replays show | What to look for |
+|---|---|---|---|
+| **The hook's escape value is 1, not 3** | **Scoring** | **With setup value, it keeps the hook in hand when the Smoke Bomb alone gets the same kill (fight 0, turn 21 and fight 2, turn 24 of `logs/run7`), and loads the Spear over it (fight 0, turn 29)** | **The hook used to set up the Spear, not to spend a turn for 1 damage** |
+| The hook's setup value: 1 per point of damage of the strongest tile reaching 2 cells or less, charged or not, with the escape modifiers | Scoring | A first guess. The crowding penalty still weighs against pulling enemies in | Whether hooking for setup pulls in enemies that then hit the hero |
+| Loading a Shockwave tile is worth 3 more | Scoring | No kills lost. Kept as a value on the loaded tile instead, even 0.5 gave up kills, since firing it then looked like a loss | Shockwave tiles loaded ahead of others, and the chains they find |
+
+On all logged boards, 9 top choices change, all on the Ronin, with no kills or HP lost and hunts as long as before.
+
 ## New in v1.11: the Strider's dash
 
 Read from the game's code after fight 8 of `logs/run7`, where v1.10 walked Striders one cell and mispredicted 4 of

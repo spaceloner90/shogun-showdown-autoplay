@@ -52,7 +52,7 @@ from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, 
                    apply_attack, can_use_special, fireable_attacks, is_tank, legal_actions, perform_special, step,
                    strike_cell, targets_of)
 
-VERSION = "v1.11"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.12"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -84,8 +84,15 @@ WEIGHTS = {
         "Dash": 6.0,                                # Away to the last free cell, but only into open space.
         "DragonPunch": 4.0,                         # Pushes the target away, as a tile.
         "Charge": 4.0, "BackCharge": 4.0,           # To the last free cell, but next to whoever is there.
-        "GrapplingHook": 3.0,                       # Moves the target, but toward the hero.
+        "GrapplingHook": 1.0,                       # Moves the target, but toward the hero: almost never helps.
     },
+    # What keeping a move that brings an enemy in is worth, per point of damage of the strongest short-reach tile
+    # in the kit, which can exploit it. On top of its escape value, and with the same modifiers.
+    "setup_values": {"GrapplingHook": 1.0},
+    "short_reach": 2,         # A tile reaching no farther than this needs enemies brought in.
+    "shockwave_loaded": 3.0,  # For loading a Shockwave tile, for chains it will likely set off once enemies bunch
+                              # up, on top of any the stack already sees from here. Given to the loading itself:
+                              # kept on the tile instead, it made firing it for a kill look like a loss. A guess.
     "escape_in_hand": 2 / 3,  # A tile in hand rather than loaded. Loading adds only a little, so it doesn't beat
                               # a high damage tile to the queue, since any attack would spend it.
     "escape_no_target": 1 / 3,  # One that acts on a target, with nobody it can act on.
@@ -396,7 +403,42 @@ def _pressure_terms(state):
 _MOVES_TARGET = SMOKE_BOMBS | {"DragonPunch", "GrapplingHook"}
 
 
-def _escape_value(state):
+def _loaded_can_kill(state):
+    """Whether the loaded tiles can kill from here, in which case the loaded ones are about to go off."""
+    attacks_available = fireable_attacks(state)
+    return any(attacks and _preview_fire(state, attacks)[1].kills
+               for attacks in itertools.permutations(attacks_available, min(len(attacks_available), QUEUE_CAP)))
+
+
+def _kept_tiles(state, values, loaded_can_kill):
+    """What each charged tile named in `values` is worth kept, with the modifiers every kept move shares: less
+    in hand than loaded, little with nobody to act on, and nothing loaded when the loaded tiles can kill."""
+    kept = []
+    for tile in state.tiles:
+        if tile.attack.name not in values or not tile.ready or (tile.in_queue and loaded_can_kill):
+            continue
+        value = values[tile.attack.name]
+        if not tile.in_queue:
+            value *= WEIGHTS["escape_in_hand"]
+        if tile.attack.name in _MOVES_TARGET \
+                and not any(a.movable for a in targets_of(state, state.hero, tile.attack)[:1]):
+            value *= WEIGHTS["escape_no_target"]
+        kept.append(value)
+    return kept
+
+
+def _setup_value(state, loaded_can_kill):
+    """A move that brings an enemy in, kept, for a short-reach tile in the kit to exploit.
+
+    Worth more the harder the strongest such tile hits, whether or not it's charged. Bringing an enemy in also
+    crowds the hero, which the crowding penalty weighs against it."""
+    values = WEIGHTS["setup_values"]
+    exploit = max((t.attack.value for t in state.tiles if t.attack.value > 0 and t.attack.name not in values
+                   and max(map(abs, t.attack.range)) <= WEIGHTS["short_reach"]), default=0)
+    return exploit * max(_kept_tiles(state, values, loaded_can_kill), default=0.0)
+
+
+def _escape_value(state, loaded_can_kill=None):
     """Repositioning moves kept, of the hero or of others: each is a way to get out of trouble later.
 
     Each move is worth what `escape_values` guesses from its flexibility: whether it gets the hero past an
@@ -411,24 +453,11 @@ def _escape_value(state):
     only part of its value.
     """
     values = WEIGHTS["escape_values"]
-    kept = []
+    if loaded_can_kill is None:
+        loaded_can_kill = _loaded_can_kill(state)
+    kept = _kept_tiles(state, values, loaded_can_kill)
     if state.special in values and state.swap_charge >= state.swap_cooldown:
         kept.append(values[state.special] * (WEIGHTS["escape_two_way"] if state.two_way_swap else 1.0))
-    tiles = [t for t in state.tiles if t.attack.name in values and t.ready]
-    if any(t.in_queue for t in tiles):
-        attacks_available = fireable_attacks(state)
-        for attacks in itertools.permutations(attacks_available, min(len(attacks_available), QUEUE_CAP)):
-            if attacks and _preview_fire(state, attacks)[1].kills:
-                tiles = [t for t in tiles if not t.in_queue]
-                break
-    for tile in tiles:
-        value = values[tile.attack.name]
-        if not tile.in_queue:
-            value *= WEIGHTS["escape_in_hand"]
-        if tile.attack.name in _MOVES_TARGET \
-                and not any(a.movable for a in targets_of(state, state.hero, tile.attack)[:1]):
-            value *= WEIGHTS["escape_no_target"]
-        kept.append(value)
     kept.sort(reverse=True)
     return sum(kept[:1]) + WEIGHTS["escape_others"] * sum(kept[1:])
 
@@ -442,9 +471,13 @@ def _poison_value(state):
 
 def leaf_terms(state: State) -> dict[str, float]:
     """Scores a position by itself, as named parts so a decision can be explained."""
+    kept_names = set(WEIGHTS["escape_values"]) | set(WEIGHTS["setup_values"])
+    loaded_can_kill = any(t.attack.name in kept_names and t.ready for t in state.queue_tiles) \
+        and _loaded_can_kill(state)
     terms = {
         "poison": _poison_value(state),
-        "escape": _escape_value(state),
+        "escape": _escape_value(state, loaded_can_kill),
+        "setup": _setup_value(state, loaded_can_kill),
         "stack": _stack_value(state),
         "curse": _curse_value(state),
         "shield": WEIGHTS["shield"] if state.hero.shield else 0.0,
@@ -483,6 +516,8 @@ def _evaluate_action(state, action, depth, scale):
     dead = not next_state.hero.alive
     terms = {}
     _merge(terms, outcome_terms(outcome, dead, _cheapest_hit(state)), scale)
+    if action.kind == "PlayTile" and state.tiles[action.tile].attack.effect == "Shockwave":
+        _merge(terms, {"effects": WEIGHTS["shockwave_loaded"]}, scale)
     future_scale = scale * WEIGHTS["future_discount"]
     actions, labels = [action], [action.label(state)]
     position = 0.0

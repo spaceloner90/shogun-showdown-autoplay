@@ -2080,11 +2080,34 @@ class KeepingOtherMovesTest(unittest.TestCase):
         self.assertEqual(leaf_terms(state)["escape"], 9)
 
     def test_a_hook_loaded_in_hand_and_with_nobody_to_pull(self):
-        self.assertEqual(leaf_terms(self.with_tile(self.HOOK, [enemy(3, hp=9)]))["escape"], 3)
-        self.assertEqual(leaf_terms(self.with_tile(self.HOOK, [enemy(3, hp=9)], loaded=False))["escape"], 2)
+        # Bringing an enemy closer almost never gets the hero out of trouble.
+        self.assertAlmostEqual(leaf_terms(self.with_tile(self.HOOK, [enemy(3, hp=9)]))["escape"], 1)
+        self.assertAlmostEqual(leaf_terms(self.with_tile(self.HOOK, [enemy(3, hp=9)], loaded=False))["escape"], 2 / 3)
         heavy = enemy(3, hp=9)
         heavy.movable = False
-        self.assertEqual(leaf_terms(self.with_tile(self.HOOK, [heavy]))["escape"], 1)
+        self.assertAlmostEqual(leaf_terms(self.with_tile(self.HOOK, [heavy]))["escape"], 1 / 3)
+
+    def test_the_hook_sets_up_a_short_reach_tile(self):
+        spear = Tile(Attack("Spear", 4, [1, 2]), cooldown=5, charge=0)
+        lightning = Tile(Attack("Lightning", 3, [1, 2, 3, 4, 5, 6]), cooldown=2, charge=0)
+        alone = self.with_tile(self.HOOK, [enemy(3, hp=9)])
+        self.assertEqual(leaf_terms(alone)["setup"], 0)
+        alone.tiles.append(lightning)
+        self.assertEqual(leaf_terms(alone)["setup"], 0)  # Lightning reaches them where they are.
+        alone.tiles.append(spear)
+        self.assertEqual(leaf_terms(alone)["setup"], 4)  # The Spear counts even while cooling down.
+        in_hand = self.with_tile(self.HOOK, [enemy(3, hp=9)], loaded=False)
+        in_hand.tiles.append(spear)
+        self.assertAlmostEqual(leaf_terms(in_hand)["setup"], 4 * 2 / 3)
+
+    def test_loading_a_shockwave_tile_is_worth_a_little_more(self):
+        wave = Attack("Spear", 4, [1, 2], effect="Shockwave")
+        state = self.with_tile(wave, [enemy(5, hp=9)], loaded=False)
+        state.tiles.append(Tile(Attack("Spear", 4, [1, 2]), cooldown=3, charge=3))
+        by_effect = {state.tiles[c.actions[0].tile].attack.effect: c
+                     for c in rank_actions(state, depth=1) if c.actions[0].kind == "PlayTile"}
+        self.assertEqual(by_effect["Shockwave"].terms["effects"], 3)
+        self.assertNotIn("effects", by_effect["None"].terms)
 
     def test_a_shadow_dash(self):
         self.assertEqual(leaf_terms(self.with_tile(self.SHADOW_DASH, [enemy(3, hp=9)]))["escape"], 9)

@@ -47,6 +47,21 @@ happened. Where a summon lands is random, so a player can't plan around it eithe
 
 ## Principles
 
+### Extend the existing patterns
+
+A new consideration goes into the patterns already here when it can: a value on a move or tile, with the shared
+modifiers, a term in the position's score, or a rule in the simulation. A new kind of mechanism is a last resort,
+and is raised with the player before it's built, not after. The one time this was skipped, the Shockwave value
+went in as a bonus for the act of loading, which double counts at a deeper horizon and had to be redone.
+
+### An estimate disappears when what it stands for happens
+
+Anything valuing what's likely to come, like a kept escape, poison still to tick or a loaded Shockwave tile's
+chains, is read from the position a line ends in. That way it's gone once the line has played out what it stood
+for, and the result is only counted once. A value added for taking an action stays in the line's total even after
+a later turn in that line has scored what it was meant to stand for. At depth 1 the two are the same, but with
+deeper search the action version double counts.
+
 ### General rules, not special cases
 
 Every hero goes through the same rules. When the Ronin came along, the first version kept the Wanderer on its old

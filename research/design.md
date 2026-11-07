@@ -37,9 +37,10 @@ happened. Where a summon lands is random, so a player can't plan around it eithe
    it's worth shows in the final position, or in what the line does with it. Nor is an attack that hits nothing:
    its cost is already in the tile going on cooldown, which the position shows.
 2. **How good the position it leaves is.** This is where everything beyond the next turn lives:
-   - **The stack:** what the loaded tiles would do if fired, from here or after a few moves or a flip, discounted
-     for each action needed, with every firing order tried. A kill is worth far more than a wound, so a loaded
-     volley that kills counts for a lot.
+   - **The stack:** what firing the loaded tiles adds beyond keeping them, from here or after a few moves or a
+     flip, discounted for each action needed, with every firing order and size tried. A volley is scored with the
+     board it leaves, its tiles spent, against this board with them all kept (rule 2). A kill is worth far more
+     than a wound, so a loaded volley that kills counts for a lot.
    - **Tiles:** charged ones, and damage loaded.
    - **What's kept:** charged moves that are worth more than their damage (escape and setup, below).
    - **Statuses:** poison still to come, curses on enemies, the hero's shield.
@@ -113,9 +114,12 @@ hero.
 
 ### Where to stand comes from the kit
 
-The hero prefers the farthest distance where the tiles it will have soon do the most damage, up to 3 cells, or 4
-with Sniper's bonus. A melee kit comes out at 1, the Ronin's Spear at 2. Being closer than that costs a little, and
-the cost stays small: larger penalties made fights stall.
+Each tile earns credit for being able to hit the target from where the hero stands, by its damage up to the target's
+HP, less a share for each cell the hero would have to move, and discounted for each turn until it's ready. Each
+enemy adjacent costs a little, whatever the tiles. So a melee kit closes in, since its credit only comes adjacent,
+and a kit that hits as hard from further away stands off. Until v1.27 this was a preferred distance with penalties
+for being closer or further, which broke rule 1: a tile on cooldown dropped out of it, so firing Shadow Kama at
+nothing removed a penalty.
 
 ### Effects beyond damage are values on the move
 
@@ -192,6 +196,7 @@ too.
 - **Replay real logs.** Run the top choice on every logged board before and after: the Wanderer's 926 winning-run
   boards, and every Ronin board since. Count what changes, kills, HP lost and damage dealt, and look at each changed
   choice that matters.
+- **Run the principle test,** `test_principles.py`: rule 1 on every logged board. It takes several minutes.
 - **Run the stall check.** Hunt a still enemy from many starts, to catch fights that would drag on.
 - **Look at the turns that prompted it,** and make sure each one now picks what it should, for the right reason.
 - **Keep real positions as tests** (`test_positions.py`), so later changes can't quietly undo them.

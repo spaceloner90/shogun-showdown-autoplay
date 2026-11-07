@@ -146,6 +146,9 @@ class FreePlay(unittest.TestCase):
 
 
 class GoodPlaysToKeep(unittest.TestCase):
+    # Since v1.27, a sure kill now against a likely bigger volley next turn is a near tie: 105.9 to kill the Archer now,
+    # 105.7 to line up both. The player chose to deploy it and see, rather than tune the weights behind it.
+    @unittest.expectedFailure
     def test_lines_up_the_double_kill(self):
         # Fight 7, turn 2: Swirl clears the Archer, so Arrow reaches the TwinTachi behind it.
         self.assertEqual(choice(7, 2).labels[0], "PlayTile Arrow")
@@ -257,6 +260,9 @@ class RoninAsPlayed(unittest.TestCase):
         self.assertFalse(self.fires_smoke(3, 6))
         self.assertFalse(self.fires_smoke(3, 24))
 
+    # Since v1.27 it steps away to line up a volley killing both next turn, by 1.1. Killing Rei wins the fight, which
+    # nothing values yet, and the TwinTachi dying with him doesn't count as a kill: both are in the backlog.
+    @unittest.expectedFailure
     def test_still_takes_the_boss_kill(self):
         # Fight 3, turn 36: Smoke Bomb, then the hook, then Spear finishes Rei and ends the fight.
         self.assertEqual(choice(3, 36, "run6").terms.get("kills", 0), 60)

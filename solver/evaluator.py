@@ -56,7 +56,7 @@ from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER
                    apply_attack, apply_potion, can_use_special, enemy_cells, fireable_attacks, free_hand_tiles, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v1.26"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.27"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -217,6 +217,19 @@ def _spent(trial, fired):
     return trial
 
 
+def _agent_key(agent):
+    queue = tuple((a.name, a.value, tuple(a.range), a.first_target, a.effect, a.target_cell) for a in agent.queue)
+    return (agent.kind, agent.cell, agent.facing, agent.hp, agent.max_hp, agent.shield, queue, agent.action,
+            agent.curse, agent.movable, agent.poison, agent.ice, agent.freezable, agent.elite)
+
+
+def _board_key(trial, fired):
+    """Everything about a volley's board that its score reads, with which tiles it fired."""
+    traps = tuple((t["cell"], t["damage"], t["effect"]) for t in trial.traps)
+    return (frozenset(id(t) for t in fired), _agent_key(trial.hero),
+            tuple(_agent_key(e) for e in trial.enemies), traps)
+
+
 def _stack_value(state, kept_now):
     """What firing the loaded tiles is worth beyond keeping them: the best volley, from here or after a few moves or
     a flip.
@@ -232,12 +245,18 @@ def _stack_value(state, kept_now):
     fractions = WEIGHTS["stack_fractions"]
     cheapest_hit = _cheapest_hit(state)
 
+    # Different orders often leave the same board, so each board left is scored once.
+    kept_after = {}
+
     def gain(tiles, cell, flip):
         trial, outcome = _preview_fire(state, [t.attack for t in tiles], cell, flip)
         done = _volley_value(outcome, cheapest_hit) + WEIGHTS["hp_lost"] * outcome.hp_lost
         if not trial.hero.alive:
             return done + WEIGHTS["death"]
-        return done + sum(_kept_terms(_spent(trial, tiles)).values()) - kept_now
+        key = _board_key(trial, tiles)
+        if key not in kept_after:
+            kept_after[key] = sum(_kept_terms(_spent(trial, tiles)).values())
+        return done + kept_after[key] - kept_now
 
     best = 0.0
     for direction in (0, -1, 1):

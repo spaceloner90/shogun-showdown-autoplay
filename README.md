@@ -16,7 +16,7 @@ The live evaluator only uses what a player can see, so it doesn't run the enemy 
 
 ## Versions
 
-Each version that can change a choice is tagged `evaluator-<version>`, and the logs record which one made each decision.
+Each version that can change a choice is tagged `evaluator-<version>`, and the logs record which one made each decision. [`CHANGELOG.md`](CHANGELOG.md) lists what every version changed.
 
 - **`evaluator-v1`** is vetted: it won the run above.
 - **After that is unvetted** until a real run confirms it. [`research/unvetted.md`](research/unvetted.md) lists what hasn't been confirmed.

@@ -160,6 +160,8 @@ too.
 
 - Any change that can alter a choice bumps `VERSION`, gets committed, and is tagged `evaluator-<version>`. The logs
   record which version made each decision.
+- Each version gets an entry in [`CHANGELOG.md`](../CHANGELOG.md), the one place listing what every version changed,
+  marked as rule or scoring.
 - `unvetted.md` lists changes to rules and scoring that real play hasn't shown working. An item leaves when a log
   shows it working. A past win stands: later versions aren't held to winning it again.
 

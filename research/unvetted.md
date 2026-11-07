@@ -39,6 +39,21 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.18: Ieyasu's Blade of Patience and the Swapper's Boss-Swap
+
+The Ieyasu fight (fight 5 of `logs/run7_part2`) cost 11 HP, 10 of it from two 5-damage Blades. Each traced to
+Boss-Swap not being simulated. On turn 16, F1 expected Ieyasu to stay behind the Swapper, where his Dash would stop
+at it, so it called the next turn safe and sent the loaded Smoke Bomb back. The swap put him in front, and the Blade
+couldn't be answered. Turns 28 and 29 went the same way. Replayed, every Boss-Swap move is now exact, leaving only
+his summons as misses. Three top choices change, all in that fight: the Smoke Bomb loaded early on turns 3 and 4,
+and fired on turn 16 to get past the Swapper before the swap.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Boss-Swap trades places with the boss, wherever each is | Rule | All six swaps in fight 5, replayed | Stays exact |
+| Blade of Patience grows 1 a turn while waiting, starting the turn after it lands | Rule | Its logged damage, every turn of fight 5 | The predicted hit matching the logged one |
+| **F1 dodging Ieyasu's Dash and Blade** | **Scoring** | **Replays only change one choice at a time** | **The Smoke Bomb kept or used to get past him before the Blade lands** |
+
 ## New in v1.17: no assumed threat from a mirror's copy
 
 By the game's code, the Copycat Mirror copies from the hero's hand wherever the hero stands, so it can't be dodged,

@@ -210,6 +210,14 @@ Shockwave, read from the code (simulated as of v1.3):
 - The damage is stored in the game's assets. `logs/run7` shows 1, chaining through two touching enemies on turn
   41, and going off even when the tile killed its target.
 
+Ieyasu, read from the code (simulated as of v1.18):
+
+- **Blade of Patience** strikes the cell directly ahead, and hits 1 harder for each turn it waits in the queue,
+  starting the turn after it lands: 0 when it shows, up to 9 by turn 45 of fight 5 in `logs/run7_part2`. The log
+  shows its current damage. Ieyasu fires it after a Dash, so he runs up to the hero and strikes.
+- **Boss-Swap**, his Swapper's, trades places with the boss wherever each is, and neither turns. It keeps putting
+  Ieyasu in front of the Swapper or behind it. The Swapper has 30 HP, which the game doesn't show.
+
 Traps and Combo Curse, read from the code (v1.16):
 
 - **Trap** puts a trap on the cell ahead, if the cell exists, whoever is standing there. Only an enemy moving onto

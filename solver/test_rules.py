@@ -1848,6 +1848,40 @@ class LightningTest(unittest.TestCase):
         self.assertEqual(unmodeled_content({"tiles": [tile], "hero": {"queue": []}, "enemies": [], "skills": []}), [])
 
 
+class IeyasuTest(unittest.TestCase):
+    """BossSwapAttack and BladeOfPatienceAttack in the game's code, as Ieyasu and his Swapper use them."""
+    BOSS_SWAP = Attack("BossSwap", 0, [])
+    BLADE = Attack("BladeOfPatience", 4, [1], first_target=True)
+
+    def board(self, swapper_cell=5, boss_cell=6):
+        swapper = Agent("Swapper", swapper_cell, 1, 30, 30, queue=[self.BOSS_SWAP], action="Attack")
+        boss = Agent("IeyasuBoss", boss_cell, -1, 40, 40, queue=[Attack("Dash", 0, [1]), self.BLADE], action="Wait")
+        state = make_state(hero_cell=2, enemies=[swapper, boss])
+        state.cells = 9
+        return state
+
+    def test_the_swapper_trades_places_with_the_boss(self):
+        after, _ = step(self.board(), Action("Wait"))
+        cells = {e.kind: (e.cell, e.facing) for e in after.enemies}
+        self.assertEqual(cells, {"Swapper": (6, 1), "IeyasuBoss": (5, -1)})
+
+    def test_the_blade_grows_each_turn_it_waits(self):
+        after, _ = step(self.board(), Action("Wait"))
+        boss = next(e for e in after.enemies if e.kind == "IeyasuBoss")
+        self.assertEqual([a.value for a in boss.queue if a.name == "BladeOfPatience"], [5])
+
+    def test_after_the_swap_his_dash_and_blade_reach_the_hero(self):
+        # On turn 16 of the Ieyasu fight, this is what F1 missed: behind the Swapper, his Dash was blocked.
+        after, _ = step(self.board(), Action("Wait"))
+        self.assertEqual(_threat_damage(after, after.hero.cell), 5)
+
+    def test_it_raises_no_warning(self):
+        row = {"tiles": [], "hero": {"queue": []}, "skills": [],
+               "enemies": [{"kind": "Swapper", "queue": [{"name": "BossSwap", "effect": "None"}]},
+                           {"kind": "IeyasuBoss", "queue": [{"name": "BladeOfPatience", "effect": "None"}]}]}
+        self.assertEqual(unmodeled_content(row), [])
+
+
 class TrapTest(unittest.TestCase):
     """TrapAttack and Trap in the game's code: placed on the cell ahead, set off only by an enemy moving onto it."""
     TRAP = Attack("Trap", 3, [1])

@@ -14,7 +14,8 @@ ONE_ENEMY_WAVE_CAP = 6
 
 # Attacks whose behaviour is fully covered by their logged range, damage and first-target flag, plus
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
-MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Barricade", "Bomb", "Charge",
+MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Barricade", "BladeOfPatience", "Bomb",
+           "BossSwap", "Charge",
            "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Lightning", "Maku", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "SmokeBomb", "Spear", "Summon", "SwapToss",
            "Swirl", "Tetsubo", "Trap", "TurnAround", "Volley"}
@@ -686,6 +687,9 @@ def apply_attack(state, attacker, attack, outcome):
     if attack.name == "Trap":
         place_trap(state, attacker, attack, outcome)
         return
+    if attack.name == "BossSwap":
+        boss_swap(state, attacker)
+        return
     if attack.name in ("SwapToss", "Mirror", "OriginOfSymmetry"):
         moves = {"SwapToss": swap_toss, "Mirror": mirror, "OriginOfSymmetry": origin_of_symmetry}
         if not moves[attack.name](state, attacker) and attacker is state.hero:
@@ -731,6 +735,14 @@ def hit_effect(state, attacker, target, effect, outcome):
     # Each target sets off its own, even one that just died, and a shield on the target doesn't stop it.
     if effect == "Shockwave":
         shockwave(state, attacker, target, outcome)
+
+
+def boss_swap(state, attacker):
+    """Trades places with the boss, wherever each is, and neither turns. BossSwapAttack in the game's code, the
+    Swapper's, which keeps putting Ieyasu in front of or behind it."""
+    boss = next((e for e in state.enemies if e.alive and is_boss(e) and e is not attacker), None)
+    if boss is not None:
+        attacker.cell, boss.cell = boss.cell, attacker.cell
 
 
 def place_trap(state, attacker, attack, outcome):
@@ -956,6 +968,10 @@ def end_turn(state, swapped):
     for enemy in state.enemies:
         enemy.moved = False
         enemy.ice = max(0, enemy.ice - 1)
+        # Blade of Patience hits 1 harder for each turn it waits in the queue. Any here was there all this turn,
+        # since a tile played this turn isn't identified yet.
+        enemy.queue = [Attack(a.name, a.value + 1, a.range, a.first_target, a.effect, a.target_cell)
+                       if a.name == "BladeOfPatience" else a for a in enemy.queue]
         enemy.action = "Wait"  # What it does next isn't known until the game shows it.
         # A loaded Volley will lock onto wherever the hero ends this turn, leaving a turn to step off.
         aim_volleys(enemy, state.hero)

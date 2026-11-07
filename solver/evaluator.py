@@ -51,7 +51,7 @@ import itertools
 from dataclasses import dataclass, field
 
 from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, Attack, Outcome, State,
-                   apply_attack, apply_potion, can_use_special, enemy_cells, fireable_attacks, is_tank, legal_actions, perform_special,
+                   apply_attack, apply_potion, can_use_special, enemy_cells, fireable_attacks, free_hand_tiles, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
 VERSION = "v1.26"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
@@ -242,11 +242,11 @@ def _curse_value(state):
 
     That compares the hero's best hit with the curse against the best without it, with a discount for
     each turn until a tile is ready. Both are capped by the enemy's health, so a curse adds nothing to
-    an enemy that a ready tile would kill anyway. When tiles are ready to fire, the stack's value
-    already includes the doubled damage, so this adds nothing.
+    an enemy that a ready tile would kill anyway. Every tile counts, loaded or not, so having one never lowers it.
+    Leaving loaded tiles out, or the whole term when something was loaded, made a loaded tile worth less than none
+    whenever it was weaker than what the curse was waiting for. The stack also counts a loaded volley's doubled
+    hit, so a curse that volley would use is partly counted twice.
     """
-    if fireable_attacks(state):
-        return 0.0
     total = 0.0
     for enemy in state.enemies:
         if not enemy.alive or not enemy.curse or is_tank(state, enemy):
@@ -432,13 +432,14 @@ def _loaded_can_kill(state):
 
 def _kept_tiles(state, values, loaded_can_kill):
     """What each charged tile named in `values` is worth kept, with the modifiers every kept move shares: less
-    in hand than loaded, little with nobody to act on, and nothing loaded when the loaded tiles can kill."""
+    in hand than loaded, and little with nobody to act on. When the loaded tiles can kill, a loaded one is about to
+    go off with them, but sending it back first is free, so it's worth what it would be in hand."""
     kept = []
     for tile in state.tiles:
-        if tile.attack.name not in values or not tile.ready or (tile.in_queue and loaded_can_kill):
+        if tile.attack.name not in values or not tile.ready:
             continue
         value = values[tile.attack.name]
-        if not tile.in_queue:
+        if not tile.in_queue or loaded_can_kill:
             value *= WEIGHTS["escape_in_hand"]
         if tile.attack.name in _MOVES_TARGET \
                 and not any(a.movable for a in targets_of(state, state.hero, tile.attack)[:1]):
@@ -467,9 +468,9 @@ def _escape_value(state, loaded_can_kill=None):
     damage once it hits hard enough. A special move that can go backward covers both sides, so it's worth
     more. A loaded tile can be used this turn and one in hand can't, but it's never fully relied on until it's
     fired: any attack would spend it. So loading one adds only a little. A move that acts on a target is
-    worth little with nobody it can act on. If the loaded tiles can kill from here, the loaded ones go off
-    with them rather than being kept, so they earn nothing: otherwise they could talk the hero out of the
-    kill. Firing tiles never spends a special move. Having several helps, but each beyond the best counts for
+    worth little with nobody it can act on. If the loaded tiles can kill from here, the loaded ones are worth
+    only what they would be in hand, so they can't talk the hero out of the kill, but never less, since sending
+    them back is free. Firing tiles never spends a special move. Having several helps, but each beyond the best counts for
     only part of its value.
     """
     values = WEIGHTS["escape_values"]

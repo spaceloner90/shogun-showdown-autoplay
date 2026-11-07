@@ -39,6 +39,19 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.11: the Strider's dash
+
+Read from the game's code after fight 8 of `logs/run7`, where v1.10 walked Striders one cell and mispredicted 4 of
+their moves. Replayed, all 4 are now exact, leaving only the two summons as misses in the whole log. One top choice
+changes on every logged board: fight 8, turn 27 loads the Smoke Bomb instead of the Spear, since it now sees the left
+Strider dash in beside the hero. As played, the hero ended up between two Katanas on turn 28, which only the
+player's Rain of Mirrors potion avoided.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| A Strider's move runs to the last free cell | Rule | All 4 of fight 8's Strider moves, replayed | Stays exact |
+| Whoever first blocks it moves first, if going the same way | Rule | Nothing: not seen with a Strider | A Strider behind a walking enemy |
+
 ## New in v1.10: the Warden's explosion
 
 Read from the game's code after fight 7 of `logs/run7`, where two explosions happened unsimulated. Simulating it makes

@@ -23,7 +23,12 @@ Enemy AI code is for offline simulation and tuning only.
 - **Attacks that displace others:** KiPush, TwinTessen, Hookblade, Tanegashima. Each needs its rules
   read first, as they come up.
 - **Consumables:** in-battle potions aren't used by F1, and the player expects them to add a lot. This
-  means valuing each potion and having the mod use them, so it's a project of its own.
+  means valuing each potion and having the mod use them, so it's a project of its own. Scenarios saved for it:
+  - **Rain of Mirrors ("Flip all enemies"), `logs/run7` fight 8, turn 28.** The hero on cell 6 is between two
+    Striders on 5 and 7, each facing it with a Katana loaded, so every line takes at least 2. The player used the
+    potion: both turned away, the right one's Katana killed the TwinTachi on 8 instead, and Spear with Sharp Turn
+    then took no damage. The log has the board both before (seq 2126) and after (seq 2127) the potion. v1.11 would
+    likely have avoided this a turn earlier, as it now sees the left Strider dash in next to the hero.
 - **Combo skills:** Triple Combo Heal and others. They need "combo" understood first.
 - **Other corruption patterns:** the game can also send corruption left to right, right to left, or even
   and odd cells in turn. The mod logs all of them as `hazards`, and only the attack that starts them

@@ -1841,6 +1841,37 @@ class LightningTest(unittest.TestCase):
         self.assertEqual(unmodeled_content({"tiles": [tile], "hero": {"queue": []}, "enemies": [], "skills": []}), [])
 
 
+class StriderTest(unittest.TestCase):
+    """StriderEnemy.Move in the game's code: it runs to the last free cell that way, rather than one cell."""
+
+    def strider(self, cell, action="MoveRight"):
+        s = enemy(cell, facing=1, hp=4, action=action)
+        s.kind = "Strider"
+        return s
+
+    def test_it_runs_until_something_stops_it(self):
+        after, _ = step(make_state(hero_cell=4, enemies=[self.strider(0)]), Action("Wait"))
+        self.assertEqual(after.enemies[0].cell, 3)
+
+    def test_or_the_wall(self):
+        state = make_state(hero_cell=0, enemies=[self.strider(2)])
+        state.cells = 9
+        after, _ = step(state, Action("Wait"))
+        self.assertEqual(after.enemies[0].cell, 8)
+
+    def test_someone_ahead_going_the_same_way_moves_first(self):
+        walker = enemy(3, facing=1, action="MoveRight")
+        state = make_state(hero_cell=0, enemies=[self.strider(1), walker])
+        state.cells = 7
+        after, _ = step(state, Action("Wait"))
+        self.assertEqual(sorted(e.cell for e in after.enemies), [3, 4])
+
+    def test_it_raises_no_warning(self):
+        row = {"tiles": [], "hero": {"queue": []}, "skills": [],
+               "enemies": [{"kind": "Strider", "traits": ["Dash"], "queue": []}]}
+        self.assertEqual(unmodeled_content(row), [])
+
+
 class WardenTest(unittest.TestCase):
     """WardenEnemy.Die in the game's code: it explodes for 2 on its own cell and both beside it."""
 

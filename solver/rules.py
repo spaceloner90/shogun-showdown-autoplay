@@ -39,9 +39,13 @@ SWAP = "SwapSpecialMove"
 SHOVE = "PushSpecialMove"
 SPECIAL_MOVES = {SWAP, SHOVE}
 
-# Enemy traits that need no warning. Heavy and Explosive (the Warden's) are modeled, and the others haven't
-# changed any prediction.
-UNDERSTOOD_TRAITS = {"Aggro", "Explosive", "Heavy", "Quick", "Unfreezable"}
+# Enemy traits that need no warning. Heavy, Explosive (the Warden's) and Dash (the Strider's) are modeled, and the
+# others haven't changed any prediction.
+UNDERSTOOD_TRAITS = {"Aggro", "Dash", "Explosive", "Heavy", "Quick", "Unfreezable"}
+
+# Enemies whose move runs them to the last free cell that way, rather than one cell: StriderEnemy.Move in the code.
+# Their Dash trait is shown for it.
+LEAPERS = {"Strider"}
 
 # Not worth fighting while a boss is alive: it dies with the boss anyway. A one-off for the Shogun's
 # statues. Other bosses' summons are real threats, and the game doesn't even show a statue's HP.
@@ -819,12 +823,22 @@ def hero_action(state, action, outcome):
 
 
 def enemy_move(state, enemy):
-    """Moves an enemy one cell, also moving an enemy ahead that's about to go the same way."""
+    """Moves an enemy one cell, also moving an enemy ahead that's about to go the same way. A leaper runs to the
+    last free cell instead, after whoever first blocks it, if that one is going the same way."""
     if enemy.moved:
         return
     direction = enemy.move_dir
     target = enemy.cell + direction
     enemy.moved = True
+    if enemy.kind in LEAPERS:
+        cell = target
+        while 0 <= cell < state.cells and state.occupant(cell) is None:
+            cell += direction
+        blocker = state.occupant(cell) if 0 <= cell < state.cells else None
+        if blocker is not None and blocker is not state.hero and not blocker.moved and blocker.move_dir == direction:
+            enemy_move(state, blocker)
+        run_to_last_free_cell(state, enemy, direction)
+        return
     if not 0 <= target < state.cells:
         return
     occupant = state.occupant(target)

@@ -210,6 +210,12 @@ Shockwave, read from the code (simulated as of v1.3):
 - The damage is stored in the game's assets. `logs/run7` shows 1, chaining through two touching enemies on turn
   41, and going off even when the tile killed its target.
 
+The Strider, read from the code (simulated as of v1.11):
+
+- **Dash:** its move runs it to the last free cell that way, rather than one cell. Whoever first blocks it moves
+  first if they're going the same way, as with any enemy's move. Fight 8 of `logs/run7` had 4 Strider moves
+  mispredicted on v1.10, and all are exact now.
+
 The Warden, read from the code (simulated as of v1.10):
 
 - **Explosive:** a dying Warden hits its own cell and both cells beside it for 2, as its own hit, so the hero

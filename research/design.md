@@ -32,7 +32,9 @@ happened. Where a summon lands is random, so a player can't plan around it eithe
 `evaluator.py` then adds up two kinds of terms:
 
 1. **What the turn did.** Damage dealt (10 per HP), kills (60 each), HP lost (-100 per HP), damage enemies did to
-   each other, attacks that hit nothing, and so on.
+   each other, attacks that hit nothing, and so on. Only events that change the board belong here, summed turn by
+   turn along a line and discounted for each turn ahead. An action that only prepares something, like loading a
+   tile, isn't one: what it's worth shows in the final position, or in what the line does with it.
 2. **How good the position it leaves is.** This is where everything beyond the next turn lives:
    - **The stack:** what the loaded tiles would do if fired, from here or after a few moves or a flip, discounted
      for each action needed, with every firing order tried. A kill is worth far more than a wound, so a loaded

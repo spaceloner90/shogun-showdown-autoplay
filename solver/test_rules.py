@@ -474,8 +474,8 @@ class CurseTest(unittest.TestCase):
 
     def test_understood_skills_get_no_warning_and_others_do(self):
         row = {"tiles": [], "hero": {"queue": []}, "enemies": [],
-               "skills": [{"name": "Fortress", "level": 1}, {"name": "BigPockets", "level": 1}, {"name": "Sniper", "level": 1}]}
-        self.assertEqual(unmodeled_content(row), ["skill Sniper"])
+               "skills": [{"name": "Fortress", "level": 1}, {"name": "Sniper", "level": 1}, {"name": "Karma", "level": 1}]}
+        self.assertEqual(unmodeled_content(row), ["skill Karma"])
 
     def test_curse_gets_no_warning(self):
         row = {"tiles": [{"attack": {"name": "Arrow", "effect": "Curse", "tileEffect": "None"}}],
@@ -1610,6 +1610,13 @@ class ShoveSpecialMoveTest(unittest.TestCase):
         state.two_way_swap = True
         self.assertIn(Action("MoveRight"), legal_actions(state))
 
+    def test_a_backward_shove_pushes_that_way_and_keeps_the_facing(self):
+        state = ronin(hero_cell=3, facing=1, enemies=[enemy(2)])
+        state.cells = 7
+        state.two_way_swap = True
+        after, _ = step(state, Action("MoveLeft"))
+        self.assertEqual((after.hero.cell, after.hero.facing, after.enemies[0].cell, after.swap_charge), (3, 1, 0, 0))
+
     def test_it_dodges_a_melee_hit_by_moving_the_attacker(self):
         _, outcome = step(ronin(enemies=[enemy(3, action="Attack", queue=[KATANA])]), Action("MoveRight"))
         self.assertEqual(outcome.hp_lost, 0)
@@ -1831,6 +1838,84 @@ class LightningTest(unittest.TestCase):
 
     def test_it_raises_no_warning(self):
         tile = {"attack": {"name": "Lightning", "effect": "None"}}
+        self.assertEqual(unmodeled_content({"tiles": [tile], "hero": {"queue": []}, "enemies": [], "skills": []}), [])
+
+
+class SniperSkillTest(unittest.TestCase):
+    """SniperSkill in the game's code: the hero's hits on targets 4 or more cells away get its level added,
+    before a curse doubles them. Shockwave and collision hits aren't the hero's own."""
+    LIGHTNING = Attack("Lightning", 2, [1, 2, 3, 4, 5, 6])
+
+    def hit_from(self, distance, level=1, curse=False, attack=None):
+        target = enemy(distance, hp=9)
+        target.curse = curse
+        state = make_state(hero_cell=0, enemies=[target])
+        state.cells = 9
+        state.sniper_bonus = level
+        after, _ = fire(state, attack or self.LIGHTNING)
+        return 9 - after.enemies[0].hp
+
+    def test_four_cells_away_adds_its_level(self):
+        self.assertEqual((self.hit_from(3), self.hit_from(4), self.hit_from(6, level=2)), (2, 3, 4))
+
+    def test_a_curse_doubles_the_bonus_too(self):
+        self.assertEqual(self.hit_from(4, curse=True), 6)
+
+    def test_a_shockwave_hit_gets_none(self):
+        state = make_state(hero_cell=0, enemies=[enemy(4, hp=9), enemy(5, hp=9)])
+        state.cells = 9
+        state.sniper_bonus = 1
+        wave = Attack("Lightning", 2, [1, 2, 3, 4], effect="Shockwave")
+        after, _ = fire(state, wave)
+        self.assertEqual([e.hp for e in after.enemies], [5, 8])
+
+    def test_read_from_the_log(self):
+        row = {"cells": 5, "tiles": [], "enemies": [], "skills": [{"name": "Sniper", "level": 2}],
+               "hero": {"kind": "H", "cell": 0, "facing": "Right", "hp": 9, "maxHp": 9, "shield": False, "queue": [],
+                        "action": "Wait", "special": {"charge": 3, "cooldown": 3}}}
+        self.assertEqual(state_from_log(row).sniper_bonus, 2)
+
+    def test_it_makes_long_reach_worth_standing_off_for(self):
+        state = make_state(enemies=[enemy(6)])
+        state.special = "PushSpecialMove"
+        state.tiles = [Tile(self.LIGHTNING, cooldown=2, charge=2)]
+        self.assertEqual(preferred_distance(state), 3)
+        state.sniper_bonus = 1
+        self.assertEqual(preferred_distance(state), 4)
+
+
+class SharpTurnTest(unittest.TestCase):
+    """TurnAround in the game's code: the user turns around first, then strikes what's in range that way."""
+    SHARP_TURN = Attack("TurnAround", 2, [1])
+
+    def with_free_turn(self, enemies, queue=(), hero_cell=3):
+        state = make_state(hero_cell=hero_cell, enemies=enemies, queue=queue)
+        state.cells = 7
+        state.tiles.append(Tile(self.SHARP_TURN, cooldown=3, charge=3, free_play=True))
+        return state
+
+    def test_it_turns_then_strikes_behind(self):
+        after, outcome = fire(make_state(hero_cell=3, enemies=[enemy(2, hp=5)]), self.SHARP_TURN)
+        self.assertEqual((after.hero.facing, after.enemies[0].hp, outcome.wasted_attacks), (-1, 3, 0))
+
+    def test_turning_alone_isnt_a_wasted_attack(self):
+        after, outcome = fire(make_state(hero_cell=3, enemies=[enemy(5, hp=5)]), self.SHARP_TURN)
+        self.assertEqual((after.hero.facing, outcome.wasted_attacks), (-1, 0))
+
+    def test_as_a_free_tile_the_next_tile_fires_the_new_way(self):
+        state = self.with_free_turn([enemy(2, hp=5)], queue=["Swirl"])
+        state.tiles[0].attack = Attack("Katana", 2, [1])
+        sharp = len(state.tiles) - 1
+        after, _ = step(state, Action("Attack", order=(sharp, 0)))
+        self.assertEqual(after.enemies[0].hp, 1)
+
+    def test_it_can_be_fired_from_hand_with_nothing_loaded(self):
+        state = self.with_free_turn([enemy(2, hp=5)])
+        attacks = [a for a in legal_actions(state) if a.kind == "Attack"]
+        self.assertEqual([a.label(state) for a in attacks], ["Attack TurnAround (free)"])
+
+    def test_it_raises_no_warning(self):
+        tile = {"attack": {"name": "TurnAround", "effect": "None", "tileEffect": "FreePlay"}}
         self.assertEqual(unmodeled_content({"tiles": [tile], "hero": {"queue": []}, "enemies": [], "skills": []}), [])
 
 

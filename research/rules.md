@@ -210,6 +210,15 @@ Shockwave, read from the code (simulated as of v1.3):
 - The damage is stored in the game's assets. `logs/run7` shows 1, chaining through two touching enemies on turn
   41, and going off even when the tile killed its target.
 
+Sharp Turn and Sniper, read from the code (simulated as of v1.9):
+
+- **Sharp Turn** is `TurnAround` in the code, a Free Play tile. Its user turns around first, then strikes what's in
+  range in the new direction. Tiles fired after it in the same attack fire the new way too.
+- **Sniper** adds its level to the hero's own hits on a target 4 or more cells away, measured as the hit lands, and
+  before a curse doubles it. Shockwave and collision hits don't count, as they aren't the hero's.
+- **Two Way Move with the shove** lets it go backward, pushing the target that way. It needs a cell behind the
+  target either way, and the hero keeps facing the same way.
+
 Lightning, read from the code (simulated as of v1.6):
 
 - It strikes the farthest agent in range ahead. A Thorns enemy is passed over for the next farthest, and with only

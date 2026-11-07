@@ -17,12 +17,13 @@ ONE_ENEMY_WAVE_CAP = 6
 MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Barricade", "Bomb", "Charge",
            "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Lightning", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "SmokeBomb", "Spear", "Summon", "SwapToss",
-           "Swirl", "Tetsubo", "Volley"}
+           "Swirl", "Tetsubo", "TurnAround", "Volley"}
 
 # Skills the solver handles. Most need no modeling because their effects show up in the logged state,
-# like a shield, max HP or a shorter Swap cooldown. Damaging Move, Two Way Move and Unfriendly Fire are
-# simulated.
-UNDERSTOOD_SKILLS = {"BigPockets", "DamagingMove", "Fortress", "Healthy", "QuickRecovery", "TwoWayMove",
+# like a shield, max HP or a shorter Swap cooldown. Damaging Move, Sniper, Two Way Move and Unfriendly Fire
+# are simulated.
+SNIPER_DISTANCE = 4  # Sniper adds its level to the hero's hits on targets at least this many cells away.
+UNDERSTOOD_SKILLS = {"BigPockets", "DamagingMove", "Fortress", "Healthy", "QuickRecovery", "Sniper", "TwoWayMove",
                      "UnfriendlyFire"}
 
 POISON_TURNS = 3  # Applying poison sets this many turns left, and each turn's end deals 1, starting that turn.
@@ -116,6 +117,7 @@ class State:
     last_wave: bool = False
     swap_damage: int = 0  # What a swap deals to the enemy passed through, from Damaging Move.
     friendly_bonus: int = 0  # Extra damage when enemies hit each other, from Unfriendly Fire.
+    sniper_bonus: int = 0  # Extra damage on the hero's hits from 4 or more cells away, from Sniper.
     two_way_swap: bool = False  # The special move works backward as well, from Two Way Move.
     special: str = SWAP  # The hero's special move.
     # Damage on its way to marked cells: each is {"damage", "groups"}, and the first group of cells strikes
@@ -260,6 +262,8 @@ def state_from_log(row):
                           if isinstance(s, dict) and s.get("name") == "DamagingMove"), 0),
         friendly_bonus=next((s["level"] for s in row.get("skills") or []
                              if isinstance(s, dict) and s.get("name") == "UnfriendlyFire"), 0),
+        sniper_bonus=next((s["level"] for s in row.get("skills") or []
+                           if isinstance(s, dict) and s.get("name") == "Sniper"), 0),
         two_way_swap=any(isinstance(s, dict) and s.get("name") == "TwoWayMove" for s in row.get("skills") or []),
         special=special.get("name", SWAP),
         hazards=[dict(h, groups=[list(g) for g in h["groups"]]) for h in row.get("hazards") or []],
@@ -464,6 +468,10 @@ def attack_hits(state, attacker, attack):
             return []
         attacker.cell, targets[0].cell = targets[0].cell, attacker.cell
         return targets[:1]
+    # Sharp Turn turns its user around first, then strikes what's in range in the new direction.
+    if attack.name == "TurnAround":
+        attacker.facing = -attacker.facing
+        return targets_of(state, attacker, attack)
     # Lightning strikes the farthest agent in range ahead, passing over any Thorns enemy to the next farthest.
     if attack.name == "Lightning":
         in_range = [state.occupant(attacker.cell + attacker.facing * offset) for offset in attack.range]
@@ -671,10 +679,10 @@ def apply_attack(state, attacker, attack, outcome):
         elif attacker is state.hero:
             outcome.wasted_attacks += 1
         return
-    start_cell = attacker.cell
+    start_cell, start_facing = attacker.cell, attacker.facing
     hits = attack_hits(state, attacker, attack)
-    # An attack that moved the hero still did something, even if it hit nothing.
-    if not hits and attacker is state.hero and attacker.cell == start_cell:
+    # An attack that moved or turned the hero still did something, even if it hit nothing.
+    if not hits and attacker is state.hero and attacker.cell == start_cell and attacker.facing == start_facing:
         outcome.wasted_attacks += 1
     for target in hits:
         # A boss killed earlier in this sweep takes everyone else with it.
@@ -717,6 +725,9 @@ def deal_damage(state, attacker, target, value, outcome, collision=False):
     enemy_on_enemy = attacker is not None and attacker is not state.hero and target is not state.hero
     if enemy_on_enemy and not collision:
         value += state.friendly_bonus
+    # Measured when the hit lands, so a Smoke Bomb's trade of places doesn't change it, and a Charge lands adjacent.
+    if attacker is state.hero and not collision and abs(attacker.cell - target.cell) >= SNIPER_DISTANCE:
+        value += state.sniper_bonus
     if target.curse and value > 0:
         value *= 2
         target.curse = False

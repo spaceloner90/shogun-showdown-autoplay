@@ -39,6 +39,21 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.9: Sharp Turn and Sniper
+
+Both read from the game's code, for the player's next fights. Neither has come up in a log, so on every logged board
+v1.9 chooses as v1.8 did.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Sharp Turn turns its user, then strikes that way | Rule | Nothing | The hit lands behind, and the hero ends facing the other way |
+| Tiles after it in the same attack fire the new way | Rule | Nothing. Follows from the order tiles fire in | A Free Play Sharp Turn fired first, then another tile behind |
+| Turning counts as doing something, so Sharp Turn with nobody in range isn't a wasted attack | Scoring | Nothing | Whether F1 uses it as a free turn more than it should |
+| Sniper adds its level to the hero's hits from 4 or more cells away, before a curse | Rule | Nothing | Lightning, Arrow or the hook hitting for 1 more from far away |
+| With Sniper, the hero may prefer standing 4 cells off | Scoring | Only when its tiles do the most damage from there | Backing off too far, or into walls |
+
+Two Way Move with the shove was rechecked against the code for v1.9, and matches what v1.2 simulated. It's under v1.2.
+
 ## New in v1.8: sending a tile back costs nothing
 
 Fight 5, turn 4 of `logs/run7` fired the hook and Lightning at a 2 HP Archer that Lightning alone would have killed,

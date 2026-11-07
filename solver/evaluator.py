@@ -48,11 +48,11 @@ import copy
 import itertools
 from dataclasses import dataclass, field
 
-from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SWAP, UNKNOWN_TILE, Action, Attack, Outcome, State,
+from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_TILE, Action, Attack, Outcome, State,
                    apply_attack, can_use_special, fireable_attacks, is_tank, legal_actions, perform_special, step,
                    strike_cell, targets_of)
 
-VERSION = "v1.8"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.9"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -313,12 +313,15 @@ def preferred_distance(state):
     """How far from an enemy the hero wants to stand, from what its tiles can reach.
 
     The farthest distance where the tiles it will have soon do the most damage, so reach is used to stay
-    out of trouble. A melee kit comes out at 1. The same rule for every hero.
+    out of trouble. A melee kit comes out at 1. The same rule for every hero. Sniper's bonus counts too,
+    and with it the hero may stand off as far as the bonus starts.
     """
     soon = [t for t in state.tiles if t.attack.value > 0 and (t.in_queue or t.cooldown - t.charge <= 1)]
     tiles = soon or [t for t in state.tiles if t.attack.value > 0]
-    reach = {d: sum(t.attack.value for t in tiles if d in map(abs, t.attack.range))
-             for d in range(1, WEIGHTS["max_standoff"] + 1)}
+    farthest = max(WEIGHTS["max_standoff"], SNIPER_DISTANCE if state.sniper_bonus else 0)
+    reach = {d: sum(t.attack.value + (state.sniper_bonus if d >= SNIPER_DISTANCE else 0)
+                    for t in tiles if d in map(abs, t.attack.range))
+             for d in range(1, farthest + 1)}
     most = max(reach.values())
     return max(d for d, damage in reach.items() if damage == most) if most else 1
 

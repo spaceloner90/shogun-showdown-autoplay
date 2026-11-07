@@ -1913,6 +1913,12 @@ class TrapTest(unittest.TestCase):
         after, outcome = step(self.board([enemy(6, hp=9)], traps=[3]), Action("MoveRight"))
         self.assertEqual((after.hero.cell, len(after.traps), outcome.hp_lost), (3, 1, 0))
 
+    def test_two_traps_on_one_cell_both_go_off(self):
+        # As on the last turn of the Shogun fight in logs/run7_part3: two 5-damage traps took it from 10 to 0.
+        state = self.board([enemy(6, hp=9)], traps=[3, 3])
+        after, _ = fire(state, self.HOOK)
+        self.assertEqual(([e.hp for e in after.enemies], after.traps), ([2], []))  # 1 from the hook, 3 from each
+
     def test_placed_under_an_enemy_it_waits(self):
         after, _ = fire(self.board([enemy(3, hp=9)]), self.TRAP)
         self.assertEqual((after.enemies[0].hp, len(after.traps)), (9, 1))
@@ -2016,6 +2022,44 @@ class WardenTest(unittest.TestCase):
         best = rank_actions(make_state(hero_cell=2, enemies=[self.warden(3)], queue=["Swirl"]), depth=1)[0]
         self.assertNotEqual(best.actions[0].kind, "Attack")
         self.assertEqual(best.terms.get("hp_lost", 0), 0)
+
+
+class DynamicBoostTest(unittest.TestCase):
+    """DynamicBoostSkill in the game's code: after an attack that moves or turns the hero, its later hits that turn get
+    the skill's level added. The move attack's own hit doesn't: the game raises its event after that hit."""
+    SHARP_TURN = Attack("TurnAround", 1, [-1, 1])
+
+    def volley(self, attacks, level=1):
+        state = make_state(hero_cell=3, enemies=[enemy(2, hp=9), enemy(4, hp=9)])
+        state.cells = 7
+        state.dynamic_bonus = level
+        tiles = [Tile(a, cooldown=3, charge=3, in_queue=True) for a in attacks]
+        state.tiles, state.queue_tiles, state.hero.queue = tiles, list(tiles), list(attacks)
+        after, _ = step(state, Action("Attack"))
+        return sorted((e.cell, 9 - e.hp) for e in after.enemies)
+
+    def test_a_hit_after_sharp_turn_is_boosted(self):
+        # Sharp Turn hits both sides for 1, then Katana, now facing left, hits cell 2 for 2 plus 1.
+        self.assertEqual(self.volley([self.SHARP_TURN, KATANA]), [(2, 4), (4, 1)])
+
+    def test_the_turn_itself_isnt(self):
+        self.assertEqual(self.volley([self.SHARP_TURN]), [(2, 1), (4, 1)])
+
+    def test_nothing_without_the_skill(self):
+        self.assertEqual(self.volley([self.SHARP_TURN, KATANA], level=0), [(2, 3), (4, 1)])
+
+    def test_flipping_doesnt_turn_it_on(self):
+        state = make_state(hero_cell=3, enemies=[enemy(2, hp=9)])
+        state.dynamic_bonus = 1
+        after, _ = step(state, Action("Flip"))
+        self.assertFalse(after.boosted)
+
+    def test_it_lasts_only_the_turn(self):
+        state = make_state(hero_cell=3, enemies=[enemy(2, hp=9), enemy(4, hp=9)])
+        state.dynamic_bonus = 1
+        state.boosted = True
+        after, _ = step(state, Action("Wait"))
+        self.assertFalse(after.boosted)
 
 
 class SniperSkillTest(unittest.TestCase):
@@ -2208,12 +2252,16 @@ class KeepingOtherMovesTest(unittest.TestCase):
         in_hand.tiles.append(spear)
         self.assertAlmostEqual(leaf_terms(in_hand)["setup"], 4 * 2 / 3)
 
-    def load_choice(self, wave_damage, plain_damage):
+    def load_choice(self, wave_damage, plain_damage, effect="Shockwave"):
         # The plain tile comes first, so a tie would go to it.
         state = self.with_tile(Attack("Katana", plain_damage, [1, 2]), [enemy(5, hp=9)], loaded=False)
-        state.tiles.append(Tile(Attack("Katana", wave_damage, [1, 2], effect="Shockwave"), cooldown=3, charge=3))
+        state.tiles.append(Tile(Attack("Katana", wave_damage, [1, 2], effect=effect), cooldown=3, charge=3))
         best = next(c for c in rank_actions(state, depth=1) if c.actions[0].kind == "PlayTile")
         return state.tiles[best.actions[0].tile].attack
+
+    def test_the_curse_version_of_an_identical_tile_is_loaded_first(self):
+        self.assertEqual(self.load_choice(2, 2, effect="Curse").effect, "Curse")
+        self.assertEqual(self.load_choice(2, 3, effect="Curse").value, 3)
 
     def test_the_shockwave_version_of_an_identical_tile_is_loaded_first(self):
         self.assertEqual(self.load_choice(2, 2).effect, "Shockwave")

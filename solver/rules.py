@@ -21,14 +21,14 @@ MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Barricade"
            "Swirl", "Tetsubo", "Trap", "TurnAround", "Volley"}
 
 # Skills the solver handles. Most need no modeling because their effects show up in the logged state,
-# like a shield, max HP or a shorter Swap cooldown. Damaging Move, Sniper, Two Way Move and Unfriendly Fire
+# like a shield, max HP or a shorter Swap cooldown. Damaging Move, Dynamic Boost, Sniper, Two Way Move and Unfriendly Fire
 # are simulated.
 SNIPER_DISTANCE = 4  # Sniper adds its level to the hero's hits on targets at least this many cells away.
 # Combo Curse curses a random enemy on each kill after the first in a turn, by anyone: which one can't be predicted,
 # like where a summon lands, so it isn't simulated. Combo Coin and Triple Combo Heal also trigger on combos, and
 # aren't simulated or valued either: the player's call is there's no reason to yet.
-UNDERSTOOD_SKILLS = {"BigPockets", "ComboCoin", "ComboCurse", "DamagingMove", "Fortress", "Healthy", "QuickRecovery",
-                     "Sniper", "TripleComboHeal", "TwoWayMove", "UnfriendlyFire"}
+UNDERSTOOD_SKILLS = {"BigPockets", "ComboCoin", "ComboCurse", "DamagingMove", "DynamicBoost", "Fortress", "Healthy",
+                     "QuickRecovery", "Sniper", "TripleComboHeal", "TwoWayMove", "UnfriendlyFire"}
 
 POISON_TURNS = 3  # Applying poison sets this many turns left, and each turn's end deals 1, starting that turn.
 BOMB_FUSE = 2     # Turns a placed bomb waits after the one it's placed on, before it goes off on the next.
@@ -61,6 +61,10 @@ CHARGES = {"Charge": 1, "BackCharge": -1}  # Run to the last free cell, and hit 
 PLAIN_DASHES = {"Dash": 1}                 # Run to the last free cell, and hit nothing.
 SHADOW_DASHES = {"ShadowDash": 1, "BackShadowDash": -1}  # Land behind a target, hitting all they pass.
 SMOKE_BOMBS = {"SmokeBomb", "BackSmokeBomb"}  # Trade places with the first target, then hit it.
+# Attacks that move or turn the hero, which raise the game's move-attack event that Dynamic Boost listens for. Only
+# when they actually moved or turned it: a Smoke Bomb with nobody to trade places with does nothing.
+MOVE_ATTACKS = set(CHARGES) | set(PLAIN_DASHES) | set(SHADOW_DASHES) | SMOKE_BOMBS | {"TurnAround", "Mirror",
+                                                                                     "OriginOfSymmetry"}
 
 # An enemy tile being played. Its identity isn't visible until it lands in the queue.
 UNKNOWN_TILE = "Unknown"
@@ -133,6 +137,8 @@ class State:
     swap_damage: int = 0  # What a swap deals to the enemy passed through, from Damaging Move.
     friendly_bonus: int = 0  # Extra damage when enemies hit each other, from Unfriendly Fire.
     sniper_bonus: int = 0  # Extra damage on the hero's hits from 4 or more cells away, from Sniper.
+    dynamic_bonus: int = 0  # Extra damage on the hero's hits after a move attack this turn, from Dynamic Boost.
+    boosted: bool = False  # Whether a move attack has turned Dynamic Boost on this turn.
     two_way_swap: bool = False  # The special move works backward as well, from Two Way Move.
     special: str = SWAP  # The hero's special move.
     # Damage on its way to marked cells: each is {"damage", "groups"}, and the first group of cells strikes
@@ -281,6 +287,8 @@ def state_from_log(row):
                           if isinstance(s, dict) and s.get("name") == "DamagingMove"), 0),
         friendly_bonus=next((s["level"] for s in row.get("skills") or []
                              if isinstance(s, dict) and s.get("name") == "UnfriendlyFire"), 0),
+        dynamic_bonus=next((s["level"] for s in row.get("skills") or []
+                            if isinstance(s, dict) and s.get("name") == "DynamicBoost"), 0),
         sniper_bonus=next((s["level"] for s in row.get("skills") or []
                            if isinstance(s, dict) and s.get("name") == "Sniper"), 0),
         two_way_swap=any(isinstance(s, dict) and s.get("name") == "TwoWayMove" for s in row.get("skills") or []),
@@ -664,6 +672,14 @@ def shield_first_ally(state, attacker, attack):
 
 
 def apply_attack(state, attacker, attack, outcome):
+    start = (attacker.cell, attacker.facing)
+    _apply_attack(state, attacker, attack, outcome)
+    # The game raises its move-attack event after the attack's own hits, so Dynamic Boost only helps later ones.
+    if attacker is state.hero and attack.name in MOVE_ATTACKS and (attacker.cell, attacker.facing) != start:
+        state.boosted = True
+
+
+def _apply_attack(state, attacker, attack, outcome):
     if attack.name in (UNKNOWN_TILE, UNKNOWN_COPY):
         return
     if attack.name not in MODELED and attack.name not in outcome.unmodeled:
@@ -798,6 +814,8 @@ def deal_damage(state, attacker, target, value, outcome, collision=False):
     # Measured when the hit lands, so a Smoke Bomb's trade of places doesn't change it, and a Charge lands adjacent.
     if attacker is state.hero and not collision and abs(attacker.cell - target.cell) >= SNIPER_DISTANCE:
         value += state.sniper_bonus
+    if attacker is state.hero and not collision and state.boosted:
+        value += state.dynamic_bonus
     if target.curse and value > 0:
         value *= 2
         target.curse = False
@@ -955,6 +973,7 @@ def resolve_enemies(state, outcome):
 
 
 def end_turn(state, swapped):
+    state.boosted = False
     for tile in state.tiles:
         if not tile.just_played and tile.charge < tile.cooldown:
             tile.charge += 1

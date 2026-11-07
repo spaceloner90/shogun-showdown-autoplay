@@ -39,6 +39,20 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.20: Dynamic Boost, and loaded Curse tiles
+
+Dynamic Boost is read from the game's code, and confirmed by `logs/run7_part3`: the six hits there that did 1 or 2
+more than predicted are all exact now, leaving only random Combo Curses, summons and the Shogun's second phase as
+misses. Traps stacking on one cell was already simulated, and that log's last turn confirms it. A loaded tile with
+Curse is now worth 0.5, like one with Shockwave: the stack only counts a volley's damage, poison and traps, so the
+curse it would land earned nothing until the tile fired. Three top choices change, all in the Shogun's second phase,
+loading the Smoke Bomb to boost what follows it. No HP or kills lost.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| A loaded Curse tile is worth 0.5 | Scoring | A tiebreak, as the player put it, like Shockwave's | Only if a Curse tile joins the deck |
+| Loading a move attack to boost what follows | Scoring | Three choices in the Shogun fight, replayed | Smoke Bomb or Sharp Turn fired first in a volley |
+
 ## New in v1.19: the Swapper is a tank
 
 The player's call: the Swapper has 30 HP the game doesn't show against Ieyasu's 40, dies with him, and its swaps are

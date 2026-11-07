@@ -210,6 +210,15 @@ Shockwave, read from the code (simulated as of v1.3):
 - The damage is stored in the game's assets. `logs/run7` shows 1, chaining through two touching enemies on turn
   41, and going off even when the tile killed its target.
 
+Dynamic Boost and stacked traps (v1.20):
+
+- **Dynamic Boost** adds its level to the hero's own hits after an attack that moved or turned it this turn: Charge,
+  Dash, Shadow Dash, Smoke Bomb, Sharp Turn, and a few others. By the code, the game raises that event after the
+  move attack's own hit, so only later hits are boosted, and it switches off at the end of the turn. A Flip or a
+  step doesn't count, nor does the shove. Confirmed by six hits in `logs/run7_part3`.
+- **Two traps on one cell both go off.** On the last turn of the Shogun fight in `logs/run7_part3`, a second trap
+  placed on the first and the hook pulling the Shogun onto them took it from 10 to 0, 5 each.
+
 Ieyasu, read from the code (simulated as of v1.18):
 
 - **Blade of Patience** strikes the cell directly ahead, and hits 1 harder for each turn it waits in the queue,

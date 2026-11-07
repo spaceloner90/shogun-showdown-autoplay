@@ -88,9 +88,9 @@ intrinsic value, guessed from how flexible it is across situations and scaled by
   in, which almost never helps, so it's worth the least.
 - **Setup:** a move that brings an enemy in is worth more when the kit has a short-reach tile to exploit it, in
   proportion to that tile's damage.
-- **A loaded Shockwave tile:** worth a little more, for chains it may find once enemies bunch up. It's only a
-  tiebreak: it prefers the Shockwave version of a tile over an identical plain one, never over a tile doing a
-  point more damage.
+- **A loaded tile with an effect the stack doesn't score:** worth a little more. Shockwave, for chains it may find
+  once enemies bunch up, and Curse, whose worth depends on who it lands on. Only a tiebreak: it prefers the version
+  of a tile with the effect over an identical plain one, never over a tile doing a point more damage.
 
 They all share the same modifiers. A tile in hand is worth 2/3 of one loaded, so loading it adds only a little. A
 move that acts on a target is worth 1/3 with nobody it can act on. A loaded tile that would go off with a kill

@@ -178,7 +178,7 @@ log gets saved into `logs/` first.
 - **One turn ahead can't anticipate.** An attack only counts once it's telegraphed. A better player loads a Smoke
   Bomb ahead of an Archer's shot, and F1 can't see the need until it's too late. That needs knowing what enemies do,
   and lookahead.
-- **Consumables** aren't used by F1. Scenarios for them are saved in the backlog.
+- **Consumables** are used by fixed rules rather than valued in the score, one potion per key press: see `rules.md`.
 - **Which enemy to kill first** is simply lowest HP, then closest.
 - **Why a deeper line sums its turns at all.** With perfect prediction, summing each turn's events would add
   nothing over the final position: an enemy killed sooner would simply show as HP not lost later. It's done, with

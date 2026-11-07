@@ -51,10 +51,10 @@ import itertools
 from dataclasses import dataclass, field
 
 from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, Attack, Outcome, State,
-                   apply_attack, can_use_special, enemy_cells, fireable_attacks, is_tank, legal_actions, perform_special,
+                   apply_attack, apply_potion, can_use_special, enemy_cells, fireable_attacks, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v1.21"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.22"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -65,6 +65,10 @@ WEIGHTS = {
     "poison_turn": 8.0,       # Per turn of poison left on an enemy, like damage another enemy deals.
     "ice_turn": 5.0,          # Per turn of ice left on an enemy, per point of its strongest known attack (2 if none
                               # is known). Freezing a 2-damage enemy is worth about 3 damage now. A first guess.
+    # Potions. Each is used on a key press of its own, and the next press analyzes the board it leaves.
+    "heal_at_missing": 3,     # Use Edamame once the hero is missing at least this much HP, so none of its 3 is wasted.
+    "pressure": -37.0,        # Below this best score, the hardest 10% of logged boards, as the player asked: any
+                              # fewer and they'd never get used. Only then are attacking potions and D6 used.
     "trap_planted": 0.4,      # A trap on the ground, as a share of what its damage is worth. Only enemies set
                               # one off, so it's all upside: the player's read is a third to half.
     "shove_cell": 4.0,        # Per cell an enemy is shoved. Space to load in, but melee wants them close too.
@@ -569,6 +573,65 @@ def _evaluate_action(state, action, depth, scale):
 def _best_line(state, depth, scale):
     return max((_evaluate_action(state, a, depth, scale) for a in legal_actions(state)),
                key=lambda line: line.sort_key)
+
+
+DEFENSIVE_POTIONS = ("Shield", "MassIce", "RainOfMirrors")  # In order of preference when they save as much.
+ATTACKING_POTIONS = ("MassPoison", "MassCurse", "CoolUp")
+
+
+def _turn_result(state, line):
+    """What this turn does if the line's first action is taken."""
+    return step(state, line.actions[0])[1]
+
+
+def potion_plan(state, ranked):
+    """Which potion to use before this turn's action, if any, and why: the player's rules.
+
+    Edamame heals once that wastes none of it. Shield, Freeze Time and Rain of Mirrors only avoid damage: used when
+    the best line with one loses less HP this turn than the best line without, preferring the Shield unless another
+    saves more. Mass Poison, Mass Curse and Cool Up only when under pressure, and only if the best line with one kills
+    more this turn, poison ticks included. D6 is random, so it's only a last resort under pressure, against damage
+    nothing else avoids. Each potion is ranked in full, since one can make a move good that F1 ranked low without it.
+    Returns (potion, reason, ranked with it), or (None, None, None).
+    """
+    held = state.potions
+    if not held:
+        return None, None, None
+    hero = state.hero
+    if "Edamame" in held and hero.max_hp - hero.hp >= WEIGHTS["heal_at_missing"]:
+        return "Edamame", f"heal: HP {hero.hp}/{hero.max_hp}", None
+    best = ranked[0]
+    now = _turn_result(state, best)
+    pressured = best.score < WEIGHTS["pressure"]
+
+    def with_potion(name):
+        after = apply_potion(state, name)
+        again = rank_actions(after, depth=1)
+        return after, again, _turn_result(after, again[0])
+
+    if now.hp_lost > 0:
+        saves = []
+        for name in DEFENSIVE_POTIONS:
+            if name in held:
+                after, again, result = with_potion(name)
+                if result.hp_lost < now.hp_lost:
+                    saves.append((result.hp_lost, DEFENSIVE_POTIONS.index(name), name, again))
+        if saves:
+            hp, _, name, again = min(saves)
+            return name, f"avoids damage: {now.hp_lost} HP lost without it, {hp} with it", again
+    if pressured:
+        gains = []
+        for name in ATTACKING_POTIONS:
+            if name in held:
+                after, again, result = with_potion(name)
+                if result.kills > now.kills:
+                    gains.append((result.kills, again[0].score, name, again))
+        if gains:
+            kills, _, name, again = max(gains, key=lambda g: (g[0], g[1]))
+            return name, f"under pressure (best {best.score:.0f}): {now.kills} kills without it, {kills} with it", again
+        if now.hp_lost > 0 and "D6" in held:
+            return "D6", f"under pressure (best {best.score:.0f}), losing {now.hp_lost} HP that nothing else avoids", None
+    return None, None, None
 
 
 def rank_actions(state: State, depth: int = 1) -> list[Line]:

@@ -4,8 +4,8 @@ Run with: python solver/test_rules.py
 """
 import unittest
 
-from evaluator import WEIGHTS, _has_way_out, _threat_damage, ideal_target, leaf_terms, preferred_distance, rank_actions, unanswerable_damage
-from rules import Action, Agent, Attack, State, Tile, is_tank, legal_actions, state_from_log, step, unmodeled_content
+from evaluator import WEIGHTS, _has_way_out, potion_plan, _threat_damage, ideal_target, leaf_terms, preferred_distance, rank_actions, unanswerable_damage
+from rules import ICE_TURNS, SIMULATED_POTIONS, Action, Agent, Attack, State, Tile, apply_potion, is_tank, legal_actions, state_from_log, step, unmodeled_content
 
 SWIRL = Attack("Swirl", 2, [-1, 1])
 ARROW = Attack("Arrow", 2, list(range(1, 11)), first_target=True)
@@ -2073,6 +2073,84 @@ class IceTest(unittest.TestCase):
         plain_load = next(c for c in rank_actions(plain, depth=1) if c.actions[0].kind == "PlayTile")
         self.assertGreater(load.terms["stack"], plain_load.terms["stack"])
         self.assertEqual(load.terms["effects"], 0.5 * WEIGHTS["future_discount"])
+
+
+class PotionTest(unittest.TestCase):
+    """Each potion's Effect in the game's code, and the player's rules for when F1 uses one."""
+
+    def pinned(self, two=False):
+        # The hero between enemies or against the wall, with no tiles and no special move: nothing dodges.
+        right = enemy(3, hp=9, action="Attack", queue=[KATANA])
+        enemies = [enemy(1, facing=1, hp=9, action="Attack", queue=[KATANA]), right] if two else [right]
+        state = make_state(hero_cell=2 if two else 0, enemies=enemies, swap_charge=0)
+        if not two:
+            right.cell = 1
+        state.tiles = []
+        return state
+
+    def plan(self, state):
+        return potion_plan(state, rank_actions(state, depth=1))
+
+    def test_each_potion_is_used_up(self):
+        state = make_state(enemies=[enemy(3)])
+        state.potions = ["Shield", "Shield"]
+        self.assertEqual(apply_potion(state, "Shield").potions, ["Shield"])
+
+    def test_effects(self):
+        state = make_state(enemies=[enemy(3, hp=9, action="MoveLeft")])
+        state.hero.hp = 5
+        state.potions = list(SIMULATED_POTIONS)
+        self.assertEqual(apply_potion(state, "Edamame").hero.hp, 8)
+        self.assertTrue(apply_potion(state, "Shield").hero.shield)
+        frozen = apply_potion(state, "MassIce").enemies[0]
+        self.assertEqual((frozen.ice, frozen.action), (ICE_TURNS, "Wait"))
+        flipped = apply_potion(state, "RainOfMirrors").enemies[0]
+        self.assertEqual((flipped.facing, flipped.action), (1, "MoveRight"))
+        self.assertEqual(apply_potion(state, "MassPoison").enemies[0].poison, 3)
+        self.assertTrue(apply_potion(state, "MassCurse").enemies[0].curse)
+        state.tiles[0].charge = 0
+        state.swap_charge = 0
+        cooled = apply_potion(state, "CoolUp")
+        self.assertEqual((cooled.tiles[0].ready, cooled.swap_charge), (True, cooled.swap_cooldown))
+
+    def test_heal_only_when_none_of_it_is_wasted(self):
+        state = make_state(enemies=[enemy(4)])
+        state.potions = ["Edamame"]
+        state.hero.hp = 8
+        self.assertEqual(self.plan(state)[0], None)
+        state.hero.hp = 7
+        self.assertEqual(self.plan(state)[0], "Edamame")
+
+    def test_the_shield_is_preferred_when_it_saves_as_much(self):
+        state = self.pinned()
+        state.potions = ["MassIce", "Shield"]
+        self.assertEqual(self.plan(state)[0], "Shield")
+
+    def test_freeze_time_when_it_stops_more_than_one_hit(self):
+        state = self.pinned(two=True)
+        state.potions = ["Shield", "MassIce"]
+        self.assertEqual(self.plan(state)[0], "MassIce")
+
+    def test_nothing_defensive_without_damage_coming(self):
+        state = make_state(enemies=[enemy(4)])
+        state.potions = ["Shield", "MassIce", "RainOfMirrors"]
+        self.assertEqual(self.plan(state)[0], None)
+
+    def test_attacking_potions_only_under_pressure(self):
+        state = make_state(hero_cell=2, enemies=[enemy(3, hp=4)], queue=["Swirl"])
+        state.potions = ["MassCurse"]
+        ranked = rank_actions(state, depth=1)
+        self.assertEqual(potion_plan(state, ranked)[0], None)
+        ranked[0].score = WEIGHTS["pressure"] - 1
+        self.assertEqual(potion_plan(state, ranked)[0], "MassCurse")  # Doubles Swirl's 2 into a kill.
+
+    def test_d6_only_under_pressure_against_unavoidable_damage(self):
+        state = self.pinned(two=True)
+        state.potions = ["D6"]
+        ranked = rank_actions(state, depth=1)
+        self.assertEqual(potion_plan(state, ranked)[0], None if ranked[0].score >= WEIGHTS["pressure"] else "D6")
+        ranked[0].score = WEIGHTS["pressure"] - 1
+        self.assertEqual(potion_plan(state, ranked)[0], "D6")
 
 
 class DynamicBoostTest(unittest.TestCase):

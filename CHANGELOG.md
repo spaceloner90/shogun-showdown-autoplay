@@ -7,6 +7,14 @@ ones are unvetted until real play confirms them, as [`research/unvetted.md`](res
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v1.22 — consumables (2026-11-07)
+- **Rule:** each combat potion's effect, from the game's code. Using one is free and doesn't end the turn.
+- **Scoring:** the player's rules. Edamame once the hero is missing 3 HP. Shield, Freeze Time and Rain of Mirrors
+  only to lose less HP this turn, preferring the Shield. Under pressure, the worst 10% of boards by best score,
+  Mass Poison, Mass Curse and Cool Up only to make a kill, and D6 against damage nothing else avoids. Each potion is
+  checked by ranking every move again with it applied.
+- **Mod 0.12.0:** a key press uses the potion instead of acting, and the next one plays the turn.
+
 ## v1.21 — freezing (2026-11-07)
 - **Rule:** an Ice hit sets 4 turns of ice on an enemy that can be frozen, and cancels what it telegraphed this turn.
   While it has ice it does nothing, so it loses that turn and the next three. Its queue stays.

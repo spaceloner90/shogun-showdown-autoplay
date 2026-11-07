@@ -149,6 +149,7 @@ class State:
     hazards: list[dict] = field(default_factory=list)
     # Traps on the ground: {"cell", "damage", "effect"}. Only an enemy moving onto one sets it off.
     traps: list[dict] = field(default_factory=list)
+    potions: list[str] = field(default_factory=list)  # The hero's potions, by the game's names.
 
     def occupant(self, cell):
         if self.hero.alive and self.hero.cell == cell:
@@ -297,6 +298,7 @@ def state_from_log(row):
         two_way_swap=any(isinstance(s, dict) and s.get("name") == "TwoWayMove" for s in row.get("skills") or []),
         special=special.get("name", SWAP),
         hazards=[dict(h, groups=[list(g) for g in h["groups"]]) for h in row.get("hazards") or []],
+        potions=list(row.get("potions") or []),
         traps=[{"cell": t["cell"], "damage": t["damage"], "effect": t.get("effect") or "None"}
                for t in row.get("traps") or []],
     )
@@ -760,6 +762,52 @@ def hit_effect(state, attacker, target, effect, outcome):
     # Each target sets off its own, even one that just died, and a shield on the target doesn't stop it.
     if effect == "Shockwave":
         shockwave(state, attacker, target, outcome)
+
+
+# Potions the hero can use in a fight, by the game's names, and what each does, read from each one's Effect in the
+# game's code. Using one is free and immediate, and only allowed between turns. D6 rerolls every enemy's intention at
+# random, so it can't be simulated.
+SIMULATED_POTIONS = {"Edamame", "Shield", "MassIce", "RainOfMirrors", "MassPoison", "MassCurse", "CoolUp"}
+EDAMAME_HEAL = 3  # HealSmallPotion.heal
+OPPOSITE_ACTIONS = {"MoveLeft": "MoveRight", "MoveRight": "MoveLeft", "FlipLeft": "FlipRight", "FlipRight": "FlipLeft"}
+
+
+def apply_potion(state, name):
+    """A copy of the board after using this potion, which is gone from the hero's potions."""
+    state = copy.deepcopy(state)
+    state.potions.remove(name)
+    hero = state.hero
+    enemies = [e for e in state.enemies if e.alive]
+    if name == "Edamame":
+        hero.hp = min(hero.max_hp, hero.hp + EDAMAME_HEAL)
+    elif name == "Shield":
+        hero.shield = True
+    elif name == "MassIce":
+        # Freezes every enemy that can be frozen, cancelling what each telegraphed: FreezeTimePotion.
+        for enemy in enemies:
+            if enemy.freezable:
+                enemy.ice = ICE_TURNS
+                enemy.action = "Wait"
+    elif name == "RainOfMirrors":
+        # Turns every movable enemy around and reverses its telegraphed move or flip: RainOfMirrorsEffect.
+        for enemy in enemies:
+            if enemy.movable:
+                enemy.facing = -enemy.facing
+                enemy.action = OPPOSITE_ACTIONS.get(enemy.action, enemy.action)
+    elif name == "MassPoison":
+        for enemy in enemies:
+            enemy.poison = POISON_TURNS
+    elif name == "MassCurse":
+        for enemy in enemies:
+            enemy.curse = True
+    elif name == "CoolUp":
+        # Every tile and the special move fully recharged: TilesManager.RechargeCooldownForDeck.
+        for tile in state.tiles:
+            tile.charge = tile.cooldown
+        state.swap_charge = state.swap_cooldown
+    else:
+        raise ValueError(f"potion {name} isn't simulated")
+    return state
 
 
 def boss_swap(state, attacker):

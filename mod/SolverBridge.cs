@@ -26,6 +26,9 @@ public sealed class SolverResult
     public string AnalysisJson;
     public string EvaluatorVersion = "unknown";
     public readonly Dictionary<int, BestMove> Best = new Dictionary<int, BestMove>();
+    // A potion to use instead of acting on this key press, by the game's name, and why. Null if none.
+    public string Potion;
+    public string PotionReason;
 }
 
 public sealed class SolverBridge
@@ -151,6 +154,12 @@ public sealed class SolverBridge
                     order[i] = int.Parse(indexes[i], CultureInfo.InvariantCulture);
                 }
                 result.Best[int.Parse(parts[1], CultureInfo.InvariantCulture)].AttackOrder = order;
+            }
+            else if (line.StartsWith("POTION ", StringComparison.Ordinal))
+            {
+                string[] parts = line.Trim().Split(new[] { ' ' }, 3);
+                result.Potion = parts[1];
+                result.PotionReason = parts.Length > 2 ? parts[2] : "";
             }
             else if (line.StartsWith("ANALYSIS ", StringComparison.Ordinal))
             {

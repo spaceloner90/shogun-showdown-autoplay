@@ -22,13 +22,17 @@ Enemy AI code is for offline simulation and tuning only.
 
 - **Attacks that displace others:** KiPush, TwinTessen, Hookblade, Tanegashima. Each needs its rules
   read first, as they come up.
-- **Consumables:** in-battle potions aren't used by F1, and the player expects them to add a lot. This
-  means valuing each potion and having the mod use them, so it's a project of its own. Scenarios saved for it:
+- **Consumables (first version in v1.22).** F1 uses potions by the player's rules, ranking every move again with
+  each held potion applied, since a potion can make a move good that F1 ranked low without it. Still open: whether
+  the rules use them too much or too little, and Cool Up and D6 beyond their narrow rules. Scenarios saved for it:
   - **Rain of Mirrors ("Flip all enemies"), `logs/run7` fight 8, turn 28.** The hero on cell 6 is between two
     Striders on 5 and 7, each facing it with a Katana loaded, so every line takes at least 2. The player used the
     potion: both turned away, the right one's Katana killed the TwinTachi on 8 instead, and Spear with Sharp Turn
     then took no damage. The log has the board both before (seq 2126) and after (seq 2127) the potion. v1.11 would
     likely have avoided this a turn earlier, as it now sees the left Strider dash in next to the hero.
+- **Key presses are slow because Python starts each time.** A press takes about 0.5 s in game, of which the search
+  is about 0.02 s: the rest is starting a new Python process. A solver process that stays running, reloading when its
+  code changes, would cut most of it. That's a new mechanism, to raise with the player before building.
 - **Sato's acts (ignored on purpose for F1).** Sato's Maku ends the act and sets up a new battlefield: the hero
   is moved and new enemies arrive (`logs/run7_part2`, fight 3, turns 9, 16, 24 and 30). F1 only looks at the turn
   in front of it, so it doesn't matter there. A deeper search would have to stop at an act change, or know the

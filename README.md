@@ -33,4 +33,4 @@ python solver/test_rules.py
 python solver/test_positions.py
 ```
 
-In the game, F1 plays one turn and F8 reports without playing. [`research/design.md`](research/design.md) explains how it decides and why, `research/rules.md` has the game's rules as worked out from its code and from play, and `research/evaluator_backlog.md` has what's still to do.
+In the game, F1 plays one turn, or uses a potion when the solver says to, and F8 reports without playing. [`research/design.md`](research/design.md) explains how it decides and why, `research/rules.md` has the game's rules as worked out from its code and from play, and `research/evaluator_backlog.md` has what's still to do.

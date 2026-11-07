@@ -210,6 +210,18 @@ Shockwave, read from the code (simulated as of v1.3):
 - The damage is stored in the game's assets. `logs/run7` shows 1, chaining through two touching enemies on turn
   41, and going off even when the tile killed its target.
 
+Potions, read from the code (simulated as of v1.22):
+
+- **Using one** is free, doesn't end the turn, and is only allowed between turns (`Potion.CanBeUsed`).
+- **Edamame** heals 3. **Shield** shields the hero. **Freeze Time** (MassIce) freezes every enemy that can be, as
+  Ice does. **Rain of Mirrors** turns every movable enemy around and reverses its telegraphed move or flip. **Mass
+  Poison** and **Mass Curse** poison and curse every enemy. **Cool Up** recharges every tile and the special move.
+  **D6** gives each enemy that isn't frozen a different random action, so it isn't simulated.
+- **When F1 uses one**, by the player's rules, one per key press: Edamame once the hero is missing at least 3 HP.
+  Shield, Freeze Time or Rain of Mirrors when the best line with it loses less HP this turn, preferring the Shield.
+  Under pressure (best score below -37, the worst 10% of logged boards), Mass Poison, Mass Curse or Cool Up when the
+  best line with it kills more, and D6 against damage nothing else avoids.
+
 Freezing, read from the code (simulated as of v1.21):
 
 - **Ice** from a tile sets 4 turns of ice (`GameParams.iceEffectTurnsDuration`), resetting rather than adding, on an

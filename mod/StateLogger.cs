@@ -26,7 +26,7 @@ using BepInEx;
 using HarmonyLib;
 using UnityEngine;
 
-[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.11.0")]
+[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.12.0")]
 public class StateLoggerPlugin : BaseUnityPlugin
 {
     private const float PollIntervalSeconds = 0.1f;
@@ -224,6 +224,18 @@ public class StateLoggerPlugin : BaseUnityPlugin
             return;
         }
 
+        if (analysis.Potion != null)
+        {
+            // A potion is free and doesn't end the turn, so this key press only uses it. The next one analyzes the
+            // board it leaves and plays the turn.
+            string potionName = analysis.Potion;
+            string why = analysis.PotionReason;
+            string from = "Evaluator " + analysis.EvaluatorVersion + " depth " + depth;
+            analysis = null;
+            UsePotion(potionName, why, from);
+            return;
+        }
+
         BestMove move;
         if (!analysis.Best.TryGetValue(depth, out move))
         {
@@ -237,6 +249,26 @@ public class StateLoggerPlugin : BaseUnityPlugin
         string source = "Evaluator " + analysis.EvaluatorVersion + " depth " + depth;
         analysis = null;
         Execute(new Decision(action, tile, reason, move.AttackOrder), source);
+    }
+
+    // Uses a held potion the way clicking it does, and logs it. Potion.Submit refuses one that can't be used now.
+    private void UsePotion(string potionName, string why, string source)
+    {
+        Potion potion = null;
+        foreach (Potion held in GetPotions())
+        {
+            if (held.PotionEnum.ToString() == potionName && !held.AlreadyUsed) { potion = held; break; }
+        }
+        string data = "\"potion\":" + Str(potionName) + ",\"source\":" + Str(source) + ",\"reason\":" + Str(why) +
+            ",\"basedOnStateSeq\":" + lastStateSequence;
+        if (potion == null || !potion.CanBeUsed)
+        {
+            LogEvent("step_refused", "Refused potion " + potionName + ": " + (potion == null ? "not held" : "can't be used now"),
+                data);
+            return;
+        }
+        LogEvent("potion_use", "Potion: " + potionName + " | from: " + source + " | why: " + why, data);
+        potion.Submit();
     }
 
     // Plays exactly one move through the game's own input calls, and logs where it came from.

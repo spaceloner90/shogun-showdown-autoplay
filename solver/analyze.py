@@ -7,6 +7,7 @@ Output is line based:
     VERSION <evaluator version>
     BEST <depth> <game action> <deck index or -1> <score> <label>
     ORDER <depth> <deck indexes to fire, in order>  (only when firing needs queue edits first)
+    POTION <potion> <why>  (only when a potion should be used first: the key press uses it instead of acting)
     ANALYSIS <one line of JSON for the log>
     REPORT
     <the readable report, through to the end>
@@ -15,7 +16,7 @@ import json
 import sys
 import time
 
-from evaluator import VERSION, rank_actions
+from evaluator import VERSION, potion_plan, rank_actions
 from review import board
 from rules import state_from_log, unmodeled_content
 
@@ -46,7 +47,7 @@ def why_best(ranked):
     return f"beats {second.labels[0]} by {margin:.1f}: {text}"
 
 
-def build_report(row, state, by_depth):
+def build_report(row, state, by_depth, potion=None, potion_reason=None):
     wave = row.get("wave")
     wave_text = ""
     if wave:
@@ -88,6 +89,10 @@ def build_report(row, state, by_depth):
     if hidden:
         lines.append(f"  ...and {hidden} lower-scoring moves")
 
+    if state.potions:
+        lines.append(f"  Potions: {', '.join(state.potions)}")
+    if potion:
+        lines.append(f"  USE POTION {potion} first, on this key press: {potion_reason}")
     for depth in DEPTHS:
         best = by_depth[depth][0]
         lines.append(f"  F{depth} {' -> '.join(best.labels)}")
@@ -100,6 +105,7 @@ def main():
     state = state_from_log(row)
     started = time.perf_counter()
     by_depth = {depth: rank_actions(state, depth=depth) for depth in DEPTHS}
+    potion, potion_reason, _ = potion_plan(state, by_depth[DEPTHS[0]])
     elapsed = time.perf_counter() - started
 
     print(f"VERSION {VERSION}")
@@ -110,11 +116,14 @@ def main():
         print(f"BEST {depth} {game_action(state, action)} {deck_index} {best.score:.1f} {' -> '.join(best.labels)}")
         if action.order is not None:
             print(f"ORDER {depth} {','.join(str(i) for i in action.order)}")
+    if potion:
+        print(f"POTION {potion} {potion_reason}")
 
     analysis = {
         "evaluatorVersion": VERSION,
         "basedOnStateSeq": row.get("seq"),
         "seconds": round(elapsed, 3),
+        "potion": {"name": potion, "why": potion_reason} if potion else None,
         "depths": {
             str(depth): [
                 {"line": l.labels, "score": round(l.score, 2), "terms": {k: round(v, 2) for k, v in l.terms.items() if v}}
@@ -125,7 +134,7 @@ def main():
     }
     print("ANALYSIS " + json.dumps(analysis, separators=(",", ":")))
     print("REPORT")
-    print(build_report(row, state, by_depth))
+    print(build_report(row, state, by_depth, potion, potion_reason))
 
 
 if __name__ == "__main__":

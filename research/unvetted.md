@@ -39,6 +39,21 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.22: consumables
+
+One potion per key press: the mod (plugin 0.12.0) uses it instead of acting, and the next press analyzes the board it
+leaves. Replayed on the 1,788 logged boards with potions held: the Shield would have blocked both of Ieyasu's 5-damage
+Blades (fight 5 of `logs/run7_part2`, turns 17 and 29), Freeze Time stops 3 damage at once twice, Rain of Mirrors saves
+damage twice, D6 is used 4 times, and Mass Curse once, for a kill in the Shogun fight. Ranking with every held potion
+took at most 0.08 s. None of this has been played.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| The mod using a potion | Mod | Nothing: built, not run | A `potion_use` event, the potion gone, and the next press playing the turn |
+| Each potion's simulated effect | Rule | From the code; no potion has been used by F1 | The board after a potion matching the simulation |
+| **The player's rules for when to use each** | **Scoring** | **Replays above** | **Potions used where the player would, not hoarded or wasted** |
+| Pressure at a best score below -37 | Scoring | The worst 10% of logged boards | Attacking potions and D6 used in hard fights, not easy ones |
+
 ## New in v1.21: freezing
 
 Read from the game's code, for an Ice tile if one joins the deck. No logged fight had one, so no top choice changes.

@@ -147,6 +147,8 @@ class Outcome:
     enemy_damage: int = 0
     kills: int = 0
     friendly_damage: int = 0
+    # Attacks that fired at nothing. Not scored since v1.14: a fired tile already loses its readiness to its
+    # cooldown, and firing changes nothing on the board, so only events that do get summed along a line.
     wasted_attacks: int = 0
     # Queued tiles returned to hand instead of firing. Not scored: a fired tile has to be reloaded too, after its
     # cooldown, so charging only these made F1 fire tiles that changed nothing rather than keep them ready.

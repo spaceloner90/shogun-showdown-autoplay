@@ -54,7 +54,7 @@ from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, 
                    apply_attack, can_use_special, fireable_attacks, is_tank, legal_actions, perform_special, step,
                    strike_cell, targets_of)
 
-VERSION = "v1.13"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.14"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -66,7 +66,6 @@ WEIGHTS = {
     "shove_cell": 4.0,        # Per cell an enemy is shoved. Space to load in, but melee wants them close too.
     "kill": 60.0,
     "friendly_damage": 8.0,   # Per enemy HP removed by another enemy.
-    "wasted_attack": -5.0,    # Per queued attack that fires at nothing.
     "future_discount": 0.85,  # The same result one turn later is worth this fraction.
     "no_response": -60.0,     # Per point of threatened damage the hero's best answer leaves.
 
@@ -504,7 +503,6 @@ def outcome_terms(outcome: Outcome, hero_dead: bool, cheapest_hit: int = 1) -> d
         "enemy_damage": WEIGHTS["enemy_damage"] * outcome.enemy_damage,
         "kills": WEIGHTS["kill"] * outcome.kills,
         "friendly_damage": WEIGHTS["friendly_damage"] * outcome.friendly_damage,
-        "wasted_attacks": WEIGHTS["wasted_attack"] * outcome.wasted_attacks,
     }
 
 

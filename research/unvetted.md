@@ -39,6 +39,17 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.14: no cost for an attack that hits nothing
+
+It cost 5, but a fired tile already loses its readiness to its cooldown, and firing at nothing doesn't change the
+board, so by the rule only board-changing events are summed along a line. On all 1,331 logged boards, one top choice
+changes: the winning run's fight 13, turn 15 fires a free Swirl at nothing with the rest of the queue, rather than
+sending it back. Hunts take as long as before.
+
+| Item | Kind | What replays show | What to look for |
+|---|---|---|---|
+| No cost for firing at nothing | Scoring | One harmless change | Tiles with a long cooldown fired at nothing |
+
 ## New in v1.12 and v1.13: setup value, and loaded Shockwave tiles
 
 The player's read: a loaded hook is worth something beyond its damage when the kit has short-reach tiles to exploit
@@ -92,7 +103,7 @@ Both read from the game's code. Confirmed by fight 7 of `logs/run7`, on v1.9:
 
 | Item | Kind | What's already confirmed | What to look for |
 |---|---|---|---|
-| Turning counts as doing something, so Sharp Turn with nobody in range isn't a wasted attack | Scoring | Nothing | Whether F1 uses it as a free turn more than it should |
+| Sharp Turn as a free turn | Scoring | Nothing. Since v1.14 nothing is charged for a tile hitting nothing, so it's weighed by its cooldown | Whether F1 uses it as a free turn more than it should |
 | A curse doubling Sniper's bonus | Rule | Nothing | A cursed enemy hit from 4 or more cells away |
 | With Sniper, the hero may prefer standing 4 cells off | Scoring | Only when its tiles do the most damage from there | Backing off too far, or into walls |
 

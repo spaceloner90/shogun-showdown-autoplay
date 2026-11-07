@@ -202,7 +202,14 @@ with, and being surrounded should cost more. v1.4 does a first version of both, 
   killing Rei takes the TwinTachi with him, but only Rei's death counts as a kill, while next turn's volley would
   kill the TwinTachi first and count both. And a cleared room scores like any position, still earning for kept tiles
   and facing. Ideas: count deaths alongside a boss as kills, and give winning the fight a value of its own. Set aside:
-  the same board with an ordinary enemy in Rei's place is still a near tie, so the real fault is elsewhere.
+  the same board with an ordinary enemy in Rei's place is still a near tie: see the next item.
+- **A sure kill now against a bigger volley next turn.** Since v1.27 this is a near tie on many boards: a volley
+  next turn counts at 60% and a turn's discount, while an enemy left alive costs only 4 per HP. Two real boards
+  pull opposite ways: Rei (`logs/run6`, fight 3, turn 36), where killing is right, and lining up a double kill on
+  the winning run (`logs/run2_complete`, fight 7, turn 2). Left as is, to see how it plays.
+- **Test and replay time.** v1.27's stack makes a decision about 5 times slower, and the slow checks run on every
+  logged board. The player's idea: don't keep adding every experienced board to the tests, and don't run them all
+  every time.
 
 - **The position terms read a kit on cooldown as needing less.** Where the hero wants to stand, and how much being
   far from the target costs, come from tiles ready soon. A tile put on cooldown drops out, which can lower those

@@ -39,6 +39,21 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.27: scoring rebuilt on three rules
+
+Replayed on every logged board against v1.26: 252 of 2,331 choices change. 15 boards put off a kill for a bigger
+volley next turn, each within about a point, and one takes 2 HP rather than swap into being surrounded with no
+answer, a tie between two bad options. Damage dealt is down 88 and kills down 5 overall. The player's call: the
+weights behind that trade-off are guesses either way, so deploy it and see. The two boards kept as tests that now
+go the other way are marked as expected failures in `test_positions.py`.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **A volley scored with the board it leaves** | **Scoring** | **The principle test, on every logged board** | **Kills put off for a bigger volley that then doesn't land, or fights dragging on** |
+| Reach and stand-off instead of distance and crowding | Scoring | Replays only | Melee closing in, reach kits standing off, no stalls, no running to the wall |
+| A tile counts the larger of its escape and setup values | Scoring | Replays only | The hook still kept for setup |
+| A curse's best gain on any one tile | Scoring | Replays only | Only if a Curse tile joins the deck |
+
 ## New in v1.26: loading with a swap, no tile fired at nothing, and freezing at half a kill
 
 Replayed on every logged board against v1.25: 34 choices change, no HP lost and no wasted attacks (3 before). 28 load

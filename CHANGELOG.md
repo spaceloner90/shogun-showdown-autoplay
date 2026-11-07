@@ -7,6 +7,20 @@ ones are unvetted until real play confirms them, as [`research/unvetted.md`](res
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v1.27 — scoring rebuilt on three rules (2026-11-08)
+The three rules, in `research/design.md`: having more never scores lower, a tile has one use at a time, and terms
+that read the tiles only give credit. Every term was checked against them, and `solver/test_principles.py` checks
+the first on every logged board: on v1.26 it failed 309 times, now none.
+- **Scoring:** the stack scores a volley with the board it leaves, its tiles spent, against keeping them all, at
+  its fraction. Every volley size is tried, here and when looking for an answer to a threat.
+- **Scoring:** escape and setup no longer drop to nothing when the loaded tiles can kill. The stack weighs that
+  now. A tile counts the larger of its escape and setup values, not both.
+- **Scoring:** a curse is worth its best gain on any one tile.
+- **Scoring:** distance and crowding are replaced by reach, credit for each tile that can hit the target from
+  here, and a small cost per adjacent enemy.
+- **Scoring:** breaking a shield is valued at the deck's weakest tile, not the weakest ready one.
+- A decision takes about 0.11 s, from 0.02 s.
+
 ## v1.26 — loading with a swap, no tile fired at nothing, and freezing at half a kill (2026-11-07)
 - **Rule:** with the queue full, loading can send a queued tile back to hand first, a free queue edit, as one action.
   F1 never saw this, which is what kept the stalemate in fight 11 of `logs/run8` going. **Mod 0.13.0** makes the edit

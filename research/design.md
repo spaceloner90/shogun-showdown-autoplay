@@ -37,18 +37,58 @@ happened. Where a summon lands is random, so a player can't plan around it eithe
    it's worth shows in the final position, or in what the line does with it. Nor is an attack that hits nothing:
    its cost is already in the tile going on cooldown, which the position shows.
 2. **How good the position it leaves is.** This is where everything beyond the next turn lives:
-   - **The stack:** what the loaded tiles would do if fired, from here or after a few moves or a flip, discounted
-     for each action needed, with every firing order tried. A kill is worth far more than a wound, so a loaded
-     volley that kills counts for a lot.
+   - **The stack:** what firing the loaded tiles adds beyond keeping them, from here or after a few moves or a
+     flip, discounted for each action needed, with every firing order and size tried. A volley is scored with the
+     board it leaves, its tiles spent, against this board with them all kept (rule 2). A kill is worth far more
+     than a wound, so a loaded volley that kills counts for a lot.
    - **Tiles:** charged ones, and damage loaded.
    - **What's kept:** charged moves that are worth more than their damage (escape and setup, below).
    - **Statuses:** poison still to come, curses on enemies, the hero's shield.
-   - **Where the hero stands:** facing the right enemy, distance from where the kit wants to be, crowding, and
-     being flanked or surrounded, which is much worse with no way out.
+   - **Where the hero stands:** facing the right enemy, how much of the kit can reach the target from here, a
+     small cost for each enemy adjacent, and being flanked or surrounded, which is much worse with no way out.
    - **Pressure:** enemy HP left in the room, more so as the next wave nears.
    - **Threats with no answer:** damage queued against the hero that nothing available could avoid.
 
 ## Principles
+
+### Three rules every score keeps
+
+These come first. The rest of the evaluator was built up piece by piece, and where a piece breaks one of these, the
+piece is wrong, however sensible it looked alone.
+
+1. **Having more never scores lower.** A ready tile never scores below the same tile on cooldown, and a loaded tile
+   never below the same tile in hand. In the game the hero can always leave a tile unused, and sending one back is
+   free, so a tile can't make the position worse. A score that says otherwise gives F1 a reason to throw the tile
+   away: Shadow Kama was fired at nothing to shed a positioning penalty.
+2. **One tile, one use.** A tile's uses (fire it, keep it to escape or set up, keep it ready) are alternatives. A
+   position counts the best way to use its tiles, never several uses of one tile at once. Adding them up made
+   waiting with a killing volley loaded look as good as killing, and the patch for that broke rule 1.
+3. **Terms that read the tiles only give credit** for what they can do, and never penalize what they aren't doing.
+   A penalty that grows with the tiles makes having them a burden.
+
+Where the game itself punishes holding something, like the Copycat Mirror copying a tile from the hand, that's the
+simulation's to play out, not a score's. Every rule, old or proposed, is checked against these three in theory
+before it's built, and `test_principles.py` checks rule 1 on every logged board.
+
+### Every term against the three rules
+
+As of v1.27, checked in theory:
+
+| Term | Rule 1 | Rule 2 | Rule 3 | What changed in v1.27 |
+|---|---|---|---|---|
+| Stack | Broke: only full-size volleys were tried, so a tile that hurt a volley's last place could lower it | Broke: credited firing tiles that the kept terms also credited keeping | Keeps | The position is the better of keeping everything, and the volley (at its fraction) plus what it leaves kept. Every volley size is tried |
+| Escape, setup | Broke: a loaded tile earned nothing when the loaded tiles could kill, but 2/3 in hand | Broke: the hook earned escape and setup at once; and see the stack | Keeps | The zeroing is gone, the stack handles it. A tile's kept worth is the larger of its escape and setup values |
+| Ready tiles, loaded damage | Keeps | See the stack | Keeps | Read after the volley, in the stack's case |
+| Loaded effects tiebreak | Keeps | Keeps: an effect once fired shows in the volley | Keeps | |
+| Curse | Broke: zero whenever something was loaded; and a tile that kills anyway made the curse look worthless | See the stack | Keeps | The curse's best gain on any one tile, counting every tile |
+| Distance, crowding | Broke: both grew with the tiles ready soon | Keeps | Broke | Replaced by reach and stand-off |
+| Reach (new) | Keeps: each tile only adds, more charge adds more | Read after the volley, in the stack's case | Keeps | Credit per tile for reaching the target from here, falling off per cell, discounted per turn until ready |
+| Stand-off (new) | Keeps: doesn't read the tiles | Keeps | Keeps | A small cost per adjacent enemy |
+| Flanked, surrounded | Keeps: a way out only lowers it | Keeps | Keeps: it's a credit for a way out | |
+| Facing, pressure, poison, ice, traps, shield, special charged | Keep: they don't read the tiles | Keep | Keep | |
+| Shields broken, shield as HP | Broke: valued at the weakest ready tile, so a weak tile ready lowered it | Keeps | Keeps | Valued at the weakest tile in the deck |
+| Threat with no answer | Broke: only full-size volleys were tried as answers | Keeps: a risk check, not a credit | Keeps | Every volley size is tried |
+| Damage, kills, HP lost along the line | Keep: events | Keep | Keep | |
 
 ### Extend the existing patterns
 
@@ -74,9 +114,12 @@ hero.
 
 ### Where to stand comes from the kit
 
-The hero prefers the farthest distance where the tiles it will have soon do the most damage, up to 3 cells, or 4
-with Sniper's bonus. A melee kit comes out at 1, the Ronin's Spear at 2. Being closer than that costs a little, and
-the cost stays small: larger penalties made fights stall.
+Each tile earns credit for being able to hit the target from where the hero stands, by its damage up to the target's
+HP, less a share for each cell the hero would have to move, and discounted for each turn until it's ready. Each
+enemy adjacent costs a little, whatever the tiles. So a melee kit closes in, since its credit only comes adjacent,
+and a kit that hits as hard from further away stands off. Until v1.27 this was a preferred distance with penalties
+for being closer or further, which broke rule 1: a tile on cooldown dropped out of it, so firing Shadow Kama at
+nothing removed a penalty.
 
 ### Effects beyond damage are values on the move
 
@@ -153,6 +196,7 @@ too.
 - **Replay real logs.** Run the top choice on every logged board before and after: the Wanderer's 926 winning-run
   boards, and every Ronin board since. Count what changes, kills, HP lost and damage dealt, and look at each changed
   choice that matters.
+- **Run the principle test,** `test_principles.py`: rule 1 on every logged board. It takes several minutes.
 - **Run the stall check.** Hunt a still enemy from many starts, to catch fights that would drag on.
 - **Look at the turns that prompted it,** and make sure each one now picks what it should, for the right reason.
 - **Keep real positions as tests** (`test_positions.py`), so later changes can't quietly undo them.

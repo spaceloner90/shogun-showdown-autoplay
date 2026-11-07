@@ -4,7 +4,7 @@ Run with: python solver/test_rules.py
 """
 import unittest
 
-from evaluator import WEIGHTS, _has_way_out, potion_plan, _threat_damage, ideal_target, leaf_terms, preferred_distance, rank_actions, unanswerable_damage
+from evaluator import WEIGHTS, _volleys, _has_way_out, potion_plan, _threat_damage, ideal_target, leaf_terms, rank_actions, unanswerable_damage
 from rules import ICE_TURNS, SIMULATED_POTIONS, Action, Agent, Attack, State, Tile, apply_potion, is_tank, legal_actions, state_from_log, step, unmodeled_content
 
 SWIRL = Attack("Swirl", 2, [-1, 1])
@@ -403,12 +403,13 @@ class CurseTest(unittest.TestCase):
         state.enemies[0].curse = True
         self.assertEqual(leaf_terms(state)["curse"], 0)
 
-    def test_a_curse_is_worthless_when_the_best_ready_tile_already_kills(self):
-        # Swirl kills this 3hp enemy anyway, so helping Arrow do it too adds nothing.
+    def test_a_curse_counts_its_best_use_even_when_another_tile_kills_anyway(self):
+        # Swirl kills this 3hp enemy anyway, but the curse lets Arrow kill it too, leaving Swirl free: 2 damage
+        # becomes a kill, 20 becomes 90, and half of that 70 counts. Another tile can only add (rule 1).
         state = make_state(enemies=[enemy(3, hp=3)])
         state.enemies[0].curse = True
         state.tiles[0].attack = Attack("Swirl", 3, [-1, 1])
-        self.assertEqual(leaf_terms(state)["curse"], 0)
+        self.assertEqual(leaf_terms(state)["curse"], 35)
 
     def test_a_curse_counts_when_it_makes_a_kill_available_sooner(self):
         # Swirl would kill, but it's cooling down. The curse lets the ready Arrow do it now.
@@ -459,13 +460,16 @@ class CurseTest(unittest.TestCase):
             tile.charge = 0
         self.assertLess(leaf_terms(cooling)["curse"], leaf_terms(ready)["curse"])
 
-    def test_a_loaded_stack_counts_the_curse_only_once(self):
+    def test_a_loaded_volley_that_uses_the_curse_is_scored_without_it(self):
+        # The curse counts as kept, and the stack counts the volley that uses it against the board it leaves, where
+        # the curse is gone: firing Swirl into it doubles 2 to 4, worth 20 more and 8 less for HP left in the room,
+        # but loses the 10 the curse was worth kept.
         state = make_state(enemies=[enemy(3, hp=9)], queue=["Swirl"])
         state.enemies[0].curse = True
         terms = leaf_terms(state)
-        self.assertEqual(terms["curse"], 0)
         plain = make_state(enemies=[enemy(3, hp=9)], queue=["Swirl"])
-        self.assertGreater(terms["stack"], leaf_terms(plain)["stack"])
+        self.assertEqual(terms["curse"], 10)
+        self.assertAlmostEqual(terms["stack"] - leaf_terms(plain)["stack"], 0.6 * (20 + 8 - 10))
 
     def test_fires_the_curse_first_when_stacked(self):
         state = self._with_curse_arrow([enemy(3, hp=9)], queue=("Swirl", "Arrow"))
@@ -679,8 +683,8 @@ class QueueCapTest(unittest.TestCase):
     def test_the_stack_counts_only_the_best_three(self):
         terms = leaf_terms(self._four_tiles())
         self.assertEqual(terms["loaded"], 2.0 * (4 + 2 + 2))
-        # Swirl, Arrow and Tetsubo, for 8 damage: the fourth tile can't join.
-        self.assertEqual(terms["stack"], 0.6 * 80)
+        # The stack's volleys never fire more than three, though every size up to that is tried.
+        self.assertEqual({len(v) for v in _volleys(self._four_tiles())}, {1, 2, 3})
 
 
 class DamagingMoveTest(unittest.TestCase):
@@ -868,11 +872,13 @@ class EvaluatorTest(unittest.TestCase):
         self.assertGreater(leaf_terms(near)["stack"], leaf_terms(alone)["stack"] * 2)
 
     def test_closing_in_matters_less_with_nothing_to_threaten(self):
-        armed = make_state(hero_cell=0, enemies=[enemy(4)])
-        unarmed = make_state(hero_cell=0, enemies=[enemy(4)])
-        for tile in unarmed.tiles:
-            tile.charge = 0
-        self.assertLess(leaf_terms(armed)["distance"], leaf_terms(unarmed)["distance"])
+        def pull(charge):
+            far, near = (make_state(hero_cell=cell, enemies=[enemy(4)]) for cell in (0, 3))
+            for state in (far, near):
+                for tile in state.tiles:
+                    tile.charge = charge
+            return leaf_terms(near)["reach"] - leaf_terms(far)["reach"]
+        self.assertGreater(pull(5), pull(0))
 
     def test_a_free_play_tile_in_hand_counts_toward_the_stack(self):
         in_hand = make_state(hero_cell=2, facing=1, enemies=[enemy(3, hp=2)])
@@ -902,12 +908,13 @@ class EvaluatorTest(unittest.TestCase):
             enemy(0, facing=1, queue=[Attack("Long", 2, [1, 2, 3])]), enemy(3, queue=[KATANA])])
         self.assertEqual(unanswerable_damage(state), 2)
 
-    def test_closes_in_rather_than_running_from_a_loaded_enemy(self):
-        # Nothing threatens the hero yet, and an enemy is out of reach with tiles on cooldown.
+    def test_doesnt_run_from_a_loaded_enemy(self):
+        # Nothing threatens the hero yet, and an enemy is out of reach with tiles on cooldown. With nothing to hit it
+        # with soon, closing in is worth less than standing next to it costs, so it waits rather than run.
         state = make_state(hero_cell=2, enemies=[enemy(4, queue=[KATANA])])
         for tile in state.tiles:
             tile.charge = 0
-        self.assertEqual(rank_actions(state, depth=1)[0].actions[0].kind, "MoveRight")
+        self.assertNotEqual(rank_actions(state, depth=1)[0].actions[0].kind, "MoveLeft")
 
     def test_prefers_facing_the_target(self):
         state = make_state(hero_cell=2, facing=1, enemies=[enemy(1, facing=1)])
@@ -1459,18 +1466,18 @@ class PoisonTest(unittest.TestCase):
         self.assertEqual(after.enemies[0].poison, 2)  # Back up to 3, then one tick.
 
     def test_poison_counts_for_nothing_if_the_volley_then_kills(self):
-        def stack(hp):
+        def stack(hp, effect="Poison"):
             state = make_state(hero_cell=3, enemies=[enemy(4, hp=hp)])
-            first = Tile(Attack("Spear", 1, [1], first_target=True, effect="Poison"), cooldown=3, charge=3)
+            first = Tile(Attack("Spear", 1, [1], first_target=True, effect=effect), cooldown=3, charge=3)
             second = Tile(Attack("Katana", 2, [1], first_target=True), cooldown=3, charge=3)
             first.in_queue = second.in_queue = True
             state.tiles = [first, second]
             state.queue_tiles = [first, second]
             state.hero.queue = [first.attack, second.attack]
             return leaf_terms(state)["stack"]
-        # At 3 HP the volley kills: 3 damage and a kill. At 9 HP it's 3 damage and 3 turns of poison.
-        self.assertAlmostEqual(stack(3), (30 + 60) * 0.6)
-        self.assertAlmostEqual(stack(9), (30 + 24) * 0.6)
+        # At 3 HP the volley kills, so the poison adds nothing. At 9 HP it adds 3 turns of poison, 24.
+        self.assertAlmostEqual(stack(3), stack(3, effect="None"))
+        self.assertAlmostEqual(stack(9) - stack(9, effect="None"), 24 * 0.6)
 
     def test_the_hero_is_hurt_by_it_too(self):
         state = make_state(enemies=[enemy(4)])
@@ -1719,7 +1726,8 @@ class HeroGrapplingHookTest(unittest.TestCase):
             state.tiles, state.queue_tiles = tiles, list(tiles)
             state.hero.queue = list(attacks)
             return leaf_terms(state)["stack"]
-        self.assertAlmostEqual(stack([KATANA, HOOK]), (30 + 60) * 0.6)
+        self.assertGreater(stack([KATANA, HOOK]), stack([HOOK]))
+        self.assertGreater(stack([KATANA, HOOK]), stack([KATANA]))
 
     def test_it_will_fire_the_combo_in_the_right_order(self):
         state = make_state(hero_cell=0, enemies=[enemy(3, hp=3)])
@@ -2306,12 +2314,18 @@ class SniperSkillTest(unittest.TestCase):
         self.assertEqual(state_from_log(row).sniper_bonus, 2)
 
     def test_it_makes_long_reach_worth_standing_off_for(self):
-        state = make_state(enemies=[enemy(6)])
-        state.special = "PushSpecialMove"
-        state.tiles = [Tile(self.LIGHTNING, cooldown=2, charge=2)]
-        self.assertEqual(preferred_distance(state), 3)
-        state.sniper_bonus = 1
-        self.assertEqual(preferred_distance(state), 4)
+        def best_distance(bonus):
+            scores = {}
+            for distance in range(1, 6):
+                state = make_state(hero_cell=0, enemies=[enemy(distance, hp=9)])
+                state.cells = 9
+                state.tiles = [Tile(self.LIGHTNING, cooldown=2, charge=2)]
+                state.sniper_bonus = bonus
+                terms = leaf_terms(state)
+                scores[distance] = terms["reach"] + terms["stand_off"]
+            return max(scores, key=lambda d: (round(scores[d], 6), -d))
+        self.assertEqual(best_distance(0), 2)
+        self.assertEqual(best_distance(1), 4)
 
 
 class SharpTurnTest(unittest.TestCase):
@@ -2395,8 +2409,9 @@ class KeepingSmokeBombTest(unittest.TestCase):
         heavy.movable = False
         self.assertEqual(leaf_terms(self.with_smoke([heavy]))["escape"], 4)
 
-    def test_it_earns_nothing_if_it_would_kill_from_here(self):
-        self.assertEqual(leaf_terms(self.with_smoke([enemy(3, hp=1)]))["escape"], 0)
+    def test_kept_it_counts_in_full_even_if_it_would_kill_from_here(self):
+        # Whether it's about to go off is the stack's to weigh, scoring the volley against the board it leaves.
+        self.assertEqual(leaf_terms(self.with_smoke([enemy(3, hp=1)]))["escape"], 12)
 
     def test_it_still_fires_for_a_kill(self):
         best = rank_actions(self.with_smoke([enemy(3, hp=1)]), depth=1)[0]
@@ -2489,9 +2504,10 @@ class KeepingOtherMovesTest(unittest.TestCase):
         state = self.with_tile(self.SHADOW_DASH, [enemy(3, hp=9)], shove_charged=True)
         self.assertEqual(leaf_terms(state)["escape"], 12)
 
-    def test_a_kill_from_here_cancels_the_loaded_tile_but_not_the_shove(self):
+    def test_a_kill_from_here_doesnt_cancel_a_loaded_tile_kept(self):
+        # The shove, 6, and half the hook's 1. The kill the hook could make is the stack's to weigh.
         state = self.with_tile(self.HOOK, [enemy(3, hp=1)], shove_charged=True)
-        self.assertEqual(leaf_terms(state)["escape"], 6)
+        self.assertEqual(leaf_terms(state)["escape"], 6.5)
 
 
 class KeepingSwapTest(unittest.TestCase):
@@ -2543,41 +2559,41 @@ class KitPositionTest(unittest.TestCase):
         state.tiles = [Tile(attack, cooldown=5, charge=5 - wait) for attack, wait in tiles]
         return state
 
+    def best_distance(self, *tiles, swap=False):
+        """Where the hero would rather stand from a lone enemy, by reach and stand-off: the nearest of the best."""
+        scores = {}
+        for distance in range(1, 6):
+            terms = leaf_terms(self.kit(*tiles, hero_cell=1, enemies=[enemy(1 + distance, hp=9)], swap=swap))
+            scores[distance] = terms["reach"] + terms["stand_off"]
+        return max(scores, key=lambda d: (round(scores[d], 6), -d))
+
     def test_the_swap_hero_follows_its_tiles_too(self):
-        self.assertEqual(preferred_distance(self.kit((KATANA, 0), swap=True)), 1)
-        self.assertEqual(preferred_distance(self.kit((self.SPEAR, 0), (self.HOOK, 0), swap=True)), 2)
+        self.assertEqual(self.best_distance((KATANA, 0), swap=True), 1)
+        self.assertEqual(self.best_distance((self.SPEAR, 0), (self.HOOK, 0), swap=True), 2)
 
     def test_melee_without_swap_still_has_to_be_adjacent(self):
-        self.assertEqual(preferred_distance(self.kit((KATANA, 0))), 1)
+        self.assertEqual(self.best_distance((KATANA, 0)), 1)
 
-    def test_a_spear_wants_its_full_reach(self):
-        self.assertEqual(preferred_distance(self.kit((self.SPEAR, 0))), 2)
+    def test_a_spear_stands_at_its_full_reach(self):
+        self.assertEqual(self.best_distance((self.SPEAR, 0)), 2)
 
-    def test_the_most_damage_decides_it(self):
-        self.assertEqual(preferred_distance(self.kit((self.SPEAR, 0), (self.HOOK, 0), (self.SMOKE, 0))), 2)
+    def test_long_reach_stands_off(self):
+        self.assertEqual(self.best_distance((self.HOOK, 0)), 2)
 
-    def test_long_reach_stands_off_but_not_all_the_way_to_the_wall(self):
-        self.assertEqual(preferred_distance(self.kit((self.HOOK, 0))), 3)
+    def test_a_tile_on_cooldown_counts_for_less(self):
+        ready = leaf_terms(self.kit((self.SPEAR, 0), enemies=[enemy(5)]))["reach"]
+        waiting = leaf_terms(self.kit((self.SPEAR, 3), enemies=[enemy(5)]))["reach"]
+        self.assertLess(waiting, ready)
+        self.assertGreater(waiting, 0)
 
-    def test_only_tiles_available_soon_count(self):
-        self.assertEqual(preferred_distance(self.kit((self.SPEAR, 3), (self.HOOK, 0))), 3)
+    def test_an_adjacent_enemy_costs_something_whatever_the_kit(self):
+        for tiles in (((self.SPEAR, 0),), ((KATANA, 0),), ()):
+            self.assertEqual(leaf_terms(self.kit(*tiles, hero_cell=3, enemies=[enemy(4)]))["stand_off"], -1.5)
 
-    def test_with_everything_on_cooldown_the_whole_deck_counts(self):
-        self.assertEqual(preferred_distance(self.kit((self.SPEAR, 4))), 2)
-
-    def test_being_too_close_costs_something(self):
-        state = self.kit((self.SPEAR, 0), hero_cell=3, enemies=[enemy(4)])
-        self.assertEqual(leaf_terms(state)["crowding"], -3)
-
-    def test_at_full_reach_it_doesnt(self):
-        terms = leaf_terms(self.kit((self.SPEAR, 0), hero_cell=3, enemies=[enemy(5)]))
-        self.assertEqual((terms["crowding"], terms["distance"]), (0, 0))
-
-    def test_too_far_still_costs_something(self):
-        self.assertLess(leaf_terms(self.kit((self.SPEAR, 0), hero_cell=1, enemies=[enemy(6)]))["distance"], 0)
-
-    def test_the_swap_hero_is_crowded_like_anyone(self):
-        self.assertEqual(leaf_terms(self.kit((self.SPEAR, 0), enemies=[enemy(4)], swap=True))["crowding"], -3)
+    def test_too_far_earns_less_reach(self):
+        near = leaf_terms(self.kit((self.SPEAR, 0), hero_cell=3, enemies=[enemy(5)]))["reach"]
+        far = leaf_terms(self.kit((self.SPEAR, 0), hero_cell=1, enemies=[enemy(6)]))["reach"]
+        self.assertLess(far, near)
 
     def test_a_swap_on_cooldown_is_no_way_out(self):
         state = self.kit((self.SPEAR, 0), enemies=[enemy(0, facing=1), enemy(6)], swap=True)

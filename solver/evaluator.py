@@ -29,9 +29,11 @@ research/design.md has the reasoning behind all of this. Principles, from how th
   Spending it on a hit that could have been dodged has a cost.
 - An enemy's shield is different: it has to be removed anyway, so it counts as extra HP, equal to the
   hero's weakest tile, since that's the cheapest way to remove it. Breaking one earns that credit.
-- Where to stand depends on the kit, the same rule for every hero: the farthest distance its tiles do
-  the most damage from. A melee kit comes out at 1. Being flanked or surrounded is much worse with no
-  way out.
+- Where to stand depends on the kit, the same rule for every hero: credit for each tile that can reach the
+  target from here, and a small cost for each enemy adjacent. Being flanked or surrounded is much worse
+  with no way out.
+- Three rules every score keeps, from research/design.md: having more never scores lower, a tile has one
+  use at a time, and terms that read the tiles only give credit. test_principles.py checks the first.
 - A move that repositions the hero or an enemy is worth something kept, by how flexible it is, so
   firing one for its damage alone gives up more than the tile. These are values on the move itself,
   not lookahead.
@@ -51,10 +53,10 @@ import itertools
 from dataclasses import dataclass, field
 
 from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, Attack, Outcome, State,
-                   apply_attack, apply_potion, can_use_special, enemy_cells, fireable_attacks, is_tank, legal_actions, perform_special,
+                   apply_attack, apply_potion, can_use_special, enemy_cells, fireable_attacks, free_hand_tiles, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v1.26"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.27"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -113,13 +115,16 @@ WEIGHTS = {
     "shield": 100.0,          # Holding a shield, worth about 1 HP. Hits average 1.4, but it may go unused.
     "facing_ideal": 6.0,      # Facing the enemy we most want to hit.
     "facing_other": 2.0,      # Facing an enemy, but not that one.
-    "distance": -2.0,         # Per cell of gap between the hero and the ideal target.
-    "unarmed_distance": 0.25, # The share of that which still applies with nothing to threaten them.
+    # Per point of damage a tile can deal the ideal target from where the hero stands, up to its HP, discounted per
+    # turn until the tile is ready. Each cell the hero would have to move to bring the tile in range takes off a
+    # share, so closing in pays a little per cell.
+    "reach": 4.0,
+    "reach_falloff": 0.25,
     "surrounded": -20.0,      # Enemies directly on both sides.
     "flanked": -6.0,          # Enemies on both sides, at any distance.
     "no_way_out": 2.5,        # How much worse those are with no charged Swap and no charged Smoke Bomb that reaches.
-    "crowding": -3.0,         # Per cell an enemy is closer than the hero's tiles need it to be. -10 stalls fights.
-    "max_standoff": 3,        # The furthest a kit prefers to stand off, so it doesn't run to the wall.
+    "stand_off": -1.5,        # Per enemy adjacent to the hero, whatever its tiles: so a kit that hits as hard
+                              # from further away stands off. Small, so a melee kit still closes in.
     "enemy_hp_left": -4.0,    # Per enemy HP still in the room.
     "wave_pressure": -3.0,    # Per enemy HP in the room, scaled up as the next wave gets close.
 }
@@ -171,10 +176,9 @@ def _preview_fire(state, attacks, cell=None, flip=False):
 
 
 def _cheapest_hit(state):
-    """The damage of the weakest tile available: what it costs to remove an enemy's shield."""
-    tiles = [t.attack.value for t in state.tiles if t.attack.value > 0]
-    ready = [t.attack.value for t in state.tiles if t.attack.value > 0 and (t.in_queue or t.ready)]
-    return min(ready or tiles or [1])
+    """The damage of the weakest tile in the deck: what it costs to remove an enemy's shield. The whole deck rather
+    than the ready tiles, so a weak tile coming ready doesn't make breaking a shield worth less (rule 1)."""
+    return min((t.attack.value for t in state.tiles if t.attack.value > 0), default=1)
 
 
 def _effective_hp(state, enemy):
@@ -191,29 +195,70 @@ def _volley_value(outcome, cheapest_hit):
             + outcome.kills * WEIGHTS["kill"] + broken + outcome.shove_cells * WEIGHTS["shove_cell"])
 
 
-def _stack_value(state):
-    """What the queue is worth: its best volley from anywhere nearby, less the moves needed to get there.
+def _volleys(state):
+    """Every way to fire: loaded and Free Play tiles, any number of them up to what the queue holds, in every order.
+    Every size, since a tile that would hurt a volley can always be left out."""
+    tiles = list(state.queue_tiles) + free_hand_tiles(state)
+    for size in range(1, min(len(tiles), QUEUE_CAP) + 1):
+        yield from itertools.permutations(tiles, size)
 
-    Firing order is free, so every order is tried. Only the hero moves here: enemies stay put.
+
+def _spent(trial, fired):
+    """The board a volley leaves, with its tiles out of the queue and on cooldown. A trial board shares its tiles
+    with the position it came from, so they're copied first."""
+    copies = {id(t): copy.copy(t) for t in trial.tiles}
+    fired_ids = {id(t) for t in fired}
+    trial.tiles = [copies[id(t)] for t in trial.tiles]
+    trial.queue_tiles = [copies[id(t)] for t in trial.queue_tiles if id(t) not in fired_ids]
+    for tile_id in fired_ids:
+        copies[tile_id].in_queue = False
+        copies[tile_id].charge = 0
+    trial.hero.queue = [t.attack for t in trial.queue_tiles]
+    return trial
+
+
+def _agent_key(agent):
+    queue = tuple((a.name, a.value, tuple(a.range), a.first_target, a.effect, a.target_cell) for a in agent.queue)
+    return (agent.kind, agent.cell, agent.facing, agent.hp, agent.max_hp, agent.shield, queue, agent.action,
+            agent.curse, agent.movable, agent.poison, agent.ice, agent.freezable, agent.elite)
+
+
+def _board_key(trial, fired):
+    """Everything about a volley's board that its score reads, with which tiles it fired."""
+    traps = tuple((t["cell"], t["damage"], t["effect"]) for t in trial.traps)
+    return (frozenset(id(t) for t in fired), _agent_key(trial.hero),
+            tuple(_agent_key(e) for e in trial.enemies), traps)
+
+
+def _stack_value(state, kept_now):
+    """What firing the loaded tiles is worth beyond keeping them: the best volley, from here or after a few moves or
+    a flip.
+
+    One tile, one use (rule 2): a volley spends its tiles, so it's credited with what it does plus how the position
+    it leaves scores without them, less how this position scores with them all kept. That difference counts at the
+    volley's fraction for the moves it needs, as the chance it lands, and never below nothing, since the hero can
+    always keep them. Every order and size is tried. Only the hero moves here: enemies stay put.
     """
-    attacks_available = fireable_attacks(state)
-    if not attacks_available:
+    volleys = list(_volleys(state))
+    if not volleys:
         return 0.0
     fractions = WEIGHTS["stack_fractions"]
     cheapest_hit = _cheapest_hit(state)
-    poison_now = _poison_value(state)
-    traps_now = _trap_value(state)
-    ice_now = _ice_value(state)
 
-    def volley(attacks, cell, flip):
-        trial, outcome = _preview_fire(state, attacks, cell, flip)
-        # Measured after the whole volley, so poison on an enemy that then dies is worth nothing. Traps it plants
-        # count the same way.
-        return (_volley_value(outcome, cheapest_hit) + _poison_value(trial) - poison_now
-                + _trap_value(trial) - traps_now + _ice_value(trial) - ice_now)
+    # Different orders often leave the same board, so each board left is scored once.
+    kept_after = {}
+
+    def gain(tiles, cell, flip):
+        trial, outcome = _preview_fire(state, [t.attack for t in tiles], cell, flip)
+        done = _volley_value(outcome, cheapest_hit) + WEIGHTS["hp_lost"] * outcome.hp_lost
+        if not trial.hero.alive:
+            return done + WEIGHTS["death"]
+        key = _board_key(trial, tiles)
+        if key not in kept_after:
+            kept_after[key] = sum(_kept_terms(_spent(trial, tiles)).values())
+        return done + kept_after[key] - kept_now
 
     best = 0.0
-    orders = list(itertools.permutations(attacks_available, min(len(attacks_available), QUEUE_CAP)))
     for direction in (0, -1, 1):
         for steps in range(0 if direction == 0 else 1, 1 if direction == 0 else len(fractions)):
             cell = state.hero.cell + direction * steps
@@ -223,12 +268,12 @@ def _stack_value(state):
                 actions = steps + flip
                 if actions >= len(fractions):
                     continue
-                for attacks in orders:
-                    best = max(best, volley(attacks, cell, flip) * fractions[actions])
+                for tiles in volleys:
+                    best = max(best, gain(tiles, cell, flip) * fractions[actions])
     # Staying put is covered above only for an occupied-free start, which the hero's own cell isn't.
     for flip in (False, True):
-        for attacks in orders:
-            best = max(best, volley(attacks, None, flip) * fractions[int(flip)])
+        for tiles in volleys:
+            best = max(best, gain(tiles, None, flip) * fractions[int(flip)])
     return best
 
 
@@ -240,24 +285,22 @@ def _hit_value(enemy, damage):
 def _curse_value(state):
     """What the curses on enemies are worth: a fraction of how much better each makes the next hit there.
 
-    That compares the hero's best hit with the curse against the best without it, with a discount for
-    each turn until a tile is ready. Both are capped by the enemy's health, so a curse adds nothing to
-    an enemy that a ready tile would kill anyway. When tiles are ready to fire, the stack's value
-    already includes the doubled damage, so this adds nothing.
+    That's the most the curse adds to any one tile's hit, with a discount for each turn until the tile is ready,
+    capped by the enemy's health, so it's worth most where it turns a wound into a kill. Every tile counts, loaded
+    or not, and taking the best tile's gain means another tile can only add (rule 1). Comparing the best hit with
+    the curse against the best without it didn't: a tile that kills anyway made the curse look worthless. A volley
+    that would use the curse is scored on the board it leaves, where the curse is gone.
     """
-    if fireable_attacks(state):
-        return 0.0
     total = 0.0
     for enemy in state.enemies:
         if not enemy.alive or not enemy.curse or is_tank(state, enemy):
             continue
-        with_curse = without_curse = 0.0
+        best = 0.0
         for tile in state.tiles:
             value = tile.attack.value
             discount = WEIGHTS["future_discount"] ** max(0, tile.cooldown - tile.charge)
-            with_curse = max(with_curse, _hit_value(enemy, value * 2) * discount)
-            without_curse = max(without_curse, _hit_value(enemy, value) * discount)
-        total += with_curse - without_curse
+            best = max(best, (_hit_value(enemy, value * 2) - _hit_value(enemy, value)) * discount)
+        total += best
     return total * WEIGHTS["curse"]
 
 
@@ -308,11 +351,8 @@ def unanswerable_damage(state):
                 best = min(best, _threat_damage(state, cell))
             elif can_use_special(state, direction):
                 best = min(best, _threat_after_special(state, direction))
-    attacks_available = fireable_attacks(state)
-    for attacks in itertools.permutations(attacks_available, min(len(attacks_available), QUEUE_CAP)):
-        if not attacks:
-            break
-        trial, _ = _preview_fire(state, attacks)
+    for tiles in _volleys(state):
+        trial, _ = _preview_fire(state, [t.attack for t in tiles])
         trial.enemies = [e for e in trial.enemies if e.alive]
         best = min(best, _threat_damage(trial, trial.hero.cell))
     return best
@@ -327,30 +367,27 @@ def ideal_target(state):
     return min(enemies, key=lambda e: (_effective_hp(state, e), abs(e.cell - state.hero.cell)))
 
 
-def _threat_presented(state, target):
-    """From 0 to 1, how much of the target's HP the hero could deal soon: loaded, ready or nearly ready."""
-    damage = 0
-    for tile in state.tiles:
-        if tile.in_queue or tile.cooldown - tile.charge <= 1:
-            damage += tile.attack.value
-    return min(1.0, damage / max(1, _effective_hp(state, target)))
+def _reach_value(state, target):
+    """Credit for each tile that can reach the target from where the hero stands (rule 3: only credit).
 
-
-def preferred_distance(state):
-    """How far from an enemy the hero wants to stand, from what its tiles can reach.
-
-    The farthest distance where the tiles it will have soon do the most damage, so reach is used to stay
-    out of trouble. A melee kit comes out at 1. The same rule for every hero. Sniper's bonus counts too,
-    and with it the hero may stand off as far as the bonus starts.
+    A tile counts its damage up to the target's HP, with Sniper's bonus where it would hit from far enough, less a
+    share for each cell the hero would have to move to bring it in range, and a discount for each turn until it's
+    ready. Each tile only adds, and more charge adds more, so having a tile never lowers it (rule 1).
     """
-    soon = [t for t in state.tiles if t.attack.value > 0 and (t.in_queue or t.cooldown - t.charge <= 1)]
-    tiles = soon or [t for t in state.tiles if t.attack.value > 0]
-    farthest = max(WEIGHTS["max_standoff"], SNIPER_DISTANCE if state.sniper_bonus else 0)
-    reach = {d: sum(t.attack.value + (state.sniper_bonus if d >= SNIPER_DISTANCE else 0)
-                    for t in tiles if d in map(abs, t.attack.range))
-             for d in range(1, farthest + 1)}
-    most = max(reach.values())
-    return max(d for d, damage in reach.items() if damage == most) if most else 1
+    distance = abs(target.cell - state.hero.cell)
+    hp = _effective_hp(state, target)
+    total = 0.0
+    for tile in state.tiles:
+        if tile.attack.value <= 0:
+            continue
+        best = 0.0
+        for reach in set(map(abs, tile.attack.range)):
+            damage = tile.attack.value + (state.sniper_bonus if reach >= SNIPER_DISTANCE else 0)
+            closeness = max(0.0, 1.0 - WEIGHTS["reach_falloff"] * abs(distance - reach))
+            best = max(best, min(damage, hp) * closeness)
+        waiting = 0 if tile.in_queue else max(0, tile.cooldown - tile.charge)
+        total += best * WEIGHTS["future_discount"] ** waiting
+    return WEIGHTS["reach"] * total
 
 
 def _swap_charged(state):
@@ -395,16 +432,11 @@ def _position_terms(state):
         if not _has_way_out(state):
             surrounded *= WEIGHTS["no_way_out"]
 
-    # Closing in matters less with nothing to threaten them with.
-    floor = WEIGHTS["unarmed_distance"]
-    armed = floor + (1.0 - floor) * _threat_presented(state, target)
-    preferred = preferred_distance(state)
-    nearest = min(abs(e.cell - hero.cell) for e in state.enemies if e.alive and not is_tank(state, e)) \
-        if any(e.alive and not is_tank(state, e) for e in state.enemies) else preferred
+    beside = [e for e in state.enemies if e.alive and not is_tank(state, e) and abs(e.cell - hero.cell) == 1]
     return {
         "facing": facing,
-        "distance": WEIGHTS["distance"] * armed * max(0, abs(target.cell - hero.cell) - preferred),
-        "crowding": WEIGHTS["crowding"] * max(0, preferred - nearest),
+        "reach": _reach_value(state, target),
+        "stand_off": WEIGHTS["stand_off"] * len(beside),
         "surrounded": surrounded,
     }
 
@@ -423,63 +455,46 @@ def _pressure_terms(state):
 _MOVES_TARGET = SMOKE_BOMBS | {"DragonPunch", "GrapplingHook"}
 
 
-def _loaded_can_kill(state):
-    """Whether the loaded tiles can kill from here, in which case the loaded ones are about to go off."""
-    attacks_available = fireable_attacks(state)
-    return any(attacks and _preview_fire(state, attacks)[1].kills
-               for attacks in itertools.permutations(attacks_available, min(len(attacks_available), QUEUE_CAP)))
+def _kept_moves(state):
+    """Repositioning moves kept, of the hero or of others, as escape and setup values.
 
+    Escape: each move is a way out of trouble later, worth what `escape_values` guesses from its flexibility:
+    whether it gets the hero past an enemy, away, or only moves the enemy, and in how many situations it works.
+    Spending one for its damage alone gives that up for several turns. A special move that can go backward covers
+    both sides, so it's worth more. A loaded tile can be used this turn and one in hand can't, so loading one adds a
+    little. A move that acts on a target is worth little with nobody it can act on. Firing tiles never spends a
+    special move.
 
-def _kept_tiles(state, values, loaded_can_kill):
-    """What each charged tile named in `values` is worth kept, with the modifiers every kept move shares: less
-    in hand than loaded, little with nobody to act on, and nothing loaded when the loaded tiles can kill."""
+    Setup: a move that brings an enemy in is worth more when the kit has a short-reach tile to exploit it, in
+    proportion to that tile's damage, charged or not.
+
+    One tile, one use (rule 2): a tile counts the larger of its escape and setup values, not both. Having several
+    helps, but each beyond the best counts for only part of its value. Whether the loaded tiles are about to fire
+    is the stack's to weigh: it scores a volley by the board it leaves, without these.
+    """
+    escape_values, setup_values = WEIGHTS["escape_values"], WEIGHTS["setup_values"]
+    exploit = max((t.attack.value for t in state.tiles if t.attack.value > 0 and t.attack.name not in setup_values
+                   and max(map(abs, t.attack.range)) <= WEIGHTS["short_reach"]), default=0)
     kept = []
     for tile in state.tiles:
-        if tile.attack.name not in values or not tile.ready or (tile.in_queue and loaded_can_kill):
+        name = tile.attack.name
+        if not tile.ready or (name not in escape_values and name not in setup_values):
             continue
-        value = values[tile.attack.name]
+        uses = [(escape_values.get(name, 0.0), "escape"), (exploit * setup_values.get(name, 0.0), "setup")]
+        value, term = max(uses)
         if not tile.in_queue:
             value *= WEIGHTS["escape_in_hand"]
-        if tile.attack.name in _MOVES_TARGET \
-                and not any(a.movable for a in targets_of(state, state.hero, tile.attack)[:1]):
+        if name in _MOVES_TARGET and not any(a.movable for a in targets_of(state, state.hero, tile.attack)[:1]):
             value *= WEIGHTS["escape_no_target"]
-        kept.append(value)
-    return kept
-
-
-def _setup_value(state, loaded_can_kill):
-    """A move that brings an enemy in, kept, for a short-reach tile in the kit to exploit.
-
-    Worth more the harder the strongest such tile hits, whether or not it's charged. Bringing an enemy in also
-    crowds the hero, which the crowding penalty weighs against it."""
-    values = WEIGHTS["setup_values"]
-    exploit = max((t.attack.value for t in state.tiles if t.attack.value > 0 and t.attack.name not in values
-                   and max(map(abs, t.attack.range)) <= WEIGHTS["short_reach"]), default=0)
-    return exploit * max(_kept_tiles(state, values, loaded_can_kill), default=0.0)
-
-
-def _escape_value(state, loaded_can_kill=None):
-    """Repositioning moves kept, of the hero or of others: each is a way to get out of trouble later.
-
-    Each move is worth what `escape_values` guesses from its flexibility: whether it gets the hero past an
-    enemy, away, or only moves the enemy, and in how many situations it works. Spending one for its damage
-    alone gives that up for several turns, which is worth counting, so a Swap with Damaging Move gets used for
-    damage once it hits hard enough. A special move that can go backward covers both sides, so it's worth
-    more. A loaded tile can be used this turn and one in hand can't, but it's never fully relied on until it's
-    fired: any attack would spend it. So loading one adds only a little. A move that acts on a target is
-    worth little with nobody it can act on. If the loaded tiles can kill from here, the loaded ones go off
-    with them rather than being kept, so they earn nothing: otherwise they could talk the hero out of the
-    kill. Firing tiles never spends a special move. Having several helps, but each beyond the best counts for
-    only part of its value.
-    """
-    values = WEIGHTS["escape_values"]
-    if loaded_can_kill is None:
-        loaded_can_kill = _loaded_can_kill(state)
-    kept = _kept_tiles(state, values, loaded_can_kill)
-    if state.special in values and state.swap_charge >= state.swap_cooldown:
-        kept.append(values[state.special] * (WEIGHTS["escape_two_way"] if state.two_way_swap else 1.0))
+        kept.append((value, term))
+    if state.special in escape_values and state.swap_charge >= state.swap_cooldown:
+        kept.append((escape_values[state.special] * (WEIGHTS["escape_two_way"] if state.two_way_swap else 1.0),
+                     "escape"))
     kept.sort(reverse=True)
-    return sum(kept[:1]) + WEIGHTS["escape_others"] * sum(kept[1:])
+    terms = {"escape": 0.0, "setup": 0.0}
+    for rank, (value, term) in enumerate(kept):
+        terms[term] += value if rank == 0 else WEIGHTS["escape_others"] * value
+    return terms
 
 
 def _trap_value(state):
@@ -508,19 +523,14 @@ def _poison_value(state):
     return value + state.hero.poison * WEIGHTS["hp_lost"]
 
 
-def leaf_terms(state: State) -> dict[str, float]:
-    """Scores a position by itself, as named parts so a decision can be explained."""
-    kept_names = set(WEIGHTS["escape_values"]) | set(WEIGHTS["setup_values"])
-    loaded_can_kill = any(t.attack.name in kept_names and t.ready for t in state.queue_tiles) \
-        and _loaded_can_kill(state)
+def _kept_terms(state):
+    """Every part of a position's score except the stack: what it's worth with every tile kept."""
     terms = {
         "poison": _poison_value(state),
         "traps": _trap_value(state),
         "ice": _ice_value(state),
-        "escape": _escape_value(state, loaded_can_kill),
-        "setup": _setup_value(state, loaded_can_kill),
+        **_kept_moves(state),
         "effects": sum(WEIGHTS["loaded_effects"].get(t.attack.effect, 0.0) for t in state.queue_tiles),
-        "stack": _stack_value(state),
         "curse": _curse_value(state),
         "shield": WEIGHTS["shield"] if state.hero.shield else 0.0,
         "ready_tiles": WEIGHTS["ready_tile"] * sum(t.ready for t in state.tiles),
@@ -530,6 +540,13 @@ def leaf_terms(state: State) -> dict[str, float]:
     }
     terms.update(_position_terms(state))
     terms.update(_pressure_terms(state))
+    return terms
+
+
+def leaf_terms(state: State) -> dict[str, float]:
+    """Scores a position by itself, as named parts so a decision can be explained."""
+    terms = _kept_terms(state)
+    terms["stack"] = _stack_value(state, sum(terms.values()))
     return terms
 
 

@@ -43,9 +43,9 @@ SPECIAL_MOVES = {SWAP, SHOVE}
 # others haven't changed any prediction.
 UNDERSTOOD_TRAITS = {"Aggro", "Dash", "Explosive", "Heavy", "Quick", "Unfreezable"}
 
-# Enemies whose move runs them to the last free cell that way, rather than one cell: StriderEnemy.Move in the code.
-# Their Dash trait is shown for it.
-LEAPERS = {"Strider"}
+# Enemies whose move runs them to the last free cell that way, rather than one cell: StriderEnemy.Move and
+# FumikoBoss.Move in the code. The Strider's Dash trait is shown for it.
+LEAPERS = {"Strider", "FumikoBoss"}
 
 # Not worth fighting while a boss is alive: it dies with the boss anyway. A one-off for the Shogun's
 # statues. Other bosses' summons are real threats, and the game doesn't even show a statue's HP.

@@ -1866,6 +1866,18 @@ class StriderTest(unittest.TestCase):
         after, _ = step(state, Action("Wait"))
         self.assertEqual(sorted(e.cell for e in after.enemies), [3, 4])
 
+    def test_fumiko_moves_the_same_way(self):
+        boss = self.strider(0)
+        boss.kind = "FumikoBoss"
+        after, _ = step(make_state(hero_cell=4, enemies=[boss]), Action("Wait"))
+        self.assertEqual(after.enemies[0].cell, 3)
+
+    def test_a_cursed_hero_takes_double_once(self):
+        state = make_state(hero_cell=2, enemies=[enemy(3, action="Attack", queue=[KATANA])])
+        state.hero.curse = True
+        after, outcome = step(state, Action("Wait"))
+        self.assertEqual((outcome.hp_lost, after.hero.curse), (4, False))
+
     def test_it_raises_no_warning(self):
         row = {"tiles": [], "hero": {"queue": []}, "skills": [],
                "enemies": [{"kind": "Strider", "traits": ["Dash"], "queue": []}]}

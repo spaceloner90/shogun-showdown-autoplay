@@ -215,6 +215,10 @@ The Strider, read from the code (simulated as of v1.11):
 - **Dash:** its move runs it to the last free cell that way, rather than one cell. Whoever first blocks it moves
   first if they're going the same way, as with any enemy's move. Fight 8 of `logs/run7` had 4 Strider moves
   mispredicted on v1.10, and all are exact now.
+- **Fumiko**, the boss, moves the same way (simulated as of v1.15). Her one move in fight 10 of `logs/run7` was
+  mispredicted on v1.14, and is exact now.
+- **A curse on the hero** doubles the next hit it takes, then goes, as on an enemy. Fumiko cursed the hero on turn
+  18 of that fight and died on turn 20, before anything hit it.
 
 The Warden, read from the code (simulated as of v1.10):
 

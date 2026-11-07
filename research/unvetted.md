@@ -39,6 +39,16 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.15: Fumiko's dash
+
+FumikoBoss.Move in the game's code is the Strider's: she runs to the last free cell. Her one move in fight 10 of
+`logs/run7` is now exact, leaving only summons as misses in the whole log. No top choice changes on any logged board.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Fumiko runs to the last free cell | Rule | Turn 3 of fight 10, replayed | Stays exact |
+| A curse on the hero doubles its next hit, then goes | Rule | Nothing: the hero was cursed once, and not hit before the fight ended | A hit on a cursed hero for double, and the next one normal |
+
 ## New in v1.14: no cost for an attack that hits nothing
 
 It cost 5, but a fired tile already loses its readiness to its cooldown, and firing at nothing doesn't change the

@@ -2224,21 +2224,33 @@ class PotionTest(unittest.TestCase):
         state.potions = ["Shield", "MassIce", "RainOfMirrors"]
         self.assertEqual(self.plan(state)[0], None)
 
-    def test_attacking_potions_only_under_pressure(self):
+    def test_attacking_potions_only_with_every_slot_full(self):
         state = make_state(hero_cell=2, enemies=[enemy(3, hp=4)], queue=["Swirl"])
-        state.potions = ["MassCurse"]
+        state.potions = ["MassCurse", "Shield", "Shield"]
         ranked = rank_actions(state, depth=1)
-        self.assertEqual(potion_plan(state, ranked)[0], None)
-        ranked[0].score = WEIGHTS["pressure"] - 1
         self.assertEqual(potion_plan(state, ranked)[0], "MassCurse")  # Doubles Swirl's 2 into a kill.
+        state.potion_slots = 4
+        self.assertEqual(potion_plan(state, ranked)[0], None)
+        ranked[0].score = -1000  # However hard the board, with a slot free.
+        self.assertEqual(potion_plan(state, ranked)[0], None)
 
-    def test_d6_only_under_pressure_against_unavoidable_damage(self):
+    def test_big_pockets_adds_a_slot(self):
+        row = {"cells": 5, "tiles": [], "enemies": [], "skills": [{"name": "BigPockets", "level": 1}],
+               "hero": {"kind": "H", "cell": 0, "facing": "Right", "hp": 9, "maxHp": 9, "shield": False, "queue": [],
+                        "action": "Wait", "special": {"charge": 3, "cooldown": 3}}}
+        self.assertEqual(state_from_log(row).potion_slots, 4)
+
+    def test_d6_is_the_last_resort_against_damage(self):
         state = self.pinned(two=True)
         state.potions = ["D6"]
-        ranked = rank_actions(state, depth=1)
-        self.assertEqual(potion_plan(state, ranked)[0], None if ranked[0].score >= WEIGHTS["pressure"] else "D6")
-        ranked[0].score = WEIGHTS["pressure"] - 1
-        self.assertEqual(potion_plan(state, ranked)[0], "D6")
+        self.assertEqual(self.plan(state)[0], "D6")
+        state.potions = ["D6", "Shield"]
+        self.assertEqual(self.plan(state)[0], "Shield")
+
+    def test_no_d6_without_damage_coming(self):
+        state = make_state(enemies=[enemy(4)])
+        state.potions = ["D6"]
+        self.assertEqual(self.plan(state)[0], None)
 
 
 class DynamicBoostTest(unittest.TestCase):

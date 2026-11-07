@@ -39,6 +39,17 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.28: attacking potions when every slot is full
+
+The freeze rule from v1.21 left this list: `logs/run8_part2` shows every freeze lasting the full 4 turns, the boss's
+too.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Attacking potions only with every slot full | Scoring | Replays only | No potion wasted for want of a slot, and the player not having to use one by hand |
+| D6 against any damage no other potion avoids | Scoring | Replays only | Whether its random actions help more than they hurt |
+| 3 potion slots, and one more with Big Pockets | Rule | 3 is the most held in any log | Only if you pick Big Pockets |
+
 ## New in v1.27: scoring rebuilt on three rules
 
 Replayed on every logged board against v1.26: 252 of 2,331 choices change. 15 boards put off a kill for a bigger
@@ -107,7 +118,6 @@ Read from the game's code, for an Ice tile if one joins the deck. No logged figh
 
 | Item | Kind | What's already confirmed | What to look for |
 |---|---|---|---|
-| An Ice hit freezes for 4 turns and cancels this turn's action | Rule | `logs/run8`'s Ice Shadow Dash froze enemies on 14 logged boards, with no prediction misses from it | A frozen enemy's telegraphed attack not landing, and it acting again 4 turns later |
 | Each turn of ice left is worth 5 per point of the enemy's strongest known attack | Scoring | Replaced in v1.26 | |
 | A loaded Ice tile is a 0.5 tiebreak | Scoring | As for Shockwave and Curse | Only if an Ice tile joins the deck |
 

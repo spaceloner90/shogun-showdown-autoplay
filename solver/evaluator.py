@@ -56,7 +56,7 @@ from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER
                    apply_attack, apply_potion, can_use_special, enemy_cells, fireable_attacks, free_hand_tiles, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v1.27"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.28"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -69,8 +69,6 @@ WEIGHTS = {
                               # nothing for 4 turns, which in practice is nearly as good. Less as its ice runs out.
     # Potions. Each is used on a key press of its own, and the next press analyzes the board it leaves.
     "heal_at_missing": 3,     # Use Edamame once the hero is missing at least this much HP, so none of its 3 is wasted.
-    "pressure": 11.0,         # Below this best score, the hardest 30% of logged boards, as the player asked: at 10%
-                              # and 20% they were hardly ever used. Only then are attacking potions and D6 used.
     "trap_planted": 0.4,      # A trap on the ground, as a share of what its damage is worth. Only enemies set
                               # one off, so it's all upside: the player's read is a third to half.
     "shove_cell": 4.0,        # Per cell an enemy is shoved. Space to load in, but melee wants them close too.
@@ -614,9 +612,11 @@ def potion_plan(state, ranked):
 
     Edamame heals once that wastes none of it. Shield, Freeze Time, Rain of Mirrors and Cool Up avoid damage: used
     when the best line with one loses less HP this turn than the best line without, preferring Cool Up, then the
-    Shield, unless another saves more. Mass Poison, Mass Curse and Cool Up only when under pressure, and only if the best line with one kills
-    more this turn, poison ticks included. D6 is random, so it's only a last resort under pressure, against damage
-    nothing else avoids. Each potion is ranked in full, since one can make a move good that F1 ranked low without it.
+    Shield, unless another saves more. Mass Poison, Mass Curse and Cool Up only with every potion slot full, so one
+    held back would crowd out the next one found, and only if the best line with one kills more this turn, poison
+    ticks included. D6 is random, so it's the last resort against damage no other potion avoids, whenever that comes,
+    as the player put it. Until v1.28 these were used under pressure, below a best score set from the logs, which every scoring
+    change moved, so the player dropped it. Each potion is ranked in full, since one can make a move good that F1 ranked low without it.
     Returns (potion, reason, ranked with it), or (None, None, None).
     """
     held = state.potions
@@ -627,7 +627,9 @@ def potion_plan(state, ranked):
         return "Edamame", f"heal: HP {hero.hp}/{hero.max_hp}", None
     best = ranked[0]
     now = _turn_result(state, best)
-    pressured = best.score < WEIGHTS["pressure"]
+    # With every slot full, a potion held back only crowds out the next one found, so any that helps is used.
+    full = len(held) >= state.potion_slots
+    why = f"every potion slot full ({len(held)}/{state.potion_slots})"
 
     def with_potion(name):
         after = apply_potion(state, name)
@@ -644,7 +646,7 @@ def potion_plan(state, ranked):
         if saves:
             hp, _, name, again = min(saves)
             return name, f"avoids damage: {now.hp_lost} HP lost without it, {hp} with it", again
-    if pressured:
+    if full:
         gains = []
         for name in ATTACKING_POTIONS:
             if name in held:
@@ -653,9 +655,11 @@ def potion_plan(state, ranked):
                     gains.append((result.kills, again[0].score, name, again))
         if gains:
             kills, _, name, again = max(gains, key=lambda g: (g[0], g[1]))
-            return name, f"under pressure (best {best.score:.0f}): {now.kills} kills without it, {kills} with it", again
-        if now.hp_lost > 0 and "D6" in held:
-            return "D6", f"under pressure (best {best.score:.0f}), losing {now.hp_lost} HP that nothing else avoids", None
+            return name, f"{why}: {now.kills} kills without it, {kills} with it", again
+    # The last resort against a hit: D6 is random, so it's used only once no other potion avoids the damage. A potion
+    # used above leaves the next key press to look again, D6 included.
+    if now.hp_lost > 0 and "D6" in held:
+        return "D6", f"losing {now.hp_lost} HP that nothing else avoids", None
     return None, None, None
 
 

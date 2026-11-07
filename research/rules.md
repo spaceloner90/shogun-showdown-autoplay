@@ -228,11 +228,18 @@ Potions, read from the code (simulated as of v1.22):
   **D6** gives each enemy that isn't frozen a different random action, so it isn't simulated.
 - **When F1 uses one**, by the player's rules, one per key press: Edamame once the hero is missing at least 3 HP.
   Cool Up, Shield, Freeze Time or Rain of Mirrors when the best line with it loses less HP this turn, in that order
-  of preference. Under pressure (best score below 11, the worst 30% of logged boards), Mass Poison, Mass Curse or Cool Up when the
-  best line with it kills more, and D6 against damage nothing else avoids.
+  of preference. With every potion slot full, Mass Poison, Mass Curse or Cool Up when the best line with it kills more.
+  D6 whenever damage is coming that no other potion avoids. Until v1.28 those were used under pressure instead, below a best score
+  set from the logs, which every scoring change moved.
 
 Freezing, read from the code (simulated as of v1.21):
 
+- **Ice lasts the full 4 turns, bosses included.** In `logs/run8` and `logs/run8_part2`, every frozen enemy showed
+  ice 3, 2, 1 over the three turns after the hit, waiting each turn with any loaded attack kept, and Kowa did the
+  same both times it was frozen. The hit turn is the fourth, its action cancelled.
+- **Potion slots:** 3, the most held in any log, and Big Pockets adds one (`BigPocketsSkill.PickUp`).
+- **Combo Recharge** takes 4 a level off the cooldown of the tile making a combo kill, any kill after the first in a
+  turn (`ComboRechargeSkill.OnComboKill`, `CombatManager.OnEnemyDied`). Not simulated, as the player asked.
 - **Ice** from a tile sets 4 turns of ice (`GameParams.iceEffectTurnsDuration`), resetting rather than adding, on an
   enemy that isn't Unfreezable. It cancels the action the enemy telegraphed for this turn, and its queue stays. An
   enemy with any ice chooses to do nothing, and ice counts down at each turn's end, so it loses this turn and the

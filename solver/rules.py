@@ -26,11 +26,13 @@ MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Barricade"
 SNIPER_DISTANCE = 4  # Sniper adds its level to the hero's hits on targets at least this many cells away.
 # Combo Curse curses a random enemy on each kill after the first in a turn, by anyone: which one can't be predicted,
 # like where a summon lands, so it isn't simulated. Combo Coin and Triple Combo Heal also trigger on combos, and
-# aren't simulated or valued either: the player's call is there's no reason to yet.
-UNDERSTOOD_SKILLS = {"BigPockets", "ComboCoin", "ComboCurse", "DamagingMove", "DynamicBoost", "Fortress", "Healthy",
+# aren't simulated or valued either: the player's call is there's no reason to yet. So is Combo Recharge, which
+# takes 4 a level off the cooldown of a tile making a kill after the first in a turn (ComboRechargeSkill.OnComboKill).
+UNDERSTOOD_SKILLS = {"BigPockets", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "DynamicBoost", "Fortress", "Healthy",
                      "QuickRecovery", "Sniper", "TripleComboHeal", "TwoWayMove", "UnfriendlyFire"}
 
 POISON_TURNS = 3  # Applying poison sets this many turns left, and each turn's end deals 1, starting that turn.
+POTION_SLOTS = 3  # The most held in any log without Big Pockets, which adds one (BigPocketsSkill.PickUp).
 ICE_TURNS = 4  # GameParams.iceEffectTurnsDuration: freezing sets this many turns of ice, counting down each turn's end.
 BOMB_FUSE = 2     # Turns a placed bomb waits after the one it's placed on, before it goes off on the next.
 BARRICADE_HP = 5
@@ -156,6 +158,7 @@ class State:
     # Traps on the ground: {"cell", "damage", "effect"}. Only an enemy moving onto one sets it off.
     traps: list[dict] = field(default_factory=list)
     potions: list[str] = field(default_factory=list)  # The hero's potions, by the game's names.
+    potion_slots: int = POTION_SLOTS  # How many potions the hero can hold.
 
     def occupant(self, cell):
         if self.hero.alive and self.hero.cell == cell:
@@ -309,6 +312,8 @@ def state_from_log(row):
         sniper_bonus=next((s["level"] for s in row.get("skills") or []
                            if isinstance(s, dict) and s.get("name") == "Sniper"), 0),
         two_way_swap=any(isinstance(s, dict) and s.get("name") == "TwoWayMove" for s in row.get("skills") or []),
+        potion_slots=POTION_SLOTS + sum(1 for s in row.get("skills") or []
+                                        if isinstance(s, dict) and s.get("name") == "BigPockets"),
         special=special.get("name", SWAP),
         hazards=[dict(h, groups=[list(g) for g in h["groups"]]) for h in row.get("hazards") or []],
         potions=list(row.get("potions") or []),

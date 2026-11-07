@@ -7,6 +7,15 @@ ones are unvetted until real play confirms them, as [`research/unvetted.md`](res
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v1.28 — attacking potions when every slot is full (2026-11-08)
+- **Scoring:** D6 is the last resort against damage no other potion avoids, whenever it comes, as the player put
+  it, rather than only under pressure.
+- **Scoring:** Mass Poison, Mass Curse and Cool Up for a kill are used only with every potion slot full, when
+  one held back would crowd out the next one found. They were used under pressure, below a best score set from the
+  logs, but every scoring change moves scores: v1.27's reach credit had shrunk the worst 30% to about a fifth. The
+  player dropped the cutoff rather than keep measuring it again. The hero holds 3 potions, and Big Pockets adds one.
+- Combo Recharge marked known, not simulated, as the player asked.
+
 ## v1.27 — scoring rebuilt on three rules (2026-11-08)
 The three rules, in `research/design.md`: having more never scores lower, a tile has one use at a time, and terms
 that read the tiles only give credit. Every term was checked against them, and `solver/test_principles.py` checks

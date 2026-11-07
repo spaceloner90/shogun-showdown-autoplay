@@ -198,6 +198,13 @@ with, and being surrounded should cost more. v1.4 does a first version of both, 
 
 ## Ideas not yet tried
 
+- **What an enemy's unknown tile could be.** In `logs/run8_part2`, 6 of the 10 HP lost were the Shinobi's: its Smoke
+  Bomb (trades places and hits for 1) and its Shuriken (2 from range). Each hit was unavoidable by the turn it came,
+  and the turn before, the Shinobi only showed that it was playing a tile. F1 assumes an unknown tile is 2 damage to
+  the cell beside it, so standing 2 or 3 cells off looked safe. A player who has met a Shinobi knows its two tiles.
+  Idea: assume an unknown tile is the most dangerous of that enemy's known tiles, from the ones each kind has been
+  seen playing, or from the game's enemy descriptions if they list them. Raised with the player before building.
+
 - **Ending a fight isn't valued, and deaths alongside a boss aren't kills.** In `logs/run6` (fight 3, turn 36),
   killing Rei takes the TwinTachi with him, but only Rei's death counts as a kill, while next turn's volley would
   kill the TwinTachi first and count both. And a cleared room scores like any position, still earning for kept tiles

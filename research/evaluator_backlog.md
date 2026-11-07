@@ -202,8 +202,9 @@ with, and being surrounded should cost more. v1.4 does a first version of both, 
   Bomb (trades places and hits for 1) and its Shuriken (2 from range). Each hit was unavoidable by the turn it came,
   and the turn before, the Shinobi only showed that it was playing a tile. F1 assumes an unknown tile is 2 damage to
   the cell beside it, so standing 2 or 3 cells off looked safe. A player who has met a Shinobi knows its two tiles.
-  Idea: assume an unknown tile is the most dangerous of that enemy's known tiles, from the ones each kind has been
-  seen playing, or from the game's enemy descriptions if they list them. Raised with the player before building.
+  The player's direction: F1 may know what every enemy kind does in general, as an experienced player would, so it
+  can play against an enemy's whole kit without further lookahead. "Seen before" is too vague a basis; each kind's
+  tiles should come from the game's data. After the current run.
 
 - **Ending a fight isn't valued, and deaths alongside a boss aren't kills.** In `logs/run6` (fight 3, turn 36),
   killing Rei takes the TwinTachi with him, but only Rei's death counts as a kill, while next turn's volley would

@@ -13,9 +13,10 @@ heroes and kits, starting with the Ronin.
 
 ## Ground rules
 
-- **Only what a player can see.** The live evaluator uses the board, the telegraphed enemy actions, the tiles and
-  the skills. The enemy AI's code may be read and rebuilt for offline simulation and tuning, never to predict moves
-  live.
+- **Only what a player can see, or would know.** The live evaluator uses the board, the telegraphed enemy actions,
+  the tiles and the skills, and what an experienced player knows about every enemy: what each kind can do, such as
+  the tiles it plays. It never runs the enemy AI's code to predict moves live; that code may be read and rebuilt for
+  offline simulation and tuning.
 - **One turn ahead.** F1 looks at each action available now and scores where it leads. Searching deeper (F2 and
   up) is paused. Everything a plan needs has to show up in how a position is scored.
 - **Fuzzy, not exact.** Values are judgments with round numbers, guessed first and tuned against real play. Being

@@ -218,6 +218,9 @@ Traps and Combo Curse, read from the code (v1.16):
 - **Inferred, not stated in the code:** the trap is thrown to its cell and only armed when it lands, and the game
   sets it off when an enemy *enters* it. So one placed under an enemy most likely waits for an enemy to move onto
   it, and an enemy dashing through its cell most likely sets it off. The second isn't simulated.
+- **Confirmed in play** (`logs/run7_part2`): traps at the cell ahead, set off once by an enemy walking or pulled
+  onto them, a trap placed and a hook pulling onto it in the same volley, and the hero standing on its own. An
+  enemy arriving on a trap's cell sets it off too, as one did at a new act in the Sato fight.
 - **Combo Curse** curses a random enemy for every kill after the first in a turn, by anyone, except inanimate
   ones. The kill streak resets at the start of each turn. The target is random, so it isn't simulated.
 

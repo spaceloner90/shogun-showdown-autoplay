@@ -29,6 +29,10 @@ Enemy AI code is for offline simulation and tuning only.
     potion: both turned away, the right one's Katana killed the TwinTachi on 8 instead, and Spear with Sharp Turn
     then took no damage. The log has the board both before (seq 2126) and after (seq 2127) the potion. v1.11 would
     likely have avoided this a turn earlier, as it now sees the left Strider dash in next to the hero.
+- **Sato's acts (ignored on purpose for F1).** Sato's Maku ends the act and sets up a new battlefield: the hero
+  is moved and new enemies arrive (`logs/run7_part2`, fight 3, turns 9, 16, 24 and 30). F1 only looks at the turn
+  in front of it, so it doesn't matter there. A deeper search would have to stop at an act change, or know the
+  layouts.
 - **Sharp Turn used just to face a better way (left on purpose).** F1 sometimes adds a free Sharp Turn to the end
   of a volley only to face better (`logs/run7_part2`, fight 2, turns 3 and 20), when keeping it to aim a later
   attack is usually worth more. Scoring facing as free while one is ready was considered and dropped: facing
@@ -48,7 +52,8 @@ Enemy AI code is for offline simulation and tuning only.
   it's dodged like any attack. In `logs/run7_part2` the copy was a Smoke Bomb from the end of the row, which
   nothing could avoid by then. Keeping strong tiles loaded while a mirror is queued would deny them, but the
   player's call is that reacting to what it copies is fine for now.
-- **Combo skills:** Triple Combo Heal, Combo Curse and others. "Combo" is now understood from the code: every
+- **Combo skills:** Triple Combo Heal, Combo Curse, Combo Coin and others. The player has the first three, all
+  marked known so they raise no warning, and none simulated. "Combo" is now understood from the code: every
   kill after the first in a turn, by anyone, except inanimate enemies, with the streak reset at the start of each
   turn. None are valued yet. Combos may be worth something in general, and Combo Curse in particular: each combo
   kill curses a random enemy, which is a fraction of a doubled hit later, worth estimating even though the target

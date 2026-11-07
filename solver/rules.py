@@ -15,7 +15,7 @@ ONE_ENEMY_WAVE_CAP = 6
 # Attacks whose behaviour is fully covered by their logged range, damage and first-target flag, plus
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
 MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Barricade", "Bomb", "Charge",
-           "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Lightning", "Mirror", "OriginOfSymmetry", "Shield",
+           "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Lightning", "Maku", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "SmokeBomb", "Spear", "Summon", "SwapToss",
            "Swirl", "Tetsubo", "Trap", "TurnAround", "Volley"}
 
@@ -24,9 +24,10 @@ MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Barricade"
 # are simulated.
 SNIPER_DISTANCE = 4  # Sniper adds its level to the hero's hits on targets at least this many cells away.
 # Combo Curse curses a random enemy on each kill after the first in a turn, by anyone: which one can't be predicted,
-# like where a summon lands, so it isn't simulated.
-UNDERSTOOD_SKILLS = {"BigPockets", "ComboCurse", "DamagingMove", "Fortress", "Healthy", "QuickRecovery", "Sniper",
-                     "TwoWayMove", "UnfriendlyFire"}
+# like where a summon lands, so it isn't simulated. Combo Coin and Triple Combo Heal also trigger on combos, and
+# aren't simulated or valued either: the player's call is there's no reason to yet.
+UNDERSTOOD_SKILLS = {"BigPockets", "ComboCoin", "ComboCurse", "DamagingMove", "Fortress", "Healthy", "QuickRecovery",
+                     "Sniper", "TripleComboHeal", "TwoWayMove", "UnfriendlyFire"}
 
 POISON_TURNS = 3  # Applying poison sets this many turns left, and each turn's end deals 1, starting that turn.
 BOMB_FUSE = 2     # Turns a placed bomb waits after the one it's placed on, before it goes off on the next.
@@ -673,7 +674,8 @@ def apply_attack(state, attacker, attack, outcome):
         return
     # Where a summon lands is random, so a player can't react to it either. It's ignored on purpose.
     # Copycat Mirror only gives its user a copy of a hero tile, which resolve_enemies keeps track of.
-    if attack.name in ("Summon", "CopycatMirror"):
+    # Maku, Sato's, ends the act and sets up a new battlefield, which only matters to a deeper search.
+    if attack.name in ("Summon", "CopycatMirror", "Maku"):
         return
     if attack.name == "Barricade":
         spawn_barricade(state, attacker)

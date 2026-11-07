@@ -59,9 +59,13 @@ the mod logs traps at the cell ahead of the hero (turns 6 and 15), and an enemy 
 once, the Kabukai on turn 10 and a Guardian, killed, on turn 22. The hero stood on its own trap there (turns 10 and
 19 to 22) and in the next fight (turns 27 and 28), and the trap stayed, as the player saw.
 
+The boss fight (fight 3) confirmed an enemy pulled onto a trap sets it off: on turns 8 and 46 a Trap and the hook
+fired in one volley, and the hook dragged Sato onto the fresh trap. On turn 16 F1 put a trap in a walking
+Ashigaru's path and it died on it. On turn 30 an enemy arriving with Sato's new act landed on a trap and set it
+off, which isn't simulated, since arrivals aren't.
+
 | Item | Kind | What's already confirmed | What to look for |
 |---|---|---|---|
-| An enemy pulled onto a trap sets it off | Rule | Nothing: both triggers were walks | The hook pulling an enemy onto one |
 | **One placed under an enemy waits** | **Inferred** | **Nothing: from how the game's triggers work** | **Whether it goes off at once, which would make it a 3-damage melee hit** |
 | An enemy dashing through a trap's cell | Inferred, not simulated | Nothing | A Strider or Charger passing over one |
 | **A planted trap is worth 0.4 of its damage's worth** | **Scoring** | **The player's read: a third to half, since only enemies set it off** | **Traps planted when there's nothing better to do, and set up for the hook** |

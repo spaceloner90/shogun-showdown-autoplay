@@ -1400,12 +1400,19 @@ class CopycatMirrorTest(unittest.TestCase):
     def test_it_leaves_an_unknown_copy_in_the_queue(self):
         kabukai = Agent("Kabukai", 3, -1, 5, 5, queue=[COPYCAT], action="Attack")
         after, outcome = step(make_state(enemies=[kabukai]), Action("Wait"))
-        self.assertEqual([a.name for a in after.enemies[0].queue], ["Unknown"])
+        self.assertEqual([a.name for a in after.enemies[0].queue], ["UnknownCopy"])
         self.assertEqual(outcome.hp_lost, 0)
 
-    def test_the_copy_counts_as_a_threat(self):
+    def test_the_unknown_copy_isnt_a_threat(self):
+        # It copies from the hero's hand wherever the hero stands, so it can't be dodged, and the copy could be
+        # anything: F1 reacts once it shows, before the copier can fire it.
         kabukai = Agent("Kabukai", 3, -1, 5, 5, queue=[COPYCAT], action="Attack")
         after, _ = step(make_state(enemies=[kabukai]), Action("Wait"))
+        self.assertEqual(_threat_damage(after, 2), 0)
+
+    def test_a_tile_an_enemy_plays_still_is(self):
+        ashigaru = enemy(3, action="PlayTile")
+        after, _ = step(make_state(enemies=[ashigaru]), Action("Wait"))
         self.assertGreater(_threat_damage(after, 2), 0)
 
 

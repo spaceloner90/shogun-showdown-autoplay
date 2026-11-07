@@ -61,6 +61,10 @@ SMOKE_BOMBS = {"SmokeBomb", "BackSmokeBomb"}  # Trade places with the first targ
 
 # An enemy tile being played. Its identity isn't visible until it lands in the queue.
 UNKNOWN_TILE = "Unknown"
+# A Copycat Mirror's copy of a hero tile, before it shows. Unlike a tile an enemy plays, which is usually its own
+# short attack, the copy could be anything in the hero's hand, so no threat is assumed for it: F1 reacts once it
+# shows, before the copier can fire it.
+UNKNOWN_COPY = "UnknownCopy"
 
 
 @dataclass
@@ -657,7 +661,7 @@ def shield_first_ally(state, attacker, attack):
 
 
 def apply_attack(state, attacker, attack, outcome):
-    if attack.name == UNKNOWN_TILE:
+    if attack.name in (UNKNOWN_TILE, UNKNOWN_COPY):
         return
     if attack.name not in MODELED and attack.name not in outcome.unmodeled:
         outcome.unmodeled.append(attack.name)
@@ -929,7 +933,7 @@ def resolve_enemies(state, outcome):
                     spring_traps(state, outcome, before)
             # A Copycat Mirror leaves a copy of a hero tile in the queue, and which one isn't known yet.
             copies = sum(a.name == "CopycatMirror" for a in enemy.queue)
-            enemy.queue = [Attack(UNKNOWN_TILE, 0, []) for _ in range(copies)]
+            enemy.queue = [Attack(UNKNOWN_COPY, 0, []) for _ in range(copies)]
     for enemy in enemies:
         if enemy.alive and enemy.action == "PlayTile":
             enemy.queue.append(Attack(UNKNOWN_TILE, 0, []))

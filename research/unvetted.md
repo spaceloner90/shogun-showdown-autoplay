@@ -39,6 +39,17 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.17: no assumed threat from a mirror's copy
+
+By the game's code, the Copycat Mirror copies from the hero's hand wherever the hero stands, so it can't be dodged,
+and the copy could be any tile. It counted as a 2-damage, 1-cell attack until it showed. Now it counts as nothing
+until then, while a tile an enemy plays is still assumed to be a short attack. No top choice changes on any of the
+1,430 logged boards.
+
+| Item | Kind | What replays show | What to look for |
+|---|---|---|---|
+| No assumed threat from a copy until it shows | Scoring | Nothing changes | F1 standing next to a copier, and still reacting in time once the copy shows |
+
 ## New in v1.16: traps
 
 Read from the game's code for the player's new Trap tile. No top choice changes on any logged board.

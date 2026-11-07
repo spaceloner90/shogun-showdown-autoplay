@@ -11,7 +11,7 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from rules import UNKNOWN_TILE, Action, state_from_log, step
+from rules import UNKNOWN_COPY, UNKNOWN_TILE, Action, state_from_log, step
 
 DEFAULT_LOG = Path(__file__).resolve().parent.parent / "research" / "logs" / "first_battle_tiletest.jsonl"
 
@@ -108,7 +108,7 @@ def compare(predicted, actual_row, spawned):
         actual_queue = [a["name"] for a in logged["queue"]]
         check(f"{enemy.kind} queue length", len(expected_queue), len(actual_queue))
         for expected, actual in zip(expected_queue, actual_queue):
-            if expected != UNKNOWN_TILE:
+            if expected not in (UNKNOWN_TILE, UNKNOWN_COPY):
                 check(f"{enemy.kind} queue", expected, actual)
     if not spawned:
         check("enemy count", len(predicted.enemies), len(enemies))

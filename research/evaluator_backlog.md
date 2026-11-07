@@ -198,6 +198,12 @@ with, and being surrounded should cost more. v1.4 does a first version of both, 
 
 ## Ideas not yet tried
 
+- **Ending a fight isn't valued, and deaths alongside a boss aren't kills.** In `logs/run6` (fight 3, turn 36),
+  killing Rei takes the TwinTachi with him, but only Rei's death counts as a kill, while next turn's volley would
+  kill the TwinTachi first and count both. And a cleared room scores like any position, still earning for kept tiles
+  and facing. Ideas: count deaths alongside a boss as kills, and give winning the fight a value of its own. Set aside:
+  the same board with an ordinary enemy in Rei's place is still a near tie, so the real fault is elsewhere.
+
 - **The position terms read a kit on cooldown as needing less.** Where the hero wants to stand, and how much being
   far from the target costs, come from tiles ready soon. A tile put on cooldown drops out, which can lower those
   penalties, so firing a tile can look better than it is. v1.26 rules out firing one at nothing; firing one for a

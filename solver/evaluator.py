@@ -54,7 +54,7 @@ from rules import (ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, 
                    apply_attack, apply_potion, can_use_special, enemy_cells, fireable_attacks, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v1.24"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v1.25"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -67,8 +67,8 @@ WEIGHTS = {
                               # is known). Freezing a 2-damage enemy is worth about 3 damage now. A first guess.
     # Potions. Each is used on a key press of its own, and the next press analyzes the board it leaves.
     "heal_at_missing": 3,     # Use Edamame once the hero is missing at least this much HP, so none of its 3 is wasted.
-    "pressure": -3.0,         # Below this best score, the hardest 20% of logged boards, as the player asked: at 10%
-                              # they were hardly ever used. Only then are attacking potions and D6 used.
+    "pressure": 11.0,         # Below this best score, the hardest 30% of logged boards, as the player asked: at 10%
+                              # and 20% they were hardly ever used. Only then are attacking potions and D6 used.
     "trap_planted": 0.4,      # A trap on the ground, as a share of what its damage is worth. Only enemies set
                               # one off, so it's all upside: the player's read is a third to half.
     "shove_cell": 4.0,        # Per cell an enemy is shoved. Space to load in, but melee wants them close too.
@@ -575,7 +575,10 @@ def _best_line(state, depth, scale):
                key=lambda line: line.sort_key)
 
 
-DEFENSIVE_POTIONS = ("Shield", "MassIce", "RainOfMirrors")  # In order of preference when they save as much.
+# In order of preference when they save as much. Cool Up recharges the special move and escape tiles, so it can avoid
+# a hit too, as the player pointed out, and it comes first: it only helps in narrow situations, so when it does save
+# as much, the others are worth keeping for when it can't.
+DEFENSIVE_POTIONS = ("CoolUp", "Shield", "MassIce", "RainOfMirrors")
 ATTACKING_POTIONS = ("MassPoison", "MassCurse", "CoolUp")
 
 
@@ -587,9 +590,9 @@ def _turn_result(state, line):
 def potion_plan(state, ranked):
     """Which potion to use before this turn's action, if any, and why: the player's rules.
 
-    Edamame heals once that wastes none of it. Shield, Freeze Time and Rain of Mirrors only avoid damage: used when
-    the best line with one loses less HP this turn than the best line without, preferring the Shield unless another
-    saves more. Mass Poison, Mass Curse and Cool Up only when under pressure, and only if the best line with one kills
+    Edamame heals once that wastes none of it. Shield, Freeze Time, Rain of Mirrors and Cool Up avoid damage: used
+    when the best line with one loses less HP this turn than the best line without, preferring Cool Up, then the
+    Shield, unless another saves more. Mass Poison, Mass Curse and Cool Up only when under pressure, and only if the best line with one kills
     more this turn, poison ticks included. D6 is random, so it's only a last resort under pressure, against damage
     nothing else avoids. Each potion is ranked in full, since one can make a move good that F1 ranked low without it.
     Returns (potion, reason, ranked with it), or (None, None, None).

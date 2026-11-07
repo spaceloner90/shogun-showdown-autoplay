@@ -226,8 +226,8 @@ Potions, read from the code (simulated as of v1.22):
   Poison** and **Mass Curse** poison and curse every enemy. **Cool Up** recharges every tile and the special move.
   **D6** gives each enemy that isn't frozen a different random action, so it isn't simulated.
 - **When F1 uses one**, by the player's rules, one per key press: Edamame once the hero is missing at least 3 HP.
-  Shield, Freeze Time or Rain of Mirrors when the best line with it loses less HP this turn, preferring the Shield.
-  Under pressure (best score below -37, the worst 10% of logged boards), Mass Poison, Mass Curse or Cool Up when the
+  Cool Up, Shield, Freeze Time or Rain of Mirrors when the best line with it loses less HP this turn, in that order
+  of preference. Under pressure (best score below 11, the worst 30% of logged boards), Mass Poison, Mass Curse or Cool Up when the
   best line with it kills more, and D6 against damage nothing else avoids.
 
 Freezing, read from the code (simulated as of v1.21):

@@ -7,6 +7,11 @@ ones are unvetted until real play confirms them, as [`research/unvetted.md`](res
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v1.25 — potion pressure at 30%, and Cool Up to avoid damage (2026-11-07)
+- **Scoring:** pressure is now the worst 30% of boards, a best score below 11.
+- **Scoring:** Cool Up also counts as a damage-avoiding potion, since recharging the special move or an escape tile
+  can avoid a hit. It's preferred first when it saves as much, being the most conditional.
+
 ## v1.24 — elites, and potion pressure at 20% (2026-11-07)
 - **Rule:** Double Strike plays an attack twice, targeting afresh, for any agent; the Double Strike elite gives its
   attacks the effect. Reactive Shield elites gain a shield after a hit that hurts them while unshielded. Quick only

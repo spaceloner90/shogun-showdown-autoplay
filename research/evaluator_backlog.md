@@ -34,8 +34,10 @@ Enemy AI code is for offline simulation and tuning only.
   strikes 2 cells ahead, and Swirl, which strikes beside it. F1 spent a lot of turns shuffling between the two
   distances, often wastefully, since they're hard to use together, though it sometimes paid off. The player's read:
   more a problem of picking the tile than of using it. Picking rewards isn't something F1 does.
-- **Attacking potions rarely get used.** Even at 20% pressure, Mass Poison, Mass Curse and Cool Up come up on 2 of
-  2,100 logged boards with potions held, because they must also make a kill this turn.
+- **Attacking potions rarely get used.** At 30% pressure, on the 2,100 logged boards with potions held, Mass Curse
+  comes up 4 times and Mass Poison once. Given each one hypothetically on all 366 pressured boards, Mass Poison adds a
+  kill this turn on 57, Mass Curse on 14 and Cool Up on 6: curse and Cool Up need something to fire this turn, which
+  only 187 had. So they're rare mostly because they're seldom held when it counts.
 - **Key presses are slow because Python starts each time.** A press takes about 0.5 s in game, of which the search
   is about 0.02 s: the rest is starting a new Python process. A solver process that stays running, reloading when its
   code changes, would cut most of it. That's a new mechanism, to raise with the player before building.

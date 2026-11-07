@@ -2184,6 +2184,16 @@ class PotionTest(unittest.TestCase):
         state.potions = ["Shield", "MassIce"]
         self.assertEqual(self.plan(state)[0], "MassIce")
 
+    def test_cool_up_avoids_damage_by_recharging_swap(self):
+        state = self.pinned()
+        state.potions = ["CoolUp"]
+        self.assertEqual(self.plan(state)[0], "CoolUp")  # The swap gets the hero past the Katana.
+
+    def test_cool_up_comes_first_when_it_saves_as_much(self):
+        state = self.pinned()
+        state.potions = ["Shield", "CoolUp"]
+        self.assertEqual(self.plan(state)[0], "CoolUp")
+
     def test_nothing_defensive_without_damage_coming(self):
         state = make_state(enemies=[enemy(4)])
         state.potions = ["Shield", "MassIce", "RainOfMirrors"]

@@ -30,6 +30,13 @@ Enemy AI code is for offline simulation and tuning only.
     potion: both turned away, the right one's Katana killed the TwinTachi on 8 instead, and Spear with Sharp Turn
     then took no damage. The log has the board both before (seq 2126) and after (seq 2127) the potion. v1.11 would
     likely have avoided this a turn earlier, as it now sees the left Strider dash in next to the hero.
+- **Stalemates (a known limit of F1, watching how often it happens).** In `logs/run8` (fight 11, from about turn 46)
+  F1 waited every turn with a full queue rather than kill a 1 HP Charger, because the Charger blocked a loaded
+  Grappler's hook: killing it left 3 unanswerable damage, waiting left 1. Each cycle repeated the same board with the
+  hero 1 HP lower, until the player played a turn by hand. Valuing enemy body-blocks is right in general, so that
+  stays. Ideas considered and not taken yet: remembering this fight's boards from the log to spot a repeat, then
+  either not repeating the same choice (could just wander between other poor moves, taking damage) or requiring
+  progress (there may be no progress to make that turn). Neither is satisfying yet: see how often it comes up.
 - **Juggling tiles of different reach (deck choice, not play).** In `logs/run8` the Wanderer had Shadow Kama, which
   strikes 2 cells ahead, and Swirl, which strikes beside it. F1 spent a lot of turns shuffling between the two
   distances, often wastefully, since they're hard to use together, though it sometimes paid off. The player's read:

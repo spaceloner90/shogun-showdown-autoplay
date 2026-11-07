@@ -43,12 +43,51 @@ happened. Where a summon lands is random, so a player can't plan around it eithe
    - **Tiles:** charged ones, and damage loaded.
    - **What's kept:** charged moves that are worth more than their damage (escape and setup, below).
    - **Statuses:** poison still to come, curses on enemies, the hero's shield.
-   - **Where the hero stands:** facing the right enemy, distance from where the kit wants to be, crowding, and
-     being flanked or surrounded, which is much worse with no way out.
+   - **Where the hero stands:** facing the right enemy, how much of the kit can reach the target from here, a
+     small cost for each enemy adjacent, and being flanked or surrounded, which is much worse with no way out.
    - **Pressure:** enemy HP left in the room, more so as the next wave nears.
    - **Threats with no answer:** damage queued against the hero that nothing available could avoid.
 
 ## Principles
+
+### Three rules every score keeps
+
+These come first. The rest of the evaluator was built up piece by piece, and where a piece breaks one of these, the
+piece is wrong, however sensible it looked alone.
+
+1. **Having more never scores lower.** A ready tile never scores below the same tile on cooldown, and a loaded tile
+   never below the same tile in hand. In the game the hero can always leave a tile unused, and sending one back is
+   free, so a tile can't make the position worse. A score that says otherwise gives F1 a reason to throw the tile
+   away: Shadow Kama was fired at nothing to shed a positioning penalty.
+2. **One tile, one use.** A tile's uses (fire it, keep it to escape or set up, keep it ready) are alternatives. A
+   position counts the best way to use its tiles, never several uses of one tile at once. Adding them up made
+   waiting with a killing volley loaded look as good as killing, and the patch for that broke rule 1.
+3. **Terms that read the tiles only give credit** for what they can do, and never penalize what they aren't doing.
+   A penalty that grows with the tiles makes having them a burden.
+
+Where the game itself punishes holding something, like the Copycat Mirror copying a tile from the hand, that's the
+simulation's to play out, not a score's. Every rule, old or proposed, is checked against these three in theory
+before it's built, and `test_principles.py` checks rule 1 on every logged board.
+
+### Every term against the three rules
+
+As of v1.27, checked in theory:
+
+| Term | Rule 1 | Rule 2 | Rule 3 | What changed in v1.27 |
+|---|---|---|---|---|
+| Stack | Broke: only full-size volleys were tried, so a tile that hurt a volley's last place could lower it | Broke: credited firing tiles that the kept terms also credited keeping | Keeps | The position is the better of keeping everything, and the volley (at its fraction) plus what it leaves kept. Every volley size is tried |
+| Escape, setup | Broke: a loaded tile earned nothing when the loaded tiles could kill, but 2/3 in hand | Broke: the hook earned escape and setup at once; and see the stack | Keeps | The zeroing is gone, the stack handles it. A tile's kept worth is the larger of its escape and setup values |
+| Ready tiles, loaded damage | Keeps | See the stack | Keeps | Read after the volley, in the stack's case |
+| Loaded effects tiebreak | Keeps | Keeps: an effect once fired shows in the volley | Keeps | |
+| Curse | Broke: zero whenever something was loaded; and a tile that kills anyway made the curse look worthless | See the stack | Keeps | The curse's best gain on any one tile, counting every tile |
+| Distance, crowding | Broke: both grew with the tiles ready soon | Keeps | Broke | Replaced by reach and stand-off |
+| Reach (new) | Keeps: each tile only adds, more charge adds more | Read after the volley, in the stack's case | Keeps | Credit per tile for reaching the target from here, falling off per cell, discounted per turn until ready |
+| Stand-off (new) | Keeps: doesn't read the tiles | Keeps | Keeps | A small cost per adjacent enemy |
+| Flanked, surrounded | Keeps: a way out only lowers it | Keeps | Keeps: it's a credit for a way out | |
+| Facing, pressure, poison, ice, traps, shield, special charged | Keep: they don't read the tiles | Keep | Keep | |
+| Shields broken, shield as HP | Broke: valued at the weakest ready tile, so a weak tile ready lowered it | Keeps | Keeps | Valued at the weakest tile in the deck |
+| Threat with no answer | Broke: only full-size volleys were tried as answers | Keeps: a risk check, not a credit | Keeps | Every volley size is tried |
+| Damage, kills, HP lost along the line | Keep: events | Keep | Keep | |
 
 ### Extend the existing patterns
 

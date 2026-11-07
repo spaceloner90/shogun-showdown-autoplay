@@ -171,6 +171,12 @@ log gets saved into `logs/` first.
   and lookahead.
 - **Consumables** aren't used by F1. Scenarios for them are saved in the backlog.
 - **Which enemy to kill first** is simply lowest HP, then closest.
+- **Why a deeper line sums its turns at all.** With perfect prediction, summing each turn's events would add
+  nothing over the final position: an enemy killed sooner would simply show as HP not lost later. It's done, with
+  each turn discounted, because prediction gets worse with each turn. Past the first, enemies are treated as
+  standing still, and spawns and summons can't be predicted at all, which keeps early kills worth more even with a
+  perfect model of the enemies. So the right discount depends on how good the prediction is. A deeper search built
+  on the enemies' real behavior would want a gentler one.
 - **If F2 returns,** the position terms carry over as they are. A line adds up what each of its turns did, and
   only adds position terms at its end, so those only ever estimate what's beyond the horizon. Poison that ticks
   within an F4 line counts as damage dealt, and only what's left at the end is estimated. A value added for an

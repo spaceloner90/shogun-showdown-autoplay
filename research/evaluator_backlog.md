@@ -134,6 +134,10 @@ with, and being surrounded should cost more. v1.4 does a first version of both, 
   Position terms still hold at a deeper horizon: they're only added at the end of a line, and the turns before it
   are played out, so they only estimate what's beyond it. Values on moves and tiles stay position terms for that
   reason, rather than being added for the action.
+- **The per-turn discount stands in for poor prediction (not acting on it now).** Summing a line's turns, each
+  discounted, only makes sense because predictions get worse with each turn: enemies are treated as standing still
+  after the first, and spawns can't be predicted. A deeper search built on the enemies' real behavior should
+  discount less, though spawns will always make early kills worth more. See `design.md`.
 - **Escape values are guesses.** As of v1.7 every repositioning move is worth something kept, from how flexible it
   is, and they're first guesses to tune in play. Only Swap and the Smoke Bomb count as a way out when flanked.
 - **The shove for collision damage.** Fight 2, turn 7 spent it for 2 damage, and it was down for 4 turns.

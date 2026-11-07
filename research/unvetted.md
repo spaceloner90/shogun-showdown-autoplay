@@ -45,11 +45,11 @@ Read from the game's code for the player's new Trap tile. No top choice changes 
 
 Confirmed by `logs/run7_part2`, one fight on v1.16 with every turn predicted exactly but one random Combo Curse:
 the mod logs traps at the cell ahead of the hero (turns 6 and 15), and an enemy walking onto one takes its damage
-once, the Kabukai on turn 10 and a Guardian, killed, on turn 22.
+once, the Kabukai on turn 10 and a Guardian, killed, on turn 22. The hero stood on its own trap there (turns 10 and
+19 to 22) and in the next fight (turns 27 and 28), and the trap stayed, as the player saw.
 
 | Item | Kind | What's already confirmed | What to look for |
 |---|---|---|---|
-| The hero standing on its own trap doesn't set it off | Rule | Nothing: not seen | The hero on a trap's cell, and the trap still there |
 | An enemy pulled onto a trap sets it off | Rule | Nothing: both triggers were walks | The hook pulling an enemy onto one |
 | **One placed under an enemy waits** | **Inferred** | **Nothing: from how the game's triggers work** | **Whether it goes off at once, which would make it a 3-damage melee hit** |
 | An enemy dashing through a trap's cell | Inferred, not simulated | Nothing | A Strider or Charger passing over one |

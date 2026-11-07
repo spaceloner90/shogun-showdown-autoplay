@@ -1,8 +1,9 @@
 # What real logs haven't confirmed
 
-`evaluator-v1` is the vetted version: it played the whole winning run in `logs/run5_full`, fights 9 to 30.
-Anything here is newer than that, or never came up in it. Passing tests and replaying old logs doesn't vet
-something, because old logs can't show new behavior. An item leaves this list when a real log shows it working.
+Changes to rules and scoring that real play hasn't shown working yet. `evaluator-v1` won day 1 with the Wanderer
+(`logs/run5_full`, fights 9 to 30), and that stands: later versions aren't held to winning it again. Passing tests
+and replaying old logs doesn't vet a change, because old logs can't show new behavior. An item leaves this list
+when a real log shows it working.
 
 ## New in v1.1
 
@@ -41,8 +42,7 @@ enemies appeared, and the player confirmed the hook looks right.
 ## New in v1.5: the same rules for every hero
 
 v1.4 fenced the Swap hero off with the old "close in" rule. Now it goes through the same kit rules as anyone. None of
-this has been played, and the winning run in `logs/run5_full` no longer vets the Wanderer's positioning or Swap use.
-On its 926 boards, 16 top choices change from v1.4: no kills are lost (267 against 266) and no HP, and every change
+this has been played. On the winning run's 926 boards, 16 top choices change from v1.4: no kills are lost (267 against 266) and no HP, and every change
 either holds a Swap or makes the same kill with a tile instead. The Ronin's 110 boards in `logs/run6` don't change.
 
 | Item | Kind | What replays show | What to look for |

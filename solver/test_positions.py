@@ -274,6 +274,13 @@ class RoninWithLightning(unittest.TestCase):
         after, _ = step(position(2, 21, "run7"), Action("Attack"))
         self.assertEqual([(e.kind, e.hp) for e in after.enemies if e.kind == "BaruBoss"], [("BaruBoss", 4)])
 
+    def test_two_shockwaves_from_one_spear(self):
+        # Fight 4, turn 8: Spear hit the Guardian on 2 and the Yari Master on 1. Each set off its own chain, so the
+        # Guardian on 0 took 1 from each, and the first chain's 1 let the Spear's 3 kill the 4 HP Yari Master.
+        best = choice(4, 8, "run7")
+        after, _ = step(position(4, 8, "run7"), best.actions[0])
+        self.assertEqual(([(e.cell, e.hp) for e in after.enemies], best.terms.get("kills", 0)), ([(0, 3)], 120))
+
     def test_still_puts_baru_in_front_of_the_ashigaru(self):
         # Fight 2, turn 24: Smoke Bomb and the hook moved Baru into the Ashigaru's attack, which killed him.
         best = choice(2, 24, "run7")

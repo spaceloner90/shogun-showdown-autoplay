@@ -31,6 +31,7 @@ BOMB_FUSE = 2     # Turns a placed bomb waits after the one it's placed on, befo
 BARRICADE_HP = 5
 MAX_SHOVE_CREDIT = 3  # A shove counts for at most this many cells: further than that gains little.
 SHOCKWAVE_DAMAGE = 1  # Stored in the game's assets, not its code. Seen in logs/run7.
+WARDEN_EXPLOSION = 2  # What a dying Warden deals to its cell and both beside it. In the game's code.
 
 # Each hero has one special move, triggered by moving into an occupied cell. Swap is the Wanderer's, and
 # Shove is the Ronin's. The other heroes' moves aren't simulated, so they aren't offered as actions.
@@ -38,8 +39,9 @@ SWAP = "SwapSpecialMove"
 SHOVE = "PushSpecialMove"
 SPECIAL_MOVES = {SWAP, SHOVE}
 
-# Enemy traits that need no warning. Heavy is modeled, and the others haven't changed any prediction.
-UNDERSTOOD_TRAITS = {"Aggro", "Heavy", "Quick", "Unfreezable"}
+# Enemy traits that need no warning. Heavy and Explosive (the Warden's) are modeled, and the others haven't
+# changed any prediction.
+UNDERSTOOD_TRAITS = {"Aggro", "Explosive", "Heavy", "Quick", "Unfreezable"}
 
 # Not worth fighting while a boss is alive: it dies with the boss anyway. A one-off for the Shogun's
 # statues. Other bosses' summons are real threats, and the game doesn't even show a statue's HP.
@@ -760,6 +762,19 @@ def deal_damage(state, attacker, target, value, outcome, collision=False):
                 end_of_boss(state)
     elif is_boss(target) and not target.alive:
         end_of_boss(state)
+    if damage and not target.alive and target.kind == "Warden":
+        explode(state, target, outcome)
+
+
+def explode(state, warden, outcome):
+    """A Warden that dies hits its own cell and both beside it for 2, the hero included, as its own hit.
+
+    By the code it doesn't if it dies before its first decision, but any Warden on the board has made one. Each
+    Warden this kills explodes in turn."""
+    for cell in (warden.cell - 1, warden.cell, warden.cell + 1):
+        agent = state.occupant(cell) if 0 <= cell < state.cells else None
+        if agent is not None:
+            land_hit(state, warden, agent, WARDEN_EXPLOSION, outcome)
 
 
 def fire_hero_queue(state, outcome, order=None):

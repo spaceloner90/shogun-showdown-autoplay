@@ -39,6 +39,19 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v1.10: the Warden's explosion
+
+Read from the game's code after fight 7 of `logs/run7`, where two explosions happened unsimulated. Simulating it makes
+turn 7 of that fight exact, leaving only the two summons as misses. On every logged board, 2 top choices change,
+both in fight 7 and both a different tile to load: turn 1 loads the Smoke Bomb to swap a Warden next to the Ashigaru.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| 2 to its own cell and both beside it, as its own hit | Rule | Turns 7 and 24 of fight 7, replayed | The hero taking 2 when one dies beside it, and a shield blocking it |
+| Each Warden it kills explodes in turn | Rule | Turn 24, though the Shockwave would have killed the second anyway | Two touching Wardens, the second killed only by the first |
+| No explosion for one that dies before its first decision | Rule | Not seen. Every Warden on the board is assumed to have decided | A Warden summoned and killed the same turn |
+| F1 not killing one beside itself | Scoring | Follows from the simulation, and tested on a made-up board | Whether it steps back first, or uses the blast on other enemies |
+
 ## New in v1.9: Sharp Turn and Sniper
 
 Both read from the game's code. Confirmed by fight 7 of `logs/run7`, on v1.9:

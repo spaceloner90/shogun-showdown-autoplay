@@ -210,6 +210,13 @@ Shockwave, read from the code (simulated as of v1.3):
 - The damage is stored in the game's assets. `logs/run7` shows 1, chaining through two touching enemies on turn
   41, and going off even when the tile killed its target.
 
+The Warden, read from the code (simulated as of v1.10):
+
+- **Explosive:** a dying Warden hits its own cell and both cells beside it for 2, as its own hit, so the hero
+  takes it when adjacent and a shield blocks it. Each Warden it kills explodes in turn. By the code, one that
+  dies before its first decision doesn't, but every Warden on the board when the hero acts has made one: one that
+  arrived with wave 2 on turn 6 of fight 7 in `logs/run7` exploded on turn 7.
+
 Sharp Turn and Sniper, read from the code (simulated as of v1.9):
 
 - **Sharp Turn** is `TurnAround` in the code, a Free Play tile. Its user turns around first, then strikes what's in

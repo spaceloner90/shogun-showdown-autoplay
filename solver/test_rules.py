@@ -1841,6 +1841,44 @@ class LightningTest(unittest.TestCase):
         self.assertEqual(unmodeled_content({"tiles": [tile], "hero": {"queue": []}, "enemies": [], "skills": []}), [])
 
 
+class WardenTest(unittest.TestCase):
+    """WardenEnemy.Die in the game's code: it explodes for 2 on its own cell and both beside it."""
+
+    def warden(self, cell, hp=1):
+        w = enemy(cell, hp=hp)
+        w.kind = "Warden"
+        return w
+
+    def test_killing_one_beside_the_hero_costs_2(self):
+        _, outcome = fire(make_state(hero_cell=2, enemies=[self.warden(3)]), KATANA)
+        self.assertEqual((outcome.kills, outcome.hp_lost), (1, 2))
+
+    def test_it_hits_the_enemy_on_its_other_side(self):
+        after, outcome = fire(make_state(hero_cell=0, enemies=[self.warden(1), enemy(2, hp=3)]), KATANA)
+        self.assertEqual(([(e.cell, e.hp) for e in after.enemies], outcome.hp_lost), ([(2, 1)], 2))
+
+    def test_one_warden_sets_off_the_next(self):
+        enemies = [self.warden(2), self.warden(3), enemy(4, hp=3)]
+        after, outcome = fire(make_state(hero_cell=0, enemies=enemies), ARROW)
+        self.assertEqual(([(e.cell, e.hp) for e in after.enemies], outcome.kills, outcome.hp_lost), ([(4, 1)], 2, 0))
+
+    def test_a_shield_blocks_it(self):
+        state = make_state(hero_cell=2, enemies=[self.warden(3)])
+        state.hero.shield = True
+        _, outcome = fire(state, KATANA)
+        self.assertEqual(outcome.hp_lost, 0)
+
+    def test_one_that_survives_doesnt(self):
+        _, outcome = fire(make_state(hero_cell=2, enemies=[self.warden(3, hp=5)]), KATANA)
+        self.assertEqual(outcome.hp_lost, 0)
+
+    def test_f1_doesnt_kill_it_from_beside_it(self):
+        # Swirl loaded, a 1 HP Warden adjacent: firing now kills it but takes the blast.
+        best = rank_actions(make_state(hero_cell=2, enemies=[self.warden(3)], queue=["Swirl"]), depth=1)[0]
+        self.assertNotEqual(best.actions[0].kind, "Attack")
+        self.assertEqual(best.terms.get("hp_lost", 0), 0)
+
+
 class SniperSkillTest(unittest.TestCase):
     """SniperSkill in the game's code: the hero's hits on targets 4 or more cells away get its level added,
     before a curse doubles them. Shockwave and collision hits aren't the hero's own."""

@@ -16,8 +16,8 @@ public sealed class BestMove
     public float Score;
     public string Line;
     public int[] AttackOrder;
-    // For PlayTile with a full queue: the queued tile to send back to hand first, by deck index. -1 if none.
-    public int ReplaceIndex = -1;
+    // For PlayTile: the queued tiles to send back to hand first, by deck index. Null if none.
+    public int[] ReplaceIndexes;
 }
 
 public sealed class SolverResult
@@ -160,8 +160,13 @@ public sealed class SolverBridge
             else if (line.StartsWith("REPLACE ", StringComparison.Ordinal))
             {
                 string[] parts = line.Trim().Split(' ');
-                result.Best[int.Parse(parts[1], CultureInfo.InvariantCulture)].ReplaceIndex =
-                    int.Parse(parts[2], CultureInfo.InvariantCulture);
+                string[] indexes = parts[2].Split(',');
+                int[] replace = new int[indexes.Length];
+                for (int i = 0; i < indexes.Length; i++)
+                {
+                    replace[i] = int.Parse(indexes[i], CultureInfo.InvariantCulture);
+                }
+                result.Best[int.Parse(parts[1], CultureInfo.InvariantCulture)].ReplaceIndexes = replace;
             }
             else if (line.StartsWith("POTION ", StringComparison.Ordinal))
             {

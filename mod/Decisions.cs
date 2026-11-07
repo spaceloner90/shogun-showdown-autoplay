@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CombatEnums;
 
 // One move for the mod to play.
@@ -15,15 +16,15 @@ public sealed class Decision
     // tiles still in hand. Null fires the queue as it is.
     public readonly int[] AttackOrder;
 
-    // For PlayTile with a full queue: the queued tile to send back to hand first, a free queue edit. Null if none.
-    public readonly Tile ReplaceTile;
+    // For PlayTile: queued tiles to send back to hand first, free queue edits. Null if none.
+    public readonly List<Tile> ReplaceTiles;
 
-    public Decision(ActionEnum action, Tile tile, string reason, int[] attackOrder = null, Tile replaceTile = null)
+    public Decision(ActionEnum action, Tile tile, string reason, int[] attackOrder = null, List<Tile> replaceTiles = null)
     {
         Action = action;
         Tile = tile;
         Reason = reason;
         AttackOrder = attackOrder;
-        ReplaceTile = replaceTile;
+        ReplaceTiles = replaceTiles;
     }
 }

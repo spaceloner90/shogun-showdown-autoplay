@@ -26,7 +26,7 @@ using BepInEx;
 using HarmonyLib;
 using UnityEngine;
 
-[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.13.0")]
+[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.14.0")]
 public class StateLoggerPlugin : BaseUnityPlugin
 {
     private const float PollIntervalSeconds = 0.1f;
@@ -245,7 +245,12 @@ public class StateLoggerPlugin : BaseUnityPlugin
 
         CombatEnums.ActionEnum action = (CombatEnums.ActionEnum)Enum.Parse(typeof(CombatEnums.ActionEnum), move.Action);
         Tile tile = move.DeckIndex >= 0 ? GetTiles()[move.DeckIndex] : null;
-        Tile replace = move.ReplaceIndex >= 0 ? GetTiles()[move.ReplaceIndex] : null;
+        List<Tile> replace = null;
+        if (move.ReplaceIndexes != null)
+        {
+            replace = new List<Tile>();
+            foreach (int index in move.ReplaceIndexes) replace.Add(GetTiles()[index]);
+        }
         string reason = "score " + Num(move.Score) + ", plan: " + move.Line;
         string source = "Evaluator " + analysis.EvaluatorVersion + " depth " + depth;
         analysis = null;
@@ -283,20 +288,23 @@ public class StateLoggerPlugin : BaseUnityPlugin
             "\"action\":" + Str(decision.Action.ToString()) +
             ",\"tile\":" + (decision.Tile != null ? Str(tileName) : "null") +
             ",\"deckIndex\":" + (decision.Tile != null ? GetTiles().IndexOf(decision.Tile).ToString() : "null") +
-            ",\"replace\":" + (decision.ReplaceTile != null ? Str(TileName(decision.ReplaceTile)) : "null") +
+            ",\"replace\":" + (decision.ReplaceTiles != null ? Str(ReplaceNames(decision.ReplaceTiles)) : "null") +
             ",\"source\":" + Str(source) +
             ",\"reason\":" + Str(decision.Reason) +
             ",\"basedOnStateSeq\":" + lastStateSequence);
 
-        // A tile sent back to make room is a free queue edit, made first, since the queue is full until then.
-        if (decision.ReplaceTile != null)
+        // Tiles sent back are free queue edits, made first, since one may be what makes room.
+        if (decision.ReplaceTiles != null)
         {
-            string problem = SendBackToHand(decision.ReplaceTile, source);
-            if (problem != null)
+            foreach (Tile sent in decision.ReplaceTiles)
             {
-                LogEvent("step_refused", "Refused " + actionText + ": " + problem,
-                    "\"action\":\"PlayTile\",\"why\":" + Str(problem));
-                return;
+                string problem = SendBackToHand(sent, source);
+                if (problem != null)
+                {
+                    LogEvent("step_refused", "Refused " + actionText + ": " + problem,
+                        "\"action\":\"PlayTile\",\"why\":" + Str(problem));
+                    return;
+                }
             }
         }
 
@@ -348,6 +356,13 @@ public class StateLoggerPlugin : BaseUnityPlugin
 
         // Not "sticky": real key presses can queue during a turn, but one press must be one move.
         combat.PlayerInputsCombatAction(decision.Action, false);
+    }
+
+    private static string ReplaceNames(List<Tile> tiles)
+    {
+        List<string> names = new List<string>();
+        foreach (Tile tile in tiles) names.Add(TileName(tile));
+        return string.Join(", ", names.ToArray());
     }
 
     // Sends a queued tile back to the hand through the same call a click on it uses, and logs the edit. Returns

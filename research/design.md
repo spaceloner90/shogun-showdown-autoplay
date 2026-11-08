@@ -201,9 +201,9 @@ too.
   `research/boards/core.json`, with every board's margin in `margins.json`. Raw logs are never trimmed, and `--full`
   runs every board. When a log is added to `solver/logged_boards.py`, run `condense.py --add`, which adds its boards
   against what the core already covers and takes in boards newly changed between versions, leaving the rest alone so
-  replays stay comparable. `--rebuild` starts over, for when the criteria change. Checked against past versions,
-  the core held about a third to half of each version's changes in a seventh of the boards, and
-  without the changed boards it missed two small fixes entirely.
+  replays stay comparable. `--rebuild` starts over, for when the criteria change. Checked against past versions
+  before the changed boards were added, the core held 103 of their 265 changes (39%) in a seventh of the boards, but
+  missed two small fixes entirely and caught only 1 of v2.15's 24, which is why boards that changed are kept.
 - **Replay real logs.** `tools/replay.py` runs the top choice on every core board, in parallel, in about 13 s, and
   saves it to `research/replays/<version>.core.json`; `--full` runs every board, in about 75 s, into
   `<version>.json`, and `--tag` replays a tagged version from git. `tools/compare.py` then counts what changes,

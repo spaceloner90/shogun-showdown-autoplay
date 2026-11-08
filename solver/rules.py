@@ -854,8 +854,10 @@ def _apply_attack(state, attacker, attack, outcome):
         return
     start_cell, start_facing = attacker.cell, attacker.facing
     hits = attack_hits(state, attacker, attack)
-    # An attack that moved or turned the hero still did something, even if it hit nothing.
-    if not hits and attacker is state.hero and attacker.cell == start_cell and attacker.facing == start_facing:
+    # An attack that moved or turned the hero still did something, even if it hit nothing, and so does a reload.
+    reload = attack.name == "Crossbow" and attack.value == 0
+    if (not hits and attacker is state.hero and attacker.cell == start_cell and attacker.facing == start_facing
+            and not reload):
         outcome.wasted_attacks += 1
     for target in hits:
         # A boss killed earlier in this sweep takes everyone else with it.

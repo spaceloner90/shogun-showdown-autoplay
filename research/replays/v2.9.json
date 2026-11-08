@@ -9519,6 +9519,796 @@
 "sent": 0,
 "wasted": 0
 },
+"run11 3:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Swirl",
+"score": 4.38,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight (phase)",
+"score": 77.23,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Swirl",
+"score": 12.45,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile GrapplingHook",
+"score": 20.78,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 34.12,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 55.95,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:15": {
+"dmg": 6,
+"fired": 3,
+"hp": 0,
+"kills": 0,
+"label": "Attack GrapplingHook > Swirl > ScarStrike",
+"score": 81.29,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 22.63,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 14.36,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 16.49,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Swirl",
+"score": 54.74,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 22.48,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile GrapplingHook",
+"score": 76.67,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:21": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack GrapplingHook > Swirl",
+"score": 102.04,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 22.63,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 25.02,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 57.26,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:25": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10086.34,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile GrapplingHook",
+"score": 36.81,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:4": {
+"dmg": 6,
+"fired": 3,
+"hp": 0,
+"kills": 0,
+"label": "Attack GrapplingHook > Swirl > ScarStrike",
+"score": 71.48,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": -6.13,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": -4.94,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": -52.78,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight",
+"score": -70.91,
+"sent": 0,
+"wasted": 0
+},
+"run11 3:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 2.69,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Swirl",
+"score": 66.56,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile GrapplingHook",
+"score": 34.81,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 33.28,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Swirl",
+"score": 68.17,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:13": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 107.85,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 13.61,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 16.06,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 17.77,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight (phase)",
+"score": -5.81,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Swirl",
+"score": 49.1,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:19": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 95.81,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:2": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 112.95,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile GrapplingHook",
+"score": -19.0,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 1,
+"kills": 0,
+"label": "Flip",
+"score": -38.29,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:22": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10091.25,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile GrapplingHook",
+"score": 49.15,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 61.37,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:5": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 91.25,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Swirl",
+"score": 47.01,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 65.61,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:8": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 114.79,
+"sent": 0,
+"wasted": 0
+},
+"run11 4:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 22.65,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Crossbow",
+"score": 63.07,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:10": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack Swirl (Crossbow to hand)",
+"score": 89.47,
+"sent": 1,
+"wasted": 0
+},
+"run12 0:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Crossbow",
+"score": 27.58,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile GrapplingHook",
+"score": 43.39,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Swirl",
+"score": 78.2,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:14": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack GrapplingHook > Swirl (Crossbow to hand)",
+"score": 121.25,
+"sent": 1,
+"wasted": 0
+},
+"run12 0:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 28.91,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Crossbow",
+"score": 35.32,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Swirl",
+"score": 13.79,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 1,
+"kills": 0,
+"label": "Wait",
+"score": -23.02,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile GrapplingHook (Crossbow to hand)",
+"score": 88.55,
+"sent": 1,
+"wasted": 0
+},
+"run12 0:2": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 95.36,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 103.87,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:21": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack Swirl > GrapplingHook (ScarStrike to hand)",
+"score": 161.25,
+"sent": 1,
+"wasted": 0
+},
+"run12 0:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 6.81,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Crossbow",
+"score": 13.76,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Swirl",
+"score": 57.23,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 60.05,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:26": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack Swirl (ScarStrike, Crossbow to hand)",
+"score": 85.3,
+"sent": 2,
+"wasted": 0
+},
+"run12 0:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile GrapplingHook",
+"score": 27.67,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 29.37,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 77.05,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Swirl",
+"score": 52.98,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Swirl",
+"score": 89.95,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 109.65,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:32": {
+"dmg": 5,
+"fired": 3,
+"hp": 0,
+"kills": 2,
+"label": "Attack Swirl > ScarStrike > GrapplingHook",
+"score": 10189.55,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 60.29,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:5": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 91.53,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile GrapplingHook",
+"score": 48.45,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:7": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 85.37,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Swirl",
+"score": -3.63,
+"sent": 0,
+"wasted": 0
+},
+"run12 0:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 1,
+"kills": 0,
+"label": "PlayTile Crossbow",
+"score": -37.79,
+"sent": 0,
+"wasted": 0
+},
 "run5_full 10:1": {
 "dmg": 0,
 "fired": 0,

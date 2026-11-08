@@ -47,7 +47,7 @@ enemies appeared, and the player confirmed the hook looks right.
 | Item | Kind | What's already confirmed | What to look for |
 |---|---|---|---|
 | Crossbow: 2 targets, then empty, then a reload | Rule | Read from `CrossbowAttack` | Hits and the tile's value in the log matching, shot and reload |
-| **A reload is worth a ready tile with its damage loaded (8 for 3)** | **Scoring** | **The player's suggestion, read literally** | **F1 bringing the empty Crossbow along in attacks, without wasting turns on it. If it never does, the value is too small** |
+| **A reload is worth a ready tile with its damage loaded (8 for 3)** | **Scoring** | **The player's suggestion, read literally. `logs/run12` showed reloads never offered, fixed in v2.10** | **F1 bringing the empty Crossbow along in attacks, without wasting turns on it. If it never does, the value is too small** |
 | **Reach by actions, and movement abilities' reach as one of their uses** | **Scoring** | **Same as before for walkers in open space; tests** | **F1 using dashes, phases and movement tiles to get in range, and not closing in through blockers it can't pass** |
 
 ## New in v2.8: the Shadow's dash

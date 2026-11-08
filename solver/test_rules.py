@@ -3026,6 +3026,14 @@ class CrossbowTest(unittest.TestCase):
         step(state, Action("Attack"))
         self.assertEqual(state.tiles[0].attack.value, 3)
 
+    def test_a_reload_isnt_a_wasted_attack(self):
+        # logs/run12: F1 could never fire a reload, since attacks firing at nothing are dropped, so it kept
+        # loading the empty Crossbow and sending it back to hand.
+        state = self.board(0, [enemy(0, facing=1)])
+        _, outcome = step(state, Action("Attack"))
+        self.assertEqual(outcome.wasted_attacks, 0)
+        self.assertIn("Attack", [line.labels[0] for line in rank_actions(state)])
+
     def test_a_loaded_reload_is_worth_firing(self):
         # Nobody in range, so only the reload makes the stack worth anything.
         state = self.board(0, [])

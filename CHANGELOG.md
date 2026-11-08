@@ -9,6 +9,12 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.10 — a reload isn't a wasted attack (2026-11-08)
+- **Fix:** F1 drops any attack where a tile fires at nothing, and a Crossbow's reload hits nobody by design, so no
+  attack that reloaded was ever offered. The stack still credited the reload, so in `logs/run12` F1 kept loading
+  the empty Crossbow and sending it back to hand when it attacked.
+- Replay: those 3 `run12` attacks now take the reload along; nothing else changes.
+
 ## v2.9 — the Crossbow, and reach by real movement (2026-11-08)
 - **Rule:** the Crossbow alternates. Loaded, it hits the first 2 agents in range for its damage, 3 to start, and
   empties; empty, its next use reloads it to its base damage and hits nobody (`CrossbowAttack.ApplyEffect`,

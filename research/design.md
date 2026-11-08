@@ -194,15 +194,30 @@ too.
 
 ## Checking a change
 
-- **Replay real logs.** `tools/replay.py` runs the top choice on every logged board, in parallel, in about 17 s, and
-  saves it to `research/replays/<version>.json`; `--tag` replays a tagged version from git. `tools/compare.py` then
-  counts what changes, kills, HP lost and damage dealt, and `--show` lists each changed choice to look at. The boards
-  are listed in `solver/logged_boards.py`: add each new log there. `tools/choices.py` shows one board's top choices
-  with every term, and `tools/potions.py` which potion F1 would use on every board holding one.
-- **Run the principle test,** `test_principles.py`: rule 1 on every logged board, in a few seconds.
+- **The core boards.** Everyday checks run on a core of the logged boards, about a seventh of them, that
+  `tools/condense.py` picks by meaning: every board a position test names, every board whose choice changed between
+  two versions' full replays, enough boards to cover each hero, tile, effect, skill, potion, enemy, elite, status,
+  hazard and trap, and the closest calls, at most 4 a fight beyond the first two kinds. It's kept in
+  `research/boards/core.json`, with every board's margin in `margins.json`. Raw logs are never trimmed, and `--full`
+  runs every board. When a log is added to `solver/logged_boards.py`, run `condense.py --add`, which adds its boards
+  against what the core already covers and takes in boards newly changed between versions, leaving the rest alone so
+  replays stay comparable. `--rebuild` starts over, for when the criteria change. Checked against past versions,
+  the core held about a third to half of each version's changes in a seventh of the boards, and
+  without the changed boards it missed two small fixes entirely.
+- **Replay real logs.** `tools/replay.py` runs the top choice on every core board, in parallel, in about 13 s, and
+  saves it to `research/replays/<version>.core.json`; `--full` runs every board, in about 75 s, into
+  `<version>.json`, and `--tag` replays a tagged version from git. `tools/compare.py` then counts what changes,
+  kills, HP lost and damage dealt, on the core unless `--full`, and `--show` lists each changed choice to look at.
+  `tools/choices.py` shows one board's top choices with every term, and `tools/potions.py` which potion F1 would use
+  on every board holding one.
+- **Use the full set for releases:** before pushing, run `replay.py --full`, compare with `--full`, then
+  `condense.py --add` so any newly changed boards join the core, and `SHOGUN_FULL=1` for the principle test.
+- **Run the principle test,** `test_principles.py`: rule 1 on the core boards, in about 5 s.
 - **Run the stall check.** Hunt a still enemy from many starts, to catch fights that would drag on.
 - **Look at the turns that prompted it,** and make sure each one now picks what it should, for the right reason.
-- **Keep real positions as tests** (`test_positions.py`), so later changes can't quietly undo them.
+- **Keep real positions as tests** (`test_positions.py`), so later changes can't quietly undo them, but only for a
+  board that shows something no test covers yet: a new mechanic, a mistake that got fixed, or a judgment the player
+  made. Tests aren't added for every change, so the suite stays fast. Each one is pinned in the core.
 - **Know what replays can't show.** A replay changes one choice from a board the old version reached, so it can't
   show how a whole fight would go. Only real fights vet a change.
 

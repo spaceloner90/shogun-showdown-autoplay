@@ -241,11 +241,10 @@ with, and being surrounded should cost more. v1.4 does a first version of both, 
   next turn counts at 60% and a turn's discount, while an enemy left alive costs only 4 per HP. Two real boards
   pull opposite ways: Rei (`logs/run6`, fight 3, turn 36), where killing is right, and lining up a double kill on
   the winning run (`logs/run2_complete`, fight 7, turn 2). Left as is, to see how it plays.
-- **Test and replay time (partly done).** The full replay and the principle test now run in parallel, in about 17 s
-  and 4 s, from about 4 and 4.5 minutes, and each version's replay is kept in `research/replays/`. Still to do, as the
-  player suggested: a smaller everyday set of boards chosen by meaning (every board a test names, close calls,
-  coverage of each mechanic, a cap per fight), the full set only for releases, and adding a position test only
-  when a board shows something no test covers.
+- **Test and replay time (done).** The full replay and the principle test run in parallel, and since the core boards
+  (see `research/design.md`, "Checking a change"), everyday checks run on about a seventh of the boards: the replay in
+  13 s rather than 75, the principle test in 5 rather than 20. The full set is for releases, and a position test is
+  only added when a board shows something no test covers.
 
 - **The position terms read a kit on cooldown as needing less (fixed in v1.27).** Distance and crowding are
   replaced by reach and stand-off, which only give credit, by the three rules.

@@ -1,18 +1,29 @@
 """Compares two replays from tools/replay.py: totals by log, and each board whose choice changed.
 
-    python tools/compare.py v1.28 v2.1          # names of files in research/replays/
+    python tools/compare.py v1.28 v2.1          # on the core boards
     python tools/compare.py v1.28 v2.1 --show   # also list every changed choice
+    python tools/compare.py v1.28 v2.1 --full   # on every logged board, from the full replays
+
+On the core, each side uses its core replay if there is one, or its full replay cut down to the core.
 """
 import argparse
 import json
 from pathlib import Path
 
 REPLAYS = Path(__file__).resolve().parent.parent / "research" / "replays"
+CORE = REPLAYS.parent / "boards" / "core.json"
 
 
-def load(name):
-    path = Path(name) if name.endswith(".json") else REPLAYS / f"{name}.json"
-    return json.loads(path.read_text(encoding="utf-8"))
+def load(name, full):
+    if name.endswith(".json"):
+        return json.loads(Path(name).read_text(encoding="utf-8"))
+    core = REPLAYS / f"{name}.core.json"
+    path = core if core.exists() and not full else REPLAYS / f"{name}.json"
+    results = json.loads(path.read_text(encoding="utf-8"))
+    if full:
+        return results
+    keep = set(json.loads(CORE.read_text(encoding="utf-8"))["boards"])
+    return {k: v for k, v in results.items() if k in keep}
 
 
 def main():
@@ -20,8 +31,9 @@ def main():
     parser.add_argument("base")
     parser.add_argument("variant")
     parser.add_argument("--show", action="store_true", help="list every changed choice")
+    parser.add_argument("--full", action="store_true", help="every logged board, not just the core")
     args = parser.parse_args()
-    base, var = load(args.base), load(args.variant)
+    base, var = load(args.base, args.full), load(args.variant, args.full)
     keys = [k for k in base if k in var]
     logs = sorted({k.split()[0] for k in keys}, key=lambda log: next(i for i, k in enumerate(keys) if k.startswith(log + " ")))
     for log in logs:

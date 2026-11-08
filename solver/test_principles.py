@@ -5,9 +5,11 @@ throw it away to get there, as when Shadow Kama was fired at nothing to shed a p
 tile never scores lower than the same tile in hand, since sending it back is a free queue edit.
 
 Each logged board is checked as it stands. The boards come from solver/logged_boards.py, and include the board
-each real choice left, since that's the next turn's board in the log. The checks run in parallel.
+each real choice left, since that's the next turn's board in the log. The checks run in parallel, on the core boards
+unless SHOGUN_FULL is set.
 
 Run with: python solver/test_principles.py
+    or, on every logged board: SHOGUN_FULL=1 python solver/test_principles.py
 """
 import copy
 import os
@@ -66,7 +68,8 @@ class Principles(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         with ProcessPoolExecutor(max_workers=os.cpu_count()) as pool:
-            cls.broken = [b for found in pool.map(broken_on, logged_boards(), chunksize=8) for b in found]
+            boards = logged_boards(core=not os.environ.get("SHOGUN_FULL"))
+            cls.broken = [b for found in pool.map(broken_on, boards, chunksize=8) for b in found]
 
     def check(self, kind):
         broken = [text for k, text in self.broken if k == kind]

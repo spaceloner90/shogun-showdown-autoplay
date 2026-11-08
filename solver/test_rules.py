@@ -3298,5 +3298,27 @@ class ComboTest(unittest.TestCase):
         self.assertEqual(outcome_terms(outcome, False, 1, 2)["combos"], WEIGHTS["combo_skill"] * 2 * 2)
 
 
+class MonomancerTest(unittest.TestCase):
+    """MonomancerSkill in the game's code: its level added to the hero's hits on an attack with one tile queued."""
+
+    def test_a_single_tile_gets_the_bonus(self):
+        state = make_state(enemies=[enemy(3, hp=5)], queue=["Swirl"])
+        state.mono_bonus = 1
+        after, _ = step(state, Action("Attack"))
+        self.assertEqual(after.enemies[0].hp, 2)
+
+    def test_two_tiles_dont(self):
+        state = make_state(enemies=[enemy(3, hp=9)], queue=["Swirl", "Arrow"])
+        state.mono_bonus = 1
+        after, _ = step(state, Action("Attack"))
+        self.assertEqual(after.enemies[0].hp, 9 - 2 - 2)
+
+    def test_big_pockets_adds_a_slot_per_level(self):
+        row = {"cells": 5, "hero": {"kind": "Wanderer", "cell": 0, "facing": "Right", "hp": 10, "maxHp": 10,
+               "shield": False, "queue": [], "action": "Wait", "special": {"name": "SwapSpecialMove", "charge": 4,
+               "cooldown": 4}}, "enemies": [], "tiles": [], "skills": [{"name": "BigPockets", "level": 2}]}
+        self.assertEqual(state_from_log(row).potion_slots, 5)
+
+
 if __name__ == "__main__":
     unittest.main()

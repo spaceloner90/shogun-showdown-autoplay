@@ -180,6 +180,11 @@ Later bosses in that log, with the rules read from the game's code (simulated as
   neither occupant can be immovable.
 - **Mirror** moves its user across the room's middle (the left of the two on an even room), trading places
   with anyone there. Both turn around.
+- **Monomancer** (the skill, `MonomancerSkill`): its level added to the hero's hits on an attack fired with a single
+  tile in the queue, Free Play tiles included. Not on collisions. Simulated as of v2.25.
+- **Skill levels:** Back Stabber, Close Combat, Damaging Move, Dynamic Boost, Monomancer, Sniper and Unfriendly
+  Fire add their level; Big Pockets a potion slot per level. The rest don't change with level, except Combo
+  Recharge, which isn't simulated.
 - **The kill streak** (`CombatManager.KillStreak`): every enemy death in a turn, by anyone, not inanimate things;
   reset as each turn begins. From the second, each death is a combo kill, which Combo Curse, Chilling Combo, Combo
   Recharge, Combo Coin and Triple Combo Heal answer. **Triple Combo Heal** heals the hero 1 on each from the third,

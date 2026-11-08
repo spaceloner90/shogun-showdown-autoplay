@@ -9,6 +9,16 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.25 — Monomancer; Big Pockets by level (2026-11-08)
+- **Rule:** Monomancer adds its level to the hero's hits on an attack fired with one tile in the queue
+  (`MonomancerSkill.OnHeroAttacks`, `ProcessAttack`). Not on collisions. Reach doesn't count it; the stack and the
+  search do.
+- **Fix:** Big Pockets adds a potion slot per level (`PickUp` and `LevelUp` each add one); only one was counted.
+- **Checked:** every other level-scaled skill (Back Stabber, Close Combat, Damaging Move, Dynamic Boost, Sniper,
+  Unfriendly Fire) adds its level, as the solver reads it. Combo Recharge's level isn't simulated; the rest don't
+  change with level.
+- No choice changes on the core.
+
 ## v2.24 — combos: Triple Combo Heal simulated, combo skills valued (2026-11-08)
 - **Rule:** the turn's kill streak counts every enemy death, by anyone, poison and blasts included, inanimate things
   not (`CombatManager.OnEnemyDied`); from the second, each is a combo kill. Triple Combo Heal heals the hero 1 at

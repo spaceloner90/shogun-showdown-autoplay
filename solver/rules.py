@@ -34,7 +34,7 @@ SNIPER_DISTANCE = 4  # Sniper adds its level to the hero's hits on targets at le
 # and Chilling Combo, which freezes enemies on a combo kill. Reactive Shield is simulated. Shield Retention keeps the
 # hero's shield from one fight to the next (ShieldRetentionSkill.PickUp), and Fortress shields it as a fight begins,
 # both of which show in the logged state.
-UNDERSTOOD_SKILLS = {"BigPockets", "ChillingCombo", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "BackStabber", "CloseCombat", "DynamicBoost", "Fortress", "Healthy", "MamushiMove",
+UNDERSTOOD_SKILLS = {"BigPockets", "ChillingCombo", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "BackStabber", "CloseCombat", "DynamicBoost", "Fortress", "Healthy", "MamushiMove", "Monomancer",
                      "QuickRecovery", "ReactiveShield", "ShieldRetention", "Sniper", "TripleComboHeal", "TwoWayMove",
                      "UnfriendlyFire"}
 
@@ -176,6 +176,8 @@ class State:
     tile_start_cell: int | None = None  # Where the hero stood as its current tile began (Agent.CellBeforeExecution).
     tile_directional: bool = True  # Whether the hero's current tile is directional.
     kill_streak: int = 0  # Enemies killed so far this turn, by anyone (CombatManager.KillStreak).
+    mono_bonus: int = 0  # Monomancer: extra damage on the hero's hits when it attacks with a single tile.
+    mono_active: bool = False  # Whether this turn's attack is a single tile, so Monomancer applies.
     triple_heal: bool = False  # Triple Combo Heal: each kill from the third in a turn heals the hero 1.
     combo_skills: int = 0  # How many of Combo Curse and Chilling Combo the hero has: random effects on combo kills.
     dynamic_bonus: int = 0  # Extra damage on the hero's hits after a move attack this turn, from Dynamic Boost.
@@ -381,6 +383,8 @@ def state_from_log(row):
                              if isinstance(s, dict) and s.get("name") == "UnfriendlyFire"), 0),
         dynamic_bonus=next((s["level"] for s in row.get("skills") or []
                             if isinstance(s, dict) and s.get("name") == "DynamicBoost"), 0),
+        mono_bonus=next((s["level"] for s in row.get("skills") or []
+                         if isinstance(s, dict) and s.get("name") == "Monomancer"), 0),
         backstab_bonus=next((s["level"] for s in row.get("skills") or []
                              if isinstance(s, dict) and s.get("name") == "BackStabber"), 0),
         close_bonus=next((s["level"] for s in row.get("skills") or []
@@ -393,7 +397,8 @@ def state_from_log(row):
                          if isinstance(s, dict) and s.get("name") in ("ComboCurse", "ChillingCombo")),
         reactive_shield=any(isinstance(s, dict) and s.get("name") == "ReactiveShield" for s in row.get("skills") or []),
         special_poison=any(isinstance(s, dict) and s.get("name") == "MamushiMove" for s in row.get("skills") or []),
-        potion_slots=POTION_SLOTS + sum(1 for s in row.get("skills") or []
+        # A slot per level (BigPocketsSkill.PickUp and LevelUp each add one).
+        potion_slots=POTION_SLOTS + sum(s.get("level") or 1 for s in row.get("skills") or []
                                         if isinstance(s, dict) and s.get("name") == "BigPockets"),
         special=special.get("name", SWAP),
         hazards=[dict(h, groups=[list(g) for g in h["groups"]]) for h in row.get("hazards") or []],
@@ -1140,6 +1145,9 @@ def deal_damage(state, attacker, target, value, outcome, collision=False):
         value += state.close_bonus
     # Back Stabber: a directional tile, begun from the side the enemy faces away from (BackStabberSkill.ProcessAttack:
     # the start cell behind the target's facing). Not on collisions.
+    # Monomancer: an attack fired with one tile in the queue (MonomancerSkill.OnHeroAttacks), not on collisions.
+    if attacker is state.hero and not collision and state.mono_bonus and state.mono_active:
+        value += state.mono_bonus
     if attacker is state.hero and not collision and state.backstab_bonus and target is not state.hero:
         start = state.tile_start_cell if state.tile_start_cell is not None else attacker.cell
         if state.tile_directional and (start - target.cell) * target.facing < 0:
@@ -1215,6 +1223,7 @@ def fire_crossbow(tile, outcome):
 def fire_hero_queue(state, outcome, order=None):
     """Fires the chosen tiles in order. Any others go back to the hand, still charged."""
     fired = list(state.queue_tiles) if order is None else [state.tiles[i] for i in order]
+    state.mono_active = len(fired) == 1
     for tile in fired:
         exact_before = outcome.exact_hits
         before = enemy_cells(state)
@@ -1226,6 +1235,7 @@ def fire_hero_queue(state, outcome, order=None):
         # Perfect Strike: an exact kill recharges the tile straight away.
         if tile.attack.effect == "PerfectStrike" and outcome.exact_hits > exact_before:
             tile.charge = tile.cooldown
+    state.mono_active = False  # Until the end of the turn in the game, but the hero's hits are all in the volley.
     outcome.sent_back += sum(not any(t is f for f in fired) for t in state.queue_tiles)
     for tile in state.queue_tiles:
         tile.in_queue = False

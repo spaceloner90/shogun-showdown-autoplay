@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.25: Monomancer
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| +level on a single-tile attack | Rule | Read from `MonomancerSkill` | Hit sizes matching on single-tile volleys |
+
 ## New in v2.24: combos
 
 | Item | Kind | What's already confirmed | What to look for |

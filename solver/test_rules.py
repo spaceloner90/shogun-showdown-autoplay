@@ -2930,7 +2930,34 @@ def shadow(hero_cell=2, facing=1, enemies=(), swap_charge=4):
     state = make_state(hero_cell=hero_cell, facing=facing, enemies=enemies, swap_charge=swap_charge)
     state.cells = 7
     state.special = "PhaseSpecialMove"
+    state.hero.kind = "Shadow"
     return state
+
+
+class ShadowDashTest(unittest.TestCase):
+    """ShadowHero in the game's code: every move is a dash to the last free cell that way."""
+
+    def test_a_move_dashes_up_to_the_next_enemy(self):
+        after, _ = step(shadow(hero_cell=1, enemies=[enemy(5)]), Action("MoveRight"))
+        self.assertEqual(after.hero.cell, 4)
+
+    def test_a_move_dashes_to_the_wall(self):
+        after, _ = step(shadow(hero_cell=4, enemies=[enemy(5)]), Action("MoveLeft"))
+        self.assertEqual(after.hero.cell, 0)
+
+    def test_others_still_step_one_cell(self):
+        state = shadow(hero_cell=1, enemies=[enemy(5)])
+        state.hero.kind = "Wanderer"
+        self.assertEqual(step(state, Action("MoveRight"))[0].hero.cell, 2)
+
+    def test_the_stack_only_counts_cells_a_dash_reaches(self):
+        # A Katana needs the enemy adjacent: one dash right gets there, from four cells away.
+        state = shadow(hero_cell=0, enemies=[enemy(5)])
+        katana = Tile(KATANA, 3, 3, in_queue=True)
+        state.tiles, state.queue_tiles, state.hero.queue = [katana], [katana], [KATANA]
+        self.assertGreater(leaf_terms(state)["stack"], 0)
+        state.hero.kind = "Wanderer"
+        self.assertEqual(leaf_terms(state)["stack"], 0)
 
 
 class PhaseSpecialMoveTest(unittest.TestCase):

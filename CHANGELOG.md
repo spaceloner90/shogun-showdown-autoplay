@@ -9,6 +9,15 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.8 — the Shadow dashes when it moves (2026-11-08)
+- **Rule:** every move the Shadow makes is a dash to the last free cell that way, next to whoever stops it or at the
+  wall (`ShadowHero.PerformMoveAction`, `Dash`: `Cell.LastFreeCellInDirection`). Into an occupied cell it's still the
+  Phase. In the first two fights of `logs/run11`, v2.7 missed all 15 of its moves; now 75 of 75 turns match.
+- **Evaluator:** the stack walks to where moves actually go, so for the Shadow one move reaches the cell next to the
+  enemy, and stepping aside from a threat lands where the dash does.
+- Replay: 10 of 77 `run11` choices change, 1 fewer kill and 2 less damage, no HP lost: closing in is one move now,
+  so F1 dashes in for a bigger volley more often, once (fight 2, turn 22) over a kill now. None on older logs.
+
 ## v2.7 — the Shadow's Phase (2026-11-08)
 - **Rule:** Phase (`PhaseSpecialMove`) takes the hero through the agent next to it, and any in a row behind it, to the
   first free cell past them; nobody moves. It needs someone adjacent, movable or not, and a free cell before the wall,

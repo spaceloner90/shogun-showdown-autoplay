@@ -255,6 +255,9 @@ Freezing, read from the code (simulated as of v1.21):
   poison tick at the end of the turn he's hurt still sees the old lights: in `logs/run10`, fight 20 turn 42, a tick
   hurt him on the cell lit before. Over that fight's 51 turns, the lights moved exactly the 3 times his HP had
   dropped, never onto a cell just lit or his own, and the 2 ticks of poison he carried in the dark did nothing.
+- **The Shadow dashes** whenever it moves: to the last free cell that way, stopping next to the first agent or at
+  the wall (`ShadowHero.PerformMoveAction`, `Dash`). It can't take a single step unless the cell after is taken. It
+  passes over traps, which only enemies set off. Simulated as of v2.8.
 - **Phase** (the Shadow's special move, `PhaseSpecialMove`): moving into an adjacent agent takes the hero through it,
   and through any others in an unbroken row behind it, to the first free cell past them. Nobody else moves, and
   anyone can be passed, Heavy or not. It's refused when the row runs to the wall, and goes only the way the hero

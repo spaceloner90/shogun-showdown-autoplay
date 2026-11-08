@@ -423,6 +423,20 @@ def can_use_special(state, direction):
     )
 
 
+def move_destination(state, cell, direction):
+    """Where a move from `cell` ends, or None if the next cell is a wall or taken (then it's the special move).
+    One cell, except for the Shadow, who dashes to the last free cell that way, next to whoever or whatever stops
+    it (ShadowHero.PerformMoveAction and Dash: Cell.LastFreeCellInDirection)."""
+    nxt = cell + direction
+    if not 0 <= nxt < state.cells or state.occupant(nxt) is not None:
+        return None
+    if state.hero.kind != "Shadow":
+        return nxt
+    while 0 <= nxt + direction < state.cells and state.occupant(nxt + direction) is None:
+        nxt += direction
+    return nxt
+
+
 def phase_cell(state, direction):
     """Where a Phase lands: the first free cell past the agents in a row from the hero's side, or None at the wall."""
     cell = state.hero.cell + direction
@@ -1117,7 +1131,7 @@ def hero_action(state, action, outcome):
             spring_traps(state, outcome, before)
             swapped = True
         else:
-            hero.cell = target
+            hero.cell = move_destination(state, hero.cell, direction)
     return swapped
 
 

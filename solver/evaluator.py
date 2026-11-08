@@ -53,10 +53,10 @@ import itertools
 from dataclasses import dataclass, field
 
 from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, Attack, Outcome, State,
-                   apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, legal_actions, perform_special,
+                   apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.7"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.8"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -265,10 +265,12 @@ def _stack_value(state, kept_now):
         return done + kept_after[key] - kept_now
 
     best = 0.0
-    for direction in (0, -1, 1):
-        for steps in range(0 if direction == 0 else 1, 1 if direction == 0 else len(fractions)):
-            cell = state.hero.cell + direction * steps
-            if not 0 <= cell < state.cells or state.occupant(cell) is not None:
+    for direction in (-1, 1):
+        # Each move goes where the hero's moves go: a cell at a time, or for the Shadow, a dash to the last free one.
+        cell = state.hero.cell
+        for steps in range(1, len(fractions)):
+            cell = move_destination(state, cell, direction)
+            if cell is None:
                 break
             for flip in (False, True):
                 actions = steps + flip
@@ -354,7 +356,7 @@ def unanswerable_damage(state):
         cell = hero.cell + direction
         if 0 <= cell < state.cells:
             if state.occupant(cell) is None:
-                best = min(best, _threat_damage(state, cell))
+                best = min(best, _threat_damage(state, move_destination(state, hero.cell, direction)))
             elif can_use_special(state, direction):
                 best = min(best, _threat_after_special(state, direction))
     for tiles in _volleys(state):

@@ -2418,6 +2418,19 @@ class PotionTest(unittest.TestCase):
 class DynamicBoostTest(unittest.TestCase):
     """DynamicBoostSkill in the game's code: after an attack that moves or turns the hero, its later hits that turn get
     the skill's level added. The move attack's own hit doesn't: the game raises its event after that hit."""
+
+    def test_a_free_play_dash_first_boosts_what_follows(self):
+        # The Jujitsuka's kit in logs/run9: a Free Play Dash closes in and turns the boost on, so Sai's counter on an
+        # enemy about to attack does 2 x 2 + 1 = 5 and kills it. Without the boost it leaves 1 HP and takes the Katana.
+        def best(bonus):
+            state = jujitsuka(hero_cell=0, enemies=[enemy(3, hp=5, action="Attack", queue=[KATANA])])
+            sai = Tile(Attack("Sai", 2, [1], first_target=True), 5, 5, in_queue=True)
+            state.tiles = [Tile(Attack("Dash", 0, [1, 2, 3, 4, 5, 6]), 3, 3, free_play=True), sai]
+            state.queue_tiles, state.hero.queue = [sai], [sai.attack]
+            state.dynamic_bonus = bonus
+            return rank_actions(state, depth=1)[0].labels[0]
+        self.assertEqual(best(1), "Attack Dash (free) > Sai")
+        self.assertNotEqual(best(0)[:6], "Attack")
     SHARP_TURN = Attack("TurnAround", 1, [-1, 1])
 
     def volley(self, attacks, level=1):

@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.20: unknown enemies are assumed to fire
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| An unknown enemy attacks when what it holds would hit the hero | Search | 165 of 207 such turns in the logs | Fewer boss hits walked into |
+| A guessed turn counts at 0.5, a wave turn at 0.85 | Search | The player's call; `run14` turn 14 now attacks now | F4 no longer trading certain damage for plans that rely on a boss waiting |
+
 ## New in v2.19: Twin Tessen
 
 | Item | Kind | What's already confirmed | What to look for |

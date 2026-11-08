@@ -289,3 +289,11 @@ worth more and so makes loading them up front a little more likely.
 its cooldown, as it did every other time, including a third first-turn shot. Not found in the tile code
 (`Tile.Played`, `OnEndOfTurn`, `CombatManager.OnPreciseKill` all ruled out or unclear); possibly a game bug, as the
 player suspects. Not simulated: 2 mispredictions in 658 turns.
+
+## Mixed-direction kits: a backward tile among forward ones (for F2)
+
+`logs/run12`: Back Strike with Double Strike, in a kit of forward tiles, was loaded 37 times, sent back 19 and fired
+20. Two reasons, from the player: it only chains into a stack when enemies stand precisely on both sides, and F1
+credits flip-then-fire at the fraction of a step, as if the enemy waited while the hero turned. v2.14 made reach
+count facing, which barely moved it (52 loads to 51 in replay). A real fix needs enemies acting between the setup and
+the shot, so it waits for F2+; pricing flips higher in the stack was offered and declined as a made-up tweak.

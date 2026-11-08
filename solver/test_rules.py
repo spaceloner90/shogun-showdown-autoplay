@@ -3104,6 +3104,22 @@ class ReachByMovementTest(unittest.TestCase):
         state = self.katana_board(1, [enemy(2), enemy(4, hp=1)])
         self.assertEqual(_reach_value(state, state.enemies[1]), 0.0)
 
+    def test_a_tile_facing_away_pays_a_flip(self):
+        from evaluator import _reach_value
+        state = self.katana_board(3, [enemy(4)])
+        self.assertAlmostEqual(_reach_value(state, state.enemies[0]), WEIGHTS["reach"] * 2)
+        state.hero.facing = -1
+        self.assertAlmostEqual(_reach_value(state, state.enemies[0]), WEIGHTS["reach"] * 2 * 0.75)
+
+    def test_back_strike_needs_the_target_behind(self):
+        # logs/run12: with Kowa in front, Back Strike counted as if it could hit him.
+        from evaluator import _reach_value
+        state = self.katana_board(2, [enemy(3, hp=6)])
+        back = Tile(Attack("BackStrike", 3, [-1], first_target=True, effect="DoubleStrike"), 3, 3)
+        state.tiles = [back]
+        state.queue_tiles, state.hero.queue = [], []
+        self.assertAlmostEqual(_reach_value(state, state.enemies[0]), WEIGHTS["reach"] * 3 * 0.75)
+
     def test_a_phase_past_the_blocker_counts_as_its_use(self):
         from evaluator import _kept_moves, _reach_gain
         state = self.katana_board(1, [enemy(2), enemy(4, hp=1)], kind="Shadow")

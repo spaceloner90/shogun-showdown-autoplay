@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.13"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.14"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -411,19 +411,24 @@ def ideal_target(state):
 REACH_ACTIONS = math.ceil(1 / WEIGHTS["reach_falloff"]) - 1
 
 
-def _walk(state, start, budget):
-    """Cells the hero can get to from `start` with plain moves, and the fewest moves each takes, up to `budget`."""
+def _walk(state, start, facing, budget):
+    """Where and which way the hero can stand after plain moves and flips from `start`, facing `facing`, with the
+    fewest actions each takes, up to `budget`. A move keeps the hero's facing; a flip is an action of its own."""
     occupied = {e.cell for e in state.enemies if e.alive}
-    costs = {start: 0}
-    frontier = [start]
+    costs = {(start, facing): 0}
+    frontier = [(start, facing)]
     for cost in range(1, budget + 1):
         reached = []
-        for cell in frontier:
+        for cell, way in frontier:
+            options = [(cell, -way)]
             for direction in (-1, 1):
                 nxt = move_destination(state, cell, direction, occupied)
-                if nxt is not None and nxt not in costs:
-                    costs[nxt] = cost
-                    reached.append(nxt)
+                if nxt is not None:
+                    options.append((nxt, way))
+            for node in options:
+                if node not in costs:
+                    costs[node] = cost
+                    reached.append(node)
         frontier = reached
     return costs
 
@@ -444,10 +449,10 @@ def _reach_key(state, target, transport):
 
 
 def _reach_nodes(state, target, transport=None):
-    """Where the hero and the target can be after a few of the hero's actions, with the fewest it takes: plain
-    moves, as the hero really moves (blocked by whoever is in the way, and for the Shadow, a dash), and at most one
-    use of `transport` if given ("special" for the special move, or a tile), from any cell plain moves reach, after
-    a flip if need be. Enemies stay put, as in the stack. A tile in hand takes a turn to load first."""
+    """Where the hero can stand, which way it faces, and where the target is, after a few of the hero's actions,
+    with the fewest it takes: plain moves, as the hero really moves (blocked by whoever is in the way, and for the
+    Shadow, a dash), flips, and at most one use of `transport` if given ("special" for the special move, or a tile),
+    from anywhere those reach. Enemies stay put, as in the stack. A tile in hand takes a turn to load first."""
     key = _reach_key(state, target, transport)
     if key in _REACH_CACHE:
         return _REACH_CACHE[key]
@@ -458,29 +463,24 @@ def _reach_nodes(state, target, transport=None):
         aimed = board.enemies[index]
         if not aimed.alive:
             return
-        for cell, cost in _walk(board, board.hero.cell, REACH_ACTIONS - start_cost).items():
-            pair = (cell, aimed.cell)
-            best[pair] = min(best.get(pair, cost + start_cost), cost + start_cost)
+        for (cell, facing), cost in _walk(board, board.hero.cell, board.hero.facing, REACH_ACTIONS - start_cost).items():
+            node = (cell, facing, aimed.cell)
+            best[node] = min(best.get(node, cost + start_cost), cost + start_cost)
 
     record(state, 0)
     if transport is not None:
         load = 1 if transport == "special" or transport.in_queue or transport.free_play else 2
-        for cell, cost in _walk(state, state.hero.cell, REACH_ACTIONS - load).items():
-            for flip in (False, True):
-                if cost + flip + load > REACH_ACTIONS:
+        for (cell, facing), cost in _walk(state, state.hero.cell, state.hero.facing, REACH_ACTIONS - load).items():
+            for direction in ((-1, 1) if transport == "special" else (None,)):
+                board = _light_copy(state)
+                board.hero.cell, board.hero.facing = cell, facing
+                if direction is None:
+                    apply_attack(board, board.hero, transport.attack, Outcome())
+                elif can_use_special(board, direction):
+                    perform_special(board, direction, Outcome())
+                else:
                     continue
-                for direction in ((-1, 1) if transport == "special" else (None,)):
-                    board = _light_copy(state)
-                    board.hero.cell = cell
-                    if flip:
-                        board.hero.facing = -board.hero.facing
-                    if direction is None:
-                        apply_attack(board, board.hero, transport.attack, Outcome())
-                    elif can_use_special(board, direction):
-                        perform_special(board, direction, Outcome())
-                    else:
-                        continue
-                    record(board, cost + flip + load)
+                record(board, cost + load)
     if len(_REACH_CACHE) > 200_000:
         _REACH_CACHE.clear()
     _REACH_CACHE[key] = best
@@ -489,18 +489,20 @@ def _reach_nodes(state, target, transport=None):
 
 def _reach_total(state, target, nodes, exclude=None):
     """Each tile's best damage on the target from any of these positions, up to its HP, a quarter off for each
-    action it took to get there and discounted for each turn until the tile is ready."""
+    action it took to get there and discounted for each turn until the tile is ready. A tile only counts from where
+    it points at the target, its range read from the way the hero faces, so a tile that hits behind needs the
+    target behind, and turning around costs an action like a move."""
     hp = _effective_hp(state, target)
     total = 0.0
     for tile in state.tiles:
         if tile.attack.value <= 0 or tile is exclude:
             continue
-        reaches = set(map(abs, tile.attack.range))
+        offsets = set(tile.attack.range)
         best = 0.0
-        for (hero_cell, target_cell), cost in nodes.items():
-            reach = abs(target_cell - hero_cell)
-            if reach not in reaches:
+        for (hero_cell, facing, target_cell), cost in nodes.items():
+            if (target_cell - hero_cell) * facing not in offsets:
                 continue
+            reach = abs(target_cell - hero_cell)
             damage = tile.attack.value + (state.sniper_bonus if reach >= SNIPER_DISTANCE else 0)
             closeness = max(0.0, 1.0 - WEIGHTS["reach_falloff"] * cost)
             best = max(best, min(damage, hp) * closeness * WEIGHTS["pierce"].get(tile.attack.name, 1.0))

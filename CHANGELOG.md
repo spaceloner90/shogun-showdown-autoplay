@@ -9,6 +9,14 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.14 — reach counts facing (2026-11-08)
+- **Scoring:** a tile's reach only counts from where it points at the target, its range read from the way the hero
+  faces, and a flip costs an action like a move. Before, ranges counted either way, so in `logs/run12` Back Strike
+  counted as reaching Kowa standing in front. Still a credit, and more options only lower the actions needed, so
+  the three rules hold. Decisions take about 0.056 s.
+- Replay: 151 of 5,186 choices change, 2 more kills and 7 more damage, no HP lost. Back Strike loads on `run12`
+  barely move (52 to 51): what drives them is the stack crediting flip-then-fire, at the same fraction as a step.
+
 ## v2.13 — Back Strike (2026-11-08)
 - **Rule:** Back Strike hits the first agent on the cell behind the hero, a plain hit: 3 damage, cooldown 3
   (`BackStrikeAttack.ApplyEffect`). Tetsubo, the other choice on offer, was already simulated.

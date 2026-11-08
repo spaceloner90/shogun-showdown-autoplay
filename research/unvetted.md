@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.14: reach counts facing
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Reach only where a tile points at the target, a flip costing an action | Scoring | Tests; replay neutral to slightly better | Back-hitting tiles and forward ones no longer credited the wrong way round |
+
 ## New in v2.11: piercing tiles' potential
 
 | Item | Kind | What's already confirmed | What to look for |

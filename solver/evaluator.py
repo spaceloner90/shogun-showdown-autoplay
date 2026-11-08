@@ -52,11 +52,11 @@ import copy
 import itertools
 from dataclasses import dataclass, field
 
-from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, Attack, Outcome, State,
+from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, Attack, Outcome, State,
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.6"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.7"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -90,6 +90,7 @@ WEIGHTS = {
     # to tune later.
     "escape_values": {
         "SwapSpecialMove": 12.0,                    # Past an adjacent enemy, any time, without a tile.
+        "PhaseSpecialMove": 12.0,                   # Past the adjacent enemy and any behind it, like the Swap.
         "SmokeBomb": 12.0, "BackSmokeBomb": 12.0,   # Past the first target, at any range.
         "ShadowDash": 9.0, "BackShadowDash": 9.0,   # Behind a target, past everyone in between.
         "PushSpecialMove": 6.0,                     # Pushes an adjacent enemy away, without a tile. Not past it.
@@ -402,7 +403,7 @@ def _swap_charged(state):
     """A charged Swap is a way out, whoever is around. It needs nobody adjacent yet, since closing in is what
     brings enemies next to the hero, and requiring it had F1 walk up to them just so the way out would count.
     Nor does it need anyone swappable now: that made killing the last one look bad, though more will come."""
-    return state.special == SWAP and state.swap_charge >= state.swap_cooldown
+    return state.special in (SWAP, PHASE) and state.swap_charge >= state.swap_cooldown
 
 
 def _ready_smoke_bombs(state):

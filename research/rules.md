@@ -255,6 +255,11 @@ Freezing, read from the code (simulated as of v1.21):
   poison tick at the end of the turn he's hurt still sees the old lights: in `logs/run10`, fight 20 turn 42, a tick
   hurt him on the cell lit before. Over that fight's 51 turns, the lights moved exactly the 3 times his HP had
   dropped, never onto a cell just lit or his own, and the 2 ticks of poison he carried in the dark did nothing.
+- **Phase** (the Shadow's special move, `PhaseSpecialMove`): moving into an adjacent agent takes the hero through it,
+  and through any others in an unbroken row behind it, to the first free cell past them. Nobody else moves, and
+  anyone can be passed, Heavy or not. It's refused when the row runs to the wall, and goes only the way the hero
+  faces unless Two Way Move. Damaging Move's hit lands on the agent next to where the hero started. Simulated as of
+  v2.7.
 - **Reactive Shield** (the hero's skill, `ReactiveShieldSkill.UponHeroTookDamage`): whenever the hero takes damage
   and lives without a shield, it gets one, from any damage: a hit, a collision or a poison tick. So of two hits in
   one turn, the second is blocked. Simulated as of v2.6.

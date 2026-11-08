@@ -44,13 +44,14 @@ MAX_SHOVE_CREDIT = 3  # A shove counts for at most this many cells: further than
 SHOCKWAVE_DAMAGE = 1  # Stored in the game's assets, not its code. Seen in logs/run7.
 WARDEN_EXPLOSION = 2  # What a dying Warden deals to its cell and both beside it. In the game's code.
 
-# Each hero has one special move, triggered by moving into an occupied cell. Swap is the Wanderer's, and
-# Shove is the Ronin's. The other heroes' moves aren't simulated, so they aren't offered as actions.
+# Each hero has one special move, triggered by moving into an occupied cell. Swap is the Wanderer's, Shove the
+# Ronin's, Throw the Jujitsuka's and Phase the Shadow's. Any other isn't simulated, so it isn't offered as an action.
 SWAP = "SwapSpecialMove"
 SHOVE = "PushSpecialMove"
 THROW = "ThrowSpecialMove"  # The Jujitsuka's: throws the enemy behind the hero over to the front.
-SPECIAL_MOVES = {SWAP, SHOVE, THROW}
-SPECIAL_LABELS = {SWAP: "swap", SHOVE: "shove", THROW: "throw"}
+PHASE = "PhaseSpecialMove"  # The Shadow's: passes through the line of agents ahead to the first free cell.
+SPECIAL_MOVES = {SWAP, SHOVE, THROW, PHASE}
+SPECIAL_LABELS = {SWAP: "swap", SHOVE: "shove", THROW: "throw", PHASE: "phase"}
 
 # Enemy traits that need no warning. Heavy, Explosive (the Warden's) and Dash (the Strider's) are modeled, and the
 # others haven't changed any prediction.
@@ -399,6 +400,15 @@ def can_use_special(state, direction):
     occupant = state.occupant(target)
     if state.special == SHOVE and not 0 <= target + direction < state.cells:
         return False
+    if state.special == PHASE:
+        # Through anyone, movable or not, but only with a free cell past the line before the wall
+        # (PhaseSpecialMove.Allowed, PotentialPhaseCell).
+        return (
+            (direction == state.hero.facing or state.two_way_swap)
+            and state.swap_charge >= state.swap_cooldown
+            and occupant is not None
+            and phase_cell(state, direction) is not None
+        )
     if state.special == THROW:
         landing = state.hero.cell - direction
         if not 0 <= landing < state.cells or state.occupant(landing) is not None:
@@ -411,6 +421,16 @@ def can_use_special(state, direction):
         and occupant is not None
         and occupant.movable
     )
+
+
+def phase_cell(state, direction):
+    """Where a Phase lands: the first free cell past the agents in a row from the hero's side, or None at the wall."""
+    cell = state.hero.cell + direction
+    while 0 <= cell < state.cells:
+        if state.occupant(cell) is None:
+            return cell
+        cell += direction
+    return None
 
 
 def perform_special(state, direction, outcome):
@@ -426,6 +446,13 @@ def perform_special(state, direction, outcome):
             land_hit(state, hero, occupant, state.swap_damage, outcome)
         if occupant.alive:
             push(state, hero, occupant, direction, outcome, credit_distance=False)
+        return
+    if state.special == PHASE:
+        # The hero passes through and nobody moves. Damaging Move hits the agent it first passed
+        # (PhaseSpecialMove.Perform: SpecialMove.ApplyEffectOnTargetAfterPositionCrossing on the hero's old neighbour).
+        hero.cell = phase_cell(state, direction)
+        if state.swap_damage:
+            land_hit(state, hero, occupant, state.swap_damage, outcome)
         return
     if state.special == THROW:
         # Over the hero to the cell on its other side, then pushed on that way as far as it goes, hitting whoever stops

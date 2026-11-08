@@ -1892,10 +1892,10 @@ class ShoveSpecialMoveTest(unittest.TestCase):
 
     def test_an_unknown_special_move_isnt_offered_and_warns(self):
         state = make_state(enemies=[enemy(3)])
-        state.special = "PhaseSpecialMove"
+        state.special = "MadeUpSpecialMove"
         self.assertNotIn(Action("MoveRight"), legal_actions(state))
-        row = {"tiles": [], "hero": {"queue": [], "special": {"name": "PhaseSpecialMove"}}, "enemies": [], "skills": []}
-        self.assertEqual(unmodeled_content(row), ["special move PhaseSpecialMove"])
+        row = {"tiles": [], "hero": {"queue": [], "special": {"name": "MadeUpSpecialMove"}}, "enemies": [], "skills": []}
+        self.assertEqual(unmodeled_content(row), ["special move MadeUpSpecialMove"])
 
     def test_the_shove_is_read_from_the_log(self):
         hero = {"kind": "Ronin", "cell": 2, "facing": "Right", "hp": 10, "maxHp": 10, "shield": False, "queue": [],
@@ -2924,6 +2924,53 @@ class ReactiveShieldTest(unittest.TestCase):
         after, _ = step(before, Action("Wait"))
         self.assertEqual(_shield_value(after) - _shield_value(before), WEIGHTS["shield"] / 2)
         self.assertGreater(-WEIGHTS["hp_lost"], WEIGHTS["shield"] / 2)
+
+
+def shadow(hero_cell=2, facing=1, enemies=(), swap_charge=4):
+    state = make_state(hero_cell=hero_cell, facing=facing, enemies=enemies, swap_charge=swap_charge)
+    state.cells = 7
+    state.special = "PhaseSpecialMove"
+    return state
+
+
+class PhaseSpecialMoveTest(unittest.TestCase):
+    """PhaseSpecialMove in the game's code: through the agents ahead to the first free cell past them."""
+
+    def test_it_passes_a_line_of_enemies_and_nobody_moves(self):
+        state = shadow(enemies=[enemy(3), enemy(4)])
+        after, _ = step(state, Action("MoveRight"))
+        self.assertEqual((after.hero.cell, [e.cell for e in after.enemies], after.swap_charge), (5, [3, 4], 0))
+
+    def test_it_dodges_what_the_enemy_passed_aims_at_its_old_cell(self):
+        state = shadow(enemies=[enemy(3, action="Attack", queue=[KATANA])])
+        after, outcome = step(state, Action("MoveRight"))
+        self.assertEqual((after.hero.cell, outcome.hp_lost), (4, 0))
+
+    def test_it_goes_through_an_enemy_that_cant_be_moved(self):
+        wall = enemy(3)
+        wall.movable = False
+        self.assertTrue(can_use_special(shadow(enemies=[wall]), 1))
+
+    def test_not_with_no_free_cell_before_the_wall(self):
+        self.assertFalse(can_use_special(shadow(hero_cell=4, enemies=[enemy(5), enemy(6)]), 1))
+
+    def test_only_forward_without_two_way_move(self):
+        state = shadow(enemies=[enemy(1)])
+        self.assertFalse(can_use_special(state, -1))
+        state.two_way_swap = True
+        self.assertTrue(can_use_special(state, -1))
+
+    def test_damaging_move_hits_the_first_one_passed(self):
+        state = shadow(enemies=[enemy(3), enemy(4)])
+        state.swap_damage = 1
+        after, _ = step(state, Action("MoveRight"))
+        self.assertEqual([e.hp for e in after.enemies], [2, 3])
+
+    def test_a_charged_phase_counts_as_escape(self):
+        state = shadow(enemies=[enemy(3)])
+        kept = leaf_terms(state)
+        state.swap_charge = 0
+        self.assertGreater(kept["escape"], leaf_terms(state).get("escape", 0))
 
 
 if __name__ == "__main__":

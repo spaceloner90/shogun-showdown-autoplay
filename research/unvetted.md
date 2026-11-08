@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.7: the Shadow's Phase
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Phase through a row of agents to the first free cell | Rule | Read from `PhaseSpecialMove` | No refused phases, landing cells matching, and none offered into a row that runs to the wall |
+| Phase scored like the Swap (escape 12, a way out) | Scoring | A first guess: it passes more than the Swap, but leaves the enemies where they were | Whether F1 keeps it for dodging, and phases through lines when cornered |
+
 ## New in v2.6: Reactive Shield
 
 | Item | Kind | What's already confirmed | What to look for |

@@ -9,6 +9,14 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.7 — the Shadow's Phase (2026-11-08)
+- **Rule:** Phase (`PhaseSpecialMove`) takes the hero through the agent next to it, and any in a row behind it, to the
+  first free cell past them; nobody moves. It needs someone adjacent, movable or not, and a free cell before the wall,
+  and goes only the way the hero faces, unless Two Way Move (`PhaseSpecialMove.Allowed`, `PotentialPhaseCell`).
+  Damaging Move hits the first one passed.
+- **Scoring:** the same as the Swap: escape value 12, and a charged Phase counts as a way out.
+- No logged board has the Shadow yet, so no choice changes in replays.
+
 ## v2.6 — Reactive Shield, and when Nobunaga's lights move (2026-11-08)
 - **Rule:** with Reactive Shield, the hero gets a shield whenever it takes damage and lives without one
   (`ReactiveShieldSkill.UponHeroTookDamage`). Shield Retention and Fortress need nothing simulated, since their

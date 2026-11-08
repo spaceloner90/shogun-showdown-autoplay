@@ -9,6 +9,15 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.18 — the hero's Mirror (2026-11-08)
+- **Rule, checked:** the hero's Mirror is the Shogun's (`MirrorAttack`), already simulated: across the room's
+  middle, the left one of two on an even room, trading places with whoever is there, both turning round; refused
+  for an immovable occupant. It's always a Free Play tile (`MirrorAttack.Initialize`), cooldown 6, no damage.
+- **Scoring:** Mirror gets an escape value, 9 like the Shadow Dash, which also lets its reach gain count.
+- **Fix:** a Free Play movement tile in hand counted only two thirds of its escape value, as if it had to be loaded
+  first; it joins any attack from hand, so it now counts in full.
+- Replay: 1 of 833 core choices changes (`run9`), nothing lost.
+
 ## v2.17 — F2 to F4 search ahead with the enemy AI (2026-11-08)
 - **New:** the F2, F3 and F4 keys search that many turns ahead (`solver/search.py`), playing the turns out with
   the ported enemy AI. A turn with every enemy action known counts in full, as the player asked; one with an unknown

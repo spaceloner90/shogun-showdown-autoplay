@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.17"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.18"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -95,6 +95,9 @@ WEIGHTS = {
         # The Phase: past the adjacent enemy and any behind it, like the Swap (tied to it below).
         "SmokeBomb": 12.0,                          # Past the first target, at any range. BackSmokeBomb is tied.
         "ShadowDash": 9.0,                          # Behind a target, past everyone in between. BackShadowDash too.
+        "Mirror": 9.0,                              # Across the room's middle, past everyone between, trading places
+                                                    # with whoever's there, but to a fixed cell and turned round. A
+                                                    # first guess, the Shadow Dash's.
         "PushSpecialMove": 6.0,                     # Pushes an adjacent enemy away, without a tile. Not past it.
         # The Throw: the enemy behind over to the front and away, a shove from behind (tied to the shove below).
         "Dash": 6.0,                                # Away to the last free cell, but only into open space.
@@ -634,7 +637,8 @@ def _kept_moves(state):
             continue
         uses = [(escape_values.get(name, 0.0), "escape"), (exploit * setup_values.get(name, 0.0), "setup")]
         value, term = max(uses)
-        if not tile.in_queue:
+        # A Free Play tile joins any attack from hand, so in hand it's as good as loaded.
+        if not tile.in_queue and not tile.free_play:
             value *= WEIGHTS["escape_in_hand"]
         if name in _MOVES_TARGET and not any(a.movable for a in targets_of(state, state.hero, tile.attack)[:1]):
             value *= WEIGHTS["escape_no_target"]

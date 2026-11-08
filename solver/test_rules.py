@@ -3160,5 +3160,30 @@ class MamushiMoveTest(unittest.TestCase):
         self.assertEqual((after.enemies, outcome.kills), ([], 1))
 
 
+class HeroMirrorTest(unittest.TestCase):
+    """MirrorAttack used by the hero: a Free Play tile, cooldown 6, that moves its user across the room's middle."""
+    MIRROR = Attack("Mirror", 0, [])
+
+    def test_the_hero_trades_places_across_the_middle_and_both_turn(self):
+        state = make_state(hero_cell=1, enemies=[enemy(2), enemy(3)])
+        after, outcome = fire(state, self.MIRROR)
+        cells = sorted((e.cell, e.facing) for e in after.enemies)
+        self.assertEqual((after.hero.cell, after.hero.facing, cells), (3, -1, [(1, 1), (2, -1)]))
+        self.assertEqual(outcome.wasted_attacks, 0)
+
+    def test_not_across_an_immovable_enemy(self):
+        wall = enemy(3)
+        wall.movable = False
+        _, outcome = fire(make_state(hero_cell=1, enemies=[wall]), self.MIRROR)
+        self.assertEqual(outcome.wasted_attacks, 1)
+
+    def test_a_free_play_mirror_in_hand_is_worth_as_much_as_loaded(self):
+        from evaluator import _kept_moves
+        state = make_state(hero_cell=1, enemies=[enemy(3)], swap_charge=0)
+        state.tiles = [Tile(self.MIRROR, 6, 6, free_play=True)]
+        state.queue_tiles, state.hero.queue = [], []
+        self.assertEqual(_kept_moves(state)["escape"], WEIGHTS["escape_values"]["Mirror"])
+
+
 if __name__ == "__main__":
     unittest.main()

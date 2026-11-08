@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.18: the hero's Mirror
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| The hero's Mirror, the Shogun's attack | Rule | The Shogun's Mirror predicted in past logs; the same code | No refused or mispredicted Mirrors |
+| Mirror's escape value 9, and Free Play move tiles counted in full in hand | Scoring | A first guess | F1 keeping Mirror for escapes and using it to cross to enemies |
+
 ## New in v2.17: F2 to F4 search ahead
 
 | Item | Kind | What's already confirmed | What to look for |

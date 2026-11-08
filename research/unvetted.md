@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.23: Back Stabber
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| +level on directional hits from behind the target's facing | Rule | Read from `BackStabberSkill` | Hit sizes matching, especially after Mirror or a Throw turns enemies round |
+
 ## New in v2.22: Close Combat
 
 | Item | Kind | What's already confirmed | What to look for |

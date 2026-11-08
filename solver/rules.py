@@ -34,7 +34,7 @@ SNIPER_DISTANCE = 4  # Sniper adds its level to the hero's hits on targets at le
 # and Chilling Combo, which freezes enemies on a combo kill. Reactive Shield is simulated. Shield Retention keeps the
 # hero's shield from one fight to the next (ShieldRetentionSkill.PickUp), and Fortress shields it as a fight begins,
 # both of which show in the logged state.
-UNDERSTOOD_SKILLS = {"BigPockets", "ChillingCombo", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "CloseCombat", "DynamicBoost", "Fortress", "Healthy", "MamushiMove",
+UNDERSTOOD_SKILLS = {"BigPockets", "ChillingCombo", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "BackStabber", "CloseCombat", "DynamicBoost", "Fortress", "Healthy", "MamushiMove",
                      "QuickRecovery", "ReactiveShield", "ShieldRetention", "Sniper", "TripleComboHeal", "TwoWayMove",
                      "UnfriendlyFire"}
 
@@ -105,6 +105,7 @@ class Attack:
     first_target: bool = False  # Stops at the first agent in range, rather than hitting them all.
     effect: str = "None"  # Curse, Poison, Perfect Strike and Shockwave are modeled.
     target_cell: int | None = None  # For a Volley: the cell it's locked onto, shown as a warning in the game.
+    directional: bool = True  # The game's IsDirectional: only Lightning, Scar Strike and Smoke Bomb aren't.
 
 
 @dataclass
@@ -170,7 +171,10 @@ class State:
     sniper_bonus: int = 0  # Extra damage on the hero's hits from 4 or more cells away, from Sniper.
     # Extra damage on the hero's hits on an adjacent enemy, from Close Combat, unless that tile moved the hero.
     close_bonus: int = 0
+    # Extra damage on the hero's directional hits on an enemy facing away from where the tile began, from Back Stabber.
+    backstab_bonus: int = 0
     tile_start_cell: int | None = None  # Where the hero stood as its current tile began (Agent.CellBeforeExecution).
+    tile_directional: bool = True  # Whether the hero's current tile is directional.
     dynamic_bonus: int = 0  # Extra damage on the hero's hits after a move attack this turn, from Dynamic Boost.
     boosted: bool = False  # Whether a move attack has turned Dynamic Boost on this turn.
     reactive_shield: bool = False  # Reactive Shield: taking damage shields the hero.
@@ -290,7 +294,7 @@ def state_from_log(row):
     """Builds a State from a 'state' line of state.jsonl."""
     def attack(data):
         return Attack(data["name"], data["value"] or 0, list(data["range"]), bool(data["closestTargetOnly"]),
-                      data.get("effect") or "None")
+                      data.get("effect") or "None", directional=data.get("directional", True) is not False)
 
     def agent(data):
         return Agent(
@@ -372,6 +376,8 @@ def state_from_log(row):
                              if isinstance(s, dict) and s.get("name") == "UnfriendlyFire"), 0),
         dynamic_bonus=next((s["level"] for s in row.get("skills") or []
                             if isinstance(s, dict) and s.get("name") == "DynamicBoost"), 0),
+        backstab_bonus=next((s["level"] for s in row.get("skills") or []
+                             if isinstance(s, dict) and s.get("name") == "BackStabber"), 0),
         close_bonus=next((s["level"] for s in row.get("skills") or []
                           if isinstance(s, dict) and s.get("name") == "CloseCombat"), 0),
         sniper_bonus=next((s["level"] for s in row.get("skills") or []
@@ -902,6 +908,7 @@ def _apply_attack(state, attacker, attack, outcome):
     start_cell, start_facing = attacker.cell, attacker.facing
     if attacker is state.hero:
         state.tile_start_cell = start_cell
+        state.tile_directional = attack.directional
     hits = attack_hits(state, attacker, attack)
     # An attack that moved or turned the hero still did something, even if it hit nothing, and so does a reload.
     reload = attack.name == "Crossbow" and attack.value == 0
@@ -1109,6 +1116,12 @@ def deal_damage(state, attacker, target, value, outcome, collision=False):
             and abs(attacker.cell - target.cell) == 1
             and attacker.cell == (state.tile_start_cell if state.tile_start_cell is not None else attacker.cell)):
         value += state.close_bonus
+    # Back Stabber: a directional tile, begun from the side the enemy faces away from (BackStabberSkill.ProcessAttack:
+    # the start cell behind the target's facing). Not on collisions.
+    if attacker is state.hero and not collision and state.backstab_bonus and target is not state.hero:
+        start = state.tile_start_cell if state.tile_start_cell is not None else attacker.cell
+        if state.tile_directional and (start - target.cell) * target.facing < 0:
+            value += state.backstab_bonus
     if attacker is state.hero and not collision and state.boosted:
         value += state.dynamic_bonus
     if target.curse and value > 0:

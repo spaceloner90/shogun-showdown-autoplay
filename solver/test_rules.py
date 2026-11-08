@@ -3240,5 +3240,29 @@ class CloseCombatTest(unittest.TestCase):
                                                                   "skills": row["skills"]}))
 
 
+class BackStabberTest(unittest.TestCase):
+    """BackStabberSkill in the game's code: its level added to a directional hit from behind the target."""
+
+    def board(self, enemy_facing):
+        state = make_state(enemies=[enemy(3, facing=enemy_facing, hp=5)], queue=["Swirl"])
+        state.backstab_bonus = 1
+        return state
+
+    def test_from_behind_it_gets_the_bonus(self):
+        # The enemy at 3 faces right, away from the hero at 2.
+        after, _ = step(self.board(1), Action("Attack"))
+        self.assertEqual(after.enemies[0].hp, 2)
+
+    def test_not_from_the_front(self):
+        after, _ = step(self.board(-1), Action("Attack"))
+        self.assertEqual(after.enemies[0].hp, 3)
+
+    def test_not_with_a_tile_that_isnt_directional(self):
+        state = self.board(1)
+        bolt = Attack("Lightning", 2, [1], first_target=True, directional=False)
+        after, _ = fire(state, bolt)
+        self.assertEqual(after.enemies[0].hp, 3)
+
+
 if __name__ == "__main__":
     unittest.main()

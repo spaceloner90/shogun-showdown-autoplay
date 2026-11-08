@@ -9,6 +9,13 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.23 — Back Stabber (2026-11-08)
+- **Rule:** Back Stabber adds its level to the hero's directional hits (all but Lightning, Scar Strike and Smoke
+  Bomb) on an enemy facing away from where the tile began, so not a dash's arrival behind it
+  (`BackStabberSkill.ProcessAttack`). Not on collisions. The logs' `directional` flag is now read. Reach doesn't
+  count it, since it depends on the enemy's facing; the stack and the search do.
+- No logged run has it: no choice changes on the core.
+
 ## v2.22 — Close Combat (2026-11-08)
 - **Rule:** Close Combat adds its level to the hero's hits on an adjacent enemy, unless the tile making the hit
   moved the hero: a Charge's or Smoke Bomb's own hit gets nothing, but the tile after it does, since the game

@@ -180,6 +180,9 @@ Later bosses in that log, with the rules read from the game's code (simulated as
   neither occupant can be immovable.
 - **Mirror** moves its user across the room's middle (the left of the two on an even room), trading places
   with anyone there. Both turn around.
+- **Back Stabber** (the skill, `BackStabberSkill`): its level added to each of the hero's directional hits on an
+  enemy facing away from the cell the tile began on. Lightning, Scar Strike and Smoke Bomb aren't directional. Not
+  on collisions. Simulated as of v2.23.
 - **Close Combat** (the skill, `CloseCombatSkill`): its level added to each of the hero's hits on an enemy right
   beside it, if that tile didn't move the hero (`Agent.ExecuteTile` records the cell as each tile begins). Not on
   collisions. Simulated as of v2.22.

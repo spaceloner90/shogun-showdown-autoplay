@@ -1,5 +1,5 @@
 {
- "built_with": "v2.15",
+ "built_with": "v2.21",
  "params": {
   "coverage": 4,
   "close": 3.0,
@@ -10,6 +10,7 @@
   "run11",
   "run12",
   "run13",
+  "run14",
   "run5_full",
   "run6",
   "run7",
@@ -1027,6 +1028,106 @@
   ],
   "run13 9:58": [
    "close call (0.4)"
+  ],
+  "run14 1:16": [
+   "covers elite: Heavy",
+   "close call (1.3)"
+  ],
+  "run14 1:24": [
+   "covers elite: Heavy",
+   "close call (0.6)"
+  ],
+  "run14 1:25": [
+   "covers elite: Heavy",
+   "close call (1.3)"
+  ],
+  "run14 1:30": [
+   "covers elite: Heavy",
+   "close call (1.2)"
+  ],
+  "run14 2:18": [
+   "covers enemy status: shield"
+  ],
+  "run14 2:19": [
+   "covers enemy status: shield"
+  ],
+  "run14 2:20": [
+   "covers enemy status: shield"
+  ],
+  "run14 2:50": [
+   "covers enemy: Charger",
+   "close call (0.2)"
+  ],
+  "run14 3:10": [
+   "covers enemy: ReiBoss",
+   "close call (0.6)"
+  ],
+  "run14 3:11": [
+   "covers enemy: ReiBoss",
+   "close call (0.3)"
+  ],
+  "run14 3:23": [
+   "covers enemy: ReiBoss",
+   "close call (0.2)"
+  ],
+  "run14 3:28": [
+   "covers enemy: ReiBoss",
+   "close call (0.6)"
+  ],
+  "run14 4:15": [
+   "covers elite: DoubleStrike"
+  ],
+  "run14 4:6": [
+   "covers elite: DoubleStrike"
+  ],
+  "run14 4:7": [
+   "covers elite: DoubleStrike",
+   "close call (0.6)"
+  ],
+  "run14 4:9": [
+   "covers elite: DoubleStrike"
+  ],
+  "run14 5:1": [
+   "close call (0.3)"
+  ],
+  "run14 5:10": [
+   "covers enemy: Charger"
+  ],
+  "run14 5:27": [
+   "covers enemy: Charger"
+  ],
+  "run14 5:29": [
+   "covers enemy: Charger"
+  ],
+  "run14 6:12": [
+   "covers enemy: Barricade"
+  ],
+  "run14 6:13": [
+   "covers enemy: Barricade",
+   "close call (1.0)"
+  ],
+  "run14 6:14": [
+   "covers enemy: Barricade",
+   "close call (2.1)"
+  ],
+  "run14 6:16": [
+   "covers enemy: Barricade",
+   "close call (0.7)"
+  ],
+  "run14 7:2": [
+   "covers enemy: Archer",
+   "close call (0.7)"
+  ],
+  "run14 7:22": [
+   "covers queue: full"
+  ],
+  "run14 7:40": [
+   "covers enemy: Archer",
+   "close call (1.5)"
+  ],
+  "run14 7:8": [
+   "covers enemy: Archer",
+   "close call (0.3)"
   ],
   "run5_full 10:13": [
    "close call (0.2)"

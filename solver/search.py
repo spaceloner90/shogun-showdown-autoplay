@@ -18,22 +18,32 @@ from evaluator import (WEIGHTS, Line, _cheapest_hit, _kept_terms, fight_won, lea
                        unanswerable_damage)
 from rules import UNKNOWN_COPY, UNKNOWN_TILE, legal_actions, step
 
+# What a turn counts for when something in it isn't known. A wave about to arrive keeps F1's future discount: new
+# enemies do nothing the turn they come in and don't change what's already there. An enemy whose action is only
+# guessed counts much less, so damage certain now beats damage later that relies on it, as the player asked.
+UNKNOWN_ACTION = 0.5
 BEAM = 4
 LEAF_BEAM = 2  # On the last turn, only this many of the BEAM get the full position score.
 
 
+def _actions_known(state):
+    return all(e.known and not any(a.name in (UNKNOWN_TILE, UNKNOWN_COPY) for a in e.queue)
+               for e in state.enemies if e.alive)
+
+
+def _wave_coming(state):
+    return state.turns_until_wave is not None and not state.last_wave and state.turns_until_wave <= 1
+
+
 def certain(state):
     """Whether the coming turn is fully known: every enemy's telegraph and tiles, and no wave about to arrive."""
-    if state.turns_until_wave is not None and not state.last_wave and state.turns_until_wave <= 1:
-        return False
-    for enemy in state.enemies:
-        if enemy.alive and (not enemy.known or any(a.name in (UNKNOWN_TILE, UNKNOWN_COPY) for a in enemy.queue)):
-            return False
-    return True
+    return _actions_known(state) and not _wave_coming(state)
 
 
 def _factor(state):
-    return 1.0 if certain(state) else WEIGHTS["future_discount"]
+    if not _actions_known(state):
+        return UNKNOWN_ACTION
+    return WEIGHTS["future_discount"] if _wave_coming(state) else 1.0
 
 
 def state_key(state):

@@ -246,6 +246,16 @@ def tile_for(enemy):
     return FIRST_TILE.get(enemy.kind) if tiles == 0 else None
 
 
+def guess(state, enemy):
+    """For an enemy whose choice can't be known: it attacks if what it holds would hit the hero, else waits. In the
+    logs, enemies with AI not ported (bosses mostly) attacked on 165 of 207 turns they could hit the hero, most
+    bosses every time, and on 8% of the rest. It's a guess, so it stays marked unknown."""
+    from rules import UNKNOWN_COPY, UNKNOWN_TILE
+    if enemy.ice > 0 or any(a.name in (UNKNOWN_TILE, UNKNOWN_COPY) for a in enemy.queue):
+        return Choice("Wait")
+    return Choice("Attack") if _valued(enemy) and _threatening(state, enemy) else Choice("Wait")
+
+
 def decide(state, enemy, previous):
     """What `enemy` telegraphs for next turn, decided at the end of this one, in which it did `previous`. None when
     that can't be known."""

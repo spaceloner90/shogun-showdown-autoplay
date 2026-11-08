@@ -9,6 +9,17 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.20 — unknown enemies are assumed to fire (2026-11-08)
+- **Search:** an enemy whose AI isn't known (bosses mostly) is now assumed to attack with what it holds whenever
+  that would hit the hero, and to wait otherwise. In the logs such enemies attacked on 165 of 207 turns they could
+  hit the hero, most bosses every time, Rei on 19 of 28, and on 8% of turns they couldn't. Before, the search had
+  them wait, and planned on that.
+- **Search:** a turn with a guessed enemy action counts at 0.5, from F1's future discount of 0.85, which still
+  applies to a wave about to arrive, as the player asked: new enemies do nothing the turn they come. In `run14`,
+  the Shadow's turn 14 against Rei, F4 dashed away to attack a turn later, counting on Rei waiting; it now attacks
+  now, by 9.2. The 2 HP lost there was unavoidable either way: Rei's loaded Charge reached the whole row.
+- F1 is unchanged on the core boards.
+
 ## v2.19 — Twin Tessen, and F4 always answers (2026-11-08)
 - **Rule:** Twin Tessen hits the agent on each side of the hero for its damage, 1 to start, cooldown 6, then
   pushes each movable one it hit away from the hero as far as it goes, dead or not, a collision hitting both

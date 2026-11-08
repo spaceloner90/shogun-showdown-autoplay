@@ -1307,9 +1307,11 @@ def end_turn(state, swapped):
     for enemy in state.enemies:
         previous = enemy.action
         choice = enemy_ai.decide(state, enemy, previous) if state.hero.alive else None
-        enemy.action = choice.action if choice else "Wait"
-        enemy.tile_to_play = choice.tile if choice else None
         enemy.known = choice is not None
+        if choice is None:
+            choice = enemy_ai.guess(state, enemy)
+        enemy.action = choice.action
+        enemy.tile_to_play = choice.tile
     for enemy in state.enemies:
         # A loaded Volley will lock onto wherever the hero ends this turn, leaving a turn to step off.
         aim_volleys(enemy, state.hero)

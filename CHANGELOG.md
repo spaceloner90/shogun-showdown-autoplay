@@ -8,6 +8,13 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.3 — a simpler wound value (2026-11-08)
+- **Scoring:** with Scar Strike anywhere in the deck, each wounded enemy is worth half of its damage there, up to
+  the enemy's HP, as the player asked: no discount while it cools down, since its cooldown is short, and no kill
+  bonus, since a kill it would make shows in the stack.
+- Replay: on `run9`, 7 of 114 choices change from v2.2. Fight 1, turn 7 flips to set up Dragon Punch and Scar
+  Strike killing the 2 HP TwinTachi next turn, rather than chip the 3 HP Ashigaru now.
+
 ## v2.2 — wounds for Scar Strike, and Dragon Punch's flying bodies (2026-11-08)
 - **Scoring:** with Scar Strike, each wounded enemy is worth half of what its hit on it would be, more where it would
   kill, discounted per turn until it's ready: so a 1-damage chip on an enemy at full health is worth half as much

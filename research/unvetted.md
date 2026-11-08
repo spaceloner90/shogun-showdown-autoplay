@@ -48,7 +48,7 @@ Strike's hits matched the simulation.
 
 | Item | Kind | What's already confirmed | What to look for |
 |---|---|---|---|
-| **A wounded enemy is worth half of Scar Strike's hit on it** | **Scoring** | **The player's suggestion, as a value on the position** | **Chip damage spread over full-health enemies ahead of Scar Strike, without wasting turns on it** |
+| **A wounded enemy is worth half of Scar Strike's damage on it, with it in the deck (v2.3)** | **Scoring** | **The player's suggestion, as a value on the position** | **Chip damage spread over full-health enemies ahead of Scar Strike, without wasting turns on it** |
 | Dragon Punch pushes a target it kills | Rule | `logs/run9`, fight 2 turn 11 and fight 3 turn 31 | Stays exact |
 
 ## New in v2.1: winning, deaths alongside a boss, and the Jujitsuka

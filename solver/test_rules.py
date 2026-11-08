@@ -1703,16 +1703,21 @@ class ScarStrikeTest(unittest.TestCase):
         state.tiles = [Tile(self.SCAR, 5, charge)]
         return leaf_terms(state)["wounds"]
 
-    def test_a_chip_on_a_full_enemy_is_worth_half_again_with_it_ready(self):
+    def test_a_chip_on_a_full_enemy_is_worth_half_again(self):
         # 1 damage is worth 10; the wound it leaves is worth half of Scar Strike's 1-damage hit, 5.
         self.assertEqual(self.wounds(enemy(6, hp=2)), 5)
         self.assertEqual(self.wounds(enemy(6, hp=3)), 0)
 
-    def test_more_when_it_would_kill(self):
-        self.assertEqual(self.wounds(enemy(6, hp=1)), 0.5 * (10 + 60))
+    def test_no_more_when_it_would_kill(self):
+        # The kill shows in the stack when it's loaded, so the wound itself is worth the same.
+        self.assertEqual(self.wounds(enemy(6, hp=1)), 5)
 
-    def test_less_while_it_cools_down(self):
-        self.assertAlmostEqual(self.wounds(enemy(6, hp=2), charge=3), 5 * 0.85 ** 2)
+    def test_the_same_while_it_cools_down(self):
+        self.assertEqual(self.wounds(enemy(6, hp=2), charge=0), 5)
+
+    def test_nothing_without_it_in_the_deck(self):
+        state = jujitsuka(hero_cell=0, enemies=[enemy(6, hp=2)])
+        self.assertEqual(leaf_terms(state)["wounds"], 0)
 
     def test_where_the_hero_stands_doesnt_matter_to_it(self):
         state = jujitsuka(hero_cell=0, enemies=[enemy(6, hp=2)])

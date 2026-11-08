@@ -56,7 +56,7 @@ from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER
                    apply_attack, apply_potion, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.2"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.3"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -115,8 +115,8 @@ WEIGHTS = {
     "escape_others": 0.5,     # Each escape beyond the best, which helps less.
     "escape_two_way": 1.5,    # A special move with Two Way Move covers both sides, so it's worth this much more.
     "curse": 0.5,             # Fraction of what a curse would add to the hero's next hit on that enemy.
-    "wound": 0.5,             # With Scar Strike, the share of its hit on each wounded enemy, as the player asked: a
-                              # 1-damage chip on an enemy at full health is worth half as much again, with it ready.
+    "wound": 0.5,             # With Scar Strike in the deck, the share of its damage on each wounded enemy, as the
+                              # player asked: a 1-damage chip on an enemy at full health is worth half as much again.
     "shield": 100.0,          # Holding a shield, worth about 1 HP. Hits average 1.4, but it may go unused.
     "facing_ideal": 6.0,      # Facing the enemy we most want to hit.
     "facing_other": 2.0,      # Facing an enemy, but not that one.
@@ -522,21 +522,16 @@ def _ice_value(state):
 
 
 def _wound_value(state):
-    """Wounded enemies, for Scar Strike, which hits every enemy below full health wherever it is: each is worth a share
-    of what that hit would be, more where it would kill, discounted for each turn until the tile is ready. Only credit,
-    and more charge adds more (rules 1 and 3). A volley firing it is scored with it spent (rule 2), so it doesn't also
-    earn reach credit, where the hero stands not mattering to it."""
-    scars = [t for t in state.tiles if t.attack.name == "ScarStrike" and t.attack.value > 0]
-    if not scars:
+    """Wounded enemies, with Scar Strike in the deck, which hits every enemy below full health wherever it is: each is
+    worth a share of its damage there, up to the enemy's HP. Its cooldown is short enough that it's relevant either way,
+    and a kill it would make shows in the stack, as the player put it, so neither changes this. It reads the deck, not
+    readiness, so it keeps rules 1 and 3, and an enemy it hits stays wounded for the next one."""
+    scar = max((t.attack.value for t in state.tiles if t.attack.name == "ScarStrike"), default=0)
+    if not scar:
         return 0.0
-    total = 0.0
-    for enemy in state.enemies:
-        if not enemy.alive or enemy.hp >= enemy.max_hp or is_tank(state, enemy) or enemy.kind == "TwinSideBoss":
-            continue
-        for tile in scars:
-            waiting = 0 if tile.in_queue else max(0, tile.cooldown - tile.charge)
-            total += _hit_value(enemy, tile.attack.value) * WEIGHTS["future_discount"] ** waiting
-    return WEIGHTS["wound"] * total
+    wounded = [e for e in state.enemies if e.alive and e.hp < e.max_hp and not is_tank(state, e)
+               and e.kind != "TwinSideBoss"]
+    return WEIGHTS["wound"] * WEIGHTS["enemy_damage"] * sum(min(scar, e.hp) for e in wounded)
 
 
 def _poison_value(state):

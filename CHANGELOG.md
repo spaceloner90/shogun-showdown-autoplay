@@ -9,6 +9,12 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.12 — the reload follows the loaded Crossbow's worth (2026-11-08)
+- **Scoring fix:** a reload is worth a ready tile with its damage loaded, and v2.11 raised a loaded Crossbow's
+  damage by its pierce without raising the reload. Both now read one function, so any change to either moves both:
+  11 for a 3-damage Crossbow, from 8. The damage itself was already the tile's logged base damage.
+- Replay: 2 `run12` choices now load the empty Crossbow to reload, over Scar Strike; no other change.
+
 ## v2.11 — piercing tiles' potential (2026-11-08)
 - **Scoring:** a tile that can hit two in a line counts for more than its stated damage where its potential is
   valued, loaded damage and reach, as the player asked, like an effect: the Crossbow 1.5 times, since it hits any 2

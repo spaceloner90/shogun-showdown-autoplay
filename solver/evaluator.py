@@ -57,7 +57,7 @@ from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP, SMOKE_BOMBS,
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.11"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.12"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -208,11 +208,17 @@ def _volley_value(outcome, cheapest_hit):
             + _reload_value(outcome))
 
 
+def _loaded_worth(name, damage):
+    """What a tile's damage is worth loaded, with a piercing tile's potential."""
+    return WEIGHTS["loaded_damage"] * damage * WEIGHTS["pierce"].get(name, 1.0)
+
+
 def _reload_value(outcome):
     """A Crossbow's reload is worth having its loaded tile ready, as the player put it: what a ready tile loaded
-    with that damage holds on the position. Earned when it fires, since that's when the reload happens; the shot it
-    sets up counts for its own damage when that fires (rule 2)."""
-    return WEIGHTS["ready_tile"] * outcome.reloads + WEIGHTS["loaded_damage"] * outcome.reloaded
+    with that damage holds on the position, read from the same values, so it follows any change to them. Earned when
+    it fires, since that's when the reload happens; the shot it sets up counts for its own damage when that fires
+    (rule 2)."""
+    return WEIGHTS["ready_tile"] * outcome.reloads + _loaded_worth("Crossbow", outcome.reloaded)
 
 
 def _volleys(state):
@@ -690,8 +696,7 @@ def _kept_terms(state):
         "shield": _shield_value(state),
         "ready_tiles": WEIGHTS["ready_tile"] * sum(t.ready for t in state.tiles),
         # An attack can only fire what the queue holds, so anything beyond that adds nothing.
-        "loaded": WEIGHTS["loaded_damage"] * sum(sorted((a.value * WEIGHTS["pierce"].get(a.name, 1.0)
-                                                         for a in fireable_attacks(state)), reverse=True)[:QUEUE_CAP]),
+        "loaded": sum(sorted((_loaded_worth(a.name, a.value) for a in fireable_attacks(state)), reverse=True)[:QUEUE_CAP]),
         "swap_ready": WEIGHTS["swap_ready"] if state.swap_charge >= state.swap_cooldown else 0.0,
     }
     terms.update(_position_terms(state))

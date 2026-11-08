@@ -3039,6 +3039,13 @@ class CrossbowTest(unittest.TestCase):
         terms = leaf_terms(state)
         self.assertAlmostEqual(terms["loaded"], WEIGHTS["loaded_damage"] * 3 * WEIGHTS["pierce"]["Crossbow"])
 
+    def test_a_reload_is_worth_what_its_loaded_tile_holds(self):
+        # The reload and the loaded term read the same values, pierce included, so they move together.
+        loaded = leaf_terms(self.board(3, [enemy(5, hp=5)]))["loaded"]
+        _, outcome = step(self.board(0, [enemy(5, hp=5)]), Action("Attack"))
+        from evaluator import outcome_terms
+        self.assertAlmostEqual(outcome_terms(outcome, False, 1)["reload"], WEIGHTS["ready_tile"] + loaded)
+
     def test_a_loaded_reload_is_worth_firing(self):
         # Nobody in range, so only the reload makes the stack worth anything.
         state = self.board(0, [])

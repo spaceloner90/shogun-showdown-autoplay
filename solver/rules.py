@@ -17,7 +17,7 @@ ONE_ENEMY_WAVE_CAP = 6
 MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Barricade", "BladeOfPatience", "Bomb",
            "BossSwap", "Charge",
            "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Lightning", "Maku", "Mirror", "OriginOfSymmetry", "Shield",
-           "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "ScarStrike", "SmokeBomb", "Spear", "Summon", "SwapToss",
+           "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Sai", "ScarStrike", "SmokeBomb", "Spear", "Summon", "SwapToss",
            "Swirl", "Tetsubo", "Trap", "TurnAround", "Volley"}
 
 # Skills the solver handles. Most need no modeling because their effects show up in the logged state,
@@ -794,7 +794,11 @@ def _apply_attack(state, attacker, attack, outcome):
         # A boss killed earlier in this sweep takes everyone else with it.
         if not target.alive:
             continue
-        land_hit(state, attacker, target, attack.value, outcome)
+        value = attack.value
+        # Sai hits twice as hard on an enemy telegraphing an attack this turn: a counter (SaiAttack.ApplyEffect).
+        if attack.name == "Sai" and target.action == "Attack":
+            value *= 2
+        land_hit(state, attacker, target, value, outcome)
         hit_effect(state, attacker, target, attack.effect, outcome)
         # A shield blocks the hook's damage, but not its pull.
         if attack.name == "GrapplingHook" and target.alive and target.movable:

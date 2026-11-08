@@ -244,6 +244,8 @@ Freezing, read from the code (simulated as of v1.21):
   the cell in front, which must exist and be free, then pushes it on that way to the last free cell, like the shove,
   so whoever stops it and it both take a collision hit. Only toward the hero's back, unless Two Way Move lets it go
   both ways. Damaging Move's hit lands after the crossing.
+- **Sai** (`SaiAttack`): the first agent on the cell ahead, for its damage, doubled if that enemy's telegraphed action
+  this turn is to attack. 2 damage and cooldown 5 to start.
 - **Dragon Punch** pushes its target even when the hit kills it: the body still flies and hits whoever stops it,
   for 1 (`DragonPunchAttack.PerformAttack` has no check). In `logs/run9`, a dead Charger flew across the room into a
   TwinTachi, and Rei's punch sent a dead TwinTachi into the hero.

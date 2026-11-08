@@ -41,6 +41,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.4: Sai
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Sai doubles on an enemy telegraphing an attack | Rule | Read from `SaiAttack` | The doubled hit matching the simulation, and Sai saved for an enemy about to attack |
+
 ## New in v2.2: wounds for Scar Strike, and Dragon Punch's flying bodies
 
 The Jujitsuka's first fights in `logs/run9` confirm the Throw is her special move, with no refused moves, and Scar

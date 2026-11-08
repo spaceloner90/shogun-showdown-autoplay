@@ -8,6 +8,11 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.4 — Sai (2026-11-08)
+- **Rule:** Sai hits the first agent on the cell ahead for its damage, 2 to start, twice that on an enemy
+  telegraphing an attack this turn: a counter (`SaiAttack.ApplyEffect`). Cooldown 5.
+- No logged deck had it, so no choice changes in replays.
+
 ## v2.3 — a simpler wound value (2026-11-08)
 - **Scoring:** with Scar Strike anywhere in the deck, each wounded enemy is worth half of its damage there, up to
   the enemy's HP, as the player asked: no discount while it cools down, since its cooldown is short, and no kill

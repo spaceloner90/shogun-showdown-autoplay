@@ -1673,6 +1673,23 @@ class DragonPunchKillTest(unittest.TestCase):
         self.assertEqual(outcome.hp_lost, 1)
 
 
+class SaiTest(unittest.TestCase):
+    """SaiAttack in the game's code: the first agent on the cell ahead, twice as hard if it's telegraphing an attack."""
+    SAI = Attack("Sai", 2, [1], first_target=True)
+
+    def test_it_hits_the_enemy_ahead(self):
+        after, outcome = fire(jujitsuka(enemies=[enemy(3, hp=5)]), self.SAI)
+        self.assertEqual(after.enemies[0].hp, 3)
+
+    def test_twice_as_hard_on_one_about_to_attack(self):
+        after, outcome = fire(jujitsuka(enemies=[enemy(3, hp=5, action="Attack", queue=[KATANA])]), self.SAI)
+        self.assertEqual((after.enemies[0].hp, outcome.hp_lost), (1, 2))
+
+    def test_only_the_cell_ahead(self):
+        _, outcome = fire(jujitsuka(enemies=[enemy(4, hp=5)]), self.SAI)
+        self.assertEqual(outcome.wasted_attacks, 1)
+
+
 class ScarStrikeTest(unittest.TestCase):
     """ScarStrikeAttack in the game's code: every enemy below full health, wherever it is."""
     SCAR = Attack("ScarStrike", 1, [])

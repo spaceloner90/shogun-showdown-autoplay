@@ -3114,5 +3114,17 @@ class ReachByMovementTest(unittest.TestCase):
         self.assertEqual(_kept_moves(state)["move_reach"], 0.0)
 
 
+class BackStrikeTest(unittest.TestCase):
+    """BackStrikeAttack in the game's code: the first agent on the cell behind, a plain hit."""
+    BACK_STRIKE = Attack("BackStrike", 3, [-1], first_target=True)
+
+    def test_it_hits_behind_and_not_ahead(self):
+        state = make_state(enemies=[enemy(1, facing=1, hp=5), enemy(3, hp=5)])
+        after, outcome = fire(state, self.BACK_STRIKE)
+        self.assertEqual([e.hp for e in after.enemies], [2, 5])
+        row = {"tiles": [{"attack": {"name": "BackStrike"}}], "hero": {"queue": []}, "enemies": [], "skills": []}
+        self.assertEqual(unmodeled_content(row), [])
+
+
 if __name__ == "__main__":
     unittest.main()

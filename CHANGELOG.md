@@ -9,6 +9,11 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.13 — Back Strike (2026-11-08)
+- **Rule:** Back Strike hits the first agent on the cell behind the hero, a plain hit: 3 damage, cooldown 3
+  (`BackStrikeAttack.ApplyEffect`). Tetsubo, the other choice on offer, was already simulated.
+- No logged deck has it, so no choice changes in replays.
+
 ## v2.12 — the reload follows the loaded Crossbow's worth (2026-11-08)
 - **Scoring fix:** a reload is worth a ready tile with its damage loaded, and v2.11 raised a loaded Crossbow's
   damage by its pierce without raising the reload. Both now read one function, so any change to either moves both:

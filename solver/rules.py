@@ -15,7 +15,7 @@ ONE_ENEMY_WAVE_CAP = 6
 
 # Attacks whose behaviour is fully covered by their logged range, damage and first-target flag, plus
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
-MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Barricade", "BladeOfPatience", "Bomb",
+MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb", "Barricade", "BladeOfPatience", "Bomb",
            "BossSwap", "Charge", "Crossbow",
            "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Lightning", "Maku", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Sai", "ScarStrike", "SmokeBomb", "Spear", "Summon", "SwapToss",

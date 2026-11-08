@@ -56,7 +56,7 @@ from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.5"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.6"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -544,6 +544,16 @@ def _poison_value(state):
     return value + state.hero.poison * WEIGHTS["hp_lost"]
 
 
+def _shield_value(state):
+    """A shield blocks the next hit. With Reactive Shield, the next damage brings one anyway, so going without is
+    only half as bad: hits alternate between blocked and taken either way, and holding one now saves a hit only
+    when an odd number are left. So an unshielded hero with the skill holds half a shield's worth, and a hit costs
+    its HP less half a shield, never nothing."""
+    if state.hero.shield:
+        return WEIGHTS["shield"]
+    return WEIGHTS["shield"] / 2 if state.reactive_shield else 0.0
+
+
 def _kept_terms(state):
     """Every part of a position's score except the stack: what it's worth with every tile kept."""
     terms = {
@@ -554,7 +564,7 @@ def _kept_terms(state):
         "effects": sum(WEIGHTS["loaded_effects"].get(t.attack.effect, 0.0) for t in state.queue_tiles),
         "curse": _curse_value(state),
         "wounds": _wound_value(state),
-        "shield": WEIGHTS["shield"] if state.hero.shield else 0.0,
+        "shield": _shield_value(state),
         "ready_tiles": WEIGHTS["ready_tile"] * sum(t.ready for t in state.tiles),
         # An attack can only fire what the queue holds, so anything beyond that adds nothing.
         "loaded": WEIGHTS["loaded_damage"] * sum(sorted((a.value for a in fireable_attacks(state)), reverse=True)[:QUEUE_CAP]),

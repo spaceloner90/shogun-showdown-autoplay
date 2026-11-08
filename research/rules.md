@@ -247,9 +247,23 @@ Freezing, read from the code (simulated as of v1.21):
 - **Nobunaga** (`NobunagaBoss`): hurt only on a spotlit cell. Anywhere else his armor stops the whole hit, shield
   and curse untouched, and poison ticks too, since they're hits; a tile's effect, such as poison or a curse, still
   lands, as `Attack.HitTarget` applies it after `ReceiveAttack` whatever happened. Lit cells: 3 above two-thirds of
-  his HP, 2 above a third, then 1 (2 and 1 when corrupted). On his turn, if his HP has changed since his last turn,
-  the lights move to random cells other than the lit ones and his own, rerolled if they'd all be corners when fewer
-  than 3. The game shows them as spotlights; mod 0.15.0 logs them.
+  his HP, 2 above a third, then 1 (2 and 1 when corrupted). At the very end of each turn, if his HP has dropped since
+  the last, the lights move to random cells other than the lit ones and his own, rerolled if they'd all be corners
+  when fewer than 3. The game shows them as spotlights; mod 0.15.0 logs them.
+- **When the lights move** (fixed in v2.6): his `ProcessTurn`, which compares his HP and moves them, is run by the
+  room's turn (`Room.ProcessTurn`), after every agent's end of turn (`Agent.EndOfTurn`), where poison ticks. So a
+  poison tick at the end of the turn he's hurt still sees the old lights: in `logs/run10`, fight 20 turn 42, a tick
+  hurt him on the cell lit before. Over that fight's 51 turns, the lights moved exactly the 3 times his HP had
+  dropped, never onto a cell just lit or his own, and the 2 ticks of poison he carried in the dark did nothing.
+- **Reactive Shield** (the hero's skill, `ReactiveShieldSkill.UponHeroTookDamage`): whenever the hero takes damage
+  and lives without a shield, it gets one, from any damage: a hit, a collision or a poison tick. So of two hits in
+  one turn, the second is blocked. Simulated as of v2.6.
+- **Shield Retention** keeps the hero's shield from one fight to the next (`ShieldRetentionSkill.PickUp` turns off
+  `RemoveShieldWhenExitCombatMode`), and **Fortress** shields it as each fight begins. Both show in the logged
+  state, so neither needs simulating.
+- **Freezing, checked again in `logs/run10`**: across `run8` to `run10`, every one of 72 enemies frozen while
+  telegraphing something lost that action, all 70 at ice 1 waited, and each acted normally once at 0. The ice shows
+  3, 2 and 1 on the three turns after the hit, so an enemy loses the turn it's frozen on and the three after.
 - **Sai** (`SaiAttack`): the first agent on the cell ahead, for its damage, doubled if that enemy's telegraphed action
   this turn is to attack. 2 damage and cooldown 5 to start.
 - **Dragon Punch** pushes its target even when the hit kills it: the body still flies and hits whoever stops it,

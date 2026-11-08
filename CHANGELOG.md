@@ -2,11 +2,26 @@
 
 Every evaluator version, newest first: what it changed and why. Each is tagged `evaluator-<version>`, and its commit
 message has the details and the replay numbers. `evaluator-v1` is the version that won day 1 with the Wanderer, and
-`evaluator-v2.0` the one that finished day 2 with it, killing the Shogun. Each item is unvetted until real play
+`evaluator-v2.0` the one that finished day 2 with it, killing the Shogun. `evaluator-v2.5` won day 1 with the
+Jujitsuka, a weaker hero to start, in `logs/run10`. Each item is unvetted until real play
 confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
+
+## v2.6 — Reactive Shield, and when Nobunaga's lights move (2026-11-08)
+- **Rule:** with Reactive Shield, the hero gets a shield whenever it takes damage and lives without one
+  (`ReactiveShieldSkill.UponHeroTookDamage`). Shield Retention and Fortress need nothing simulated, since their
+  shields show in the logged state.
+- **Rule fix:** Nobunaga's lights move at the very end of the turn, after poison ticks, and only when his HP has
+  dropped (`Room.ProcessTurn` runs after `Agent.EndOfTurn`). v2.5 moved them at the start of the enemies' turn, so it
+  had the tick at the end of the turn he was hurt blocked; in `logs/run10` it landed.
+- **Scoring:** with Reactive Shield, going without a shield is worth half a shield, since the next damage brings one:
+  hits alternate between blocked and taken either way. Without that, a 1-damage hit would score as free, its HP
+  paid back by the shield it brings. Now a hit costs its HP less half a shield, and losing a shield costs half.
+- `logs/run10`, a full Jujitsuka run that beat Nobunaga without losing HP to him (51 turns): 836 of 853 turns
+  predicted exactly, the rest all enemies arriving. Replay: 6 of its 875 choices change, for 2 more kills and 4 more
+  damage, no HP lost; none on older logs.
 
 ## v2.5 — Nobunaga's armor and spotlights (2026-11-08)
 - **Rule:** Nobunaga can only be hurt on a spotlit cell; anywhere else his armor stops the whole hit, poison ticks

@@ -1,4 +1,8754 @@
 {
+"run10 10:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 109.93,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 231.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 265.73,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:12": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 380.75,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 286.15,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 310.8,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 259.43,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:16": {
+"dmg": 9,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 437.71,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 137.78,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 149.45,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:19": {
+"dmg": 2,
+"fired": 2,
+"hp": 2,
+"kills": 0,
+"label": "Attack",
+"score": 161.55,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 182.43,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 218.83,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 147.94,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:22": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 256.2,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 2,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 41.92,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:24": {
+"dmg": 8,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10151.43,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:3": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 372.25,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 267.73,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 295.65,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:6": {
+"dmg": 9,
+"fired": 2,
+"hp": 2,
+"kills": 0,
+"label": "Attack",
+"score": 257.35,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 321.36,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 305.3,
+"sent": 0,
+"wasted": 0
+},
+"run10 10:9": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack Shuriken (DragonPunch to hand)",
+"score": 376.5,
+"sent": 1,
+"wasted": 0
+},
+"run10 11:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 40.05,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:10": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 3,
+"label": "Attack DragonPunch (ShadowDash to hand)",
+"score": 315.36,
+"sent": 1,
+"wasted": 0
+},
+"run10 11:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 129.06,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 132.19,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 149.99,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:14": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 180.29,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 165.96,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:16": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 3,
+"label": "MoveRight (throw)",
+"score": 390.02,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:17": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 178.41,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 85.21,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 126.76,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 67.76,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:20": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 198.32,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 103.95,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 139.49,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 156.48,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:24": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 179.53,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 49.0,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 1,
+"kills": 0,
+"label": "Flip",
+"score": -41.18,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:27": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 170.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 160.6,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 185.0,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:3": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 114.8,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:30": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 290.44,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 147.32,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:32": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10171.43,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 32.44,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 56.88,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:6": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 93.95,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 49.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 1,
+"kills": 0,
+"label": "Flip",
+"score": -40.05,
+"sent": 0,
+"wasted": 0
+},
+"run10 11:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 201.17,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 8.52,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 2.01,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 38.52,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:12": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack Shuriken (ShadowDash to hand)",
+"score": 93.38,
+"sent": 1,
+"wasted": 0
+},
+"run10 12:13": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight (throw)",
+"score": 118.49,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 71.55,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:15": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 103.41,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 15.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:17": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 44.92,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 47.18,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 55.81,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:2": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 31.4,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:20": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Charge > DragonPunch",
+"score": 98.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 49.57,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:22": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 91.71,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 44.98,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 60.05,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:25": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 84.77,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 79.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 97.39,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 122.26,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:29": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack DragonPunch > ScarStrike (Shuriken to hand)",
+"score": 198.43,
+"sent": 1,
+"wasted": 0
+},
+"run10 12:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 44.66,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 25.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:31": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 50.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 37.93,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 49.2,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:34": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 91.49,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:35": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveLeft (throw)",
+"score": 213.44,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike (Charge to hand)",
+"score": 124.16,
+"sent": 1,
+"wasted": 0
+},
+"run10 12:37": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 150.05,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:38": {
+"dmg": 7,
+"fired": 3,
+"hp": 0,
+"kills": 3,
+"label": "Attack DragonPunch > ScarStrike > Shuriken",
+"score": 10263.63,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 95.91,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 150.66,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:6": {
+"dmg": 9,
+"fired": 2,
+"hp": 0,
+"kills": 3,
+"label": "Attack",
+"score": 298.28,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 40.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight (throw)",
+"score": 58.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 12:9": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 86.29,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 60.67,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:10": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveLeft (throw)",
+"score": 100.39,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 39.42,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 76.14,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:13": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack ScarStrike > Shuriken",
+"score": 138.4,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 40.79,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 59.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 72.07,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:17": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 163.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 23.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:19": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 12.59,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:2": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 88.51,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:20": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight (throw)",
+"score": 80.25,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 87.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:22": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 137.63,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 36.56,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 82.11,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:25": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 150.56,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 45.15,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 66.12,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:28": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Shuriken > ShadowDash",
+"score": 96.85,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 28.25,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 52.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 53.16,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 62.85,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 102.04,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:33": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack Charge > Shuriken (ScarStrike to hand)",
+"score": 10155.68,
+"sent": 1,
+"wasted": 0
+},
+"run10 13:4": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 69.79,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 60.04,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:6": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 89.03,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 17.28,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:8": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 40.28,
+"sent": 0,
+"wasted": 0
+},
+"run10 13:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 15.59,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 56.66,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 94.14,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:11": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack Shuriken > Charge",
+"score": 132.63,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 111.75,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:13": {
+"dmg": 8,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 125.83,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 63.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:15": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 87.45,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 70.73,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 77.9,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:18": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 97.35,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 83.7,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:2": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 128.44,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:20": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10106.43,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 94.73,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 107.94,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:5": {
+"dmg": 7,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 170.79,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 72.34,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 87.83,
+"sent": 0,
+"wasted": 0
+},
+"run10 14:8": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack Shuriken (ShadowDash to hand)",
+"score": 119.09,
+"sent": 1,
+"wasted": 0
+},
+"run10 14:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 76.54,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 131.43,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 138.61,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 137.7,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 185.78,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 212.93,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:14": {
+"dmg": 7,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack Shuriken > ScarStrike (DragonPunch to hand)",
+"score": 297.85,
+"sent": 1,
+"wasted": 0
+},
+"run10 15:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 125.6,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:16": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 139.45,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 145.71,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:18": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 162.05,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 148.62,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:2": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 166.63,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 150.41,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 187.19,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:22": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 260.23,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 117.11,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 144.31,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:25": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 177.25,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 133.53,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 144.37,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 170.89,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:29": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 263.51,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 113.71,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 119.15,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 139.59,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 144.58,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 163.12,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:34": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 211.81,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:35": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 121.36,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 119.24,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:37": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 148.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:38": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack Shuriken (ShadowDash to hand)",
+"score": 165.08,
+"sent": 1,
+"wasted": 0
+},
+"run10 15:39": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight (throw)",
+"score": 130.31,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 144.62,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:40": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 210.44,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:41": {
+"dmg": 7,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 301.16,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:42": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 144.02,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:43": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 173.95,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:44": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 170.16,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:45": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 169.52,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:46": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 162.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 159.33,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:6": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 210.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 102.05,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:8": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 130.64,
+"sent": 0,
+"wasted": 0
+},
+"run10 15:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 129.9,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 124.29,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 117.11,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:11": {
+"dmg": 6,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 198.51,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 33.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 45.67,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 70.79,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 95.02,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:16": {
+"dmg": 5,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack DragonPunch > Charge > Shuriken",
+"score": 169.65,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 30.23,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 68.95,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:19": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Shuriken > ScarStrike",
+"score": 105.87,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 157.52,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 34.24,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 96.33,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:22": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack DragonPunch (ShadowDash to hand)",
+"score": 156.43,
+"sent": 1,
+"wasted": 0
+},
+"run10 16:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 32.07,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:24": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 56.0,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 69.97,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 108.45,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:27": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 173.85,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 35.79,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 59.83,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:3": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 218.95,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:30": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 110.78,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:31": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": 65.03,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 60.73,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 114.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:34": {
+"dmg": 5,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack ScarStrike (Shuriken to hand)",
+"score": 10183.41,
+"sent": 1,
+"wasted": 0
+},
+"run10 16:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 49.45,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 53.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:6": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": 68.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 56.88,
+"sent": 0,
+"wasted": 0
+},
+"run10 16:8": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack Shuriken (ShadowDash to hand)",
+"score": 89.28,
+"sent": 1,
+"wasted": 0
+},
+"run10 16:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 24.46,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 115.13,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 84.56,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:11": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 105.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 14.8,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 28.25,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:14": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 76.03,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 31.93,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 46.93,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:17": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 77.91,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 79.33,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 120.41,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 157.29,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:20": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 185.29,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 81.76,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 90.67,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 111.41,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:24": {
+"dmg": 5,
+"fired": 3,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 181.9,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": -13.29,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 19.21,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 28.46,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:28": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack Shuriken (ShadowDash to hand)",
+"score": 63.36,
+"sent": 1,
+"wasted": 0
+},
+"run10 17:29": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 2,
+"label": "MoveLeft (throw)",
+"score": 146.16,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 185.56,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 38.31,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 31.13,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 62.79,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 98.13,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:34": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 123.48,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:35": {
+"dmg": 8,
+"fired": 3,
+"hp": 0,
+"kills": 2,
+"label": "Attack Charge > DragonPunch > ScarStrike",
+"score": 213.6,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": -0.29,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:37": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 12.93,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:38": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 6.24,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:39": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": -3.42,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:4": {
+"dmg": 6,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack ShadowDash > ScarStrike (DragonPunch to hand)",
+"score": 191.01,
+"sent": 1,
+"wasted": 0
+},
+"run10 17:40": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight (throw)",
+"score": 110.04,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:41": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 127.27,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:42": {
+"dmg": 7,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack ScarStrike (ShadowDash to hand)",
+"score": 212.34,
+"sent": 1,
+"wasted": 0
+},
+"run10 17:43": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 22.76,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:44": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 51.24,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:45": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 60.03,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:46": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 80.93,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:47": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 69.0,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:48": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 72.65,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:49": {
+"dmg": 6,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 172.74,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 47.54,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:50": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 27.6,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:51": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": 21.34,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:52": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 82.84,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:53": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 175.51,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:54": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 38.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:55": {
+"dmg": 0,
+"fired": 0,
+"hp": 1,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": -28.04,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:56": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 92.53,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:57": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack ShadowDash > Shuriken",
+"score": 150.65,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:58": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 83.57,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:59": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10104.26,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 70.9,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 91.45,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:8": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 153.96,
+"sent": 0,
+"wasted": 0
+},
+"run10 17:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 65.64,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 133.84,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 186.54,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:11": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack Shuriken > Charge",
+"score": 240.92,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 215.4,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:13": {
+"dmg": 10,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 226.02,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 158.07,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:15": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 198.94,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 171.43,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 187.33,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:18": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 226.29,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 186.05,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:2": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 223.64,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 191.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:21": {
+"dmg": 8,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Charge > ScarStrike",
+"score": 10238.6,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 176.44,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 193.17,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:5": {
+"dmg": 7,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 265.99,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 161.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 171.71,
+"sent": 0,
+"wasted": 0
+},
+"run10 18:8": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack Shuriken (DragonPunch to hand)",
+"score": 214.29,
+"sent": 1,
+"wasted": 0
+},
+"run10 18:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 165.35,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 130.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 139.38,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 153.72,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:12": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Charge > DragonPunch",
+"score": 213.21,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 139.76,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:14": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 168.71,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 110.13,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 169.34,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 190.93,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:18": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack Shuriken (ScarStrike to hand)",
+"score": 253.33,
+"sent": 1,
+"wasted": 0
+},
+"run10 19:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 125.61,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:2": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 160.74,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 154.51,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:21": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack Shuriken (ScarStrike to hand)",
+"score": 173.51,
+"sent": 1,
+"wasted": 0
+},
+"run10 19:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 124.08,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 169.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 199.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:25": {
+"dmg": 8,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 217.0,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 52.45,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 63.47,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:28": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 90.57,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 65.79,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 168.28,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:30": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 93.96,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 42.74,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 64.42,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 90.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:34": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": -110.71,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:35": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack Shuriken (DragonPunch, ScarStrike to hand)",
+"score": -109.1,
+"sent": 2,
+"wasted": 0
+},
+"run10 19:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 4,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": -354.67,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:37": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 89.17,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:38": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 142.98,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:39": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 68.41,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:4": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 196.91,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:40": {
+"dmg": 0,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 87.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:41": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 84.4,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:42": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 106.43,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:43": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 33.88,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:44": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 62.14,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:45": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 63.3,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:46": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 91.54,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:47": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 109.16,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:48": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveLeft (throw)",
+"score": 199.94,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:49": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack DragonPunch > Shuriken (Charge to hand)",
+"score": 181.33,
+"sent": 1,
+"wasted": 0
+},
+"run10 19:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 107.76,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:50": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 43.07,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:51": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 74.59,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:52": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 129.06,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:53": {
+"dmg": 0,
+"fired": 0,
+"hp": 2,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": -140.98,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:54": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 173.96,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:55": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 156.66,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:56": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 161.44,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:57": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack Shuriken (DragonPunch to hand)",
+"score": 183.51,
+"sent": 1,
+"wasted": 0
+},
+"run10 19:58": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 127.44,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:59": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 187.23,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 140.3,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:60": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 216.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:61": {
+"dmg": 9,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 319.43,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:62": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight (throw)",
+"score": 118.57,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:63": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 129.14,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:64": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 150.4,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:65": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 121.21,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:66": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 121.98,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:67": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 196.46,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:68": {
+"dmg": 4,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 270.74,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:69": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 136.96,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 150.13,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:70": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 146.8,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:71": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 168.38,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:72": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 154.25,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:73": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 173.13,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:74": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": 116.02,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:75": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 193.24,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:76": {
+"dmg": 5,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 276.06,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:77": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 134.05,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:78": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 151.0,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:79": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 178.07,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:8": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 175.93,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:80": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 162.69,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:81": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 183.13,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:82": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 116.28,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:83": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 159.73,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:84": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 224.28,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:85": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 162.28,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:86": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 196.14,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:87": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 133.57,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:88": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight (throw)",
+"score": 136.71,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:89": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 158.47,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 112.33,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:90": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 148.9,
+"sent": 0,
+"wasted": 0
+},
+"run10 19:91": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10167.28,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 13.7,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 2.5,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 8.82,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 45.0,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:13": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 105.38,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": -5.14,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": -4.11,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": -4.33,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": -105.87,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": -1.84,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": -3.45,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 32.37,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 35.74,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:21": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 71.23,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 11.94,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight",
+"score": 75.28,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:24": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 4.55,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": -4.38,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": -2.41,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": -77.61,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:28": {
+"dmg": 1,
+"fired": 1,
+"hp": 2,
+"kills": 1,
+"label": "Attack",
+"score": -124.95,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 12.7,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 41.37,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 17.03,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 18.83,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 17.03,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 20.53,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:34": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 52.02,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:35": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10087.65,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 52.7,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:5": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 91.65,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 2.84,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 1.84,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 0.89,
+"sent": 0,
+"wasted": 0
+},
+"run10 1:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 2.41,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": -13.87,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge (Shuriken to hand)",
+"score": 68.09,
+"sent": 1,
+"wasted": 0
+},
+"run10 20:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 68.14,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike (DragonPunch to hand)",
+"score": 71.35,
+"sent": 1,
+"wasted": 0
+},
+"run10 20:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 71.35,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 71.35,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 71.35,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 71.35,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 71.35,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 71.35,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:19": {
+"dmg": 1,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack ShadowDash > Charge (ScarStrike to hand)",
+"score": 138.72,
+"sent": 1,
+"wasted": 0
+},
+"run10 20:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": -5.37,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 73.75,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 96.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 108.44,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:23": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack ScarStrike (DragonPunch to hand)",
+"score": 129.96,
+"sent": 1,
+"wasted": 0
+},
+"run10 20:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 49.96,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 59.8,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 66.35,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 76.2,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 81.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike (ShadowDash to hand)",
+"score": 178.1,
+"sent": 1,
+"wasted": 0
+},
+"run10 20:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": -5.37,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:30": {
+"dmg": 15,
+"fired": 3,
+"hp": 0,
+"kills": 0,
+"label": "Attack ScarStrike > Shuriken > DragonPunch",
+"score": 250.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 95.65,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 101.08,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 106.28,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:34": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Charge > Shuriken (ShadowDash to hand)",
+"score": 166.96,
+"sent": 1,
+"wasted": 0
+},
+"run10 20:35": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 87.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 116.98,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:37": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 119.11,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:38": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 134.94,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:39": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 135.87,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 112.21,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:40": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 102.93,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:41": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 129.73,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:42": {
+"dmg": 10,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 189.14,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:43": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 41.33,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:44": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight (throw)",
+"score": 35.94,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:45": {
+"dmg": 0,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 46.89,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:46": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 53.12,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:47": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 53.83,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:48": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 73.67,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:49": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 80.75,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:5": {
+"dmg": 14,
+"fired": 3,
+"hp": 0,
+"kills": 0,
+"label": "Attack Shuriken > Charge > ScarStrike",
+"score": 176.41,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:50": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken (ShadowDash to hand)",
+"score": 111.97,
+"sent": 1,
+"wasted": 0
+},
+"run10 20:51": {
+"dmg": 4,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack ScarStrike (DragonPunch, Shuriken to hand)",
+"score": 10118.51,
+"sent": 2,
+"wasted": 0
+},
+"run10 20:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 38.63,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 43.92,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 48.17,
+"sent": 0,
+"wasted": 0
+},
+"run10 20:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 58.14,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 115.31,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 55.43,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 1,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 3.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 107.32,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:13": {
+"dmg": 6,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack ScarStrike > Shuriken",
+"score": 204.29,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 23.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 83.04,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:16": {
+"dmg": 7,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 179.48,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 2,
+"label": "PlayTile Shuriken",
+"score": 84.77,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 2,
+"kills": 1,
+"label": "Flip",
+"score": -94.03,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:19": {
+"dmg": 4,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 159.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 150.41,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 136.89,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 182.02,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:22": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 258.13,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 106.63,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 160.28,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:25": {
+"dmg": 7,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack ShadowDash > DragonPunch",
+"score": 249.76,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:26": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveLeft (throw)",
+"score": 164.66,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "PlayTile Shuriken",
+"score": 149.46,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 149.26,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:29": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack ScarStrike > Shuriken",
+"score": 239.01,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:3": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": 190.79,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 109.89,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:31": {
+"dmg": 0,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 76.18,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 117.52,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 132.37,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:34": {
+"dmg": 4,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 171.11,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:35": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 160.06,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 189.25,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:37": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 251.81,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:38": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 127.57,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:39": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 164.32,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 168.36,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:40": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "PlayTile DragonPunch",
+"score": 222.7,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:41": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight (throw)",
+"score": 213.84,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:42": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 153.94,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:43": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 223.07,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:44": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 74.29,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:45": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 137.5,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:46": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 179.08,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:47": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight (throw)",
+"score": 63.35,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:48": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 69.98,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:49": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 85.08,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:5": {
+"dmg": 4,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack ScarStrike (DragonPunch to hand)",
+"score": 239.71,
+"sent": 1,
+"wasted": 0
+},
+"run10 21:50": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 108.21,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:51": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 36.65,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:52": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 61.55,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:53": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 87.17,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:54": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "PlayTile ScarStrike",
+"score": 193.03,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:55": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 180.77,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:56": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 258.03,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:57": {
+"dmg": 13,
+"fired": 3,
+"hp": 0,
+"kills": 3,
+"label": "Attack",
+"score": 421.81,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:58": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 140.93,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:59": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 168.81,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 124.43,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:60": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 217.53,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:61": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 117.9,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:62": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 155.12,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:63": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 181.54,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:64": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 169.02,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:65": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10183.51,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:7": {
+"dmg": 4,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 182.11,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": -6.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 21:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 40.32,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 30.03,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 129.21,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 136.7,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike (ShadowDash to hand)",
+"score": 202.4,
+"sent": 1,
+"wasted": 0
+},
+"run10 22:13": {
+"dmg": 14,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack Shuriken > Charge > ScarStrike",
+"score": 213.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 2,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": -164.83,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 142.22,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:16": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack Shuriken > DragonPunch",
+"score": 178.16,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 133.99,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 154.04,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 173.85,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 76.11,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:20": {
+"dmg": 4,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack ScarStrike (Shuriken to hand)",
+"score": 10213.93,
+"sent": 1,
+"wasted": 0
+},
+"run10 22:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 24.88,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:22": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 48.64,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 57.91,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 51.72,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 62.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 59.89,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 109.72,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:28": {
+"dmg": 10,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack ScarStrike (Shuriken to hand)",
+"score": 161.34,
+"sent": 1,
+"wasted": 0
+},
+"run10 22:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 91.12,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:3": {
+"dmg": 9,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack Charge > DragonPunch",
+"score": 145.25,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 39.92,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:31": {
+"dmg": 8,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack Charge > DragonPunch",
+"score": 92.2,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 20.98,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ShadowDash",
+"score": 31.14,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:34": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 55.28,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:35": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 74.85,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:36": {
+"dmg": 8,
+"fired": 3,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 136.71,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:37": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 76.17,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:38": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 88.11,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:39": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 92.81,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 48.63,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:40": {
+"dmg": 6,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10129.73,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 110.21,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:6": {
+"dmg": 6,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 177.13,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 82.9,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:8": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 109.71,
+"sent": 0,
+"wasted": 0
+},
+"run10 22:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 111.81,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 28.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 11.77,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 45.91,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:12": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 77.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 17.95,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:14": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 24.37,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 26.69,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:16": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 36.81,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 18.89,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:18": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 2,
+"label": "MoveRight (throw)",
+"score": 140.38,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 9.27,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 71.35,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 34.46,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 45.98,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:22": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 89.73,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 77.72,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:24": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 158.22,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 10.92,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 19.01,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 21.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 52.91,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:29": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 89.73,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:3": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 129.61,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 25.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 39.12,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:32": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 90.64,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 35.97,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:34": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 72.42,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:35": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 3.77,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 10.92,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:37": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 20.34,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:38": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 25.02,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:39": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 51.52,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 48.74,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:40": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 64.6,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:41": {
+"dmg": 3,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10109.65,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:5": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 77.65,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": -7.7,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": -4.05,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 53.17,
+"sent": 0,
+"wasted": 0
+},
+"run10 2:9": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 100.7,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": -9.76,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": -18.83,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": -19.17,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 29.7,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:13": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight (throw)",
+"score": 83.48,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": -66.54,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 2,
+"kills": 0,
+"label": "MoveRight",
+"score": -131.49,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:16": {
+"dmg": 6,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack DragonPunch > ScarStrike",
+"score": 137.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 18.76,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:18": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 23.14,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 14.23,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 4.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 18.57,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 32.57,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:22": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 43.69,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 56.48,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:24": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10089.35,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:3": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 23.12,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": -2.27,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:5": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 65.92,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": -22.23,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": -13.39,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:8": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": -6.99,
+"sent": 0,
+"wasted": 0
+},
+"run10 3:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": -18.94,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 20.66,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:10": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight (throw)",
+"score": 79.16,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 53.78,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:12": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack ScarStrike (DragonPunch to hand)",
+"score": 74.81,
+"sent": 1,
+"wasted": 0
+},
+"run10 4:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": -7.74,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 28.55,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 38.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:16": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 62.46,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 41.36,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:18": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveLeft (throw)",
+"score": 143.02,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 99.7,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 49.73,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:20": {
+"dmg": 5,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack ScarStrike (DragonPunch to hand)",
+"score": 10172.46,
+"sent": 1,
+"wasted": 0
+},
+"run10 4:3": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 102.31,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 14.01,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 10.98,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 11.5,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 13.01,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 16.96,
+"sent": 0,
+"wasted": 0
+},
+"run10 4:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 19.55,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 24.69,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 87.18,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 136.21,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 174.53,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:13": {
+"dmg": 7,
+"fired": 2,
+"hp": 0,
+"kills": 4,
+"label": "Attack",
+"score": 322.18,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:14": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": 18.83,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 21.7,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 36.22,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:17": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 72.14,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 7.06,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:19": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 12.23,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 51.72,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 39.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:21": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveLeft (throw)",
+"score": 132.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:22": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 85.67,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 7.12,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 29.62,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 51.36,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 71.18,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:27": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack DragonPunch > Shuriken",
+"score": 133.74,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 28.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 56.05,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:3": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 103.87,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:30": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 90.98,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 23.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 46.34,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 63.24,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:34": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack DragonPunch > Charge",
+"score": 10101.35,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 15.98,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 20.98,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 19.57,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:7": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 28.22,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 23.24,
+"sent": 0,
+"wasted": 0
+},
+"run10 5:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 41.12,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 40.5,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 15.33,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 75.17,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:12": {
+"dmg": 7,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 134.82,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 12.54,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 16.55,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 56.84,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:16": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack Shuriken (DragonPunch to hand)",
+"score": 86.12,
+"sent": 1,
+"wasted": 0
+},
+"run10 6:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 57.59,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 42.16,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 51.82,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:2": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 97.17,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:20": {
+"dmg": 6,
+"fired": 3,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 81.31,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 24.9,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 24.93,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 51.82,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:24": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 75.07,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 54.85,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 46.64,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 72.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 72.65,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:4": {
+"dmg": 4,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 57.48,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": -6.96,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 0.8,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:7": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack Charge > DragonPunch",
+"score": 14.51,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 43.82,
+"sent": 0,
+"wasted": 0
+},
+"run10 6:9": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 35.36,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 31.46,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 2,
+"kills": 0,
+"label": "Flip",
+"score": -157.44,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:11": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 61.21,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 56.49,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 60.41,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 107.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:15": {
+"dmg": 5,
+"fired": 3,
+"hp": 0,
+"kills": 2,
+"label": "Attack Charge > DragonPunch > Shuriken",
+"score": 206.15,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": -42.03,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:17": {
+"dmg": 2,
+"fired": 1,
+"hp": 2,
+"kills": 1,
+"label": "Attack",
+"score": -111.22,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 32.09,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 46.34,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 56.93,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:20": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 64.55,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 62.03,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:22": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 81.43,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 41.24,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 70.58,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 95.66,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": 42.16,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:27": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Shuriken > ScarStrike (DragonPunch to hand)",
+"score": 77.88,
+"sent": 1,
+"wasted": 0
+},
+"run10 7:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 48.54,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 38.38,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 56.71,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 49.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 66.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 85.83,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:33": {
+"dmg": 4,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack Charge > DragonPunch > Shuriken",
+"score": 149.31,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:34": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 60.66,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:35": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 79.35,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 10.02,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:37": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 33.95,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:38": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 42.25,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:39": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 53.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:4": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveLeft (throw)",
+"score": 153.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:40": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight (throw)",
+"score": 170.51,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:41": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 156.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:42": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 58.01,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:43": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10075.67,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:5": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack Shuriken (ScarStrike to hand)",
+"score": 77.74,
+"sent": 1,
+"wasted": 0
+},
+"run10 7:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 4.36,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 44.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:8": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 90.65,
+"sent": 0,
+"wasted": 0
+},
+"run10 7:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": -68.38,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 29.43,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 22.62,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 46.48,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 73.54,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 76.11,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 101.4,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:15": {
+"dmg": 6,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack Charge > ScarStrike > Shuriken",
+"score": 179.87,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 50.59,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 54.23,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:18": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack Shuriken (DragonPunch to hand)",
+"score": 63.76,
+"sent": 1,
+"wasted": 0
+},
+"run10 8:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 49.67,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 61.22,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 62.05,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:21": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Charge > DragonPunch",
+"score": 91.05,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 27.63,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 49.42,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 67.82,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:25": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 78.7,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 1,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": -11.49,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:27": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 152.18,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:28": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": 42.63,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 58.11,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:3": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 119.93,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:30": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 89.22,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 27.78,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 32.5,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 75.48,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:34": {
+"dmg": 4,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack ScarStrike (Charge to hand)",
+"score": 114.26,
+"sent": 1,
+"wasted": 0
+},
+"run10 8:35": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 64.47,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:36": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 117.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:37": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 46.99,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:38": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 63.51,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:39": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 46.92,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 22.11,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:40": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 68.87,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:41": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 104.81,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:42": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack DragonPunch (Charge, Shuriken to hand)",
+"score": 10171.88,
+"sent": 2,
+"wasted": 0
+},
+"run10 8:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 39.29,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": 42.91,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:7": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 64.33,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 52.46,
+"sent": 0,
+"wasted": 0
+},
+"run10 8:9": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 49.54,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 16.68,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 31.51,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:11": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 64.64,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": -6.03,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 26.5,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:14": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 48.46,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 33.53,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 56.36,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:17": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 86.61,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 39.63,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 38.51,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:2": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 41.6,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:20": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 58.08,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 81.6,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:22": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 124.38,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 23.76,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 60.03,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 75.2,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:26": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack Shuriken > ScarStrike",
+"score": 159.1,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 8.34,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 39.67,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 43.5,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 51.83,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:30": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 87.77,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 13.06,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 33.45,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 68.36,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:34": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 89.67,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:35": {
+"dmg": 4,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack Charge > ScarStrike > Shuriken",
+"score": 149.67,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 43.74,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:37": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 57.03,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:38": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack Shuriken (DragonPunch to hand)",
+"score": 79.73,
+"sent": 1,
+"wasted": 0
+},
+"run10 9:39": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": -3.89,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 95.62,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:40": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 40.0,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:41": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 80.47,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:42": {
+"dmg": 5,
+"fired": 3,
+"hp": 0,
+"kills": 2,
+"label": "Attack Charge > DragonPunch > Shuriken",
+"score": 165.78,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:43": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 3.65,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:44": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 47.52,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:45": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": 55.96,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:46": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Shuriken > ScarStrike",
+"score": 116.04,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:47": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": -4.95,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:48": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 12.86,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:49": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 34.63,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:5": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveLeft (throw)",
+"score": 204.74,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:50": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Charge > DragonPunch",
+"score": 83.31,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:51": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": 25.08,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:52": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 36.31,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:53": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight (throw)",
+"score": 107.81,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:54": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 69.42,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:55": {
+"dmg": 4,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10107.74,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:6": {
+"dmg": 6,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack DragonPunch > ScarStrike",
+"score": 189.67,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Shuriken",
+"score": -5.31,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:8": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 17.05,
+"sent": 0,
+"wasted": 0
+},
+"run10 9:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Charge",
+"score": 13.94,
+"sent": 0,
+"wasted": 0
+},
 "run5_full 10:1": {
 "dmg": 0,
 "fired": 0,

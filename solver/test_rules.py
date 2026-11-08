@@ -1733,6 +1733,14 @@ class NobunagaTest(unittest.TestCase):
         after, outcome = fire(state, Attack("SmokeBomb", 1, [1, 2, 3], first_target=True))
         self.assertEqual((after.enemies[0].cell, after.enemies[0].hp), (2, 39))
 
+    def test_a_poison_tick_lands_before_the_lights_move(self):
+        # logs/run10, fight 20 turn 42: hurt in the light, then poisoned, and the tick still hurt him on the old
+        # light. The lights move from the room's turn, after every agent's end of turn.
+        state = self.board(lit=[3])
+        state.enemies[0].poison = 2
+        after, _ = fire(state, KATANA)
+        self.assertEqual((after.enemies[0].hp, after.lit_cells, after.nobunaga_hp_last_turn), (37, [], 37))
+
     def test_f1_goes_for_another_enemy_while_he_is_dark(self):
         state = self.board(lit=[0])
         state.enemies.append(enemy(5, hp=3))
@@ -2883,6 +2891,39 @@ class WarningsTest(unittest.TestCase):
 
     def test_unknown_things_still_do(self):
         self.assertEqual(self.notes({"kind": "X", "queue": [], "traits": ["Odd"]}), ["X trait Odd"])
+
+
+
+
+class ReactiveShieldTest(unittest.TestCase):
+    """ReactiveShieldSkill in the game's code: once the hero takes damage and lives, it gets a shield if it had none."""
+
+    def board(self, queue):
+        state = make_state(enemies=[enemy(3, action="Attack", queue=queue)])
+        state.reactive_shield = True
+        return state
+
+    def test_taking_damage_brings_a_shield(self):
+        after, outcome = step(self.board([KATANA]), Action("Wait"))
+        self.assertEqual((outcome.hp_lost, after.hero.shield), (2, True))
+
+    def test_it_blocks_the_next_hit_the_same_turn(self):
+        after, outcome = step(self.board([KATANA, KATANA]), Action("Wait"))
+        self.assertEqual((outcome.hp_lost, after.hero.shield), (2, False))
+
+    def test_a_blocked_hit_brings_none(self):
+        state = self.board([KATANA])
+        state.hero.shield = True
+        after, outcome = step(state, Action("Wait"))
+        self.assertEqual((outcome.hp_lost, after.hero.shield), (0, False))
+
+    def test_a_hit_still_costs_half_a_shield_or_more(self):
+        # The new shield doesn't make a hit free: going without one is worth half a shield with the skill.
+        from evaluator import _shield_value
+        before = self.board([KATANA])
+        after, _ = step(before, Action("Wait"))
+        self.assertEqual(_shield_value(after) - _shield_value(before), WEIGHTS["shield"] / 2)
+        self.assertGreater(-WEIGHTS["hp_lost"], WEIGHTS["shield"] / 2)
 
 
 if __name__ == "__main__":

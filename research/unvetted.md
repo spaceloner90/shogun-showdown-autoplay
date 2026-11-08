@@ -1,7 +1,8 @@
 # What real logs haven't confirmed
 
 Changes to rules and scoring that real play hasn't shown working yet. `evaluator-v1` won day 1 with the Wanderer
-(`logs/run5_full`, fights 9 to 30), and `evaluator-v2.0` day 2 (`logs/run8` and `logs/run8_part2`), and those stand:
+(`logs/run5_full`, fights 9 to 30), `evaluator-v2.0` day 2 (`logs/run8` and `logs/run8_part2`), and `evaluator-v2.5`
+day 1 with the Jujitsuka (`logs/run10`, killing the Shogun with 9 of 10 HP, 1 HP lost to bosses), and those stand:
 later versions aren't held to winning them again. A win doesn't vet the items below either: each needs a log
 showing that change working. Passing tests
 and replaying old logs doesn't vet a change, because old logs can't show new behavior. An item leaves this list
@@ -41,15 +42,22 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
-## New in v2.5: Nobunaga's armor and spotlights
-
-Nothing logged has the lit cells yet: mod 0.15.0 starts logging them.
+## New in v2.6: Reactive Shield
 
 | Item | Kind | What's already confirmed | What to look for |
 |---|---|---|---|
-| **Hurt only on a lit cell, effects through the armor** | **Rule** | **Read from `NobunagaBoss` and `Attack.HitTarget`** | **Hits on him matching the simulation, lit and dark, and poison applied in the dark ticking only in the light** |
-| The lights move once he's been hurt, unknown where | Rule | Read from `NobunagaBoss.ProcessTurn` | `litCells` changing exactly when his HP changed since his last turn |
-| No reach or targeting on him while dark | Scoring | Boards from `logs/run9` with chosen lights | F1 dodging rather than trading blows with him in the dark, and trading him into the light when it can |
+| Taking damage shields the hero | Rule | Read from `ReactiveShieldSkill`; v2.6 predicts all 4 of its triggers that v2.5 missed in `logs/run10` | Stays exact |
+| **Without a shield, Reactive Shield is worth half of one** | **Scoring** | **A first guess, from hits alternating between blocked and taken** | **F1 neither soaking hits for the shield nor dodging to save one it would get back. In `logs/run10`, fight 21 turn 4, it now lets the shield take a Sniper's volley to kill two** |
+
+## New in v2.5: Nobunaga's armor and spotlights
+
+`logs/run10` vets the rules: the hits on him matched, lit and dark, the lights moved exactly when his HP had
+dropped, and poison carried in the dark never ticked. The one miss, a tick landing the turn he was hurt, was the
+order of the move, fixed in v2.6. F1 beat him in 51 turns without losing HP to him.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| No reach or targeting on him while dark | Scoring | One clean fight in `logs/run10`: 10 of the hero's attacks with him lit, 6 with him dark (at others) | More fights, and whether he gets pushed into the light on purpose (backlog) |
 
 ## New in v2.4: Sai
 

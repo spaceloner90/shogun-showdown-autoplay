@@ -28,9 +28,12 @@ SNIPER_DISTANCE = 4  # Sniper adds its level to the hero's hits on targets at le
 # like where a summon lands, so it isn't simulated. Combo Coin and Triple Combo Heal also trigger on combos, and
 # aren't simulated or valued either: the player's call is there's no reason to yet. So is Combo Recharge, which
 # takes 4 a level off the cooldown of a tile making a kill after the first in a turn (ComboRechargeSkill.OnComboKill),
-# and Chilling Combo, which freezes enemies on a combo kill.
+# and Chilling Combo, which freezes enemies on a combo kill. Reactive Shield is simulated. Shield Retention keeps the
+# hero's shield from one fight to the next (ShieldRetentionSkill.PickUp), and Fortress shields it as a fight begins,
+# both of which show in the logged state.
 UNDERSTOOD_SKILLS = {"BigPockets", "ChillingCombo", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "DynamicBoost", "Fortress", "Healthy",
-                     "QuickRecovery", "Sniper", "TripleComboHeal", "TwoWayMove", "UnfriendlyFire"}
+                     "QuickRecovery", "ReactiveShield", "ShieldRetention", "Sniper", "TripleComboHeal", "TwoWayMove",
+                     "UnfriendlyFire"}
 
 POISON_TURNS = 3  # Applying poison sets this many turns left, and each turn's end deals 1, starting that turn.
 POTION_SLOTS = 3  # The most held in any log without Big Pockets, which adds one (BigPocketsSkill.PickUp).
@@ -153,6 +156,7 @@ class State:
     sniper_bonus: int = 0  # Extra damage on the hero's hits from 4 or more cells away, from Sniper.
     dynamic_bonus: int = 0  # Extra damage on the hero's hits after a move attack this turn, from Dynamic Boost.
     boosted: bool = False  # Whether a move attack has turned Dynamic Boost on this turn.
+    reactive_shield: bool = False  # Reactive Shield: taking damage shields the hero.
     two_way_swap: bool = False  # The special move works backward as well, from Two Way Move.
     special: str = SWAP  # The hero's special move.
     # Damage on its way to marked cells: each is {"damage", "groups"}, and the first group of cells strikes
@@ -322,6 +326,7 @@ def state_from_log(row):
         sniper_bonus=next((s["level"] for s in row.get("skills") or []
                            if isinstance(s, dict) and s.get("name") == "Sniper"), 0),
         two_way_swap=any(isinstance(s, dict) and s.get("name") == "TwoWayMove" for s in row.get("skills") or []),
+        reactive_shield=any(isinstance(s, dict) and s.get("name") == "ReactiveShield" for s in row.get("skills") or []),
         potion_slots=POTION_SLOTS + sum(1 for s in row.get("skills") or []
                                         if isinstance(s, dict) and s.get("name") == "BigPockets"),
         special=special.get("name", SWAP),
@@ -923,12 +928,13 @@ def armored(state, agent):
 
 
 def relocate_lights(state, nobunaga):
-    """On Nobunaga's turn, his spotlights move if his HP has changed since his last turn, to random cells other than
-    the ones lit and his own (NobunagaBoss.ProcessTurn). Where is unknown, so none counts as lit from then on."""
+    """At the end of each turn, his spotlights move if his HP has dropped since the last, to random cells other than
+    the ones lit and his own (NobunagaBoss.ProcessTurn, which the room runs after the agents' end of turn). Where is
+    unknown, so none counts as lit from then on."""
     if state.lit_cells is None or not nobunaga.alive:
         return
     last = state.nobunaga_hp_last_turn
-    if last is not None and nobunaga.hp != last:
+    if last is not None and nobunaga.hp < last:
         state.lit_cells = []
     state.nobunaga_hp_last_turn = nobunaga.hp
 
@@ -995,6 +1001,10 @@ def deal_damage(state, attacker, target, value, outcome, collision=False):
     target.hp -= damage
     if target is state.hero:
         outcome.hp_lost += damage
+        # Reactive Shield shields the hero once it takes damage and lives, if it has no shield
+        # (ReactiveShieldSkill.UponHeroTookDamage). Any damage: a hit, a collision or a poison tick.
+        if state.reactive_shield and damage > 0 and target.alive:
+            target.shield = True
     elif tank:
         if attacker is state.hero:
             outcome.tank_damage += damage
@@ -1123,9 +1133,6 @@ def resolve_enemies(state, outcome):
     # changed who is further left. state.enemies is already in that order.
     enemies = list(state.enemies)
     for enemy in enemies:
-        if enemy.kind == "NobunagaBoss":
-            relocate_lights(state, enemy)
-    for enemy in enemies:
         if not enemy.alive:
             continue
         if enemy.action == "FlipLeft":
@@ -1185,5 +1192,10 @@ def step(state, action):
     resolve_enemies(next_state, outcome)
     tick_poison(next_state, outcome)
     strike_hazards(next_state, outcome, already_on_the_way)
+    # Last of all, from the room's turn: after every agent's end of turn, so a poison tick still sees the old lights
+    # (CombatManager.ProcessTurn calls Room.ProcessTurn after Agent.EndOfTurn).
+    for enemy in list(next_state.enemies):
+        if enemy.kind == "NobunagaBoss":
+            relocate_lights(next_state, enemy)
     end_turn(next_state, swapped)
     return next_state, outcome

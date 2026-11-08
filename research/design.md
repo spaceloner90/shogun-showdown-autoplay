@@ -210,8 +210,11 @@ F2 to F4 play the hero's next turns out against the enemy AI (`solver/search.py`
   always, and whole key presses took 0.25 to 0.5 s.
 - **The fight simulator** (`tools/simulate.py`) plays whole fights offline from every logged fight and wave start
   where all enemies are ported, with a chosen policy, and counts HP lost and the turns the hero was hit. Unlike a
-  replay, it shows how a whole fight goes. `tools/check_ai.py` checks the AI's telegraphs against the logs, and
-  `tools/time_search.py` times the search.
+  replay, it shows how a whole fight goes. `tools/check_ai.py` checks the AI's telegraphs against the logs,
+  `tools/check_rollout.py` how far ahead the whole simulation holds (the moves really played, run 1 to 4 turns
+  through the rules and the AI, against what the game logged), and `tools/time_search.py` times the search. With
+  every enemy ported, the board 4 turns on was exact 83% of the time (89% where every enemy's choice was known
+  throughout; 24% where a Shinobi's or Warden's hidden last tile mattered), and with a boss in, 10%.
 
 ## Adding a mechanic
 

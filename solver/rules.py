@@ -17,7 +17,7 @@ ONE_ENEMY_WAVE_CAP = 6
 MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Barricade", "BladeOfPatience", "Bomb",
            "BossSwap", "Charge",
            "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Lightning", "Maku", "Mirror", "OriginOfSymmetry", "Shield",
-           "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "SmokeBomb", "Spear", "Summon", "SwapToss",
+           "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "ScarStrike", "SmokeBomb", "Spear", "Summon", "SwapToss",
            "Swirl", "Tetsubo", "Trap", "TurnAround", "Volley"}
 
 # Skills the solver handles. Most need no modeling because their effects show up in the logged state,
@@ -45,7 +45,9 @@ WARDEN_EXPLOSION = 2  # What a dying Warden deals to its cell and both beside it
 # Shove is the Ronin's. The other heroes' moves aren't simulated, so they aren't offered as actions.
 SWAP = "SwapSpecialMove"
 SHOVE = "PushSpecialMove"
-SPECIAL_MOVES = {SWAP, SHOVE}
+THROW = "ThrowSpecialMove"  # The Jujitsuka's: throws the enemy behind the hero over to the front.
+SPECIAL_MOVES = {SWAP, SHOVE, THROW}
+SPECIAL_LABELS = {SWAP: "swap", SHOVE: "shove", THROW: "throw"}
 
 # Enemy traits that need no warning. Heavy, Explosive (the Warden's) and Dash (the Strider's) are modeled, and the
 # others haven't changed any prediction.
@@ -123,6 +125,7 @@ class Agent:
     poison: int = 0  # Turns of poison left. Each deals 1 at the end of the turn, and a shield blocks it.
     ice: int = 0  # Turns of being frozen left. A frozen enemy doesn't act.
     freezable: bool = True  # Unfreezable enemies can't be frozen.
+    inanimate: bool = False  # An object rather than a fighter, such as a Barricade. The game doesn't count it as a kill.
     elite: str = "None"  # The game's elite type. Heavy, Reactive Shield and Double Strike change the rules.
 
     @property
@@ -160,6 +163,7 @@ class State:
     traps: list[dict] = field(default_factory=list)
     potions: list[str] = field(default_factory=list)  # The hero's potions, by the game's names.
     potion_slots: int = POTION_SLOTS  # How many potions the hero can hold.
+    fight_won: bool = False  # Set when a boss dies, which ends the fight. See fight_won() for the rest.
 
     def occupant(self, cell):
         if self.hero.alive and self.hero.cell == cell:
@@ -225,7 +229,7 @@ class Action:
         if self.kind in ("MoveLeft", "MoveRight"):
             direction = -1 if self.kind == "MoveLeft" else 1
             if state.occupant(state.hero.cell + direction) is not None:
-                return f"{self.kind} ({'shove' if state.special == SHOVE else 'swap'})"
+                return f"{self.kind} ({SPECIAL_LABELS.get(state.special, 'special')})"
         return self.kind
 
 
@@ -256,6 +260,7 @@ def state_from_log(row):
             poison=data.get("poison") or 0,
             ice=data.get("ice") or 0,
             freezable="Unfreezable" not in (data.get("traits") or []),
+            inanimate=bool(data.get("inanimate")),
             elite=data.get("elite") or "None",
         )
 
@@ -375,15 +380,22 @@ def unmodeled_content(row):
 def can_use_special(state, direction):
     """A special move needs a charge and a movable occupant, in the facing direction without Two Way Move.
 
-    A shove also needs a cell behind the target, though someone can be standing on it.
+    A shove also needs a cell behind the target, though someone can be standing on it. A throw goes the other way:
+    it takes the enemy behind the hero, without Two Way Move, and needs the cell in front of the hero to exist and be
+    empty, to land it on (ThrowSpecialMove.Allowed).
     """
     target = state.hero.cell + direction
     occupant = state.occupant(target)
     if state.special == SHOVE and not 0 <= target + direction < state.cells:
         return False
+    if state.special == THROW:
+        landing = state.hero.cell - direction
+        if not 0 <= landing < state.cells or state.occupant(landing) is not None:
+            return False
+    allowed_way = -state.hero.facing if state.special == THROW else state.hero.facing
     return (
         state.special in SPECIAL_MOVES
-        and (direction == state.hero.facing or state.two_way_swap)
+        and (direction == allowed_way or state.two_way_swap)
         and state.swap_charge >= state.swap_cooldown
         and occupant is not None
         and occupant.movable
@@ -403,6 +415,15 @@ def perform_special(state, direction, outcome):
             land_hit(state, hero, occupant, state.swap_damage, outcome)
         if occupant.alive:
             push(state, hero, occupant, direction, outcome, credit_distance=False)
+        return
+    if state.special == THROW:
+        # Over the hero to the cell on its other side, then pushed on that way as far as it goes, hitting whoever stops
+        # it, as a shove does (ThrowSpecialMove.Perform, Agent.Pushed). Damaging Move's hit comes after the crossing.
+        occupant.cell = hero.cell - direction
+        if state.swap_damage:
+            land_hit(state, hero, occupant, state.swap_damage, outcome)
+        if occupant.alive:
+            push(state, hero, occupant, -direction, outcome, credit_distance=False)
         return
     occupant.cell = hero.cell
     if state.swap_damage:
@@ -529,6 +550,10 @@ def attack_hits(state, attacker, attack):
     # reaches just the cell 2 ahead, past anyone in between.
     if attack.name == "ShadowKama":
         return targets_of(state, attacker, attack)[:1]
+    # Scar Strike hits every enemy below full health, wherever it is, chosen as the attack begins, so earlier tiles in
+    # the volley can add to them (ScarStrikeAttack.Begin). Only the hero can use it.
+    if attack.name == "ScarStrike":
+        return [e for e in state.enemies if e.alive and e.hp < e.max_hp] if attacker is state.hero else []
     # Sharp Turn turns its user around first, then strikes what's in range in the new direction.
     if attack.name == "TurnAround":
         attacker.facing = -attacker.facing
@@ -636,7 +661,7 @@ def spawn_barricade(state, attacker):
     cell = attacker.cell + attacker.facing
     if 0 <= cell < state.cells and state.occupant(cell) is None:
         facing = 1 if state.hero.cell > cell else -1
-        state.enemies.append(Agent("Barricade", cell, facing, BARRICADE_HP, BARRICADE_HP))
+        state.enemies.append(Agent("Barricade", cell, facing, BARRICADE_HP, BARRICADE_HP, inanimate=True))
 
 
 def place_bomb(state, attacker, attack):
@@ -892,10 +917,29 @@ def land_hit(state, attacker, target, value, outcome, collision=False):
             target.shield = True
 
 
-def end_of_boss(state):
-    """When a boss dies, everyone else in the room dies with it."""
+def end_of_boss(state, by_hero, outcome):
+    """When a boss dies, everyone else in the room dies with it, and the fight is won.
+
+    Each one counts as a kill by whoever killed the boss, with its HP as damage, the same as killing it outright,
+    except a tank, which was only ever worth anything as part of the boss, and anything inanimate, like a Barricade,
+    which isn't a fighter."""
     for enemy in state.enemies:
+        if enemy.alive and not is_boss(enemy) and enemy.kind not in TANKS and not enemy.inanimate:
+            if by_hero:
+                outcome.enemy_damage += enemy.hp
+            else:
+                outcome.friendly_damage += enemy.hp
+            outcome.kills += 1
         enemy.hp = 0
+    state.fight_won = True
+
+
+def fight_won(state):
+    """Whether the fight is over and won: a boss is dead, or every enemy of the last wave, or of a room without
+    waves."""
+    if state.fight_won:
+        return True
+    return not any(e.alive for e in state.enemies) and (state.turns_until_wave is None or state.last_wave)
 
 
 def deal_damage(state, attacker, target, value, outcome, collision=False):
@@ -936,9 +980,9 @@ def deal_damage(state, attacker, target, value, outcome, collision=False):
             main.hp = max(0, main.hp - damage)
             if not main.alive:
                 outcome.kills += 1
-                end_of_boss(state)
+                end_of_boss(state, attacker is state.hero, outcome)
     elif is_boss(target) and not target.alive:
-        end_of_boss(state)
+        end_of_boss(state, attacker is state.hero, outcome)
     if damage and not target.alive and target.kind == "Warden":
         explode(state, target, outcome)
 

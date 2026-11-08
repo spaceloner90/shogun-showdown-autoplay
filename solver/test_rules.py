@@ -5,7 +5,7 @@ Run with: python solver/test_rules.py
 import unittest
 
 from evaluator import WEIGHTS, _volleys, _has_way_out, potion_plan, _threat_damage, ideal_target, leaf_terms, rank_actions, unanswerable_damage
-from rules import ICE_TURNS, SIMULATED_POTIONS, Action, Agent, Attack, State, Tile, apply_potion, is_tank, legal_actions, state_from_log, step, unmodeled_content
+from rules import ICE_TURNS, can_use_special, fight_won, SIMULATED_POTIONS, Action, Agent, Attack, State, Tile, apply_potion, is_tank, legal_actions, state_from_log, step, unmodeled_content
 
 SWIRL = Attack("Swirl", 2, [-1, 1])
 ARROW = Attack("Arrow", 2, list(range(1, 11)), first_target=True)
@@ -800,6 +800,7 @@ class ShieldValueTest(unittest.TestCase):
     def test_a_kill_that_removes_the_attacker_keeps_the_shield(self):
         state = make_state(enemies=[enemy(3, hp=2, action="Attack", queue=[KATANA])], queue=["Swirl"])
         state.hero.shield = True
+        state.turns_until_wave = 5  # More to come, so the kill doesn't win the fight and the position still counts.
         best = rank_actions(state, depth=1)[0]
         self.assertEqual(best.actions[0].kind, "Attack")
         self.assertEqual(best.terms["shield"], 85)
@@ -1151,12 +1152,47 @@ class BossDeathTest(unittest.TestCase):
     def test_everyone_dies_with_the_boss(self):
         state = make_state(enemies=[shogun(cell=3, hp=2), enemy(0)])
         after, outcome = fire(state, KATANA)
-        self.assertEqual((after.enemies, outcome.kills), ([], 1))
+        self.assertEqual((after.enemies, outcome.kills), ([], 2))  # They count as kills, as if killed outright.
 
-    def test_a_sweep_gets_no_credit_for_those_who_die_with_the_boss(self):
+    def test_a_sweep_counts_those_who_die_with_the_boss(self):
+        # Swirl hits both for 2: the Shogun dies, and the Ashigaru's last 1 HP counts too, as a kill.
         state = make_state(enemies=[shogun(cell=1, hp=2), enemy(3)])
         after, outcome = fire(state, SWIRL)
-        self.assertEqual((after.enemies, outcome.kills, outcome.enemy_damage), ([], 1, 2))
+        self.assertEqual((after.enemies, outcome.kills, outcome.enemy_damage), ([], 2, 5))
+
+    def test_killing_the_boss_wins_the_fight(self):
+        state = make_state(enemies=[shogun(cell=3, hp=2), enemy(0)])
+        after, _ = fire(state, KATANA)
+        self.assertTrue(fight_won(after))
+
+    def test_a_cleared_room_wins_only_on_the_last_wave(self):
+        state = make_state(enemies=[enemy(3, hp=2)])
+        state.turns_until_wave, state.last_wave = 4, False
+        self.assertFalse(fight_won(fire(state, KATANA)[0]))
+        state = make_state(enemies=[enemy(3, hp=2)])
+        state.turns_until_wave, state.last_wave = 4, True
+        self.assertTrue(fight_won(fire(state, KATANA)[0]))
+
+    def test_a_free_win_now_beats_anything(self):
+        state = make_state(enemies=[enemy(3, hp=2)], queue=["Swirl"])
+        best = rank_actions(state, depth=1)[0]
+        self.assertEqual((best.actions[0].kind, best.terms.get("win")), ("Attack", WEIGHTS["win"]))
+
+    def test_a_win_that_costs_hp_now_earns_nothing_extra(self):
+        # Killing a lone Warden from beside it wins, but its blast hits the hero for 2.
+        state = make_state(hero_cell=2, enemies=[WardenTest.warden(None, 3)], queue=["Swirl"])
+        lines = {line.labels[0]: line for line in rank_actions(state, depth=1)}
+        self.assertNotIn("win", lines["Attack"].terms)
+
+    def test_a_barricade_dying_with_its_boss_counts_nothing(self):
+        barricade = Agent("Barricade", 0, 1, 5, 5, inanimate=True)
+        _, outcome = fire(make_state(enemies=[shogun(cell=3, hp=2), barricade]), KATANA)
+        self.assertEqual((outcome.kills, outcome.enemy_damage), (1, 2))
+
+    def test_a_tank_dying_with_its_boss_counts_nothing(self):
+        state = make_state(enemies=[shogun(cell=3, hp=2), statue(cell=0)])
+        _, outcome = fire(state, KATANA)
+        self.assertEqual((outcome.kills, outcome.enemy_damage), (1, 2))
 
     def test_their_attacks_die_with_them(self):
         state = make_state(enemies=[shogun(cell=3, hp=2), enemy(1, facing=1, action="Attack", queue=[KATANA])])
@@ -1580,6 +1616,79 @@ def ronin(hero_cell=2, facing=1, enemies=(), swap_charge=4):
     return state
 
 
+def jujitsuka(hero_cell=2, facing=1, enemies=(), swap_charge=4):
+    state = make_state(hero_cell=hero_cell, facing=facing, enemies=enemies, swap_charge=swap_charge)
+    state.cells = 7
+    state.special = "ThrowSpecialMove"
+    return state
+
+
+class ThrowSpecialMoveTest(unittest.TestCase):
+    """ThrowSpecialMove in the game's code: the enemy behind the hero goes over it, then is pushed on as far as it goes."""
+
+    def test_the_enemy_behind_lands_in_front_and_slides_away(self):
+        # Facing right, the enemy behind is on the left, so the throw is a move left, into it.
+        after, _ = step(jujitsuka(enemies=[enemy(1, facing=1)]), Action("MoveLeft"))
+        self.assertEqual((after.hero.cell, after.enemies[0].cell, after.swap_charge), (2, 6, 0))
+
+    def test_it_stops_at_whoever_is_there_and_both_take_a_collision(self):
+        after, _ = step(jujitsuka(enemies=[enemy(1, facing=1), enemy(5)]), Action("MoveLeft"))
+        self.assertEqual(sorted((e.cell, e.hp) for e in after.enemies), [(4, 2), (5, 2)])
+
+    def test_not_the_way_the_hero_faces_without_two_way_move(self):
+        state = jujitsuka(enemies=[enemy(3)])
+        self.assertNotIn("MoveRight", [a.kind for a in legal_actions(state)])
+        state.two_way_swap = True
+        self.assertIn("MoveRight", [a.kind for a in legal_actions(state)])
+
+    def test_the_cell_in_front_must_be_free(self):
+        self.assertFalse(can_use_special(jujitsuka(enemies=[enemy(1, facing=1), enemy(3)]), -1))
+        self.assertFalse(can_use_special(jujitsuka(hero_cell=6, facing=1, enemies=[enemy(5, facing=1)]), -1))
+
+    def test_a_heavy_enemy_cant_be_thrown(self):
+        heavy = enemy(1, facing=1)
+        heavy.movable = False
+        self.assertFalse(can_use_special(jujitsuka(enemies=[heavy]), -1))
+
+    def test_the_label_says_throw(self):
+        state = jujitsuka(enemies=[enemy(1, facing=1)])
+        self.assertEqual(Action("MoveLeft").label(state), "MoveLeft (throw)")
+
+
+class ScarStrikeTest(unittest.TestCase):
+    """ScarStrikeAttack in the game's code: every enemy below full health, wherever it is."""
+    SCAR = Attack("ScarStrike", 1, [])
+
+    def test_it_hits_every_wounded_enemy_anywhere(self):
+        wounded_far, wounded_behind, healthy = enemy(6, hp=2), enemy(0, facing=1, hp=1), enemy(3)
+        state = jujitsuka(enemies=[wounded_behind, healthy, wounded_far])
+        after, outcome = fire(state, self.SCAR)
+        self.assertEqual(sorted((e.cell, e.hp) for e in after.enemies), [(3, 3), (6, 1)])
+        self.assertEqual(outcome.kills, 1)
+
+    def test_an_earlier_tile_in_the_volley_adds_a_target(self):
+        state = jujitsuka(enemies=[enemy(3)])
+        swirl, scar = Tile(SWIRL, 3, 3, in_queue=True), Tile(self.SCAR, 5, 5, in_queue=True)
+        state.tiles = [swirl, scar]
+        state.queue_tiles = [swirl, scar]
+        state.hero.queue = [SWIRL, self.SCAR]
+        # Swirl takes the 3 HP Ashigaru to 1, which makes it a target, and Scar Strike finishes it.
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual((after.enemies, outcome.kills), ([], 1))
+
+    def test_with_nobody_wounded_it_hits_nothing(self):
+        _, outcome = fire(jujitsuka(enemies=[enemy(3)]), self.SCAR)
+        self.assertEqual(outcome.wasted_attacks, 1)
+
+    def test_it_reaches_a_wounded_target_from_anywhere(self):
+        def reach(hp):
+            state = jujitsuka(hero_cell=0, enemies=[enemy(6, hp=hp)])
+            state.tiles = [Tile(self.SCAR, 5, 5)]
+            return leaf_terms(state)["reach"]
+        self.assertGreater(reach(2), 0)
+        self.assertEqual(reach(3), 0)
+
+
 class ShoveSpecialMoveTest(unittest.TestCase):
     def test_it_pushes_the_target_and_the_hero_stays(self):
         after, outcome = step(ronin(enemies=[enemy(3)]), Action("MoveRight"))
@@ -1806,7 +1915,7 @@ class ShockwaveTest(unittest.TestCase):
     def test_a_boss_dying_ends_it(self):
         state = make_state(hero_cell=0, enemies=[shogun(cell=1, hp=2), enemy(2, hp=5)])
         after, outcome = fire(state, WAVE_KATANA)
-        self.assertEqual((after.enemies, outcome.kills), ([], 1))
+        self.assertEqual((after.enemies, outcome.kills), ([], 2))
 
     def test_a_statue_in_the_chain_earns_little(self):
         state = make_state(hero_cell=0, enemies=[shogun(cell=1, hp=20), statue(cell=2)])

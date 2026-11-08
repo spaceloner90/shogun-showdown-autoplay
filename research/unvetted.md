@@ -41,6 +41,16 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.1: winning, deaths alongside a boss, and the Jujitsuka
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| A free win this turn beats anything; one costing HP earns nothing extra | Scoring | The player's rule; Rei and the Warden test | Bosses and last enemies finished off, without HP spent to win a turn sooner |
+| Deaths alongside a boss count as kills, except tanks and inanimate things | Rule | The code: everyone dies with the boss | Only matters when choosing between volleys that kill the boss |
+| **The Jujitsuka's Throw** | **Rule** | **Read from `ThrowSpecialMove`; the mod sends it as a move toward the enemy behind, untested** | **No refused moves, the enemy landing in front and sliding as simulated, and the throw used to clear a flank** |
+| The Throw's escape value of 6 | Scoring | A first guess, the shove's | Whether it's kept for a flank or spent too readily |
+| Scar Strike hits every wounded enemy | Rule | Read from `ScarStrikeAttack` | Hits matching the simulation, and F1 wounding enemies to set it up |
+
 ## New in v1.28: attacking potions when every slot is full
 
 The freeze rule from v1.21 left this list: `logs/run8_part2` shows every freeze lasting the full 4 turns, the boss's

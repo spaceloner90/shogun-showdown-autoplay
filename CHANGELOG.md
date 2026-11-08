@@ -8,6 +8,20 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.1 — winning, deaths alongside a boss, and the Jujitsuka (2026-11-08)
+- **Scoring:** winning the fight this turn at no HP cost beats anything, as the player put it. A win that costs HP
+  this turn earns nothing extra, since HP carries into the next fight and a safe win may be a turn away: a lone
+  Warden beside the hero is still killed from range a turn later rather than take its blast. Rei
+  (`logs/run6`, fight 3, turn 36), passed up since v1.27, is killed again.
+- **Rule:** enemies that die alongside a boss count as kills, with their HP as damage, except tanks and anything
+  inanimate, like a Barricade. A won fight is a dead boss, or a cleared last wave or room without waves.
+- **Rule:** the Jujitsuka's Throw: the enemy behind the hero goes over it to the front, then is pushed on as far as
+  it goes, hitting whoever stops it, like the shove. Only toward the hero's back without Two Way Move, and only
+  onto a free cell in front. Kept, it's worth 6 as an escape, the shove's value, as a first guess.
+- **Rule:** Scar Strike hits every enemy below full health, wherever it is, chosen as it begins, so earlier tiles
+  in the volley can add targets. It earns reach credit on a wounded target from anywhere.
+- Replay against v2.0: 4 of 2,710 choices change, Rei among them, with no kill or HP lost.
+
 ## v2.0 — day 2 won (2026-11-08)
 - The same code as v1.28. With it the Wanderer finished day 2 and killed the Shogun: `run8` and `run8_part2`, the
   last four fights on v1.28 for 4 HP, 1 of it against the Shogun. The player credits much of it to Chilling Combo,

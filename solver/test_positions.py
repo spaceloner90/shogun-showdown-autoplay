@@ -260,12 +260,11 @@ class RoninAsPlayed(unittest.TestCase):
         self.assertFalse(self.fires_smoke(3, 6))
         self.assertFalse(self.fires_smoke(3, 24))
 
-    # Since v1.27 it steps away to line up a volley killing both next turn, by 1.1. Killing Rei wins the fight, which
-    # nothing values yet, and the TwinTachi dying with him doesn't count as a kill: both are in the backlog.
-    @unittest.expectedFailure
     def test_still_takes_the_boss_kill(self):
-        # Fight 3, turn 36: Smoke Bomb, then the hook, then Spear finishes Rei and ends the fight.
-        self.assertEqual(choice(3, 36, "run6").terms.get("kills", 0), 60)
+        # Fight 3, turn 36: Smoke Bomb, then the hook, then Spear finishes Rei and ends the fight. From v1.27 to v2.0
+        # it stepped away instead, since nothing valued winning. The TwinTachi dying with him counts as a kill too.
+        best = choice(3, 36, "run6")
+        self.assertEqual((best.terms.get("kills", 0), "win" in best.terms), (120, True))
 
     def test_still_fires_it_to_get_out_of_a_hit(self):
         # Fight 2, turn 10: pinned at the wall with a Katana coming.
@@ -317,7 +316,8 @@ class RoninWithLightning(unittest.TestCase):
     def test_still_puts_baru_in_front_of_the_ashigaru(self):
         # Fight 2, turn 24: Smoke Bomb and the hook moved Baru into the Ashigaru's attack, which killed him.
         best = choice(2, 24, "run7")
-        self.assertEqual((best.terms.get("kills", 0), best.terms.get("hp_lost", 0)), (60, 0))
+        # Baru's death takes the Ashigaru with him, which counts as a kill too since v2.1.
+        self.assertEqual((best.terms.get("kills", 0), best.terms.get("hp_lost", 0)), (120, 0))
 
 
 def final_boss_rows():

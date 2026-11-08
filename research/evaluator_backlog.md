@@ -3,6 +3,19 @@
 Open ideas, with F2+ frozen: these all have to work at depth 1 using only what a player can see.
 Enemy AI code is for offline simulation and tuning only.
 
+## The biggest wins: stack patterns and enemy targeting
+
+The player's read, after day 2: figuring out the right stack pattern and which enemy to go for is where the most is
+left to gain. Both are scattered below; this pulls them together.
+
+- **Stack patterns.** Which tiles to load together and in what order, and when to hold a stack for a bigger volley
+  rather than fire. Today a stack is valued for its best volley within a few moves, with fixed fractions, and a
+  sure kill now against a bigger volley next turn is a near tie on many boards since v1.27 (see below). Holding a
+  tile in reserve for a threat that hasn't appeared isn't rewarded at all (see "Holding tiles in reserve").
+- **Enemy targeting.** The ideal target is simply the lowest HP, then the closest. An enemy's danger only registers
+  once its attack is queued, which is often too late (see "Prioritizing dangerous enemies"). Knowing every enemy
+  kind's tiles, agreed for after run 8, is the first step: an Archer or a Shinobi counts as a threat before it loads.
+
 ## Done in v0.3
 
 - Kills are valued over wounds, and one volley doing the work of several is worth more.
@@ -82,16 +95,14 @@ Enemy AI code is for offline simulation and tuning only.
 - **Other corruption patterns:** the game can also send corruption left to right, right to left, or even
   and odd cells in turn. The mod logs all of them as `hazards`, and only the attack that starts them
   needs adding, but none has been seen yet.
-- **Heavy enemies:** as of v0.9, the solver assumes the Heavy trait means an enemy can't be swapped or
-  pulled. The code shows swap and hook need a movable target, but the link to Heavy is an inference.
 - **Summon (ignoring on purpose):** where a summon appears is random, so a player can't react to it
   either. It will keep causing a prediction miss each time, which is expected.
 - **Perfect Strike:** simulated as of v0.11, but cooldowns aren't valued, so F1 won't aim for it.
 - **Shield refinements:** a shield is worth a flat 1 HP (v0.7). It should be worth less near the end of
   a fight, since it usually expires then, and hitting an enemy's shield still scores nothing.
-- **Status effects:** ice, as a tile effect or on the hero. Being cursed has no direct cost in how the
-  hero's position is scored yet. Poison is simulated as of v1.1, and what it's worth is a first guess:
-  see `unvetted.md`.
+- **Statuses on the hero:** poison on the hero is simulated and costs its HP, and a curse doubles the next hit it
+  takes within a simulated turn. Still open: carrying a curse into the next turn costs nothing in the position's
+  score, and the hero being frozen isn't simulated.
 - **Skills:** 36 exist, by the game's code. See the survey below.
 
 ## Skill survey
@@ -163,11 +174,13 @@ forgiving. The player's further read: "close in and face enemies" suited melee w
 depend on the kit. A hero with reach and a hook wants to stay back and only grab the enemies it wants to deal
 with, and being surrounded should cost more. v1.4 does a first version of both, and values a kept Smoke Bomb. Still open:
 
-- **The hook drags enemies in.** Fight 2, turn 30: it pulled a TwinTachi adjacent for 1 damage, winning by 5 points,
-  and the hero took 2 from a Swirl two turns later. v1.4's crowding penalty only stops this at -6, which is close to
-  stalling fights, so it still happens at -3. Choosing who to grab belongs with enemy priority.
-- **Backing into walls.** Standing off could get the hero pinned, as on fight 2, turn 10. Nothing scores being
-  near a wall yet.
+- **The hook drags enemies in (weighed since v1.12).** Fight 2, turn 30: it pulled a TwinTachi adjacent for 1 damage,
+  and the hero took 2 from a Swirl two turns later. The hook's setup value is what pulling one in earns, and since
+  v1.27 the stand-off cost of an adjacent enemy is what it costs. Choosing who to grab is part of enemy targeting.
+- **Backing into walls (partly covered).** Standing off could get the hero pinned, as on fight 2, turn 10. Nothing
+  scores the wall itself, but being pinned shows once a threat is telegraphed: the no-answer check has only one way
+  to step, and being flanked with no way out costs more. Since v1.27 there's less to drive it: reach doesn't fall
+  with distance for long tiles, and only an adjacent enemy costs anything.
 - **Kits other than these.** As of v1.5 every hero uses the same rules, as the player asked: general rules going
   forward, developed further wherever going back shows them worse. Preferred distance has been looked at on the
   Ronin's deck and the Wanderer's winning-run decks, where it comes out at 1 on 894 of 926 boards.
@@ -188,9 +201,11 @@ with, and being surrounded should cost more. v1.4 does a first version of both, 
   discount less, though spawns will always make early kills worth more. See `design.md`.
 - **Escape values are guesses.** As of v1.7 every repositioning move is worth something kept, from how flexible it
   is, and they're first guesses to tune in play. Only Swap and the Smoke Bomb count as a way out when flanked.
-- **The shove for collision damage.** Fight 2, turn 7 spent it for 2 damage, and it was down for 4 turns.
-- **Facing.** Fight 2, turn 32: Spear killed one TwinTachi while the one behind the hero hit. The answer was to
-  flip a turn earlier, which depth 1 only partly sees.
+- **The shove for collision damage (handled since v1.7).** Fight 2, turn 7 spent it for 2 damage, and it was down
+  for 4 turns. Since v1.7 a kept shove is worth 6 as an escape, so spending it for damage counts that cost.
+- **Flipping ahead of time.** Fight 2, turn 32: Spear killed one TwinTachi while the one behind the hero hit. The
+  answer was to flip a turn earlier. The facing term exists; seeing the need a turn early is anticipation, the known
+  limit of depth 1, which knowing enemy kits may help with.
 - **Weak starting decks.** A still enemy with 25 HP takes about 50 turns with the Ronin's starting tiles, against
   about 10 for the Wanderer's final deck, so fights last longer and each mistake costs more.
 

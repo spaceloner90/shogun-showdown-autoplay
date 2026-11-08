@@ -240,6 +240,15 @@ Freezing, read from the code (simulated as of v1.21):
   all: Hideyoshi has the Unfreezable trait, and the Ice Shadow Dash hitting him in `logs/run8_part2` (fight 5, turn
   13) did nothing beyond its damage. The solver reads the trait.
 - **Chilling Combo** freezes enemies on a combo kill. Not simulated, as the player asked, like Combo Curse.
+- **Throw** (the Jujitsuka's special move, `ThrowSpecialMove`): takes the movable enemy behind the hero, over it to
+  the cell in front, which must exist and be free, then pushes it on that way to the last free cell, like the shove,
+  so whoever stops it and it both take a collision hit. Only toward the hero's back, unless Two Way Move lets it go
+  both ways. Damaging Move's hit lands after the crossing.
+- **Scar Strike** (`ScarStrikeAttack`): hits every enemy below full health, wherever it is, regardless of range and
+  facing, chosen as the attack begins. 1 damage, cooldown 5. Enemies can't use it.
+- **Winning:** a fight is won when a boss dies, since everyone dies with it, or when the last wave, or a room
+  without waves, is cleared. The enemies dying with a boss count as its killer's kills, except tanks and inanimate
+  things such as Barricades, which the game's kill streak skips (`CombatManager.OnEnemyDied`).
 - **Potion slots:** 3, the most held in any log, and Big Pockets adds one (`BigPocketsSkill.PickUp`).
 - **Combo Recharge** takes 4 a level off the cooldown of the tile making a combo kill, any kill after the first in a
   turn (`ComboRechargeSkill.OnComboKill`, `CombatManager.OnEnemyDied`). Not simulated, as the player asked.

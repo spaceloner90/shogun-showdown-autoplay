@@ -53,10 +53,10 @@ import itertools
 from dataclasses import dataclass, field
 
 from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, Attack, Outcome, State,
-                   apply_attack, apply_potion, can_use_special, enemy_cells, fireable_attacks, free_hand_tiles, is_tank, legal_actions, perform_special,
+                   apply_attack, apply_potion, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.0"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.1"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -73,6 +73,9 @@ WEIGHTS = {
                               # one off, so it's all upside: the player's read is a third to half.
     "shove_cell": 4.0,        # Per cell an enemy is shoved. Space to load in, but melee wants them close too.
     "kill": 60.0,
+    "win": 10000.0,           # Winning the fight this turn at no HP cost, in effect infinite: nothing beats it, as the
+                              # player put it. A win that costs HP this turn earns nothing extra, so a safe win a turn
+                              # later can still come first, rather than spend HP that carries into the next fight.
     "friendly_damage": 8.0,   # Per enemy HP removed by another enemy.
     "future_discount": 0.85,  # The same result one turn later is worth this fraction.
     "no_response": -60.0,     # Per point of threatened damage the hero's best answer leaves.
@@ -90,6 +93,8 @@ WEIGHTS = {
         "SmokeBomb": 12.0, "BackSmokeBomb": 12.0,   # Past the first target, at any range.
         "ShadowDash": 9.0, "BackShadowDash": 9.0,   # Behind a target, past everyone in between.
         "PushSpecialMove": 6.0,                     # Pushes an adjacent enemy away, without a tile. Not past it.
+        "ThrowSpecialMove": 6.0,                    # Throws the enemy behind over to the front and away, like a
+                                                    # shove from behind. A first guess, the same as the shove.
         "Dash": 6.0,                                # Away to the last free cell, but only into open space.
         "DragonPunch": 4.0,                         # Pushes the target away, as a tile.
         "Charge": 4.0, "BackCharge": 4.0,           # To the last free cell, but next to whoever is there.
@@ -379,6 +384,9 @@ def _reach_value(state, target):
         if tile.attack.value <= 0:
             continue
         best = 0.0
+        # Scar Strike reaches any wounded enemy, from anywhere.
+        if tile.attack.name == "ScarStrike" and target.hp < target.max_hp:
+            best = min(tile.attack.value, hp)
         for reach in set(map(abs, tile.attack.range)):
             damage = tile.attack.value + (state.sniper_bonus if reach >= SNIPER_DISTANCE else 0)
             closeness = max(0.0, 1.0 - WEIGHTS["reach_falloff"] * abs(distance - reach))
@@ -472,7 +480,7 @@ def _kept_moves(state):
     """
     escape_values, setup_values = WEIGHTS["escape_values"], WEIGHTS["setup_values"]
     exploit = max((t.attack.value for t in state.tiles if t.attack.value > 0 and t.attack.name not in setup_values
-                   and max(map(abs, t.attack.range)) <= WEIGHTS["short_reach"]), default=0)
+                   and t.attack.range and max(map(abs, t.attack.range)) <= WEIGHTS["short_reach"]), default=0)
     kept = []
     for tile in state.tiles:
         name = tile.attack.name
@@ -572,6 +580,10 @@ def _evaluate_action(state, action, depth, scale):
     dead = not next_state.hero.alive
     terms = {}
     _merge(terms, outcome_terms(outcome, dead, _cheapest_hit(state)), scale)
+    # Ending the fight now, at no HP cost, beats anything. Only for the turn being chosen: a win later in a line, or
+    # one a stack could make next turn, counts for what it does, like any other kill.
+    if scale == 1.0 and fight_won(next_state) and outcome.hp_lost == 0:
+        _merge(terms, {"win": WEIGHTS["win"]})
     future_scale = scale * WEIGHTS["future_discount"]
     actions, labels = [action], [action.label(state)]
     position = 0.0

@@ -180,6 +180,10 @@ Later bosses in that log, with the rules read from the game's code (simulated as
   neither occupant can be immovable.
 - **Mirror** moves its user across the room's middle (the left of the two on an even room), trading places
   with anyone there. Both turn around.
+- **The kill streak** (`CombatManager.KillStreak`): every enemy death in a turn, by anyone, not inanimate things;
+  reset as each turn begins. From the second, each death is a combo kill, which Combo Curse, Chilling Combo, Combo
+  Recharge, Combo Coin and Triple Combo Heal answer. **Triple Combo Heal** heals the hero 1 on each from the third,
+  at once, nothing past full HP. Simulated as of v2.24; the others act on random enemies, or aren't simulated.
 - **Back Stabber** (the skill, `BackStabberSkill`): its level added to each of the hero's directional hits on an
   enemy facing away from the cell the tile began on. Lightning, Scar Strike and Smoke Bomb aren't directional. Not
   on collisions. Simulated as of v2.23.

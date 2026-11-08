@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.24: combos
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Kill streak by anyone, heal from the third | Rule | `run9`'s one heal predicted | Heals matching, from blasts and poison too |
+| HP healed worth HP lost; 10 per combo kill per combo skill | Scoring | The player's call; first guess for the 10 | Triples set up when safe, without taking hits for them |
+
 ## New in v2.23: Back Stabber
 
 | Item | Kind | What's already confirmed | What to look for |

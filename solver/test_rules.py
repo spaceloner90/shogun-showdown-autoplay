@@ -3264,5 +3264,39 @@ class BackStabberTest(unittest.TestCase):
         self.assertEqual(after.enemies[0].hp, 3)
 
 
+class ComboTest(unittest.TestCase):
+    """The kill streak (CombatManager.OnEnemyDied) and Triple Combo Heal (TripleComboHealSkill.UponComboKill)."""
+
+    def triple(self, hero_hp=7):
+        state = make_state(enemies=[enemy(1, facing=1, hp=1), enemy(3, hp=1)], queue=["Swirl", "Arrow"])
+        state.enemies.append(enemy(4, hp=1))
+        state.hero.hp = hero_hp
+        state.triple_heal = True
+        return state
+
+    def test_the_third_kill_in_a_turn_heals_one(self):
+        after, outcome = step(self.triple(), Action("Attack"))
+        self.assertEqual((outcome.combo_kills, outcome.healed, after.hero.hp), (2, 1, 8))
+
+    def test_no_heal_past_full_hp(self):
+        after, outcome = step(self.triple(hero_hp=10), Action("Attack"))
+        self.assertEqual((outcome.healed, after.hero.hp), (0, 10))
+
+    def test_the_streak_starts_again_each_turn(self):
+        state = self.triple()
+        after, _ = step(state, Action("Wait"))
+        self.assertEqual(after.kill_streak, 0)
+
+    def test_a_heal_is_worth_what_a_lost_hp_costs(self):
+        from evaluator import outcome_terms
+        _, outcome = step(self.triple(), Action("Attack"))
+        self.assertEqual(outcome_terms(outcome, False)["healed"], -WEIGHTS["hp_lost"])
+
+    def test_combo_skills_value_each_combo_kill(self):
+        from evaluator import outcome_terms
+        _, outcome = step(self.triple(), Action("Attack"))
+        self.assertEqual(outcome_terms(outcome, False, 1, 2)["combos"], WEIGHTS["combo_skill"] * 2 * 2)
+
+
 if __name__ == "__main__":
     unittest.main()

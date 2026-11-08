@@ -9,6 +9,15 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.24 — combos: Triple Combo Heal simulated, combo skills valued (2026-11-08)
+- **Rule:** the turn's kill streak counts every enemy death, by anyone, poison and blasts included, inanimate things
+  not (`CombatManager.OnEnemyDied`); from the second, each is a combo kill. Triple Combo Heal heals the hero 1 at
+  once on each from the third, nothing past full HP (`TripleComboHealSkill.UponComboKill`).
+- **Scoring:** HP healed is worth what HP lost costs, tied in code, so F2+ will set up a triple over several turns
+  when it's worth it. Combo Curse and Chilling Combo, random, add 10 per combo kill each, a first guess, as the
+  player asked: a little, for setting up combos at no other cost.
+- `run9`'s one Triple Combo Heal is now predicted. No choice changes on the core.
+
 ## v2.23 — Back Stabber (2026-11-08)
 - **Rule:** Back Stabber adds its level to the hero's directional hits (all but Lightning, Scar Strike and Smoke
   Bomb) on an enemy facing away from where the tile began, so not a dash's arrival behind it

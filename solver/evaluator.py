@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.23"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.24"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -121,6 +121,9 @@ WEIGHTS = {
     # guesses: the Crossbow hits any 2 across its whole range, so it lines up a double far more often than the
     # Spear, which needs them on the 2 cells ahead.
     "pierce": {"Crossbow": 1.5, "Spear": 1.25},
+    # Per combo kill, for each of Combo Curse and Chilling Combo held: they curse or freeze a random enemy then, which
+    # isn't simulated. A little, as the player asked, so the search sets up combos where it costs nothing else.
+    "combo_skill": 10.0,
     "escape_in_hand": 2 / 3,  # A tile in hand rather than loaded. Loading adds only a little, so it doesn't beat
                               # a high damage tile to the queue, since any attack would spend it.
     "escape_no_target": 1 / 3,  # One that acts on a target, with nobody it can act on.
@@ -187,6 +190,7 @@ def _light_copy(state):
 def _preview_fire(state, attacks, cell=None, flip=False):
     """Fires these attacks on a copy of the board, from `cell` if given. Returns the copy and the outcome."""
     trial = _light_copy(state)
+    trial.kill_streak = 0  # A volley fires on a turn of its own.
     if cell is not None:
         trial.hero.cell = cell
     if flip:
@@ -217,7 +221,7 @@ def _volley_value(outcome, cheapest_hit):
     broken = outcome.shields_broken * cheapest_hit * WEIGHTS["enemy_damage"]
     return (outcome.enemy_damage * WEIGHTS["enemy_damage"] + outcome.tank_damage * WEIGHTS["tank_damage"]
             + outcome.kills * WEIGHTS["kill"] + broken + outcome.shove_cells * WEIGHTS["shove_cell"]
-            + _reload_value(outcome))
+            + _reload_value(outcome) - WEIGHTS["hp_lost"] * outcome.healed)
 
 
 def _loaded_worth(name, damage):
@@ -734,7 +738,7 @@ def leaf_terms(state: State) -> dict[str, float]:
     return terms
 
 
-def outcome_terms(outcome: Outcome, hero_dead: bool, cheapest_hit: int = 1) -> dict[str, float]:
+def outcome_terms(outcome: Outcome, hero_dead: bool, cheapest_hit: int = 1, combo_skills: int = 0) -> dict[str, float]:
     return {
         "shields_broken": WEIGHTS["enemy_damage"] * cheapest_hit * outcome.shields_broken,
         "tank_damage": WEIGHTS["tank_damage"] * outcome.tank_damage,
@@ -745,6 +749,9 @@ def outcome_terms(outcome: Outcome, hero_dead: bool, cheapest_hit: int = 1) -> d
         "kills": WEIGHTS["kill"] * outcome.kills,
         "friendly_damage": WEIGHTS["friendly_damage"] * outcome.friendly_damage,
         "reload": _reload_value(outcome),
+        # HP gained is worth what HP lost costs, by Triple Combo Heal.
+        "healed": -WEIGHTS["hp_lost"] * outcome.healed,
+        "combos": WEIGHTS["combo_skill"] * outcome.combo_kills * combo_skills,
     }
 
 
@@ -758,7 +765,7 @@ def _evaluate_action(state, action, depth, scale):
     next_state, outcome = step(state, action)
     dead = not next_state.hero.alive
     terms = {}
-    _merge(terms, outcome_terms(outcome, dead, _cheapest_hit(state)), scale)
+    _merge(terms, outcome_terms(outcome, dead, _cheapest_hit(state), state.combo_skills), scale)
     # Ending the fight now, at no HP cost, beats anything. Only for the turn being chosen: a win later in a line, or
     # one a stack could make next turn, counts for what it does, like any other kill.
     if scale == 1.0 and fight_won(next_state) and outcome.hp_lost == 0:

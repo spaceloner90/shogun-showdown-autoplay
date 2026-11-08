@@ -73,7 +73,7 @@ def _turn(state, action, now=False):
     its kills, or every line ending in one would tie, and the search would keep putting it off."""
     following, outcome = step(state, action)
     dead = not following.hero.alive
-    score = sum(outcome_terms(outcome, dead, _cheapest_hit(state)).values())
+    score = sum(outcome_terms(outcome, dead, _cheapest_hit(state), state.combo_skills).values())
     won = not dead and fight_won(following)
     if now and won and outcome.hp_lost == 0:
         score += WEIGHTS["win"]

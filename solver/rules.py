@@ -28,8 +28,8 @@ MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb
 # are simulated.
 SNIPER_DISTANCE = 4  # Sniper adds its level to the hero's hits on targets at least this many cells away.
 # Combo Curse curses a random enemy on each kill after the first in a turn, by anyone: which one can't be predicted,
-# like where a summon lands, so it isn't simulated. Combo Coin and Triple Combo Heal also trigger on combos, and
-# aren't simulated or valued either: the player's call is there's no reason to yet. So is Combo Recharge, which
+# like where a summon lands, so it isn't simulated, only valued a little per combo kill, as is Chilling Combo. Triple
+# Combo Heal is simulated (combo_kill). Combo Coin isn't simulated or valued. Nor is Combo Recharge, which
 # takes 4 a level off the cooldown of a tile making a kill after the first in a turn (ComboRechargeSkill.OnComboKill),
 # and Chilling Combo, which freezes enemies on a combo kill. Reactive Shield is simulated. Shield Retention keeps the
 # hero's shield from one fight to the next (ShieldRetentionSkill.PickUp), and Fortress shields it as a fight begins,
@@ -175,6 +175,9 @@ class State:
     backstab_bonus: int = 0
     tile_start_cell: int | None = None  # Where the hero stood as its current tile began (Agent.CellBeforeExecution).
     tile_directional: bool = True  # Whether the hero's current tile is directional.
+    kill_streak: int = 0  # Enemies killed so far this turn, by anyone (CombatManager.KillStreak).
+    triple_heal: bool = False  # Triple Combo Heal: each kill from the third in a turn heals the hero 1.
+    combo_skills: int = 0  # How many of Combo Curse and Chilling Combo the hero has: random effects on combo kills.
     dynamic_bonus: int = 0  # Extra damage on the hero's hits after a move attack this turn, from Dynamic Boost.
     boosted: bool = False  # Whether a move attack has turned Dynamic Boost on this turn.
     reactive_shield: bool = False  # Reactive Shield: taking damage shields the hero.
@@ -242,6 +245,8 @@ class Outcome:
     shove_cells: int = 0  # Cells the hero shoved enemies worth fighting, up to a few per shove.
     reloads: int = 0  # Crossbows reloaded.
     reloaded: int = 0  # Damage those reloads restored.
+    combo_kills: int = 0  # Kills after the first in the turn, by anyone.
+    healed: int = 0  # HP the hero gained, from Triple Combo Heal.
     unmodeled: list[str] = field(default_factory=list)
 
 
@@ -383,6 +388,9 @@ def state_from_log(row):
         sniper_bonus=next((s["level"] for s in row.get("skills") or []
                            if isinstance(s, dict) and s.get("name") == "Sniper"), 0),
         two_way_swap=any(isinstance(s, dict) and s.get("name") == "TwoWayMove" for s in row.get("skills") or []),
+        triple_heal=any(isinstance(s, dict) and s.get("name") == "TripleComboHeal" for s in row.get("skills") or []),
+        combo_skills=sum(1 for s in row.get("skills") or []
+                         if isinstance(s, dict) and s.get("name") in ("ComboCurse", "ChillingCombo")),
         reactive_shield=any(isinstance(s, dict) and s.get("name") == "ReactiveShield" for s in row.get("skills") or []),
         special_poison=any(isinstance(s, dict) and s.get("name") == "MamushiMove" for s in row.get("skills") or []),
         potion_slots=POTION_SLOTS + sum(1 for s in row.get("skills") or []
@@ -1102,6 +1110,20 @@ def fight_won(state):
     return not any(e.alive for e in state.enemies) and (state.turns_until_wave is None or state.last_wave)
 
 
+def combo_kill(state, outcome):
+    """An enemy died: the turn's kill streak grows, by anyone's kill (CombatManager.OnEnemyDied). From the second,
+    each is a combo kill; from the third, Triple Combo Heal heals the hero 1 at once, nothing past full HP
+    (TripleComboHealSkill.UponComboKill). Combo Curse and Chilling Combo act on a random enemy then, so they're only
+    counted, for their value."""
+    state.kill_streak += 1
+    if state.kill_streak < 2:
+        return
+    outcome.combo_kills += 1
+    if state.triple_heal and state.kill_streak >= 3 and state.hero.alive and state.hero.hp < state.hero.max_hp:
+        state.hero.hp += 1
+        outcome.healed += 1
+
+
 def deal_damage(state, attacker, target, value, outcome, collision=False):
     enemy_on_enemy = attacker is not None and attacker is not state.hero and target is not state.hero
     if enemy_on_enemy and not collision:
@@ -1132,6 +1154,8 @@ def deal_damage(state, attacker, target, value, outcome, collision=False):
     damage = min(value, target.hp)
     tank = is_tank(state, target)
     target.hp -= damage
+    if target is not state.hero and not target.alive and not target.inanimate:
+        combo_kill(state, outcome)
     if target is state.hero:
         outcome.hp_lost += damage
         # Reactive Shield shields the hero once it takes damage and lives, if it has no shield
@@ -1348,6 +1372,7 @@ def step(state, action):
     """Returns the state after one full turn, and what happened. The input isn't changed."""
     next_state = state.clone()
     outcome = Outcome()
+    next_state.kill_streak = 0  # Reset as each turn begins (CombatManager.ProcessTurn).
     swapped = hero_action(next_state, action, outcome)
     already_on_the_way = len(next_state.hazards)
     resolve_enemies(next_state, outcome)

@@ -296,3 +296,12 @@ player suspects. Not simulated: 2 mispredictions in 658 turns.
 credits flip-then-fire at the fraction of a step, as if the enemy waited while the hero turned. v2.14 made reach
 count facing, which barely moved it (52 loads to 51 in replay). A real fix needs enemies acting between the setup and
 the shot, so it waits for F2+; pricing flips higher in the stack was offered and declined as a made-up tweak.
+
+## Log the enemies' hidden AI memory (right after the current run, run14)
+
+The player's call: next, after run14. `tools/check_rollout.py` shows the simulation 4 turns ahead exact on 89% of
+windows where every enemy's choice is known, and 24% where a Shinobi's or Warden's hidden last tile matters: each
+alternates two tiles by a field the board doesn't show (`ShinobiEnemy.prevAttack`, `WardenEnemy.previousAttack`),
+so with its queue empty the AI can't say which comes next. Logging them (mod 0.17), and the Summoner's
+`waitBeforeSummoning` and the Swapper's `waitCountdown`, would make those choices known and let the Summoner and
+Swapper be ported too.

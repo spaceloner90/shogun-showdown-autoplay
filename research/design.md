@@ -241,3 +241,11 @@ log gets saved into `logs/` first.
   within an F4 line counts as damage dealt, and only what's left at the end is estimated. A value added for an
   action rather than read from the final position would count even when the line already plays out what it stands
   for, so values on moves and tiles stay on the position.
+
+## Tied values
+
+A value defined in terms of another is computed from it in code, never copied, so changing one changes both, as the
+player asked: the reload from what its loaded Crossbow holds, the Phase's and Throw's escape values from the Swap's
+and the shove's, each Back tile's from its forward one, the Edamame threshold from what it heals, the reach
+lookahead from its falloff, and Reactive Shield's unshielded worth from the shield's. `test_tied_values_stay_tied`
+checks the table ones.

@@ -50,10 +50,11 @@ from __future__ import annotations
 
 import copy
 import heapq
+import math
 import itertools
 from dataclasses import dataclass, field
 
-from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, Attack, Outcome, State, Tile,
+from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, Attack, Outcome, State, Tile,
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
@@ -69,7 +70,7 @@ WEIGHTS = {
     "ice_vs_kill": 0.5,       # A freshly frozen enemy is worth this share of killing it, as the player asked: it does
                               # nothing for 4 turns, which in practice is nearly as good. Less as its ice runs out.
     # Potions. Each is used on a key press of its own, and the next press analyzes the board it leaves.
-    "heal_at_missing": 3,     # Use Edamame once the hero is missing at least this much HP, so none of its 3 is wasted.
+    "heal_at_missing": EDAMAME_HEAL,  # Use Edamame once the hero is missing at least what it heals, so none is wasted.
     "trap_planted": 0.4,      # A trap on the ground, as a share of what its damage is worth. Only enemies set
                               # one off, so it's all upside: the player's read is a third to half.
     "shove_cell": 4.0,        # Per cell an enemy is shoved. Space to load in, but melee wants them close too.
@@ -91,15 +92,14 @@ WEIGHTS = {
     # to tune later.
     "escape_values": {
         "SwapSpecialMove": 12.0,                    # Past an adjacent enemy, any time, without a tile.
-        "PhaseSpecialMove": 12.0,                   # Past the adjacent enemy and any behind it, like the Swap.
-        "SmokeBomb": 12.0, "BackSmokeBomb": 12.0,   # Past the first target, at any range.
-        "ShadowDash": 9.0, "BackShadowDash": 9.0,   # Behind a target, past everyone in between.
+        # The Phase: past the adjacent enemy and any behind it, like the Swap (tied to it below).
+        "SmokeBomb": 12.0,                          # Past the first target, at any range. BackSmokeBomb is tied.
+        "ShadowDash": 9.0,                          # Behind a target, past everyone in between. BackShadowDash too.
         "PushSpecialMove": 6.0,                     # Pushes an adjacent enemy away, without a tile. Not past it.
-        "ThrowSpecialMove": 6.0,                    # Throws the enemy behind over to the front and away, like a
-                                                    # shove from behind. A first guess, the same as the shove.
+        # The Throw: the enemy behind over to the front and away, a shove from behind (tied to the shove below).
         "Dash": 6.0,                                # Away to the last free cell, but only into open space.
         "DragonPunch": 4.0,                         # Pushes the target away, as a tile.
-        "Charge": 4.0, "BackCharge": 4.0,           # To the last free cell, but next to whoever is there.
+        "Charge": 4.0,                              # To the last free cell, but next to whoever is there. BackCharge too.
         "GrapplingHook": 1.0,                       # Moves the target, but toward the hero: almost never helps.
     },
     # What keeping a move that brings an enemy in is worth, per point of damage of the strongest short-reach tile
@@ -140,6 +140,13 @@ WEIGHTS = {
     "enemy_hp_left": -4.0,    # Per enemy HP still in the room.
     "wave_pressure": -3.0,    # Per enemy HP in the room, scaled up as the next wave gets close.
 }
+
+# Values defined as equal to others are tied here, so changing one changes them all.
+_ESCAPES = WEIGHTS["escape_values"]
+_ESCAPES["PhaseSpecialMove"] = _ESCAPES["SwapSpecialMove"]
+_ESCAPES["ThrowSpecialMove"] = _ESCAPES["PushSpecialMove"]
+for _name in ("SmokeBomb", "ShadowDash", "Charge"):
+    _ESCAPES["Back" + _name] = _ESCAPES[_name]
 
 # An enemy's newly played tile isn't identified in the simulation. Assume a short, ordinary attack.
 ASSUMED_UNKNOWN = Attack("Assumed", 2, [1], first_target=True)
@@ -400,7 +407,8 @@ def ideal_target(state):
     return min(enemies, key=lambda e: (armored(state, e), _effective_hp(state, e), abs(e.cell - state.hero.cell)))
 
 
-REACH_ACTIONS = 3  # Moves looked ahead for reach: at a quarter off each, a fourth would leave nothing.
+# Actions looked ahead for reach: as many as leave anything after the falloff for each (3 at a quarter off each).
+REACH_ACTIONS = math.ceil(1 / WEIGHTS["reach_falloff"]) - 1
 
 
 def _walk(state, start, budget):

@@ -3046,6 +3046,31 @@ class CrossbowTest(unittest.TestCase):
         from evaluator import outcome_terms
         self.assertAlmostEqual(outcome_terms(outcome, False, 1)["reload"], WEIGHTS["ready_tile"] + loaded)
 
+    def test_a_free_play_reload_joins_an_attack_from_hand(self):
+        state = self.board(0, [enemy(3, hp=2)])
+        bow = state.tiles[0]
+        bow.in_queue, bow.free_play = False, True
+        swirl = Tile(SWIRL, 3, 3, in_queue=True)
+        state.tiles = [swirl, bow]
+        state.queue_tiles, state.hero.queue = [swirl], [SWIRL]
+        best = rank_actions(state)[0]
+        self.assertTrue(best.labels[0].startswith("Attack") and "Crossbow" in best.labels[0], best.labels[0])
+        self.assertGreater(best.terms["reload"], 0)
+
+    def test_a_free_play_tile_alone_is_an_attack_with_the_queue_empty(self):
+        state = self.board(0, [enemy(3)])
+        bow = state.tiles[0]
+        bow.in_queue, bow.free_play = False, True
+        state.queue_tiles, state.hero.queue = [], []
+        self.assertIn(Action("Attack", order=(0,)), legal_actions(state))
+
+    def test_tied_values_stay_tied(self):
+        escapes = WEIGHTS["escape_values"]
+        self.assertEqual(escapes["PhaseSpecialMove"], escapes["SwapSpecialMove"])
+        self.assertEqual(escapes["ThrowSpecialMove"], escapes["PushSpecialMove"])
+        for name in ("SmokeBomb", "ShadowDash", "Charge"):
+            self.assertEqual(escapes["Back" + name], escapes[name])
+
     def test_a_loaded_reload_is_worth_firing(self):
         # Nobody in range, so only the reload makes the stack worth anything.
         state = self.board(0, [])

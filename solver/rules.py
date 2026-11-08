@@ -21,7 +21,7 @@ MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb
            "BossSwap", "Charge", "Crossbow",
            "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Lightning", "Maku", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Sai", "ScarStrike", "SmokeBomb", "Spear", "Summon", "SwapToss",
-           "Swirl", "Tetsubo", "Trap", "TurnAround", "Volley"}
+           "Swirl", "Tetsubo", "Trap", "TurnAround", "TwinTessen", "Volley"}
 
 # Skills the solver handles. Most need no modeling because their effects show up in the logged state,
 # like a shield, max HP or a shorter Swap cooldown. Damaging Move, Dynamic Boost, Sniper, Two Way Move and Unfriendly Fire
@@ -918,6 +918,12 @@ def _apply_attack(state, attacker, attack, outcome):
         # (DragonPunchAttack.PerformAttack has no check, and logs/run9 shows it twice).
         if attack.name == "DragonPunch" and target.movable:
             push(state, attacker, target, attacker.facing, outcome)
+    # Twin Tessen hits both sides, then pushes every movable one it hit away from its user, as far as each goes,
+    # dead or not, as Dragon Punch does (TwinTessenAttack.ApplyEffect, PerformPushing).
+    if attack.name == "TwinTessen":
+        for target in hits:
+            if target.movable:
+                push(state, attacker, target, 1 if target.cell > attacker.cell else -1, outcome)
 
 
 def hit_effect(state, attacker, target, effect, outcome):

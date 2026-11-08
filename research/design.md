@@ -197,7 +197,7 @@ F2 to F4 play the hero's next turns out against the enemy AI (`solver/search.py`
 - **The solver server** (`solver/server.py`) keeps worker processes warm and runs every depth at once, one job per
   distinct action now (actions that leave the same board with the same events are searched once). The mod still
   runs `analyze.py` on each key press, which hands the request to the server, starting one if none runs and
-  answering that press itself up to F3. The server restarts itself when solver code changes, and quits after 3 idle
+  answering that press itself, F2 to F4 sharing 1 s on one core. The server restarts itself when solver code changes, and quits after 3 idle
   hours. Killing it by hand leaves its workers behind; let it quit, or stop them too.
 - **The budget:** F2 to F4 get 0.45 s from the start of an answer. A depth that runs over plays the choice of the
   deepest that didn't, and the report says so; F1 always finishes. On this laptop (a 14900HX, with slower efficiency

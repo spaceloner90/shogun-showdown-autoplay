@@ -9,6 +9,17 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.19 — Twin Tessen, and F4 always answers (2026-11-08)
+- **Rule:** Twin Tessen hits the agent on each side of the hero for its damage, 1 to start, cooldown 6, then
+  pushes each movable one it hit away from the hero as far as it goes, dead or not, a collision hitting both
+  (`TwinTessenAttack.ApplyEffect`, `PerformPushing`).
+- **Scoring:** escape value 4, Dragon Punch's: it moves both neighbours but hits for less. A first guess.
+- **Fix:** answered without the solver server (the first key press after the game starts, or after solver code
+  changes), F2 to F4 now share 1 s on one core, a depth that runs out playing the next one down's choice. Before,
+  that answer stopped at F3, and the mod analyzes a board only once, so the F4 key did nothing until the board
+  changed, as the player found.
+- No logged deck has Twin Tessen: no choice changes on the core.
+
 ## v2.18 — the hero's Mirror (2026-11-08)
 - **Rule, checked:** the hero's Mirror is the Shogun's (`MirrorAttack`), already simulated: across the room's
   middle, the left one of two on an even room, trading places with whoever is there, both turning round; refused

@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.18"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.19"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -102,6 +102,8 @@ WEIGHTS = {
         # The Throw: the enemy behind over to the front and away, a shove from behind (tied to the shove below).
         "Dash": 6.0,                                # Away to the last free cell, but only into open space.
         "DragonPunch": 4.0,                         # Pushes the target away, as a tile.
+        "TwinTessen": 4.0,                          # Pushes both neighbours away, as a tile. A first guess, Dragon
+                                                    # Punch's: it covers both sides but hits for less.
         "Charge": 4.0,                              # To the last free cell, but next to whoever is there. BackCharge too.
         "GrapplingHook": 1.0,                       # Moves the target, but toward the hero: almost never helps.
     },
@@ -607,7 +609,7 @@ def _pressure_terms(state):
 
 
 # Repositioning tiles that act on their first target ahead, and only do so if it's there and movable.
-_MOVES_TARGET = SMOKE_BOMBS | {"DragonPunch", "GrapplingHook"}
+_MOVES_TARGET = SMOKE_BOMBS | {"DragonPunch", "GrapplingHook", "TwinTessen"}
 
 
 def _kept_moves(state):

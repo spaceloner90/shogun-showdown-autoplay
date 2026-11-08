@@ -148,10 +148,14 @@ def _sorted(lines):
     return lines
 
 
-def rank_lines(state, depth, beam=BEAM, leaf_beam=LEAF_BEAM):
-    """Every action available now, best first, each with the best line after it over `depth` turns in all."""
-    search = Search(beam, leaf_beam)
-    return _sorted([line_for(state, action, depth, search) for action in legal_actions(state)])
+def rank_lines(state, depth, beam=BEAM, leaf_beam=LEAF_BEAM, deadline=None):
+    """Every action available now, best first, each with the best line after it over `depth` turns in all. None if
+    a `deadline` (a time.time()) passes first."""
+    search = Search(beam, leaf_beam, deadline)
+    try:
+        return _sorted([line_for(state, action, depth, search) for action in legal_actions(state)])
+    except OutOfTime:
+        return None
 
 
 def _line_task(job):

@@ -3185,5 +3185,28 @@ class HeroMirrorTest(unittest.TestCase):
         self.assertEqual(_kept_moves(state)["escape"], WEIGHTS["escape_values"]["Mirror"])
 
 
+class TwinTessenTest(unittest.TestCase):
+    """TwinTessenAttack in the game's code: hits both neighbours, then pushes each movable one away."""
+    TESSEN = Attack("TwinTessen", 1, [-1, 1])
+
+    def test_it_hits_both_sides_and_pushes_them_apart(self):
+        state = make_state(hero_cell=3, enemies=[enemy(2, facing=1), enemy(4)])
+        state.cells = 7
+        after, outcome = fire(state, self.TESSEN)
+        self.assertEqual(sorted((e.cell, e.hp) for e in after.enemies), [(0, 2), (6, 2)])
+        self.assertEqual(outcome.enemy_damage, 2)
+
+    def test_a_push_into_someone_hits_both(self):
+        state = make_state(hero_cell=1, enemies=[enemy(2), enemy(4)])
+        after, _ = fire(state, self.TESSEN)
+        self.assertEqual(sorted((e.cell, e.hp) for e in after.enemies), [(3, 1), (4, 2)])
+
+    def test_a_heavy_enemy_is_hit_but_not_pushed(self):
+        heavy = enemy(2)
+        heavy.movable = False
+        after, _ = fire(make_state(hero_cell=1, enemies=[heavy]), self.TESSEN)
+        self.assertEqual((after.enemies[0].cell, after.enemies[0].hp), (2, 2))
+
+
 if __name__ == "__main__":
     unittest.main()

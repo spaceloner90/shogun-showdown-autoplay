@@ -180,6 +180,9 @@ Later bosses in that log, with the rules read from the game's code (simulated as
   neither occupant can be immovable.
 - **Mirror** moves its user across the room's middle (the left of the two on an even room), trading places
   with anyone there. Both turn around.
+- **Twin Tessen** (`TwinTessenAttack`): hits the agent on each side for its damage (1 to start, cooldown 6), then
+  pushes each movable one it hit away from the hero, as far as it goes, dead or not, as Dragon Punch does: whoever
+  stops one and it take 1 each. Simulated as of v2.19.
 - **The hero's Mirror** is the same attack, always Free Play (`MirrorAttack.Initialize`), cooldown 6, no damage.
 - **Origin of Symmetry** moves its user to the centre, trading places with anyone there. Nobody turns.
 - **Dragon Punch** hits, then pushes the target as far as it goes. If someone stops it, they each take 1.

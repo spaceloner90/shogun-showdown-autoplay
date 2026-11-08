@@ -24,10 +24,11 @@ import server
 # The solver itself is only imported when this process answers a request, not when it hands one to the server:
 # importing it takes longer than the server's whole answer.
 
-# F1 is the evaluator alone; F2 and deeper search ahead with the enemy AI (search.py). Without the server's workers,
-# F4 is too slow on one core, so a request answered here stops at F3, and the F4 key gets no analysis that time.
+# F1 is the evaluator alone; F2 and deeper search ahead with the enemy AI (search.py).
 DEPTHS = (1, 2, 3, 4)
-FALLBACK_DEPTHS = (1, 2, 3)
+# Answered here, without the server's workers, F2 to F4 get this long between them, on one core; one that runs out
+# plays the depth below's choice, so every key still answers. The mod analyzes each board only once.
+FALLBACK_BUDGET = 1.0
 # F2 to F4 get this long from the start of the answer. F4 usually finishes within it, but this laptop's slower cores
 # and throttling make it run over now and then; the F4 key then plays F3's choice, as the player asked, and so on
 # down. F1 always finishes.
@@ -133,8 +134,14 @@ def answer(row, pool=None, depths=DEPTHS):
         for depth in sorted(late):
             by_depth[depth] = by_depth[depth - 1]
     else:
-        by_depth = {depth: rank_actions(state, depth=1) if depth == 1 else rank_lines(state, depth)
-                    for depth in depths}
+        deadline = time.time() + FALLBACK_BUDGET
+        by_depth = {}
+        for depth in depths:
+            lines = rank_actions(state, depth=1) if depth == 1 else rank_lines(state, depth, deadline=deadline)
+            if lines is None:
+                late.append(depth)
+                lines = by_depth[depth - 1]
+            by_depth[depth] = lines
     rank = (lambda board: submit_lines(board, (1,), pool)()[1]) if pool is not None else None
     potion, potion_reason, _ = potion_plan(state, by_depth[depths[0]], rank)
     elapsed = time.perf_counter() - started
@@ -170,7 +177,7 @@ def answer(row, pool=None, depths=DEPTHS):
     print("REPORT")
     print(build_report(row, state, by_depth, potion, potion_reason))
     for depth in late:
-        print(f"  F{depth} ran out of time ({BUDGET} s), so it plays the next depth down's choice.")
+        print(f"  F{depth} ran out of time, so it plays the next depth down's choice.")
     return "\n".join(out)
 
 
@@ -178,7 +185,7 @@ def main():
     row_text = sys.stdin.read()
     text = server.ask(row_text)
     if text is None:
-        text = answer(json.loads(row_text), depths=FALLBACK_DEPTHS)
+        text = answer(json.loads(row_text))
     sys.stdout.write(text + "\n")
 
 

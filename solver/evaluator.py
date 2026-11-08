@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.21"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.22"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -514,7 +514,8 @@ def _reach_total(state, target, nodes, exclude=None):
             if cost is None:
                 continue
             reach = abs(offset)
-            damage = tile.attack.value + (state.sniper_bonus if reach >= SNIPER_DISTANCE else 0)
+            damage = (tile.attack.value + (state.sniper_bonus if reach >= SNIPER_DISTANCE else 0)
+                      + (state.close_bonus if reach == 1 else 0))
             closeness = max(0.0, 1.0 - WEIGHTS["reach_falloff"] * cost)
             best = max(best, min(damage, hp) * closeness * WEIGHTS["pierce"].get(tile.attack.name, 1.0))
         waiting = 0 if tile.in_queue else max(0, tile.cooldown - tile.charge)

@@ -34,7 +34,7 @@ SNIPER_DISTANCE = 4  # Sniper adds its level to the hero's hits on targets at le
 # and Chilling Combo, which freezes enemies on a combo kill. Reactive Shield is simulated. Shield Retention keeps the
 # hero's shield from one fight to the next (ShieldRetentionSkill.PickUp), and Fortress shields it as a fight begins,
 # both of which show in the logged state.
-UNDERSTOOD_SKILLS = {"BigPockets", "ChillingCombo", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "DynamicBoost", "Fortress", "Healthy", "MamushiMove",
+UNDERSTOOD_SKILLS = {"BigPockets", "ChillingCombo", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "CloseCombat", "DynamicBoost", "Fortress", "Healthy", "MamushiMove",
                      "QuickRecovery", "ReactiveShield", "ShieldRetention", "Sniper", "TripleComboHeal", "TwoWayMove",
                      "UnfriendlyFire"}
 
@@ -168,6 +168,9 @@ class State:
     swap_damage: int = 0  # What a swap deals to the enemy passed through, from Damaging Move.
     friendly_bonus: int = 0  # Extra damage when enemies hit each other, from Unfriendly Fire.
     sniper_bonus: int = 0  # Extra damage on the hero's hits from 4 or more cells away, from Sniper.
+    # Extra damage on the hero's hits on an adjacent enemy, from Close Combat, unless that tile moved the hero.
+    close_bonus: int = 0
+    tile_start_cell: int | None = None  # Where the hero stood as its current tile began (Agent.CellBeforeExecution).
     dynamic_bonus: int = 0  # Extra damage on the hero's hits after a move attack this turn, from Dynamic Boost.
     boosted: bool = False  # Whether a move attack has turned Dynamic Boost on this turn.
     reactive_shield: bool = False  # Reactive Shield: taking damage shields the hero.
@@ -369,6 +372,8 @@ def state_from_log(row):
                              if isinstance(s, dict) and s.get("name") == "UnfriendlyFire"), 0),
         dynamic_bonus=next((s["level"] for s in row.get("skills") or []
                             if isinstance(s, dict) and s.get("name") == "DynamicBoost"), 0),
+        close_bonus=next((s["level"] for s in row.get("skills") or []
+                          if isinstance(s, dict) and s.get("name") == "CloseCombat"), 0),
         sniper_bonus=next((s["level"] for s in row.get("skills") or []
                            if isinstance(s, dict) and s.get("name") == "Sniper"), 0),
         two_way_swap=any(isinstance(s, dict) and s.get("name") == "TwoWayMove" for s in row.get("skills") or []),
@@ -895,6 +900,8 @@ def _apply_attack(state, attacker, attack, outcome):
             outcome.wasted_attacks += 1
         return
     start_cell, start_facing = attacker.cell, attacker.facing
+    if attacker is state.hero:
+        state.tile_start_cell = start_cell
     hits = attack_hits(state, attacker, attack)
     # An attack that moved or turned the hero still did something, even if it hit nothing, and so does a reload.
     reload = attack.name == "Crossbow" and attack.value == 0
@@ -1095,6 +1102,13 @@ def deal_damage(state, attacker, target, value, outcome, collision=False):
     # Measured when the hit lands, so a Smoke Bomb's trade of places doesn't change it, and a Charge lands adjacent.
     if attacker is state.hero and not collision and abs(attacker.cell - target.cell) >= SNIPER_DISTANCE:
         value += state.sniper_bonus
+    # Close Combat: an enemy right beside the hero, the hero still where it stood as this tile began, so not a move
+    # attack's own hit (CloseCombatSkill.ProcessAttack; Agent.ExecuteTile sets CellBeforeExecution for each tile).
+    # Not on collisions, as with Sniper.
+    if (attacker is state.hero and not collision and state.close_bonus and target is not state.hero
+            and abs(attacker.cell - target.cell) == 1
+            and attacker.cell == (state.tile_start_cell if state.tile_start_cell is not None else attacker.cell)):
+        value += state.close_bonus
     if attacker is state.hero and not collision and state.boosted:
         value += state.dynamic_bonus
     if target.curse and value > 0:

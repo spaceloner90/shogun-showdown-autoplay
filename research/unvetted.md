@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.22: Close Combat
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| +level on adjacent hits, not a move tile's own hit | Rule | Read from `CloseCombatSkill` and `Agent.ExecuteTile` | Hit sizes matching, after a Charge and without |
+
 ## New in v2.20: unknown enemies are assumed to fire
 
 | Item | Kind | What's already confirmed | What to look for |

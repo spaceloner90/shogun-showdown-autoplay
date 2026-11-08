@@ -3208,5 +3208,37 @@ class TwinTessenTest(unittest.TestCase):
         self.assertEqual((after.enemies[0].cell, after.enemies[0].hp), (2, 2))
 
 
+class CloseCombatTest(unittest.TestCase):
+    """CloseCombatSkill in the game's code: its level added to the hero's hits on an adjacent enemy, unmoved."""
+
+    def test_an_adjacent_hit_gets_the_bonus(self):
+        state = make_state(enemies=[enemy(3, hp=5)], queue=["Swirl"])
+        state.close_bonus = 1
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual((after.enemies[0].hp, outcome.enemy_damage), (2, 3))
+
+    def test_not_at_range(self):
+        state = make_state(enemies=[enemy(4, hp=5)], queue=["Arrow"])
+        state.close_bonus = 1
+        after, _ = step(state, Action("Attack"))
+        self.assertEqual(after.enemies[0].hp, 3)
+
+    def test_not_on_a_move_attacks_own_hit(self):
+        # A Charge runs the hero next to the enemy: its own hit moved the hero, so no bonus, but the Katana after it
+        # begins from where the Charge left it, and gets one.
+        state = make_state(hero_cell=0, enemies=[enemy(4, hp=9)])
+        charge, katana = Tile(CHARGE, 3, 3, in_queue=True), Tile(KATANA, 3, 3, in_queue=True)
+        state.tiles, state.queue_tiles, state.hero.queue = [charge, katana], [charge, katana], [CHARGE, KATANA]
+        state.close_bonus = 1
+        after, _ = step(state, Action("Attack"))
+        self.assertEqual(after.enemies[0].hp, 9 - 1 - 3)
+
+    def test_read_from_the_log(self):
+        row = {"skills": [{"name": "CloseCombat", "level": 2}]}
+        from rules import unmodeled_content
+        self.assertNotIn("skill CloseCombat", unmodeled_content({"tiles": [], "hero": {"queue": []}, "enemies": [],
+                                                                  "skills": row["skills"]}))
+
+
 if __name__ == "__main__":
     unittest.main()

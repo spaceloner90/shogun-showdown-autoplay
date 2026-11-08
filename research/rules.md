@@ -180,6 +180,9 @@ Later bosses in that log, with the rules read from the game's code (simulated as
   neither occupant can be immovable.
 - **Mirror** moves its user across the room's middle (the left of the two on an even room), trading places
   with anyone there. Both turn around.
+- **Close Combat** (the skill, `CloseCombatSkill`): its level added to each of the hero's hits on an enemy right
+  beside it, if that tile didn't move the hero (`Agent.ExecuteTile` records the cell as each tile begins). Not on
+  collisions. Simulated as of v2.22.
 - **Twin Tessen** (`TwinTessenAttack`): hits the agent on each side for its damage (1 to start, cooldown 6), then
   pushes each movable one it hit away from the hero, as far as it goes, dead or not, as Dragon Punch does: whoever
   stops one and it take 1 each. Simulated as of v2.19.

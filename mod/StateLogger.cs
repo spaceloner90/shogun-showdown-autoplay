@@ -26,7 +26,7 @@ using BepInEx;
 using HarmonyLib;
 using UnityEngine;
 
-[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.15.0")]
+[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.16.0")]
 public class StateLoggerPlugin : BaseUnityPlugin
 {
     private const float PollIntervalSeconds = 0.1f;
@@ -820,6 +820,7 @@ public class StateLoggerPlugin : BaseUnityPlugin
     {
         sb.Append("{\"name\":").Append(Str(attack.AttackEnum.ToString()));
         sb.Append(",\"value\":").Append(attack.HasValue ? attack.Value.ToString() : "null");
+        sb.Append(",\"baseValue\":").Append(attack.HasValue ? Prop<int>(attack, "BaseValue").ToString() : "null");
         sb.Append(",\"cooldown\":").Append(attack.Cooldown);
         sb.Append(",\"level\":").Append(attack.Level);
         sb.Append(",\"maxLevel\":").Append(attack.MaxLevel);

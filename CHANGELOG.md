@@ -9,6 +9,21 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.9 — the Crossbow, and reach by real movement (2026-11-08)
+- **Rule:** the Crossbow alternates. Loaded, it hits the first 2 agents in range for its damage, 3 to start, and
+  empties; empty, its next use reloads it to its base damage and hits nobody (`CrossbowAttack.ApplyEffect`,
+  `Attack`, `Reload`). Its cooldown runs after either. Mod 0.16.0 logs each tile's base damage (`baseValue`); before
+  it, an empty Crossbow is taken to reload to 3.
+- **Scoring:** a reload is worth having its loaded tile ready, as the player put it: a ready tile (2) plus its damage
+  loaded (2 a point), 8 for 3 damage. It counts when the reload fires, like damage, so loading one shows in the
+  stack, and the shot it sets up counts for its own damage when that fires (rule 2).
+- **Scoring:** reach counts the actions it takes to get in range, a quarter off each, rather than the cells. Plain
+  moves are walked as the hero really moves, blocked by anyone in the way and dashing for the Shadow; for a walker in
+  open space nothing changes. What the special move or a movement tile adds by one use on the way is a third use of
+  it, beside escape and setup, and it counts the largest (rule 2). A tile in hand takes an action to load first.
+- Replay: 45 of 4,463 choices change, no HP lost, total kills unchanged and 1 more damage. Decisions take about
+  0.07 s, from 0.05.
+
 ## v2.8 — the Shadow dashes when it moves (2026-11-08)
 - **Rule:** every move the Shadow makes is a dash to the last free cell that way, next to whoever stops it or at the
   wall (`ShadowHero.PerformMoveAction`, `Dash`: `Cell.LastFreeCellInDirection`). Into an occupied cell it's still the

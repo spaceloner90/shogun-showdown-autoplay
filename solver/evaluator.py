@@ -49,14 +49,15 @@ and decision in the logs records the version it came from.
 from __future__ import annotations
 
 import copy
+import heapq
 import itertools
 from dataclasses import dataclass, field
 
-from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, Attack, Outcome, State,
-                   apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, legal_actions, move_destination, perform_special,
+from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, Attack, Outcome, State, Tile,
+                   apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.8"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.9"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -198,7 +199,15 @@ def _effective_hp(state, enemy):
 def _volley_value(outcome, cheapest_hit):
     broken = outcome.shields_broken * cheapest_hit * WEIGHTS["enemy_damage"]
     return (outcome.enemy_damage * WEIGHTS["enemy_damage"] + outcome.tank_damage * WEIGHTS["tank_damage"]
-            + outcome.kills * WEIGHTS["kill"] + broken + outcome.shove_cells * WEIGHTS["shove_cell"])
+            + outcome.kills * WEIGHTS["kill"] + broken + outcome.shove_cells * WEIGHTS["shove_cell"]
+            + _reload_value(outcome))
+
+
+def _reload_value(outcome):
+    """A Crossbow's reload is worth having its loaded tile ready, as the player put it: what a ready tile loaded
+    with that damage holds on the position. Earned when it fires, since that's when the reload happens; the shot it
+    sets up counts for its own damage when that fires (rule 2)."""
+    return WEIGHTS["ready_tile"] * outcome.reloads + WEIGHTS["loaded_damage"] * outcome.reloaded
 
 
 def _volleys(state):
@@ -219,6 +228,7 @@ def _spent(trial, fired):
     for tile_id in fired_ids:
         copies[tile_id].in_queue = False
         copies[tile_id].charge = 0
+        fire_crossbow(copies[tile_id], Outcome())
     trial.hero.queue = [t.attack for t in trial.queue_tiles]
     return trial
 
@@ -256,6 +266,9 @@ def _stack_value(state, kept_now):
 
     def gain(tiles, cell, flip):
         trial, outcome = _preview_fire(state, [t.attack for t in tiles], cell, flip)
+        for tile in tiles:
+            if tile.attack.name == "Crossbow" and tile.attack.value == 0:
+                fire_crossbow(copy.copy(tile), outcome)
         done = _volley_value(outcome, cheapest_hit) + WEIGHTS["hp_lost"] * outcome.hp_lost
         if not trial.hero.alive:
             return done + WEIGHTS["death"]
@@ -376,29 +389,130 @@ def ideal_target(state):
     return min(enemies, key=lambda e: (armored(state, e), _effective_hp(state, e), abs(e.cell - state.hero.cell)))
 
 
-def _reach_value(state, target):
-    """Credit for each tile that can reach the target from where the hero stands (rule 3: only credit).
+REACH_ACTIONS = 3  # Moves looked ahead for reach: at a quarter off each, a fourth would leave nothing.
 
-    A tile counts its damage up to the target's HP, with Sniper's bonus where it would hit from far enough, less a
-    share for each cell the hero would have to move to bring it in range, and a discount for each turn until it's
-    ready. Each tile only adds, and more charge adds more, so having a tile never lowers it (rule 1).
-    """
-    if armored(state, target):
-        return 0.0  # Nothing reaches him through his armor.
-    distance = abs(target.cell - state.hero.cell)
+
+def _walk(state, start, budget):
+    """Cells the hero can get to from `start` with plain moves, and the fewest moves each takes, up to `budget`."""
+    occupied = {e.cell for e in state.enemies if e.alive}
+    costs = {start: 0}
+    frontier = [start]
+    for cost in range(1, budget + 1):
+        reached = []
+        for cell in frontier:
+            for direction in (-1, 1):
+                nxt = move_destination(state, cell, direction, occupied)
+                if nxt is not None and nxt not in costs:
+                    costs[nxt] = cost
+                    reached.append(nxt)
+        frontier = reached
+    return costs
+
+
+_REACH_CACHE = {}
+
+
+def _reach_key(state, target, transport):
+    hero = state.hero
+    if transport is None or transport == "special":
+        used = transport
+    else:
+        used = (transport.attack.name, transport.attack.value, tuple(transport.attack.range), transport.attack.effect,
+                transport.in_queue, transport.free_play)
+    return (state.cells, hero.kind, hero.cell, hero.facing, state.special, state.swap_charge >= state.swap_cooldown,
+            state.two_way_swap, state.swap_damage, state.enemies.index(target), used,
+            tuple((e.kind, e.cell, e.facing, e.hp, e.alive, e.shield, e.movable) for e in state.enemies))
+
+
+def _reach_nodes(state, target, transport=None):
+    """Where the hero and the target can be after a few of the hero's actions, with the fewest it takes: plain
+    moves, as the hero really moves (blocked by whoever is in the way, and for the Shadow, a dash), and at most one
+    use of `transport` if given ("special" for the special move, or a tile), from any cell plain moves reach, after
+    a flip if need be. Enemies stay put, as in the stack. A tile in hand takes a turn to load first."""
+    key = _reach_key(state, target, transport)
+    if key in _REACH_CACHE:
+        return _REACH_CACHE[key]
+    index = state.enemies.index(target)
+    best = {}
+
+    def record(board, start_cost):
+        aimed = board.enemies[index]
+        if not aimed.alive:
+            return
+        for cell, cost in _walk(board, board.hero.cell, REACH_ACTIONS - start_cost).items():
+            pair = (cell, aimed.cell)
+            best[pair] = min(best.get(pair, cost + start_cost), cost + start_cost)
+
+    record(state, 0)
+    if transport is not None:
+        load = 1 if transport == "special" or transport.in_queue or transport.free_play else 2
+        for cell, cost in _walk(state, state.hero.cell, REACH_ACTIONS - load).items():
+            for flip in (False, True):
+                if cost + flip + load > REACH_ACTIONS:
+                    continue
+                for direction in ((-1, 1) if transport == "special" else (None,)):
+                    board = _light_copy(state)
+                    board.hero.cell = cell
+                    if flip:
+                        board.hero.facing = -board.hero.facing
+                    if direction is None:
+                        apply_attack(board, board.hero, transport.attack, Outcome())
+                    elif can_use_special(board, direction):
+                        perform_special(board, direction, Outcome())
+                    else:
+                        continue
+                    record(board, cost + flip + load)
+    if len(_REACH_CACHE) > 200_000:
+        _REACH_CACHE.clear()
+    _REACH_CACHE[key] = best
+    return best
+
+
+def _reach_total(state, target, nodes, exclude=None):
+    """Each tile's best damage on the target from any of these positions, up to its HP, a quarter off for each
+    action it took to get there and discounted for each turn until the tile is ready."""
     hp = _effective_hp(state, target)
     total = 0.0
     for tile in state.tiles:
-        if tile.attack.value <= 0:
+        if tile.attack.value <= 0 or tile is exclude:
             continue
+        reaches = set(map(abs, tile.attack.range))
         best = 0.0
-        for reach in set(map(abs, tile.attack.range)):
+        for (hero_cell, target_cell), cost in nodes.items():
+            reach = abs(target_cell - hero_cell)
+            if reach not in reaches:
+                continue
             damage = tile.attack.value + (state.sniper_bonus if reach >= SNIPER_DISTANCE else 0)
-            closeness = max(0.0, 1.0 - WEIGHTS["reach_falloff"] * abs(distance - reach))
+            closeness = max(0.0, 1.0 - WEIGHTS["reach_falloff"] * cost)
             best = max(best, min(damage, hp) * closeness)
         waiting = 0 if tile.in_queue else max(0, tile.cooldown - tile.charge)
         total += best * WEIGHTS["future_discount"] ** waiting
-    return WEIGHTS["reach"] * total
+    return total
+
+
+def _reach_value(state, target):
+    """Credit for each tile that can reach the target, from where the hero stands or after a few plain moves (rule
+    3: only credit). Moves are walked as the hero really moves, so blockers and the Shadow's dash count. What the
+    special move and movement tiles add is theirs, in `_kept_moves`, as one of their uses (rule 2).
+
+    Each tile only adds, and more charge adds more, so having a tile never lowers it (rule 1).
+    """
+    if armored(state, target):
+        return 0.0  # Nothing reaches him through his armor.
+    return WEIGHTS["reach"] * _reach_total(state, target, _reach_nodes(state, target))
+
+
+def _reach_gain(state, transport):
+    """The reach credit one use of a movement ability adds on the way, beyond plain moves: another use of that
+    ability, alongside its escape and setup values. Its own damage isn't counted, since using it to get there
+    spends it."""
+    target = ideal_target(state)
+    if target is None or armored(state, target):
+        return 0.0
+    exclude = transport if isinstance(transport, Tile) else None
+    base = _reach_total(state, target, _reach_nodes(state, target), exclude)
+    moved = _reach_total(state, target, _reach_nodes(state, target, transport), exclude)
+    return WEIGHTS["reach"] * max(0.0, moved - base)
 
 
 def _swap_charged(state):
@@ -497,12 +611,13 @@ def _kept_moves(state):
             value *= WEIGHTS["escape_in_hand"]
         if name in _MOVES_TARGET and not any(a.movable for a in targets_of(state, state.hero, tile.attack)[:1]):
             value *= WEIGHTS["escape_no_target"]
-        kept.append((value, term))
+        # Its reach gain already pays for loading it, in the actions it counts.
+        kept.append(max((value, term), (_reach_gain(state, tile), "move_reach")))
     if state.special in escape_values and state.swap_charge >= state.swap_cooldown:
-        kept.append((escape_values[state.special] * (WEIGHTS["escape_two_way"] if state.two_way_swap else 1.0),
-                     "escape"))
+        escape = escape_values[state.special] * (WEIGHTS["escape_two_way"] if state.two_way_swap else 1.0)
+        kept.append(max((escape, "escape"), (_reach_gain(state, "special"), "move_reach")))
     kept.sort(reverse=True)
-    terms = {"escape": 0.0, "setup": 0.0}
+    terms = {"escape": 0.0, "setup": 0.0, "move_reach": 0.0}
     for rank, (value, term) in enumerate(kept):
         terms[term] += value if rank == 0 else WEIGHTS["escape_others"] * value
     return terms
@@ -595,6 +710,7 @@ def outcome_terms(outcome: Outcome, hero_dead: bool, cheapest_hit: int = 1) -> d
         "enemy_damage": WEIGHTS["enemy_damage"] * outcome.enemy_damage,
         "kills": WEIGHTS["kill"] * outcome.kills,
         "friendly_damage": WEIGHTS["friendly_damage"] * outcome.friendly_damage,
+        "reload": _reload_value(outcome),
     }
 
 

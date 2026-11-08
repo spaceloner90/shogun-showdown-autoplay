@@ -2,6 +2,7 @@
 
 Run with: python solver/test_rules.py
 """
+import dataclasses
 import unittest
 
 from evaluator import WEIGHTS, _volleys, _has_way_out, potion_plan, _threat_damage, ideal_target, leaf_terms, rank_actions, unanswerable_damage
@@ -2998,6 +2999,74 @@ class PhaseSpecialMoveTest(unittest.TestCase):
         kept = leaf_terms(state)
         state.swap_charge = 0
         self.assertGreater(kept["escape"], leaf_terms(state).get("escape", 0))
+
+
+class CrossbowTest(unittest.TestCase):
+    """CrossbowAttack in the game's code: a loaded shot hits the first two in range and empties; empty, it reloads."""
+    LOADED = Attack("Crossbow", 3, list(range(1, 7)))
+
+    def board(self, value, enemies):
+        state = make_state(enemies=enemies)
+        state.cells = 7
+        bow = Tile(dataclasses.replace(self.LOADED, value=value), 5, 5, in_queue=True, base_value=3)
+        state.tiles, state.queue_tiles, state.hero.queue = [bow], [bow], [bow.attack]
+        return state
+
+    def test_a_shot_hits_the_first_two_and_empties_it(self):
+        after, outcome = step(self.board(3, [enemy(3, hp=5), enemy(4, hp=5), enemy(5, hp=5)]), Action("Attack"))
+        self.assertEqual([e.hp for e in after.enemies], [2, 2, 5])
+        self.assertEqual((after.tiles[0].attack.value, after.tiles[0].charge), (0, 0))
+
+    def test_empty_it_reloads_and_hits_nobody(self):
+        after, outcome = step(self.board(0, [enemy(3)]), Action("Attack"))
+        self.assertEqual((after.enemies[0].hp, after.tiles[0].attack.value, outcome.reloads), (3, 3, 1))
+
+    def test_the_board_it_came_from_keeps_its_value(self):
+        state = self.board(3, [enemy(3)])
+        step(state, Action("Attack"))
+        self.assertEqual(state.tiles[0].attack.value, 3)
+
+    def test_a_loaded_reload_is_worth_firing(self):
+        # Nobody in range, so only the reload makes the stack worth anything.
+        state = self.board(0, [])
+        state.enemies = [enemy(0, facing=1)]
+        self.assertGreater(leaf_terms(state)["stack"], 0)
+
+
+class ReachByMovementTest(unittest.TestCase):
+    """Reach credit counts the actions it really takes to get in range, not the cells."""
+
+    def katana_board(self, hero_cell, enemies, kind="Wanderer"):
+        state = shadow(hero_cell=hero_cell, enemies=enemies)
+        state.hero.kind = kind
+        katana = Tile(KATANA, 3, 3, in_queue=True)
+        state.tiles, state.queue_tiles, state.hero.queue = [katana], [katana], [KATANA]
+        return state
+
+    def test_a_walker_pays_a_quarter_per_step(self):
+        from evaluator import _reach_value
+        state = self.katana_board(1, [enemy(4)])
+        self.assertAlmostEqual(_reach_value(state, state.enemies[0]), WEIGHTS["reach"] * 2 * 0.5)
+
+    def test_the_shadow_gets_there_in_one_dash(self):
+        from evaluator import _reach_value
+        state = self.katana_board(1, [enemy(4)], kind="Shadow")
+        self.assertAlmostEqual(_reach_value(state, state.enemies[0]), WEIGHTS["reach"] * 2 * 0.75)
+
+    def test_nobody_walks_through_a_blocker(self):
+        from evaluator import _reach_value
+        # The 1 HP Ashigaru is the target; the 3 HP one stands between. A Katana can't get to it by walking.
+        state = self.katana_board(1, [enemy(2), enemy(4, hp=1)])
+        self.assertEqual(_reach_value(state, state.enemies[1]), 0.0)
+
+    def test_a_phase_past_the_blocker_counts_as_its_use(self):
+        from evaluator import _kept_moves, _reach_gain
+        state = self.katana_board(1, [enemy(2), enemy(4, hp=1)], kind="Shadow")
+        state.special = "PhaseSpecialMove"
+        # Phasing to cell 3 puts the Katana on the 1 HP target, one action away.
+        self.assertAlmostEqual(_reach_gain(state, "special"), WEIGHTS["reach"] * 1 * 0.75)
+        # It counts as one of the Phase's uses, the larger: here its escape value.
+        self.assertEqual(_kept_moves(state)["move_reach"], 0.0)
 
 
 if __name__ == "__main__":

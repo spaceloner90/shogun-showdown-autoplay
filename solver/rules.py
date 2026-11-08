@@ -6,6 +6,7 @@ actions are unknown, so they're treated as waiting. New enemies and wave spawns 
 from __future__ import annotations
 
 import copy
+import dataclasses
 import itertools
 from dataclasses import dataclass, field
 
@@ -15,7 +16,7 @@ ONE_ENEMY_WAVE_CAP = 6
 # Attacks whose behaviour is fully covered by their logged range, damage and first-target flag, plus
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
 MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackSmokeBomb", "Barricade", "BladeOfPatience", "Bomb",
-           "BossSwap", "Charge",
+           "BossSwap", "Charge", "Crossbow",
            "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Lightning", "Maku", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Sai", "ScarStrike", "SmokeBomb", "Spear", "Summon", "SwapToss",
            "Swirl", "Tetsubo", "Trap", "TurnAround", "Volley"}
@@ -35,6 +36,11 @@ UNDERSTOOD_SKILLS = {"BigPockets", "ChillingCombo", "ComboCoin", "ComboCurse", "
                      "QuickRecovery", "ReactiveShield", "ShieldRetention", "Sniper", "TripleComboHeal", "TwoWayMove",
                      "UnfriendlyFire"}
 
+# A Crossbow alternates: loaded, it hits the first CROSSBOW_TARGETS agents in range and empties; empty, its use
+# reloads it to its base damage, hitting nobody (CrossbowAttack.ApplyEffect, Attack, Reload). Its cooldown runs after
+# either. Logs before mod 0.16.0 don't give an empty one's base damage, so it's taken as the starting 3.
+CROSSBOW_TARGETS = 2
+CROSSBOW_DAMAGE = 3
 POISON_TURNS = 3  # Applying poison sets this many turns left, and each turn's end deals 1, starting that turn.
 POTION_SLOTS = 3  # The most held in any log without Big Pockets, which adds one (BigPocketsSkill.PickUp).
 ICE_TURNS = 4  # GameParams.iceEffectTurnsDuration: freezing sets this many turns of ice, counting down each turn's end.
@@ -107,6 +113,7 @@ class Tile:
     in_queue: bool = False
     just_played: bool = False
     free_play: bool = False  # Loading this tile doesn't use the turn, so it can join any attack.
+    base_value: int | None = None  # What a Crossbow's reload restores: its damage when loaded.
 
     @property
     def ready(self):
@@ -200,6 +207,8 @@ class Outcome:
     tank_damage: int = 0  # Damage by the hero to a tank while its boss is alive, kept out of enemy_damage.
     exact_hits: int = 0  # Hits by the hero that dealt exactly the target's remaining HP.
     shove_cells: int = 0  # Cells the hero shoved enemies worth fighting, up to a few per shove.
+    reloads: int = 0  # Crossbows reloaded.
+    reloaded: int = 0  # Damage those reloads restored.
     unmodeled: list[str] = field(default_factory=list)
 
 
@@ -280,6 +289,7 @@ def state_from_log(row):
             charge=t["attack"]["cooldown"] - t["turnsBeforeCharged"],
             in_queue="AttackQueue" in t["where"],
             free_play=t["attack"].get("tileEffect") == "FreePlay",
+            base_value=t["attack"].get("baseValue") or t["attack"].get("value") or CROSSBOW_DAMAGE,
         )
         for t in row["tiles"]
     ]
@@ -423,16 +433,19 @@ def can_use_special(state, direction):
     )
 
 
-def move_destination(state, cell, direction):
+def move_destination(state, cell, direction, occupied=None):
     """Where a move from `cell` ends, or None if the next cell is a wall or taken (then it's the special move).
     One cell, except for the Shadow, who dashes to the last free cell that way, next to whoever or whatever stops
-    it (ShadowHero.PerformMoveAction and Dash: Cell.LastFreeCellInDirection)."""
+    it (ShadowHero.PerformMoveAction and Dash: Cell.LastFreeCellInDirection). `occupied`, if given, is the set of
+    cells taken, for a hero imagined elsewhere."""
+    def taken(c):
+        return c in occupied if occupied is not None else state.occupant(c) is not None
     nxt = cell + direction
-    if not 0 <= nxt < state.cells or state.occupant(nxt) is not None:
+    if not 0 <= nxt < state.cells or taken(nxt):
         return None
     if state.hero.kind != "Shadow":
         return nxt
-    while 0 <= nxt + direction < state.cells and state.occupant(nxt + direction) is None:
+    while 0 <= nxt + direction < state.cells and not taken(nxt + direction):
         nxt += direction
     return nxt
 
@@ -602,6 +615,8 @@ def attack_hits(state, attacker, attack):
     # reaches just the cell 2 ahead, past anyone in between.
     if attack.name == "ShadowKama":
         return targets_of(state, attacker, attack)[:1]
+    if attack.name == "Crossbow":
+        return targets_of(state, attacker, attack)[:CROSSBOW_TARGETS] if attack.value > 0 else []
     # Scar Strike hits every enemy below full health, wherever it is, chosen as the attack begins, so earlier tiles in
     # the volley can add to them (ScarStrikeAttack.Begin). Only the hero can use it.
     if attack.name == "ScarStrike":
@@ -1083,6 +1098,19 @@ def explode(state, warden, outcome):
             land_hit(state, warden, agent, WARDEN_EXPLOSION, outcome)
 
 
+def fire_crossbow(tile, outcome):
+    """After a Crossbow fires: a shot empties it, and a reload loads it back to its base damage. A new attack rather
+    than a change to this one, which copies of the board share."""
+    if tile.attack.name != "Crossbow":
+        return
+    if tile.attack.value > 0:
+        tile.attack = dataclasses.replace(tile.attack, value=0)
+    else:
+        tile.attack = dataclasses.replace(tile.attack, value=tile.base_value or CROSSBOW_DAMAGE)
+        outcome.reloads += 1
+        outcome.reloaded += tile.attack.value
+
+
 def fire_hero_queue(state, outcome, order=None):
     """Fires the chosen tiles in order. Any others go back to the hand, still charged."""
     fired = list(state.queue_tiles) if order is None else [state.tiles[i] for i in order]
@@ -1091,6 +1119,7 @@ def fire_hero_queue(state, outcome, order=None):
         before = enemy_cells(state)
         apply_attack(state, state.hero, tile.attack, outcome)
         spring_traps(state, outcome, before)
+        fire_crossbow(tile, outcome)
         tile.charge = 0
         tile.just_played = True
         # Perfect Strike: an exact kill recharges the tile straight away.

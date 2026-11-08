@@ -297,7 +297,7 @@ credits flip-then-fire at the fraction of a step, as if the enemy waited while t
 count facing, which barely moved it (52 loads to 51 in replay). A real fix needs enemies acting between the setup and
 the shot, so it waits for F2+; pricing flips higher in the stack was offered and declined as a made-up tweak.
 
-## Log the enemies' hidden AI memory (right after the current run, run14)
+## Log the enemies' hidden AI memory (done in v2.26, mod 0.17.0; to be checked on the next log)
 
 The player's call: next, after run14. `tools/check_rollout.py` shows the simulation 4 turns ahead exact on 89% of
 windows where every enemy's choice is known, and 24% where a Shinobi's or Warden's hidden last tile matters: each

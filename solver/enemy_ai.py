@@ -28,6 +28,7 @@ TILES = {
     "SmokeBomb": (1, list(range(1, 11)), True),
     "Curse": (0, list(range(1, 11)), True),
     "Summon": (0, [], True),
+    "BossSwap": (0, [], True),
 }
 PLAIN_EFFECT = {("Grappler", "GrapplingHook"), ("ShadowDasher", "Charge"), ("Warden", "Summon")}
 
@@ -35,7 +36,8 @@ PLAIN_EFFECT = {("Grappler", "GrapplingHook"), ("ShadowDasher", "Charge"), ("War
 FIRST_TILE = {"Ashigaru": "Katana", "YariMaster": "Spear", "Guardian": "Katana", "TwinTachi": "Swirl",
               "Sniper": "Volley", "Archer": "Arrow", "Charger": "Charge", "Strider": "Katana",
               "Grappler": "GrapplingHook", "Shinobi": None, "Warden": None, "ShadowDasher": "Charge",
-              "BlightCharger": "Charge", "Barricade": None}
+              "BlightCharger": "Charge", "Barricade": None, "Summoner": "Summon", "Swapper": "BossSwap"}
+SWAPPER_WAIT = 3  # SwapperEnemy.get_NTurnsBetweenAttacks
 PORTED = set(FIRST_TILE)
 
 
@@ -124,6 +126,37 @@ def _pick(state, enemy, previous):
     tiles = len(enemy.queue)
     if kind == "Barricade":
         return Choice("Wait")
+    if kind == "Summoner":
+        # SummonerEnemy.AIPickAction: waits out its countdown, a turn after attacking or playing a tile, then plays
+        # Summon and fires it, which starts the countdown again. The countdown is only known since mod 0.17.0.
+        if enemy.ai_wait is None:
+            return None
+        if enemy.ai_wait > 0:
+            enemy.ai_wait -= 1
+            return Choice("Wait")
+        if previous in ("Attack", "PlayTile"):
+            return Choice("Wait")
+        if tiles == 0:
+            return _play("Summon")
+        if any(a.name == "Summon" for a in enemy.queue):
+            if enemy.ai_wait_full is None:
+                return None
+            enemy.ai_wait = enemy.ai_wait_full
+            return Choice("Attack")
+        return Choice("Wait")
+    if kind == "Swapper":
+        # SwapperEnemy.AIPickAction: a turn after playing its tile, then fires it, then waits 3 turns, then plays it.
+        if enemy.ai_wait is None:
+            return None
+        if previous == "PlayTile":
+            return Choice("Wait")
+        if tiles > 0:
+            enemy.ai_wait = SWAPPER_WAIT
+            return Choice("Attack")
+        if enemy.ai_wait > 0:
+            enemy.ai_wait -= 1
+            return Choice("Wait")
+        return _play("BossSwap")
     if kind == "TwinTachi":
         if previous == "PlayTile" and not quick:
             return Choice("Wait")

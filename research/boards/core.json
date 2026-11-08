@@ -1,5 +1,5 @@
 {
- "built_with": "v2.21",
+ "built_with": "v2.26",
  "params": {
   "coverage": 4,
   "close": 3.0,
@@ -1029,6 +1029,151 @@
   "run13 9:58": [
    "close call (0.4)"
   ],
+  "run14 10:21": [
+   "covers enemy: TwinMainBoss",
+   "close call (0.6)"
+  ],
+  "run14 10:22": [
+   "covers enemy: TwinMainBoss",
+   "close call (1.0)"
+  ],
+  "run14 10:4": [
+   "covers enemy: TwinMainBoss",
+   "close call (0.0)"
+  ],
+  "run14 10:5": [
+   "covers enemy: TwinMainBoss",
+   "close call (0.9)"
+  ],
+  "run14 11:17": [
+   "covers hero status: curse",
+   "close call (0.2)"
+  ],
+  "run14 11:2": [
+   "covers elite: Quick",
+   "close call (1.2)"
+  ],
+  "run14 11:6": [
+   "covers elite: DoubleStrike",
+   "close call (0.4)"
+  ],
+  "run14 11:9": [
+   "covers elite: DoubleStrike"
+  ],
+  "run14 12:12": [
+   "covers elite: DoubleStrike"
+  ],
+  "run14 12:14": [
+   "covers elite: DoubleStrike"
+  ],
+  "run14 12:16": [
+   "covers enemy: Archer",
+   "close call (1.3)"
+  ],
+  "run14 12:6": [
+   "covers enemy: Ashigaru"
+  ],
+  "run14 13:1": [
+   "close call (0.2)"
+  ],
+  "run14 13:10": [
+   "close call (0.5)"
+  ],
+  "run14 13:14": [
+   "close call (0.5)"
+  ],
+  "run14 13:24": [
+   "covers enemy status: poison",
+   "close call (1.3)"
+  ],
+  "run14 14:18": [
+   "covers enemy: FumikoBoss",
+   "close call (2.9)"
+  ],
+  "run14 14:20": [
+   "covers enemy: FumikoBoss"
+  ],
+  "run14 14:24": [
+   "covers enemy: FumikoBoss",
+   "close call (1.7)"
+  ],
+  "run14 14:3": [
+   "covers enemy: FumikoBoss",
+   "close call (0.2)"
+  ],
+  "run14 15:1": [
+   "covers elite: Heavy",
+   "close call (2.1)"
+  ],
+  "run14 15:15": [
+   "covers enemy status: shield"
+  ],
+  "run14 15:16": [
+   "covers enemy status: shield"
+  ],
+  "run14 15:30": [
+   "covers elite: Quick",
+   "close call (0.6)"
+  ],
+  "run14 16:10": [
+   "covers elite: Heavy",
+   "close call (0.1)"
+  ],
+  "run14 16:25": [
+   "covers enemy: BlightCharger",
+   "close call (0.5)"
+  ],
+  "run14 16:26": [
+   "covers enemy: BlightCharger",
+   "close call (0.3)"
+  ],
+  "run14 16:4": [
+   "covers elite: Heavy",
+   "close call (2.1)"
+  ],
+  "run14 17:11": [
+   "covers enemy status: ice",
+   "close call (0.5)"
+  ],
+  "run14 17:13": [
+   "close call (1.5)"
+  ],
+  "run14 17:14": [
+   "close call (0.9)"
+  ],
+  "run14 17:7": [
+   "covers enemy: Archer",
+   "close call (0.0)"
+  ],
+  "run14 18:13": [
+   "covers enemy: SatoBoss",
+   "close call (0.5)"
+  ],
+  "run14 18:22": [
+   "covers enemy: SatoBoss",
+   "close call (1.9)"
+  ],
+  "run14 18:24": [
+   "covers enemy: SatoBoss",
+   "close call (1.5)"
+  ],
+  "run14 18:25": [
+   "covers enemy: SatoBoss",
+   "close call (0.3)"
+  ],
+  "run14 19:17": [
+   "covers enemy: ShadowDasher"
+  ],
+  "run14 19:33": [
+   "covers queue: full"
+  ],
+  "run14 19:36": [
+   "covers enemy: ShadowDasher",
+   "close call (1.7)"
+  ],
+  "run14 19:4": [
+   "covers queue: full"
+  ],
   "run14 1:16": [
    "covers elite: Heavy",
    "close call (1.3)"
@@ -1044,6 +1189,49 @@
   "run14 1:30": [
    "covers elite: Heavy",
    "close call (1.2)"
+  ],
+  "run14 20:2": [
+   "covers enemy: IeyasuBoss",
+   "close call (1.5)"
+  ],
+  "run14 20:26": [
+   "covers enemy: IeyasuBoss",
+   "close call (2.6)"
+  ],
+  "run14 20:28": [
+   "covers enemy status: poison",
+   "close call (1.0)"
+  ],
+  "run14 20:9": [
+   "covers enemy: IeyasuBoss",
+   "close call (1.7)"
+  ],
+  "run14 21:33": [
+   "covers potion: CoolUp"
+  ],
+  "run14 21:35": [
+   "covers enemy status: curse",
+   "close call (1.3)"
+  ],
+  "run14 21:37": [
+   "covers enemy status: curse",
+   "close call (0.1)"
+  ],
+  "run14 21:40": [
+   "covers potion: D6"
+  ],
+  "run14 22:23": [
+   "covers hazard: hazard"
+  ],
+  "run14 22:24": [
+   "covers hazard: hazard"
+  ],
+  "run14 22:32": [
+   "covers hazard: hazard"
+  ],
+  "run14 22:33": [
+   "covers hazard: hazard",
+   "close call (0.6)"
   ],
   "run14 2:18": [
    "covers enemy status: shield"
@@ -1128,6 +1316,32 @@
   "run14 7:8": [
    "covers enemy: Archer",
    "close call (0.3)"
+  ],
+  "run14 8:13": [
+   "covers enemy: Archer",
+   "close call (1.6)"
+  ],
+  "run14 8:3": [
+   "covers enemy: Ashigaru"
+  ],
+  "run14 8:30": [
+   "covers enemy: Charger"
+  ],
+  "run14 8:7": [
+   "covers elite: Heavy"
+  ],
+  "run14 9:30": [
+   "covers queue: full"
+  ],
+  "run14 9:37": [
+   "covers elite: Quick",
+   "close call (0.5)"
+  ],
+  "run14 9:4": [
+   "covers enemy: Charger"
+  ],
+  "run14 9:6": [
+   "covers enemy: Charger"
   ],
   "run5_full 10:13": [
    "close call (0.2)"

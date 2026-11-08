@@ -210,8 +210,10 @@ def main():
     if args.rebuild:
         saved = {"logs": [], "boards": {}}
     logs = sorted({k.split()[0] for k in boards})
-    new = [log for log in logs if log not in saved["logs"]]
-    candidates = {k: r for k, r in boards.items() if k.split()[0] in new}
+    # Boards not considered before, by their margins: a log that grew since (a run saved part way) adds its new ones.
+    considered = set(json.loads(MARGINS.read_text(encoding="utf-8"))) if MARGINS.exists() and not args.rebuild else set()
+    candidates = {k: r for k, r in boards.items() if k not in considered}
+    new = sorted({k.split()[0] for k in candidates})
     changed = {k: r for k, r in changed_keys().items() if k in boards and k not in saved["boards"]}
     if not candidates and not changed:
         print("Every log is already condensed, and no new board changed between versions.")

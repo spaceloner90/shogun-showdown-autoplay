@@ -95,5 +95,56 @@ class TieTest(unittest.TestCase):
         self.assertTrue(best.labels[0].startswith("Attack"), best.labels)
 
 
+class HiddenMemoryTest(unittest.TestCase):
+    """Since mod 0.17.0 the log gives what some enemies' AI remembers, so their choices are known."""
+
+    def row(self, kind, memory, action="Wait", queue=(), tile=""):
+        enemy_row = {"kind": kind, "cell": 4, "facing": "Left", "hp": 3, "maxHp": 3, "shield": False,
+                     "queue": [{"name": q, "value": 0, "range": [], "closestTargetOnly": True} for q in queue],
+                     "action": action, "memory": memory, "tileToPlay": tile}
+        return {"cells": 7, "hero": {"kind": "Wanderer", "cell": 1, "facing": "Right", "hp": 10, "maxHp": 10,
+                "shield": False, "queue": [], "action": "Wait", "special": {"name": "SwapSpecialMove", "charge": 4,
+                "cooldown": 4}}, "enemies": [enemy_row], "tiles": [], "skills": []}
+
+    def test_the_shinobi_alternates_from_its_logged_last_tile(self):
+        from rules import state_from_log
+        state = state_from_log(self.row("Shinobi", {"prevAttack": "Shuriken"}))
+        choice = enemy_ai.decide(state, state.enemies[0], "Attack")
+        self.assertEqual(choice.action, "MoveRight")  # Away after attacking, as before.
+        foe = state.enemies[0]
+        self.assertEqual(enemy_ai.tile_for(foe), "SmokeBomb")
+
+    def test_a_logged_tile_to_play_is_used(self):
+        from rules import state_from_log
+        state = state_from_log(self.row("Warden", {"previousAttack": "Curse"}, action="PlayTile", tile="Summon"))
+        self.assertEqual(state.enemies[0].tile_to_play, "Summon")
+
+    def test_the_summoner_counts_down_then_summons(self):
+        from rules import state_from_log
+        state = state_from_log(self.row("Summoner", {"waitBeforeSummoning": 1, "turnsToWaitBeforeSummoning": 3}))
+        foe = state.enemies[0]
+        self.assertFalse(foe.movable)
+        self.assertEqual(enemy_ai.decide(state, foe, "Wait").action, "Wait")
+        self.assertEqual((enemy_ai.decide(state, foe, "Wait").action, foe.ai_wait), ("PlayTile", 0))
+
+    def test_the_summoner_fires_and_restarts_its_countdown(self):
+        from rules import state_from_log
+        state = state_from_log(self.row("Summoner", {"waitBeforeSummoning": 0, "turnsToWaitBeforeSummoning": 3},
+                                        queue=["Summon"]))
+        foe = state.enemies[0]
+        self.assertEqual((enemy_ai.decide(state, foe, "Wait").action, foe.ai_wait), ("Attack", 3))
+
+    def test_the_swapper_waits_three_after_swapping(self):
+        from rules import state_from_log
+        state = state_from_log(self.row("Swapper", {"waitCountdown": 0}, queue=["BossSwap"]))
+        foe = state.enemies[0]
+        self.assertEqual((enemy_ai.decide(state, foe, "Wait").action, foe.ai_wait), ("Attack", 3))
+
+    def test_without_logged_memory_they_stay_unknown(self):
+        from rules import state_from_log
+        state = state_from_log(self.row("Summoner", {}))
+        self.assertIsNone(enemy_ai.decide(state, state.enemies[0], "Wait"))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -145,6 +145,10 @@ class Agent:
     known: bool = True
     tile_to_play: str | None = None  # For a PlayTile the AI chose, the tile; None if unknown.
     last_tile: str | None = None  # The tile it last chose, which the Shinobi and Warden alternate on.
+    # A Summoner's turns left before it summons again, or a Swapper's before it swaps (their AI's countdowns), with
+    # the Summoner's full wait. None where not logged (before mod 0.17.0).
+    ai_wait: int | None = None
+    ai_wait_full: int | None = None
 
     @property
     def alive(self):
@@ -314,7 +318,9 @@ def state_from_log(row):
             queue=[attack(a) for a in data["queue"]],
             action=data["action"],
             curse=bool(data.get("curse")),
-            movable="Heavy" not in (data.get("traits") or []) and data.get("elite") != "Heavy",
+            # The Summoner can't be moved either (SummonerEnemy.get_Movable).
+            movable=("Heavy" not in (data.get("traits") or []) and data.get("elite") != "Heavy"
+                     and data["kind"] != "Summoner"),
             poison=data.get("poison") or 0,
             ice=data.get("ice") or 0,
             freezable="Unfreezable" not in (data.get("traits") or []),
@@ -322,13 +328,24 @@ def state_from_log(row):
             elite=data.get("elite") or "None",
         )
 
-    def with_ai_memory(enemy):
-        """What the ported AI needs that the board shows only indirectly: the tile a logged PlayTile will play, and
-        the tile last chosen, from the queue."""
+    def with_ai_memory(enemy, data):
+        """What the ported AI remembers between turns. Since mod 0.17.0 the log gives it (`memory`); before, the
+        last tile is read from the queue when one is there. A logged PlayTile's tile is the game's own `tileToPlay`
+        where logged."""
+        memory = data.get("memory") or {}
         if enemy.queue:
             enemy.last_tile = enemy.queue[-1].name
+        last = memory.get("prevAttack") or memory.get("previousAttack")
+        if last:
+            enemy.last_tile = last
+        if "waitBeforeSummoning" in memory:
+            enemy.ai_wait, enemy.ai_wait_full = memory["waitBeforeSummoning"], memory.get("turnsToWaitBeforeSummoning")
+        elif "waitCountdown" in memory:
+            enemy.ai_wait = memory["waitCountdown"]
         if enemy.action == "PlayTile":
-            enemy.tile_to_play = enemy_ai.tile_for(enemy)
+            logged = data.get("tileToPlay")
+            enemy.tile_to_play = (logged if logged and enemy.kind in enemy_ai.PORTED and logged in enemy_ai.TILES
+                                  else enemy_ai.tile_for(enemy))
         return enemy
 
     tiles = [
@@ -344,7 +361,7 @@ def state_from_log(row):
     ]
     hero = agent(row["hero"])
     hero.action = "Wait"
-    enemies = [with_ai_memory(agent(e)) for e in row["enemies"]]
+    enemies = [with_ai_memory(agent(e), e) for e in row["enemies"]]
     # The game locks a Volley onto the hero's cell as the turn it fires begins.
     for enemy in enemies:
         if enemy.action == "Attack":

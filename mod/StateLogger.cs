@@ -26,7 +26,7 @@ using BepInEx;
 using HarmonyLib;
 using UnityEngine;
 
-[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.16.0")]
+[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.17.0")]
 public class StateLoggerPlugin : BaseUnityPlugin
 {
     private const float PollIntervalSeconds = 0.1f;
@@ -595,6 +595,7 @@ public class StateLoggerPlugin : BaseUnityPlugin
             sb.Append(",\"traits\":[").Append(JoinEnums(Traits(enemy))).Append("]");
             sb.Append(",\"pattern\":").Append(PatternIndex(enemy));
             sb.Append(",\"tileToPlay\":").Append(Str(TileToPlay(enemy)));
+            sb.Append(",\"memory\":").Append(AiMemory(enemy));
             // The game numbers its attack-order badges this way in SetEnemiesAttackOrderUI.
             bool attacking = enemy.Action == CombatEnums.ActionEnum.Attack;
             sb.Append(",\"attackOrder\":").Append(attacking ? attackOrder.ToString() : "null");
@@ -1109,6 +1110,32 @@ public class StateLoggerPlugin : BaseUnityPlugin
     {
         object value = TileToPlayField != null ? TileToPlayField.GetValue(enemy) : null;
         return value == null ? "" : value.ToString();
+    }
+
+    // What some enemies' AI remembers between turns, which the board doesn't show: the Shinobi's and Warden's last
+    // tile, the Summoners' and Swapper's countdowns. Only the fields an enemy has.
+    private static readonly string[] MemoryFields = { "prevAttack", "previousAttack", "waitBeforeSummoning", "waitCountdown" };
+
+    private static string AiMemory(Enemy enemy)
+    {
+        List<string> parts = new List<string>();
+        Traverse traverse = Traverse.Create(enemy);
+        foreach (string name in MemoryFields)
+        {
+            Traverse field = traverse.Field(name);
+            if (!field.FieldExists()) continue;
+            object value = field.GetValue();
+            if (value == null) continue;
+            bool number = value is int;
+            parts.Add(Str(name) + ":" + (number ? value.ToString() : Str(value.ToString())));
+        }
+        Traverse wait = traverse.Property("TurnsToWaitBeforeSummoning");
+        if (wait.PropertyExists())
+        {
+            object value = wait.GetValue();
+            if (value != null) parts.Add(Str("turnsToWaitBeforeSummoning") + ":" + value.ToString());
+        }
+        return "{" + string.Join(",", parts.ToArray()) + "}";
     }
 
     private static string PatternIndex(Enemy enemy)

@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.26: hidden AI memory, Summoner and Swapper
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Mod 0.17.0's `memory` field | Mod | Built and installed; no log has it yet | Present for Shinobi, Warden, Summoner and Swapper |
+| Shinobi and Warden choices from it; Summoner and Swapper ported | Rule | Read from their AI code | `tools/check_ai.py` covering them, and `tools/check_rollout.py` 4-turn accuracy up |
+
 ## New in v2.25: Monomancer
 
 | Item | Kind | What's already confirmed | What to look for |

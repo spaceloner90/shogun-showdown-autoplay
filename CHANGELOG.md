@@ -9,6 +9,18 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.26 — enemies' hidden AI memory; the Summoner and Swapper (2026-11-09)
+- **Mod 0.17.0** logs what some enemies' AI remembers between turns (`memory`): the Shinobi's and Warden's last
+  tile (`prevAttack`, `previousAttack`), the Summoners' countdown and full wait (`waitBeforeSummoning`,
+  `TurnsToWaitBeforeSummoning`) and the Swapper's (`waitCountdown`). The solver reads them, and uses the game's
+  own logged `tileToPlay` for a telegraphed PlayTile.
+- **Rule:** the Summoner and Swapper are ported (`SummonerEnemy.AIPickAction`, `SwapperEnemy.AIPickAction`: the
+  Swapper waits 3 between swaps). The Summoner can't be moved (`SummonerEnemy.get_Movable`). Both stay unknown on
+  logs before 0.17.0.
+- `logs/run14`, the Shadow's day 2, finished: no hits after v2.20 but a manual key press, and two blocked by a
+  shield. 764 of 786 turns predicted exactly, the rest enemies arriving and the Sato boss.
+- Replay: 1 of 921 core choices changes. `tools/condense.py --add` now also takes new boards from a log that grew.
+
 ## v2.25 — Monomancer; Big Pockets by level (2026-11-08)
 - **Rule:** Monomancer adds its level to the hero's hits on an attack fired with one tile in the queue
   (`MonomancerSkill.OnHeroAttacks`, `ProcessAttack`). Not on collisions. Reach doesn't count it; the stack and the

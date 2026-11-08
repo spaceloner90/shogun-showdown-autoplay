@@ -188,6 +188,25 @@ class State:
     nobunaga_hp_last_turn: int | None = None  # His HP at his last turn: the lights move when it has changed.
     fight_won: bool = False  # Set when a boss dies, which ends the fight. See fight_won() for the rest.
 
+    def clone(self):
+        """An independent copy, much faster than deepcopy. Attacks are shared: nothing changes one in place."""
+        new = copy.copy(self)
+        new.hero = copy.copy(self.hero)
+        new.hero.queue = list(self.hero.queue)
+        new.enemies = []
+        for enemy in self.enemies:
+            twin = copy.copy(enemy)
+            twin.queue = list(enemy.queue)
+            new.enemies.append(twin)
+        tiles = {id(t): copy.copy(t) for t in self.tiles}
+        new.tiles = [tiles[id(t)] for t in self.tiles]
+        new.queue_tiles = [tiles[id(t)] for t in self.queue_tiles]
+        new.hazards = [dict(h, groups=[list(g) for g in h["groups"]]) for h in self.hazards]
+        new.traps = [dict(t) for t in self.traps]
+        new.potions = list(self.potions)
+        new.lit_cells = list(self.lit_cells) if self.lit_cells is not None else None
+        return new
+
     def occupant(self, cell):
         if self.hero.alive and self.hero.cell == cell:
             return self.hero
@@ -259,9 +278,9 @@ class Action:
 
 
 def aim_volleys(enemy, hero):
-    for attack in enemy.queue:
-        if attack.name == "Volley" and attack.target_cell is None:
-            attack.target_cell = hero.cell
+    # A new attack rather than a change to this one: copies of a board share their attacks, which never change.
+    enemy.queue = [dataclasses.replace(a, target_cell=hero.cell) if a.name == "Volley" and a.target_cell is None
+                   else a for a in enemy.queue]
 
 
 def state_from_log(row):
@@ -930,7 +949,7 @@ OPPOSITE_ACTIONS = {"MoveLeft": "MoveRight", "MoveRight": "MoveLeft", "FlipLeft"
 
 def apply_potion(state, name):
     """A copy of the board after using this potion, which is gone from the hero's potions."""
-    state = copy.deepcopy(state)
+    state = state.clone()
     state.potions.remove(name)
     hero = state.hero
     enemies = [e for e in state.enemies if e.alive]
@@ -1292,7 +1311,7 @@ def end_turn(state, swapped):
 
 def step(state, action):
     """Returns the state after one full turn, and what happened. The input isn't changed."""
-    next_state = copy.deepcopy(state)
+    next_state = state.clone()
     outcome = Outcome()
     swapped = hero_action(next_state, action, outcome)
     already_on_the_way = len(next_state.hazards)

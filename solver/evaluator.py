@@ -481,10 +481,16 @@ def _reach_nodes(state, target, transport=None):
                 else:
                     continue
                 record(board, cost + load)
+    # Only the cheapest way to stand at each offset from the target matters, read the way the hero faces.
+    offsets = {}
+    for (cell, facing, target_cell), cost in best.items():
+        offset = (target_cell - cell) * facing
+        if cost < offsets.get(offset, REACH_ACTIONS + 1):
+            offsets[offset] = cost
     if len(_REACH_CACHE) > 200_000:
         _REACH_CACHE.clear()
-    _REACH_CACHE[key] = best
-    return best
+    _REACH_CACHE[key] = offsets
+    return offsets
 
 
 def _reach_total(state, target, nodes, exclude=None):
@@ -497,12 +503,12 @@ def _reach_total(state, target, nodes, exclude=None):
     for tile in state.tiles:
         if tile.attack.value <= 0 or tile is exclude:
             continue
-        offsets = set(tile.attack.range)
         best = 0.0
-        for (hero_cell, facing, target_cell), cost in nodes.items():
-            if (target_cell - hero_cell) * facing not in offsets:
+        for offset in tile.attack.range:
+            cost = nodes.get(offset)
+            if cost is None:
                 continue
-            reach = abs(target_cell - hero_cell)
+            reach = abs(offset)
             damage = tile.attack.value + (state.sniper_bonus if reach >= SNIPER_DISTANCE else 0)
             closeness = max(0.0, 1.0 - WEIGHTS["reach_falloff"] * cost)
             best = max(best, min(damage, hp) * closeness * WEIGHTS["pierce"].get(tile.attack.name, 1.0))

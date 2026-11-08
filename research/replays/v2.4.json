@@ -27099,6 +27099,3486 @@
 "sent": 0,
 "wasted": 0
 },
+"run9 10:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": -77.97,
+"sent": 0,
+"wasted": 0
+},
+"run9 10:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 12.4,
+"sent": 0,
+"wasted": 0
+},
+"run9 10:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 12.65,
+"sent": 0,
+"wasted": 0
+},
+"run9 10:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 70.33,
+"sent": 0,
+"wasted": 0
+},
+"run9 10:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 94.69,
+"sent": 0,
+"wasted": 0
+},
+"run9 10:14": {
+"dmg": 11,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack BackCharge > DragonPunch > ScarStrike",
+"score": 10194.18,
+"sent": 0,
+"wasted": 0
+},
+"run9 10:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": -23.51,
+"sent": 0,
+"wasted": 0
+},
+"run9 10:3": {
+"dmg": 9,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 48.94,
+"sent": 0,
+"wasted": 0
+},
+"run9 10:4": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": -10.16,
+"sent": 0,
+"wasted": 0
+},
+"run9 10:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": -11.26,
+"sent": 0,
+"wasted": 0
+},
+"run9 10:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": -2.61,
+"sent": 0,
+"wasted": 0
+},
+"run9 10:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 16.87,
+"sent": 0,
+"wasted": 0
+},
+"run9 10:8": {
+"dmg": 8,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack Sai > DragonPunch",
+"score": 105.87,
+"sent": 0,
+"wasted": 0
+},
+"run9 10:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 8.98,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 43.78,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 25.5,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:11": {
+"dmg": 1,
+"fired": 0,
+"hp": 0,
+"kills": 2,
+"label": "MoveLeft (throw)",
+"score": 157.65,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 65.11,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 74.91,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:14": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 98.5,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 26.64,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 45.01,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 84.56,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:18": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack BackCharge > SmokeBomb (Sai to hand)",
+"score": 114.95,
+"sent": 1,
+"wasted": 0
+},
+"run9 11:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 60.05,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 67.66,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 69.94,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 90.15,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:22": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 159.8,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 31.17,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 58.48,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:25": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 83.88,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 9.24,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 14.65,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 18.61,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 22.44,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 86.86,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 27.06,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb (Sai to hand)",
+"score": 137.74,
+"sent": 1,
+"wasted": 0
+},
+"run9 11:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 172.79,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:33": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 3,
+"label": "Attack SmokeBomb > DragonPunch (ScarStrike to hand)",
+"score": 246.94,
+"sent": 1,
+"wasted": 0
+},
+"run9 11:34": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 59.18,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:35": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 76.73,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 76.54,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:37": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 91.63,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:38": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 157.09,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:39": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 62.93,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 104.38,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:40": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 86.95,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:41": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 117.3,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:42": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 235.04,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:43": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 41.58,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:44": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "PlayTile Sai",
+"score": 10086.42,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:5": {
+"dmg": 5,
+"fired": 3,
+"hp": 0,
+"kills": 3,
+"label": "Attack BackCharge > SmokeBomb > Sai",
+"score": 244.26,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 6.96,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 40.86,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 58.2,
+"sent": 0,
+"wasted": 0
+},
+"run9 11:9": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 113.5,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 16.37,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:10": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 47.91,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:11": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight (throw)",
+"score": 105.57,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 46.93,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 85.83,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 75.99,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 113.9,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:16": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack BackCharge > ScarStrike (DragonPunch to hand)",
+"score": 177.09,
+"sent": 1,
+"wasted": 0
+},
+"run9 12:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 14.05,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:18": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 33.02,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 38.17,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 77.03,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "PlayTile BackCharge",
+"score": 145.91,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:21": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack BackCharge > SmokeBomb",
+"score": 187.84,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 51.28,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:23": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 92.72,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 29.47,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 33.06,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 42.5,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb (Sai to hand)",
+"score": 69.02,
+"sent": 1,
+"wasted": 0
+},
+"run9 12:28": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack SmokeBomb (ScarStrike, DragonPunch to hand)",
+"score": 85.96,
+"sent": 2,
+"wasted": 0
+},
+"run9 12:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 18.73,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 119.62,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 47.85,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 68.22,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 95.0,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:33": {
+"dmg": 7,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 196.02,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:34": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 76.41,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:35": {
+"dmg": 4,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 111.33,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 35.97,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:37": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 51.29,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:38": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 69.62,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:39": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 83.23,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 162.22,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:40": {
+"dmg": 5,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack DragonPunch > SmokeBomb > BackCharge",
+"score": 10135.88,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:5": {
+"dmg": 11,
+"fired": 3,
+"hp": 0,
+"kills": 3,
+"label": "Attack DragonPunch > BackCharge > ScarStrike",
+"score": 313.52,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 64.23,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 77.73,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:8": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 103.32,
+"sent": 0,
+"wasted": 0
+},
+"run9 12:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 21.59,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 59.99,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:10": {
+"dmg": 4,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack Sai (BackCharge to hand)",
+"score": 127.23,
+"sent": 1,
+"wasted": 0
+},
+"run9 13:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 56.04,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 95.72,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:13": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 170.48,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 31.79,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 59.82,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:16": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 83.93,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 41.94,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 27.44,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:19": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 49.54,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:2": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 85.96,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 76.05,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "PlayTile SmokeBomb",
+"score": 129.5,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 80.68,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:23": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack BackCharge > SmokeBomb (DragonPunch to hand)",
+"score": 167.47,
+"sent": 1,
+"wasted": 0
+},
+"run9 13:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 24.54,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 30.11,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 35.42,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 39.44,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 47.6,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb (DragonPunch to hand)",
+"score": 72.06,
+"sent": 1,
+"wasted": 0
+},
+"run9 13:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 29.35,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:30": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack SmokeBomb (ScarStrike, Sai to hand)",
+"score": 10085.96,
+"sent": 2,
+"wasted": 0
+},
+"run9 13:4": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 93.96,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 34.41,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 53.94,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:7": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 121.71,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 35.87,
+"sent": 0,
+"wasted": 0
+},
+"run9 13:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 49.25,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": -30.24,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 62.21,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:11": {
+"dmg": 7,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 129.13,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 1,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": -159.84,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:13": {
+"dmg": 1,
+"fired": 1,
+"hp": 2,
+"kills": 1,
+"label": "Attack",
+"score": -110.05,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 50.12,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:15": {
+"dmg": 4,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 73.56,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 33.05,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 51.85,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 58.43,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 75.49,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": -0.49,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 85.3,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 97.01,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:22": {
+"dmg": 7,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10142.18,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 34.48,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:4": {
+"dmg": 7,
+"fired": 3,
+"hp": 0,
+"kills": 0,
+"label": "Attack BackCharge > SmokeBomb > ScarStrike",
+"score": 50.07,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 2.92,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:6": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 22.87,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 27.72,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 39.9,
+"sent": 0,
+"wasted": 0
+},
+"run9 14:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 48.4,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 68.17,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:10": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack DragonPunch > Dash (free)",
+"score": 140.08,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 36.58,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 54.41,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 81.6,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:14": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 115.02,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 47.34,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 105.37,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 134.55,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:18": {
+"dmg": 8,
+"fired": 3,
+"hp": 0,
+"kills": 2,
+"label": "Attack Sai > Dash (free) > DragonPunch",
+"score": 233.79,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 44.81,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:2": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Dash (free) > DragonPunch",
+"score": 111.75,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:20": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 90.56,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 42.94,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 76.0,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 105.22,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:24": {
+"dmg": 7,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 208.55,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 83.25,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:26": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Dash (free) > Sai",
+"score": 120.48,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 6.4,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:28": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 77.53,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 26.94,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 44.92,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 31.42,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 78.36,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:32": {
+"dmg": 5,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 140.13,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 26.45,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:34": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 50.74,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:35": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 56.47,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:36": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 77.53,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:37": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 76.0,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:38": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10095.66,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 72.09,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:5": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 125.02,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 21.49,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:7": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 38.64,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:8": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveLeft (throw)",
+"score": 117.93,
+"sent": 0,
+"wasted": 0
+},
+"run9 15:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 92.67,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 49.14,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 66.21,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:11": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight (throw)",
+"score": 128.63,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 77.12,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 91.93,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 2,
+"label": "MoveRight",
+"score": 154.7,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:15": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack BackCharge (DragonPunch to hand)",
+"score": 92.19,
+"sent": 1,
+"wasted": 0
+},
+"run9 16:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 65.33,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:17": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Dash (free) > Sai",
+"score": 102.73,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 46.8,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 58.48,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:2": {
+"dmg": 1,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack BackCharge > Dash (free)",
+"score": 108.32,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 89.23,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:21": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 154.26,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:22": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveLeft (throw)",
+"score": 122.96,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 63.65,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:24": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 91.71,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 23.97,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 53.96,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:27": {
+"dmg": 7,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack Dash (free) > Sai > BackCharge",
+"score": 180.24,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 67.23,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight",
+"score": 10085.66,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 53.32,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 82.56,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:5": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 129.02,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 30.76,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 48.93,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 88.08,
+"sent": 0,
+"wasted": 0
+},
+"run9 16:9": {
+"dmg": 5,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack Dash (free) > Sai > BackCharge",
+"score": 156.24,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 56.42,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 30.6,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb (BackCharge to hand)",
+"score": 113.71,
+"sent": 1,
+"wasted": 0
+},
+"run9 17:12": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack SmokeBomb > Sai (ScarStrike to hand)",
+"score": 187.66,
+"sent": 1,
+"wasted": 0
+},
+"run9 17:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 26.83,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 63.5,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:15": {
+"dmg": 5,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack BackCharge > Dash (free) > DragonPunch",
+"score": 138.66,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 61.61,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 54.14,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 45.11,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 63.88,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 97.33,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:20": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 165.52,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 35.52,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 68.15,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:23": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 108.49,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 88.06,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:25": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack Dash (free) > DragonPunch",
+"score": 153.03,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 35.34,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 76.09,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 113.67,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:29": {
+"dmg": 5,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack DragonPunch (SmokeBomb to hand)",
+"score": 194.72,
+"sent": 1,
+"wasted": 0
+},
+"run9 17:3": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 178.43,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 9.43,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 96.73,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:32": {
+"dmg": 7,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack BackCharge > Dash (free) > DragonPunch",
+"score": 185.7,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 117.51,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:34": {
+"dmg": 5,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 184.75,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:35": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 68.76,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 60.13,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:37": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 65.54,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:38": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 91.78,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:39": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Dash (free) > Sai (ScarStrike to hand)",
+"score": 117.09,
+"sent": 1,
+"wasted": 0
+},
+"run9 17:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 18.07,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:40": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 11.64,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:41": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 49.07,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:42": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 116.28,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:43": {
+"dmg": 10,
+"fired": 3,
+"hp": 0,
+"kills": 2,
+"label": "Attack DragonPunch > BackCharge > ScarStrike",
+"score": 229.92,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:44": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 17.67,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:45": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 65.17,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:46": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10108.12,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 25.75,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:6": {
+"dmg": 1,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Dash (free) > DragonPunch (ScarStrike to hand)",
+"score": 72.06,
+"sent": 1,
+"wasted": 0
+},
+"run9 17:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 10.87,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 16.34,
+"sent": 0,
+"wasted": 0
+},
+"run9 17:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 21.87,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": -37.23,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 33.02,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 67.62,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:12": {
+"dmg": 7,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack Dash (free) > DragonPunch > BackCharge",
+"score": 144.37,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "PlayTile ScarStrike",
+"score": 131.39,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 127.28,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:15": {
+"dmg": 9,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack BackCharge > ScarStrike",
+"score": 10225.02,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 29.03,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 40.36,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 68.64,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:19": {
+"dmg": 8,
+"fired": 3,
+"hp": 0,
+"kills": 0,
+"label": "Attack Dash (free) > Sai > DragonPunch (SmokeBomb to hand)",
+"score": 106.07,
+"sent": 1,
+"wasted": 0
+},
+"run9 18:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 7.99,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 32.21,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:21": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 38.92,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 58.7,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 90.71,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:24": {
+"dmg": 7,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack BackCharge > ScarStrike",
+"score": 10142.56,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:3": {
+"dmg": 10,
+"fired": 3,
+"hp": 0,
+"kills": 0,
+"label": "Attack Dash (free) > DragonPunch > ScarStrike",
+"score": 71.45,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": -20.89,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": -10.31,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 3.06,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:7": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack SmokeBomb > BackCharge (Sai to hand)",
+"score": 12.64,
+"sent": 1,
+"wasted": 0
+},
+"run9 18:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 6.52,
+"sent": 0,
+"wasted": 0
+},
+"run9 18:9": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 24.25,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 67.37,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 56.48,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:11": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Dash (free) > Sai",
+"score": 104.49,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 31.5,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 59.32,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 61.47,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 144.05,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:16": {
+"dmg": 10,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack DragonPunch > ScarStrike (BackCharge to hand)",
+"score": 245.32,
+"sent": 1,
+"wasted": 0
+},
+"run9 19:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 51.04,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 105.59,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:19": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack Sai > SmokeBomb",
+"score": 179.69,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:2": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Dash (free) > Sai",
+"score": 111.68,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 76.78,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 89.21,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 80.49,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 82.16,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 81.9,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 130.54,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:26": {
+"dmg": 7,
+"fired": 3,
+"hp": 0,
+"kills": 2,
+"label": "Attack BackCharge > DragonPunch > ScarStrike",
+"score": 254.12,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:27": {
+"dmg": 3,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight (throw)",
+"score": 128.76,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 59.82,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:29": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 82.47,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": -102.95,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 66.81,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:31": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Dash (free) > Sai",
+"score": 118.2,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 43.78,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 49.93,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:34": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 67.84,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:35": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack SmokeBomb > BackCharge (DragonPunch to hand)",
+"score": 117.73,
+"sent": 1,
+"wasted": 0
+},
+"run9 19:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 5.72,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:37": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 83.74,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:38": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": -109.74,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:39": {
+"dmg": 0,
+"fired": 0,
+"hp": 3,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": -228.04,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 3,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": -223.43,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:40": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 124.28,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:41": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 42.71,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:42": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 64.39,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:43": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 82.05,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:44": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack Sai (DragonPunch to hand)",
+"score": 108.79,
+"sent": 1,
+"wasted": 0
+},
+"run9 19:45": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 75.53,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:46": {
+"dmg": 5,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 143.7,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:47": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 56.98,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:48": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 95.28,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:49": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 187.88,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 70.6,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:50": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 31.8,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:51": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 39.42,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:52": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 44.72,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:53": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 47.65,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:54": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 48.36,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:55": {
+"dmg": 1,
+"fired": 0,
+"hp": 0,
+"kills": 2,
+"label": "MoveRight (throw)",
+"score": 222.97,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:56": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 107.1,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:57": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack Dash (free) > DragonPunch (ScarStrike, Sai to hand)",
+"score": 150.2,
+"sent": 2,
+"wasted": 0
+},
+"run9 19:58": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 42.01,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:59": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 75.93,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "PlayTile DragonPunch",
+"score": 100.58,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:60": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 132.13,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:61": {
+"dmg": 10,
+"fired": 3,
+"hp": 0,
+"kills": 2,
+"label": "Attack BackCharge > SmokeBomb > ScarStrike",
+"score": 10231.43,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 128.41,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 170.34,
+"sent": 0,
+"wasted": 0
+},
+"run9 19:9": {
+"dmg": 11,
+"fired": 3,
+"hp": 0,
+"kills": 3,
+"label": "Attack DragonPunch > BackCharge > ScarStrike",
+"score": 305.58,
+"sent": 0,
+"wasted": 0
+},
 "run9 1:1": {
 "dmg": 0,
 "fired": 0,
@@ -27427,6 +30907,1466 @@
 "label": "Attack ScarStrike (DragonPunch to hand)",
 "score": 90.53,
 "sent": 1,
+"wasted": 0
+},
+"run9 20:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": -38.08,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:10": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack Dash (free) > BackCharge (Sai to hand)",
+"score": 4.96,
+"sent": 1,
+"wasted": 0
+},
+"run9 20:100": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 73.95,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:101": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 96.35,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:102": {
+"dmg": 5,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack ScarStrike (Sai, DragonPunch to hand)",
+"score": 10127.66,
+"sent": 2,
+"wasted": 0
+},
+"run9 20:103": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 73.23,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:104": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 84.97,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:105": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 68.42,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:106": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 80.34,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:107": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 78.61,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:108": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 89.59,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:109": {
+"dmg": 13,
+"fired": 2,
+"hp": 0,
+"kills": 3,
+"label": "Attack Dash (free) > DragonPunch (Sai to hand)",
+"score": 10326.72,
+"sent": 1,
+"wasted": 0
+},
+"run9 20:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 8.15,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:110": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 176.77,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:111": {
+"dmg": 12,
+"fired": 1,
+"hp": 0,
+"kills": 3,
+"label": "Attack",
+"score": 10315.02,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:112": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 45.24,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:113": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 121.83,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:114": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 56.95,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:115": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 92.99,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:116": {
+"dmg": 5,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack Dash (free) > DragonPunch > SmokeBomb",
+"score": 10130.18,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:117": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 48.45,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:118": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 62.89,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:119": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack BackCharge (Sai to hand)",
+"score": 10099.05,
+"sent": 1,
+"wasted": 0
+},
+"run9 20:12": {
+"dmg": 6,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 41.32,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:120": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 49.07,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:121": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 75.1,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:122": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10110.49,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:123": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 47.16,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:124": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 62.44,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:125": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 73.76,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:126": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Dash (free) > Sai",
+"score": 10105.39,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:127": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 47.41,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:128": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 63.55,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:129": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 71.82,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": -51.19,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:130": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 85.0,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:131": {
+"dmg": 12,
+"fired": 1,
+"hp": 0,
+"kills": 3,
+"label": "Attack ScarStrike (DragonPunch to hand)",
+"score": 10315.39,
+"sent": 1,
+"wasted": 0
+},
+"run9 20:132": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 172.55,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:133": {
+"dmg": 12,
+"fired": 2,
+"hp": 0,
+"kills": 3,
+"label": "Attack Dash (free) > DragonPunch",
+"score": 10315.02,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:134": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 168.84,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:135": {
+"dmg": 12,
+"fired": 1,
+"hp": 0,
+"kills": 3,
+"label": "Attack",
+"score": 10313.32,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:136": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 7.5,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:137": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 32.39,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:138": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 169.37,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:139": {
+"dmg": 12,
+"fired": 2,
+"hp": 0,
+"kills": 3,
+"label": "Attack SmokeBomb > BackCharge",
+"score": 10314.83,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": -33.46,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:140": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 174.88,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:141": {
+"dmg": 12,
+"fired": 1,
+"hp": 0,
+"kills": 3,
+"label": "Attack",
+"score": 10317.66,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:142": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 16.63,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:143": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 128.19,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:144": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 168.42,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:145": {
+"dmg": 12,
+"fired": 2,
+"hp": 0,
+"kills": 3,
+"label": "Attack Dash (free) > Sai",
+"score": 10315.39,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:146": {
+"dmg": 0,
+"fired": 0,
+"hp": 1,
+"kills": 0,
+"label": "Wait",
+"score": -10100.0,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": -15.98,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:16": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack SmokeBomb > BackCharge",
+"score": 17.62,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 4.24,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 18.3,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 8.97,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 14.96,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 32.43,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 52.54,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:22": {
+"dmg": 14,
+"fired": 3,
+"hp": 0,
+"kills": 0,
+"label": "Attack Dash (free) > Sai > ScarStrike (DragonPunch to hand)",
+"score": 155.04,
+"sent": 1,
+"wasted": 0
+},
+"run9 20:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": -22.79,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:24": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 16.46,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": -20.93,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 5.89,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:27": {
+"dmg": 5,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack DragonPunch (SmokeBomb to hand)",
+"score": 40.88,
+"sent": 1,
+"wasted": 0
+},
+"run9 20:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 17.07,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 50.35,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:3": {
+"dmg": 11,
+"fired": 3,
+"hp": 0,
+"kills": 0,
+"label": "Attack Dash (free) > DragonPunch > ScarStrike",
+"score": 85.7,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 38.28,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:31": {
+"dmg": 9,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack BackCharge > ScarStrike",
+"score": 104.24,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 4.13,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 33.02,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:34": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Dash (free) > DragonPunch (Sai to hand)",
+"score": 59.76,
+"sent": 1,
+"wasted": 0
+},
+"run9 20:35": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": -7.93,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 34.21,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:37": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 98.21,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:38": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight (throw)",
+"score": -12.41,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:39": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 29.42,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": -63.77,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:40": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 61.7,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:41": {
+"dmg": 11,
+"fired": 3,
+"hp": 0,
+"kills": 0,
+"label": "Attack Dash (free) > ScarStrike > Sai",
+"score": 125.23,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:42": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": -17.7,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:43": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 7.17,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:44": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 25.98,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:45": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack SmokeBomb > BackCharge",
+"score": 52.47,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:46": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 13.88,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:47": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 36.84,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:48": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack BackCharge > Dash (free) (DragonPunch to hand)",
+"score": 32.0,
+"sent": 1,
+"wasted": 0
+},
+"run9 20:49": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 43.42,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": -40.65,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:50": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 75.34,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:51": {
+"dmg": 9,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack BackCharge > ScarStrike",
+"score": 132.07,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:52": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight (throw)",
+"score": 17.94,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:53": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 16.7,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:54": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 45.72,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:55": {
+"dmg": 7,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 149.49,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:56": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 11.96,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:57": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 47.15,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:58": {
+"dmg": 4,
+"fired": 3,
+"hp": 0,
+"kills": 1,
+"label": "Attack Dash (free) > SmokeBomb > Sai",
+"score": 104.38,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:59": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 38.39,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:6": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack SmokeBomb > BackCharge",
+"score": -2.31,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:60": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 31.8,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:61": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 56.64,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:62": {
+"dmg": 9,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack BackCharge > ScarStrike",
+"score": 123.76,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:63": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 32.5,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:64": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 66.44,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:65": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack Dash (free) > BackCharge",
+"score": 85.67,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:66": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 38.69,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:67": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 57.94,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:68": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 72.27,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:69": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 63.5,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": -28.07,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:70": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 66.56,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:71": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 167.62,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:72": {
+"dmg": 15,
+"fired": 3,
+"hp": 0,
+"kills": 2,
+"label": "Attack Dash (free) > DragonPunch > ScarStrike (Sai to hand)",
+"score": 304.28,
+"sent": 1,
+"wasted": 0
+},
+"run9 20:73": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 99.77,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:74": {
+"dmg": 12,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 152.4,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:75": {
+"dmg": 0,
+"fired": 0,
+"hp": 1,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": -27.22,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:76": {
+"dmg": 4,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 95.46,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:77": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 73.2,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:78": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 71.52,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:79": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 94.52,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": -12.64,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:80": {
+"dmg": 8,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack Dash (free) > Sai",
+"score": 132.44,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:81": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 77.82,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:82": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 223.15,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:83": {
+"dmg": 23,
+"fired": 2,
+"hp": 0,
+"kills": 3,
+"label": "Attack ScarStrike > DragonPunch",
+"score": 10423.32,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:84": {
+"dmg": 0,
+"fired": 0,
+"hp": 2,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": -196.82,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:85": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 50.27,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:86": {
+"dmg": 6,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack BackCharge > SmokeBomb",
+"score": 145.97,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:87": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 54.63,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:88": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "Flip",
+"score": 113.66,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:89": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 100.47,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": -16.76,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:90": {
+"dmg": 18,
+"fired": 3,
+"hp": 0,
+"kills": 2,
+"label": "Attack DragonPunch > Dash (free) > Sai",
+"score": 10324.18,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:91": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 55.46,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:92": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 132.48,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:93": {
+"dmg": 8,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 10213.32,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:94": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 48.01,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:95": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 63.98,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:96": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile SmokeBomb",
+"score": 87.93,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:97": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack SmokeBomb > BackCharge",
+"score": 10122.83,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:98": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 83.02,
+"sent": 0,
+"wasted": 0
+},
+"run9 20:99": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 76.62,
+"sent": 0,
 "wasted": 0
 },
 "run9 2:1": {
@@ -28236,6 +33176,1936 @@
 "kills": 0,
 "label": "Attack",
 "score": -19.04,
+"sent": 0,
+"wasted": 0
+},
+"run9 4:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 37.31,
+"sent": 0,
+"wasted": 0
+},
+"run9 4:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 11.1,
+"sent": 0,
+"wasted": 0
+},
+"run9 4:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 11.86,
+"sent": 0,
+"wasted": 0
+},
+"run9 4:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 19.12,
+"sent": 0,
+"wasted": 0
+},
+"run9 4:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 25.31,
+"sent": 0,
+"wasted": 0
+},
+"run9 4:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 29.8,
+"sent": 0,
+"wasted": 0
+},
+"run9 4:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 62.43,
+"sent": 0,
+"wasted": 0
+},
+"run9 4:16": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack ScarStrike (BackCharge to hand)",
+"score": 10092.56,
+"sent": 1,
+"wasted": 0
+},
+"run9 4:2": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 74.7,
+"sent": 0,
+"wasted": 0
+},
+"run9 4:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 10.83,
+"sent": 0,
+"wasted": 0
+},
+"run9 4:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 24.72,
+"sent": 0,
+"wasted": 0
+},
+"run9 4:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 19.66,
+"sent": 0,
+"wasted": 0
+},
+"run9 4:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 20.27,
+"sent": 0,
+"wasted": 0
+},
+"run9 4:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 25.27,
+"sent": 0,
+"wasted": 0
+},
+"run9 4:8": {
+"dmg": 9,
+"fired": 3,
+"hp": 0,
+"kills": 2,
+"label": "Attack DragonPunch > BackCharge > ScarStrike",
+"score": 229.84,
+"sent": 0,
+"wasted": 0
+},
+"run9 4:9": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveLeft (throw)",
+"score": 89.93,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:1": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveLeft (throw)",
+"score": 80.09,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:10": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack ScarStrike > BackCharge (DragonPunch to hand)",
+"score": 109.15,
+"sent": 1,
+"wasted": 0
+},
+"run9 5:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 46.83,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 59.04,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 70.88,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 62.49,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 73.99,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 91.57,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:17": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 153.88,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 12.42,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 50.23,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 45.02,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:20": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 104.71,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 18.97,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 19.16,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:23": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 83.93,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 14.91,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 26.01,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 59.3,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:27": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack Sai (DragonPunch to hand)",
+"score": 94.26,
+"sent": 1,
+"wasted": 0
+},
+"run9 5:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 14.35,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:29": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 95.58,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:3": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 82.31,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:30": {
+"dmg": 6,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 192.7,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 39.97,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 50.48,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:33": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 49.77,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:34": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 66.47,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:35": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 71.69,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 79.56,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:37": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack Sai (BackCharge to hand)",
+"score": 10104.26,
+"sent": 1,
+"wasted": 0
+},
+"run9 5:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 25.96,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 58.68,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 49.68,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 50.82,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 58.39,
+"sent": 0,
+"wasted": 0
+},
+"run9 5:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 100.57,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": -24.9,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 11.91,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 14.18,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:12": {
+"dmg": 5,
+"fired": 3,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 44.97,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 17.73,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:14": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 34.16,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Wait",
+"score": 4.59,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 12.31,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 30.01,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 34.82,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 36.01,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": -6.79,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:20": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack Sai (BackCharge to hand)",
+"score": 41.62,
+"sent": 1,
+"wasted": 0
+},
+"run9 6:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 35.41,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 46.35,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:23": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack ScarStrike (BackCharge to hand)",
+"score": 59.0,
+"sent": 1,
+"wasted": 0
+},
+"run9 6:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 0.68,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": -0.34,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:5": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 37.4,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 5.43,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 7.45,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 3.69,
+"sent": 0,
+"wasted": 0
+},
+"run9 6:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 7.58,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 19.12,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 50.04,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:11": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 79.35,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 5.58,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 36.47,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": -27.64,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 2,
+"kills": 0,
+"label": "PlayTile BackCharge (Sai to hand)",
+"score": -97.9,
+"sent": 1,
+"wasted": 0
+},
+"run9 7:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 136.0,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:17": {
+"dmg": 8,
+"fired": 3,
+"hp": 0,
+"kills": 3,
+"label": "Attack DragonPunch > BackCharge > ScarStrike",
+"score": 269.35,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:18": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight (throw)",
+"score": 28.94,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 24.02,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 42.91,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:20": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 32.19,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:21": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 38.1,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight",
+"score": 94.46,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 28.68,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 34.96,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 77.55,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 111.01,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:27": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack DragonPunch > ScarStrike (BackCharge to hand)",
+"score": 186.18,
+"sent": 1,
+"wasted": 0
+},
+"run9 7:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 4.84,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:29": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 25.04,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 74.29,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:30": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveRight (throw)",
+"score": 99.86,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 47.74,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 57.06,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:33": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 90.95,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:34": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 30.06,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:35": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 66.04,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:36": {
+"dmg": 2,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10102.48,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 94.86,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:5": {
+"dmg": 5,
+"fired": 3,
+"hp": 0,
+"kills": 2,
+"label": "Attack Sai > BackCharge > ScarStrike",
+"score": 179.73,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 51.48,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 69.17,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:8": {
+"dmg": 3,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 118.47,
+"sent": 0,
+"wasted": 0
+},
+"run9 7:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 43.27,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 12.47,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 26.65,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 60.8,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:12": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 82.9,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 105.51,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:14": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 182.18,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:15": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": 48.97,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:16": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 67.13,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:17": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 100.76,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:18": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 34.26,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 38.7,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:2": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 51.32,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 43.35,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:21": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack DragonPunch (BackCharge to hand)",
+"score": 52.47,
+"sent": 1,
+"wasted": 0
+},
+"run9 8:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 60.62,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 111.43,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:24": {
+"dmg": 7,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack Sai > ScarStrike",
+"score": 203.53,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 60.92,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 65.64,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 71.67,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:28": {
+"dmg": 2,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack DragonPunch (BackCharge to hand)",
+"score": 90.48,
+"sent": 1,
+"wasted": 0
+},
+"run9 8:29": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": 45.6,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:3": {
+"dmg": 3,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 96.66,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 37.71,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 42.74,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:32": {
+"dmg": 7,
+"fired": 1,
+"hp": 0,
+"kills": 2,
+"label": "Attack ScarStrike (BackCharge to hand)",
+"score": 10204.26,
+"sent": 1,
+"wasted": 0
+},
+"run9 8:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 27.05,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 44.53,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:6": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack Sai > DragonPunch",
+"score": 120.48,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:7": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 12.85,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 18.01,
+"sent": 0,
+"wasted": 0
+},
+"run9 8:9": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 40.07,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:1": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 28.55,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:10": {
+"dmg": 0,
+"fired": 0,
+"hp": 2,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": -178.88,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:11": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 22.24,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:12": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack BackCharge (DragonPunch, Sai to hand)",
+"score": 90.56,
+"sent": 2,
+"wasted": 0
+},
+"run9 9:13": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 7.46,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:14": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 39.48,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:15": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 65.49,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:16": {
+"dmg": 4,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 114.26,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:17": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 56.82,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:18": {
+"dmg": 4,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 113.83,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:19": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 31.87,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:2": {
+"dmg": 2,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": 60.69,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:20": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 36.7,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:21": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 68.58,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:22": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 29.36,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:23": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 46.85,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:24": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 83.68,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:25": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 68.96,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:26": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 71.09,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:27": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 85.65,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:28": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 108.8,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:29": {
+"dmg": 5,
+"fired": 3,
+"hp": 0,
+"kills": 2,
+"label": "Attack DragonPunch > BackCharge > ScarStrike",
+"score": 190.18,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:3": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 112.52,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:30": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 0.01,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:31": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": 3.84,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:32": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 7.53,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:33": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack BackCharge (Sai to hand)",
+"score": 18.24,
+"sent": 1,
+"wasted": 0
+},
+"run9 9:34": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveRight",
+"score": 49.36,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:35": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": 75.8,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:36": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 91.34,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:37": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 115.36,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:38": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft",
+"score": 146.99,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:39": {
+"dmg": 9,
+"fired": 2,
+"hp": 0,
+"kills": 2,
+"label": "Attack",
+"score": 222.18,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:4": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "PlayTile ScarStrike",
+"score": 133.57,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:40": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile Sai",
+"score": -5.16,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:41": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 9.74,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:42": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 1,
+"label": "Attack BackCharge (Sai to hand)",
+"score": 68.08,
+"sent": 1,
+"wasted": 0
+},
+"run9 9:43": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 16.93,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:44": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "Flip",
+"score": 23.75,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:45": {
+"dmg": 1,
+"fired": 1,
+"hp": 0,
+"kills": 0,
+"label": "Attack",
+"score": 46.29,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:46": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "MoveLeft (throw)",
+"score": 5.54,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:47": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "PlayTile BackCharge",
+"score": 104.67,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:48": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile ScarStrike",
+"score": 67.02,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:49": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack",
+"score": 10117.74,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:5": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 1,
+"label": "MoveLeft",
+"score": 82.17,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:6": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 50.05,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:7": {
+"dmg": 5,
+"fired": 2,
+"hp": 0,
+"kills": 1,
+"label": "Attack BackCharge > ScarStrike",
+"score": 112.36,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:8": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile BackCharge",
+"score": 14.13,
+"sent": 0,
+"wasted": 0
+},
+"run9 9:9": {
+"dmg": 0,
+"fired": 0,
+"hp": 0,
+"kills": 0,
+"label": "PlayTile DragonPunch",
+"score": -84.28,
 "sent": 0,
 "wasted": 0
 }

@@ -8,6 +8,18 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.5 — Nobunaga's armor and spotlights (2026-11-08)
+- **Rule:** Nobunaga can only be hurt on a spotlit cell; anywhere else his armor stops the whole hit, poison ticks
+  included, though a tile's effect still lands (`NobunagaBoss.ReceiveAttack`, `Attack.HitTarget`). 3 cells are lit
+  above two-thirds HP, 2 above a third, then 1. On his turn the lights move, at random, whenever his HP has changed
+  since his last turn; the simulation then counts nothing as lit, since where they go is unknown.
+- **Scoring:** while he's dark he isn't the ideal target, and tiles earn no reach credit against him. The stack
+  still finds volleys that trade him onto a lit cell, such as a Smoke Bomb from a lit cell.
+- **Mod 0.15.0** logs the lit cells (`litCells`) and his HP at his last turn (`nobunagaHpLastTurn`). Older logs have
+  neither, so their boards replay unchanged: no choice changes on 3,511 boards.
+- In `logs/run9` the Jujitsuka died to him at turn 146 with him on 3 HP, F1 having attacked him repeatedly in the
+  dark, thinking it could kill.
+
 ## v2.4 — Sai (2026-11-08)
 - **Rule:** Sai hits the first agent on the cell ahead for its damage, 2 to start, twice that on an enemy
   telegraphing an attack this turn: a counter (`SaiAttack.ApplyEffect`). Cooldown 5.

@@ -244,6 +244,12 @@ Freezing, read from the code (simulated as of v1.21):
   the cell in front, which must exist and be free, then pushes it on that way to the last free cell, like the shove,
   so whoever stops it and it both take a collision hit. Only toward the hero's back, unless Two Way Move lets it go
   both ways. Damaging Move's hit lands after the crossing.
+- **Nobunaga** (`NobunagaBoss`): hurt only on a spotlit cell. Anywhere else his armor stops the whole hit, shield
+  and curse untouched, and poison ticks too, since they're hits; a tile's effect, such as poison or a curse, still
+  lands, as `Attack.HitTarget` applies it after `ReceiveAttack` whatever happened. Lit cells: 3 above two-thirds of
+  his HP, 2 above a third, then 1 (2 and 1 when corrupted). On his turn, if his HP has changed since his last turn,
+  the lights move to random cells other than the lit ones and his own, rerolled if they'd all be corners when fewer
+  than 3. The game shows them as spotlights; mod 0.15.0 logs them.
 - **Sai** (`SaiAttack`): the first agent on the cell ahead, for its damage, doubled if that enemy's telegraphed action
   this turn is to attack. 2 damage and cooldown 5 to start.
 - **Dragon Punch** pushes its target even when the hit kills it: the body still flies and hits whoever stops it,

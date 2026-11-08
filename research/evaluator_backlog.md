@@ -3,6 +3,14 @@
 Open ideas, with F2+ frozen: these all have to work at depth 1 using only what a player can see.
 Enemy AI code is for offline simulation and tuning only.
 
+## Nobunaga (since v2.5)
+
+The armor and spotlights are simulated, but nothing values getting him into the light beyond the volley that does
+it: the stack finds a Smoke Bomb trade from a lit cell, or a push or throw onto one, within a few moves. The player's
+read from `logs/run9`: really prioritizing moving him into the light wins the fight, and even waiting for him to wander
+into one would have, given the damage is predicted right. Once logs with lit cells exist, see whether that's enough,
+or whether standing on a lit cell, or his being near one, needs a value of its own.
+
 ## The biggest wins: stack patterns and enemy targeting
 
 The player's read, after day 2: figuring out the right stack pattern and which enemy to go for is where the most is

@@ -41,6 +41,16 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.5: Nobunaga's armor and spotlights
+
+Nothing logged has the lit cells yet: mod 0.15.0 starts logging them.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **Hurt only on a lit cell, effects through the armor** | **Rule** | **Read from `NobunagaBoss` and `Attack.HitTarget`** | **Hits on him matching the simulation, lit and dark, and poison applied in the dark ticking only in the light** |
+| The lights move once he's been hurt, unknown where | Rule | Read from `NobunagaBoss.ProcessTurn` | `litCells` changing exactly when his HP changed since his last turn |
+| No reach or targeting on him while dark | Scoring | Boards from `logs/run9` with chosen lights | F1 dodging rather than trading blows with him in the dark, and trading him into the light when it can |
+
 ## New in v2.4: Sai
 
 | Item | Kind | What's already confirmed | What to look for |

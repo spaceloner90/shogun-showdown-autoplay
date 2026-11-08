@@ -26,7 +26,7 @@ using BepInEx;
 using HarmonyLib;
 using UnityEngine;
 
-[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.14.0")]
+[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.15.0")]
 public class StateLoggerPlugin : BaseUnityPlugin
 {
     private const float PollIntervalSeconds = 0.1f;
@@ -568,6 +568,12 @@ public class StateLoggerPlugin : BaseUnityPlugin
         AppendHazards(sb, room.Grid.NCells);
         sb.Append(",\"traps\":");
         AppendTraps(sb, room.Grid);
+        sb.Append(",\"litCells\":");
+        AppendLitCells(sb);
+        // Nobunaga's spotlights move on his turn whenever his HP has changed since his last one.
+        NobunagaBoss nobunaga = UnityEngine.Object.FindObjectOfType<NobunagaBoss>();
+        sb.Append(",\"nobunagaHpLastTurn\":");
+        sb.Append(nobunaga == null ? "null" : Traverse.Create(nobunaga).Field("hpLastTurn").GetValue<int>().ToString());
 
         sb.Append(",\"hero\":");
         AppendAgent(sb, hero, hero.HeroEnum.ToString());
@@ -623,6 +629,28 @@ public class StateLoggerPlugin : BaseUnityPlugin
 
     // Traps on the ground that haven't gone off. A Trap doesn't keep its cell, so it's the cell nearest to where it
     // lies. By the code, only an enemy entering it sets it off, once, for its damage and effect.
+    // Nobunaga's spotlit cells, where he can be hurt: the game shows them as spotlights. Null without Nobunaga.
+    private static void AppendLitCells(StringBuilder sb)
+    {
+        NobunagaBoss boss = UnityEngine.Object.FindObjectOfType<NobunagaBoss>();
+        List<Cell> cells = boss == null ? null : Traverse.Create(boss).Field("vulnerableCells").GetValue<List<Cell>>();
+        if (cells == null)
+        {
+            sb.Append("null");
+            return;
+        }
+        sb.Append("[");
+        bool first = true;
+        foreach (Cell cell in cells)
+        {
+            if (cell == null) continue;
+            if (!first) sb.Append(",");
+            first = false;
+            sb.Append(cell.IndexInGrid);
+        }
+        sb.Append("]");
+    }
+
     private static void AppendTraps(StringBuilder sb, CombatGrid grid)
     {
         sb.Append("[");

@@ -1690,6 +1690,55 @@ class SaiTest(unittest.TestCase):
         self.assertEqual(outcome.wasted_attacks, 1)
 
 
+class NobunagaTest(unittest.TestCase):
+    """NobunagaBoss in the game's code: hurt only on a spotlit cell, and the lights move once he's been hurt."""
+    POISON_KATANA = Attack("Katana", 2, [1], first_target=True, effect="Poison")
+
+    def board(self, lit, boss_cell=3, hero_cell=2, hp=40, **kwargs):
+        boss = enemy(boss_cell, hp=hp, **kwargs)
+        boss.kind, boss.max_hp = "NobunagaBoss", 40
+        state = jujitsuka(hero_cell=hero_cell, enemies=[boss])
+        state.lit_cells, state.nobunaga_hp_last_turn = list(lit), hp
+        return state
+
+    def test_his_armor_stops_a_hit_off_the_light(self):
+        after, outcome = fire(self.board(lit=[0, 5]), KATANA)
+        self.assertEqual((after.enemies[0].hp, outcome.enemy_damage), (40, 0))
+
+    def test_a_hit_in_the_light_lands(self):
+        after, _ = fire(self.board(lit=[3]), KATANA)
+        self.assertEqual(after.enemies[0].hp, 38)
+
+    def test_an_effect_still_lands_through_the_armor_but_its_ticks_dont(self):
+        after, _ = fire(self.board(lit=[0]), self.POISON_KATANA)
+        self.assertEqual((after.enemies[0].hp, after.enemies[0].poison), (40, 2))
+
+    def test_poison_ticks_in_the_light(self):
+        state = self.board(lit=[3])
+        state.enemies[0].poison = 3
+        after, _ = step(state, Action("Wait"))
+        self.assertEqual(after.enemies[0].hp, 39)
+
+    def test_once_hurt_the_lights_move_and_nothing_counts_as_lit(self):
+        after, _ = fire(self.board(lit=[3]), KATANA)
+        self.assertEqual(after.lit_cells, [])
+
+    def test_the_lights_stay_while_he_isnt_hurt(self):
+        after, _ = step(self.board(lit=[0, 5]), Action("Wait"))
+        self.assertEqual(after.lit_cells, [0, 5])
+
+    def test_trading_places_puts_him_in_the_light(self):
+        # The hero stands lit; a Smoke Bomb trades places, then hits him there.
+        state = self.board(lit=[2])
+        after, outcome = fire(state, Attack("SmokeBomb", 1, [1, 2, 3], first_target=True))
+        self.assertEqual((after.enemies[0].cell, after.enemies[0].hp), (2, 39))
+
+    def test_f1_goes_for_another_enemy_while_he_is_dark(self):
+        state = self.board(lit=[0])
+        state.enemies.append(enemy(5, hp=3))
+        self.assertEqual(ideal_target(state).kind, "Ashigaru")
+
+
 class ScarStrikeTest(unittest.TestCase):
     """ScarStrikeAttack in the game's code: every enemy below full health, wherever it is."""
     SCAR = Attack("ScarStrike", 1, [])

@@ -53,10 +53,10 @@ import itertools
 from dataclasses import dataclass, field
 
 from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER_DISTANCE, SWAP, UNKNOWN_COPY, UNKNOWN_TILE, Action, Attack, Outcome, State,
-                   apply_attack, apply_potion, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, legal_actions, perform_special,
+                   apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.4"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.5"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -369,7 +369,8 @@ def ideal_target(state):
     if not enemies:
         return None
     enemies = [e for e in enemies if not is_tank(state, e)] or enemies
-    return min(enemies, key=lambda e: (_effective_hp(state, e), abs(e.cell - state.hero.cell)))
+    # Nobunaga off a spotlit cell can't be hurt, so another enemy comes first.
+    return min(enemies, key=lambda e: (armored(state, e), _effective_hp(state, e), abs(e.cell - state.hero.cell)))
 
 
 def _reach_value(state, target):
@@ -379,6 +380,8 @@ def _reach_value(state, target):
     share for each cell the hero would have to move to bring it in range, and a discount for each turn until it's
     ready. Each tile only adds, and more charge adds more, so having a tile never lowers it (rule 1).
     """
+    if armored(state, target):
+        return 0.0  # Nothing reaches him through his armor.
     distance = abs(target.cell - state.hero.cell)
     hp = _effective_hp(state, target)
     total = 0.0

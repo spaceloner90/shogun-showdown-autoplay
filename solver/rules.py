@@ -163,6 +163,10 @@ class State:
     traps: list[dict] = field(default_factory=list)
     potions: list[str] = field(default_factory=list)  # The hero's potions, by the game's names.
     potion_slots: int = POTION_SLOTS  # How many potions the hero can hold.
+    # Nobunaga's spotlit cells, the only ones where he can be hurt, or None without him. Empty once they've moved
+    # within a simulated turn, since where they go is random.
+    lit_cells: list[int] | None = None
+    nobunaga_hp_last_turn: int | None = None  # His HP at his last turn: the lights move when it has changed.
     fight_won: bool = False  # Set when a boss dies, which ends the fight. See fight_won() for the rest.
 
     def occupant(self, cell):
@@ -323,6 +327,8 @@ def state_from_log(row):
         special=special.get("name", SWAP),
         hazards=[dict(h, groups=[list(g) for g in h["groups"]]) for h in row.get("hazards") or []],
         potions=list(row.get("potions") or []),
+        lit_cells=row.get("litCells"),
+        nobunaga_hp_last_turn=row.get("nobunagaHpLastTurn"),
         traps=[{"cell": t["cell"], "damage": t["damage"], "effect": t.get("effect") or "None"}
                for t in row.get("traps") or []],
     )
@@ -911,7 +917,27 @@ def spring_traps(state, outcome, before):
         hit_effect(state, state.hero, enemy, trap["effect"], outcome)
 
 
+def armored(state, agent):
+    """Whether Nobunaga's armor stops a hit on him: anywhere but a spotlit cell (NobunagaBoss.ReceiveAttack)."""
+    return agent.kind == "NobunagaBoss" and state.lit_cells is not None and agent.cell not in state.lit_cells
+
+
+def relocate_lights(state, nobunaga):
+    """On Nobunaga's turn, his spotlights move if his HP has changed since his last turn, to random cells other than
+    the ones lit and his own (NobunagaBoss.ProcessTurn). Where is unknown, so none counts as lit from then on."""
+    if state.lit_cells is None or not nobunaga.alive:
+        return
+    last = state.nobunaga_hp_last_turn
+    if last is not None and nobunaga.hp != last:
+        state.lit_cells = []
+    state.nobunaga_hp_last_turn = nobunaga.hp
+
+
 def land_hit(state, attacker, target, value, outcome, collision=False):
+    # Nobunaga's armor stops the whole hit off a spotlit cell, shield and curse included, but a tile's effect still
+    # lands afterward, as for a shield: Attack.HitTarget applies effects whatever ReceiveAttack did.
+    if armored(state, target):
+        return
     # A shield blocks the hit and leaves any curse in place. A tile's effect still lands afterward.
     if target.shield:
         target.shield = False
@@ -1096,6 +1122,9 @@ def resolve_enemies(state, outcome):
     # The game acts in the order it sorted at the end of last turn, even if a Swap has since
     # changed who is further left. state.enemies is already in that order.
     enemies = list(state.enemies)
+    for enemy in enemies:
+        if enemy.kind == "NobunagaBoss":
+            relocate_lights(state, enemy)
     for enemy in enemies:
         if not enemy.alive:
             continue

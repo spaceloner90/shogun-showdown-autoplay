@@ -88,6 +88,7 @@ def compare(predicted, actual_row, spawned):
     check("swap charge", predicted.swap_charge, hero["special"]["charge"])
     check("hero curse", predicted.hero.curse, bool(hero.get("curse")))
     check("hero shield", predicted.hero.shield, bool(hero.get("shield")))
+    check("hero poison", predicted.hero.poison, hero.get("poison") or 0)
 
     for tile, logged in zip(predicted.tiles, actual_row["tiles"]):
         name = tile.attack.name
@@ -110,6 +111,8 @@ def compare(predicted, actual_row, spawned):
         check(f"{enemy.kind} facing", "Left" if enemy.facing < 0 else "Right", logged["facing"])
         check(f"{enemy.kind} curse", enemy.curse, bool(logged.get("curse")))
         check(f"{enemy.kind} shield", enemy.shield, bool(logged.get("shield")))
+        check(f"{enemy.kind} poison", enemy.poison, logged.get("poison") or 0)
+        check(f"{enemy.kind} ice", enemy.ice, logged.get("ice") or 0)
         expected_queue = [a.name for a in enemy.queue]
         actual_queue = [a["name"] for a in logged["queue"]]
         check(f"{enemy.kind} queue length", len(expected_queue), len(actual_queue))

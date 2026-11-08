@@ -3142,5 +3142,23 @@ class BackStrikeTest(unittest.TestCase):
         self.assertEqual(unmodeled_content(row), [])
 
 
+class MamushiMoveTest(unittest.TestCase):
+    """MamushiMoveSkill in the game's code: the special move poisons its target, before a shove pushes it."""
+
+    def test_the_shove_poisons_and_pushes(self):
+        state = ronin(enemies=[enemy(3)])
+        state.special_poison = True
+        after, _ = step(state, Action("MoveRight"))
+        target = after.enemies[0]
+        # Poisoned for 3, and the first tick lands at the end of this turn.
+        self.assertEqual((target.cell, target.poison, target.hp), (4, 2, 2))
+
+    def test_no_poison_on_a_target_damaging_move_kills(self):
+        state = ronin(enemies=[enemy(3, hp=1)])
+        state.special_poison, state.swap_damage = True, 1
+        after, outcome = step(state, Action("MoveRight"))
+        self.assertEqual((after.enemies, outcome.kills), ([], 1))
+
+
 if __name__ == "__main__":
     unittest.main()

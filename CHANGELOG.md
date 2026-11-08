@@ -9,6 +9,14 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.15 — Mamushi Move (2026-11-08)
+- **Rule:** with Mamushi Move, the special move poisons its target for the usual 3 turns, if it's still alive after
+  Damaging Move's hit, and before a shove pushes it (`MamushiMoveSkill.SpecialMoveEffectOnTarget`,
+  `PushSpecialMove.Perform`). Its longer cooldown shows in the log. In `logs/run13`, the Ronin's day 2, all 9 shoves
+  after it was picked poisoned, unknown to F1; poison was already valued on the position, so now it counts.
+- The prediction checker now compares poison and ice too; poison was why these misses went unseen.
+- Replay: 24 of `run13`'s 897 choices change, 11 more kills and 36 more damage, no HP lost. None elsewhere.
+
 ## v2.14 — reach counts facing (2026-11-08)
 - **Scoring:** a tile's reach only counts from where it points at the target, its range read from the way the hero
   faces, and a flip costs an action like a move. Before, ranges counted either way, so in `logs/run12` Back Strike

@@ -32,7 +32,7 @@ SNIPER_DISTANCE = 4  # Sniper adds its level to the hero's hits on targets at le
 # and Chilling Combo, which freezes enemies on a combo kill. Reactive Shield is simulated. Shield Retention keeps the
 # hero's shield from one fight to the next (ShieldRetentionSkill.PickUp), and Fortress shields it as a fight begins,
 # both of which show in the logged state.
-UNDERSTOOD_SKILLS = {"BigPockets", "ChillingCombo", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "DynamicBoost", "Fortress", "Healthy",
+UNDERSTOOD_SKILLS = {"BigPockets", "ChillingCombo", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "DynamicBoost", "Fortress", "Healthy", "MamushiMove",
                      "QuickRecovery", "ReactiveShield", "ShieldRetention", "Sniper", "TripleComboHeal", "TwoWayMove",
                      "UnfriendlyFire"}
 
@@ -165,6 +165,7 @@ class State:
     dynamic_bonus: int = 0  # Extra damage on the hero's hits after a move attack this turn, from Dynamic Boost.
     boosted: bool = False  # Whether a move attack has turned Dynamic Boost on this turn.
     reactive_shield: bool = False  # Reactive Shield: taking damage shields the hero.
+    special_poison: bool = False  # Mamushi Move: the special move poisons its target.
     two_way_swap: bool = False  # The special move works backward as well, from Two Way Move.
     special: str = SWAP  # The hero's special move.
     # Damage on its way to marked cells: each is {"damage", "groups"}, and the first group of cells strikes
@@ -338,6 +339,7 @@ def state_from_log(row):
                            if isinstance(s, dict) and s.get("name") == "Sniper"), 0),
         two_way_swap=any(isinstance(s, dict) and s.get("name") == "TwoWayMove" for s in row.get("skills") or []),
         reactive_shield=any(isinstance(s, dict) and s.get("name") == "ReactiveShield" for s in row.get("skills") or []),
+        special_poison=any(isinstance(s, dict) and s.get("name") == "MamushiMove" for s in row.get("skills") or []),
         potion_slots=POTION_SLOTS + sum(1 for s in row.get("skills") or []
                                         if isinstance(s, dict) and s.get("name") == "BigPockets"),
         special=special.get("name", SWAP),
@@ -460,6 +462,16 @@ def phase_cell(state, direction):
     return None
 
 
+def special_effect(state, hero, target, outcome):
+    """What the special move does to its target besides moving it, when the game raises SpecialMoveEffectOnTarget:
+    Damaging Move's hit, and Mamushi Move's poison on a target still alive (MamushiMoveSkill). Both before a shove's
+    push (PushSpecialMove.Perform), and after the crossing for the others."""
+    if state.swap_damage:
+        land_hit(state, hero, target, state.swap_damage, outcome)
+    if state.special_poison and target.alive:
+        target.poison = POISON_TURNS
+
+
 def perform_special(state, direction, outcome):
     """The hero's special move on the agent next to it. Only for when can_use_special allows it."""
     hero = state.hero
@@ -469,8 +481,7 @@ def perform_special(state, direction, outcome):
     if state.special == SHOVE:
         # The hero stays put. Damaging Move's hit comes first, so it may leave nobody to shove. The distance
         # earns nothing here, because stepping back makes the same space and keeps the charge.
-        if state.swap_damage:
-            land_hit(state, hero, occupant, state.swap_damage, outcome)
+        special_effect(state, hero, occupant, outcome)
         if occupant.alive:
             push(state, hero, occupant, direction, outcome, credit_distance=False)
         return
@@ -478,21 +489,18 @@ def perform_special(state, direction, outcome):
         # The hero passes through and nobody moves. Damaging Move hits the agent it first passed
         # (PhaseSpecialMove.Perform: SpecialMove.ApplyEffectOnTargetAfterPositionCrossing on the hero's old neighbour).
         hero.cell = phase_cell(state, direction)
-        if state.swap_damage:
-            land_hit(state, hero, occupant, state.swap_damage, outcome)
+        special_effect(state, hero, occupant, outcome)
         return
     if state.special == THROW:
         # Over the hero to the cell on its other side, then pushed on that way as far as it goes, hitting whoever stops
         # it, as a shove does (ThrowSpecialMove.Perform, Agent.Pushed). Damaging Move's hit comes after the crossing.
         occupant.cell = hero.cell - direction
-        if state.swap_damage:
-            land_hit(state, hero, occupant, state.swap_damage, outcome)
+        special_effect(state, hero, occupant, outcome)
         if occupant.alive:
             push(state, hero, occupant, -direction, outcome, credit_distance=False)
         return
     occupant.cell = hero.cell
-    if state.swap_damage:
-        land_hit(state, hero, occupant, state.swap_damage, outcome)
+    special_effect(state, hero, occupant, outcome)
     hero.cell = target_cell
 
 

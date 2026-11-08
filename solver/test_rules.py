@@ -1655,6 +1655,24 @@ class ThrowSpecialMoveTest(unittest.TestCase):
         self.assertEqual(Action("MoveLeft").label(state), "MoveLeft (throw)")
 
 
+class DragonPunchKillTest(unittest.TestCase):
+    """logs/run9: a Dragon Punch that kills still sends the body flying into whoever is behind."""
+
+    def test_the_body_still_hits_whoever_stops_it(self):
+        punch = Attack("DragonPunch", 1, [1], first_target=True)
+        state = jujitsuka(hero_cell=0, enemies=[enemy(1, hp=1), enemy(6, hp=2)])
+        after, outcome = fire(state, punch)
+        self.assertEqual(([(e.cell, e.hp) for e in after.enemies], outcome.kills), ([(6, 1)], 1))
+
+    def test_an_enemy_punch_that_kills_still_throws_it_into_the_hero(self):
+        # logs/run9, fight 3, turn 31: Rei's Dragon Punch killed a 1 HP TwinTachi, which still flew into the hero.
+        rei = enemy(6, hp=4, action="Attack", queue=[Attack("DragonPunch", 1, [1], first_target=True)])
+        rei.kind = "ReiBoss"
+        state = jujitsuka(hero_cell=3, enemies=[enemy(5, hp=1), rei])
+        _, outcome = step(state, Action("Wait"))
+        self.assertEqual(outcome.hp_lost, 1)
+
+
 class ScarStrikeTest(unittest.TestCase):
     """ScarStrikeAttack in the game's code: every enemy below full health, wherever it is."""
     SCAR = Attack("ScarStrike", 1, [])
@@ -1680,13 +1698,26 @@ class ScarStrikeTest(unittest.TestCase):
         _, outcome = fire(jujitsuka(enemies=[enemy(3)]), self.SCAR)
         self.assertEqual(outcome.wasted_attacks, 1)
 
-    def test_it_reaches_a_wounded_target_from_anywhere(self):
-        def reach(hp):
-            state = jujitsuka(hero_cell=0, enemies=[enemy(6, hp=hp)])
-            state.tiles = [Tile(self.SCAR, 5, 5)]
-            return leaf_terms(state)["reach"]
-        self.assertGreater(reach(2), 0)
-        self.assertEqual(reach(3), 0)
+    def wounds(self, *enemies, charge=5):
+        state = jujitsuka(hero_cell=0, enemies=list(enemies))
+        state.tiles = [Tile(self.SCAR, 5, charge)]
+        return leaf_terms(state)["wounds"]
+
+    def test_a_chip_on_a_full_enemy_is_worth_half_again_with_it_ready(self):
+        # 1 damage is worth 10; the wound it leaves is worth half of Scar Strike's 1-damage hit, 5.
+        self.assertEqual(self.wounds(enemy(6, hp=2)), 5)
+        self.assertEqual(self.wounds(enemy(6, hp=3)), 0)
+
+    def test_more_when_it_would_kill(self):
+        self.assertEqual(self.wounds(enemy(6, hp=1)), 0.5 * (10 + 60))
+
+    def test_less_while_it_cools_down(self):
+        self.assertAlmostEqual(self.wounds(enemy(6, hp=2), charge=3), 5 * 0.85 ** 2)
+
+    def test_where_the_hero_stands_doesnt_matter_to_it(self):
+        state = jujitsuka(hero_cell=0, enemies=[enemy(6, hp=2)])
+        state.tiles = [Tile(self.SCAR, 5, 5)]
+        self.assertEqual(leaf_terms(state)["reach"], 0)
 
 
 class ShoveSpecialMoveTest(unittest.TestCase):

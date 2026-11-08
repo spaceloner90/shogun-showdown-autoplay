@@ -41,6 +41,16 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.2: wounds for Scar Strike, and Dragon Punch's flying bodies
+
+The Jujitsuka's first fights in `logs/run9` confirm the Throw is her special move, with no refused moves, and Scar
+Strike's hits matched the simulation.
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **A wounded enemy is worth half of Scar Strike's hit on it** | **Scoring** | **The player's suggestion, as a value on the position** | **Chip damage spread over full-health enemies ahead of Scar Strike, without wasting turns on it** |
+| Dragon Punch pushes a target it kills | Rule | `logs/run9`, fight 2 turn 11 and fight 3 turn 31 | Stays exact |
+
 ## New in v2.1: winning, deaths alongside a boss, and the Jujitsuka
 
 | Item | Kind | What's already confirmed | What to look for |

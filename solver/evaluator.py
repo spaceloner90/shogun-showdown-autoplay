@@ -56,7 +56,7 @@ from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, QUEUE_CAP, SMOKE_BOMBS, SNIPER
                    apply_attack, apply_potion, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, legal_actions, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.1"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.2"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -115,6 +115,8 @@ WEIGHTS = {
     "escape_others": 0.5,     # Each escape beyond the best, which helps less.
     "escape_two_way": 1.5,    # A special move with Two Way Move covers both sides, so it's worth this much more.
     "curse": 0.5,             # Fraction of what a curse would add to the hero's next hit on that enemy.
+    "wound": 0.5,             # With Scar Strike, the share of its hit on each wounded enemy, as the player asked: a
+                              # 1-damage chip on an enemy at full health is worth half as much again, with it ready.
     "shield": 100.0,          # Holding a shield, worth about 1 HP. Hits average 1.4, but it may go unused.
     "facing_ideal": 6.0,      # Facing the enemy we most want to hit.
     "facing_other": 2.0,      # Facing an enemy, but not that one.
@@ -384,9 +386,6 @@ def _reach_value(state, target):
         if tile.attack.value <= 0:
             continue
         best = 0.0
-        # Scar Strike reaches any wounded enemy, from anywhere.
-        if tile.attack.name == "ScarStrike" and target.hp < target.max_hp:
-            best = min(tile.attack.value, hp)
         for reach in set(map(abs, tile.attack.range)):
             damage = tile.attack.value + (state.sniper_bonus if reach >= SNIPER_DISTANCE else 0)
             closeness = max(0.0, 1.0 - WEIGHTS["reach_falloff"] * abs(distance - reach))
@@ -522,6 +521,24 @@ def _ice_value(state):
     return total
 
 
+def _wound_value(state):
+    """Wounded enemies, for Scar Strike, which hits every enemy below full health wherever it is: each is worth a share
+    of what that hit would be, more where it would kill, discounted for each turn until the tile is ready. Only credit,
+    and more charge adds more (rules 1 and 3). A volley firing it is scored with it spent (rule 2), so it doesn't also
+    earn reach credit, where the hero stands not mattering to it."""
+    scars = [t for t in state.tiles if t.attack.name == "ScarStrike" and t.attack.value > 0]
+    if not scars:
+        return 0.0
+    total = 0.0
+    for enemy in state.enemies:
+        if not enemy.alive or enemy.hp >= enemy.max_hp or is_tank(state, enemy) or enemy.kind == "TwinSideBoss":
+            continue
+        for tile in scars:
+            waiting = 0 if tile.in_queue else max(0, tile.cooldown - tile.charge)
+            total += _hit_value(enemy, tile.attack.value) * WEIGHTS["future_discount"] ** waiting
+    return WEIGHTS["wound"] * total
+
+
 def _poison_value(state):
     """Poison still to come: good on an enemy, as far as its HP goes, and bad on the hero."""
     value = sum(min(e.poison, e.hp) * WEIGHTS["poison_turn"] for e in state.enemies
@@ -538,6 +555,7 @@ def _kept_terms(state):
         **_kept_moves(state),
         "effects": sum(WEIGHTS["loaded_effects"].get(t.attack.effect, 0.0) for t in state.queue_tiles),
         "curse": _curse_value(state),
+        "wounds": _wound_value(state),
         "shield": WEIGHTS["shield"] if state.hero.shield else 0.0,
         "ready_tiles": WEIGHTS["ready_tile"] * sum(t.ready for t in state.tiles),
         # An attack can only fire what the queue holds, so anything beyond that adds nothing.

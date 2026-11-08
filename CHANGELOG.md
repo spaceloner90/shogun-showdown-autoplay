@@ -8,6 +8,15 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.2 — wounds for Scar Strike, and Dragon Punch's flying bodies (2026-11-08)
+- **Scoring:** with Scar Strike, each wounded enemy is worth half of what its hit on it would be, more where it would
+  kill, discounted per turn until it's ready: so a 1-damage chip on an enemy at full health is worth half as much
+  again, as the player asked. A value on the position, like the curse's, so it's gone once Scar Strike is spent.
+  Scar Strike's reach credit from v2.1 is dropped, since where the hero stands doesn't matter to it.
+- **Rule:** Dragon Punch pushes its target even when the hit kills it, so the body still hits whoever stops it, in
+  `logs/run9` twice, once into the hero for 1. A collision no longer counts a kill twice when it kills a boss.
+- Replay: no change on the older logs. On `run9`, 8 of 114 choices change, for 4 more damage and no kill or HP lost.
+
 ## v2.1 — winning, deaths alongside a boss, and the Jujitsuka (2026-11-08)
 - **Scoring:** winning the fight this turn at no HP cost beats anything, as the player put it. A win that costs HP
   this turn earns nothing extra, since HP carries into the next fight and a safe win may be a turn away: a lone

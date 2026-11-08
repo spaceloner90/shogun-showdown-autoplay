@@ -626,14 +626,16 @@ def origin_of_symmetry(state, attacker):
 
 
 def push(state, attacker, target, direction, outcome, credit_distance=True):
-    """Pushes the target as far as it goes. If someone stops it, each of them takes a collision hit."""
+    """Pushes the target as far as it goes. If someone stops it, each of them takes a collision hit. A target the push's
+    own hit killed still flies, so whoever stops it is still hit."""
     start = target.cell
     behind = run_to_last_free_cell(state, target, direction)
-    if credit_distance and attacker is state.hero and not is_tank(state, target):
+    if credit_distance and attacker is state.hero and target.alive and not is_tank(state, target):
         outcome.shove_cells += min(abs(target.cell - start), MAX_SHOVE_CREDIT)
     if behind:
         land_hit(state, attacker, behind[0], 1, outcome, collision=True)
-        land_hit(state, attacker, target, 1, outcome, collision=True)
+        if target.alive:
+            land_hit(state, attacker, target, 1, outcome, collision=True)
 
 
 def shockwave(state, attacker, target, outcome):
@@ -797,7 +799,9 @@ def _apply_attack(state, attacker, attack, outcome):
         # A shield blocks the hook's damage, but not its pull.
         if attack.name == "GrapplingHook" and target.alive and target.movable:
             target.cell = attacker.cell + attacker.facing
-        if attack.name == "DragonPunch" and target.alive and target.movable:
+        # Dragon Punch pushes its target even when the hit kills it: the body still flies and hits whoever stops it
+        # (DragonPunchAttack.PerformAttack has no check, and logs/run9 shows it twice).
+        if attack.name == "DragonPunch" and target.movable:
             push(state, attacker, target, attacker.facing, outcome)
 
 

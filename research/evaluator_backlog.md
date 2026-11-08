@@ -56,6 +56,11 @@ left to gain. Both are scattered below; this pulls them together.
   strikes 2 cells ahead, and Swirl, which strikes beside it. F1 spent a lot of turns shuffling between the two
   distances, often wastefully, since they're hard to use together, though it sometimes paid off. The player's read:
   more a problem of picking the tile than of using it. Picking rewards isn't something F1 does.
+- **Cool Up is never used as an attacking potion (the player sells it for now).** With every slot full it's tried
+  for a kill this turn, but recharging a tile only helps a kill this turn if the tile can then join the attack, which
+  takes a Free Play tile: loading anything else uses the turn. So without Free Play it never qualifies, and only its
+  defensive use, recharging the special move or an escape tile to dodge a hit, can come up. Seen in `logs/run9` with
+  the Jujitsuka. Ideas: value the recharge itself, the turns of cooldown it saves, when slots are full.
 - **Attacking potions only with every slot full (since v1.28).** The pressure cutoff is gone, as the player asked.
   On the 2,470 logged boards with potions held, v2.0 would use Mass Poison on 17 and Mass Curse on 16, and D6 on 4
   (`tools/potions.py`). Whether a fight that needs one ever comes with a slot free is for real play to show.

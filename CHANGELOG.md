@@ -9,6 +9,15 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.21 — F2+ takes kills now, not later (2026-11-08)
+- **Search fix:** with no discount on known turns, a kill now and the same kill a turn later score alike, and the
+  search broke such ties on the board left after this turn, as F1 does, which favours keeping tiles loaded. In
+  `run14` (fight 7, turns 20 to 21) F4 waited with a volley that killed three, and in the simulator a lone Twin
+  Tachi was never attacked. Ties now go to the line whose events come sooner (each turn later counting 0.9 for that
+  only); scores are unchanged.
+- Simulator, 120 starts: F4 left 4 uncleared in 60 turns before the fix and none after, in 803 turns rather than
+  1,052, losing 1 HP.
+
 ## v2.20 — unknown enemies are assumed to fire (2026-11-08)
 - **Search:** an enemy whose AI isn't known (bosses mostly) is now assumed to attack with what it holds whenever
   that would hit the hero, and to wait otherwise. In the logs such enemies attacked on 165 of 207 turns they could

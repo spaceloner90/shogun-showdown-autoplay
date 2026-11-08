@@ -191,6 +191,9 @@ F2 to F4 play the hero's next turns out against the enemy AI (`solver/search.py`
   enemy action (a boss, an enemy whose choice the board doesn't show, an unidentified tile) at 0.5, from there on.
   An enemy whose AI isn't known is guessed to attack whenever what it holds would hit the hero, as such enemies
   did on 80% of those turns in the logs.
+- **Ties:** of two lines that score the same, the one whose events come sooner wins (events counted 0.9 per turn
+  later, for the tie only). Breaking ties on the position after this turn, as F1 does, kept tiles loaded and put
+  kills off indefinitely, since known turns aren't discounted.
 - **The win:** ending the fight at no HP cost beats anything only on the turn being chosen, as in F1. Counting it
   later in a line too made every line ending in a win tie, and the search kept putting the win off.
 - **Speed:** every action this turn is searched, but deeper turns follow only the 4 best by a cheap score (the

@@ -22,6 +22,10 @@ from rules import UNKNOWN_COPY, UNKNOWN_TILE, legal_actions, step
 # enemies do nothing the turn they come in and don't change what's already there. An enemy whose action is only
 # guessed counts much less, so damage certain now beats damage later that relies on it, as the player asked.
 UNKNOWN_ACTION = 0.5
+# Only for ties: of two lines that score the same, the one whose events come sooner wins, its events counted this
+# much less for each turn later. Known turns aren't discounted in the score itself, so without this a kill could be
+# put off forever at no cost, and was (logs/run14 turn 20; a lone Twin Tachi in the simulator, never attacked).
+SOONER = 0.9
 BEAM = 4
 LEAF_BEAM = 2  # On the last turn, only this many of the BEAM get the full position score.
 
@@ -107,9 +111,10 @@ class Search:
         return self.leaves[key]
 
     def value(self, state, depth):
-        """The best this board can score over `depth` more turns, and the line that does it, as (action, label)."""
+        """The best this board can score over `depth` more turns, how soon its events come (for ties), and the line
+        that does it, as (action, label)."""
         if depth == 0:
-            return self.leaf(state), []
+            return self.leaf(state), 0.0, []
         key = (state_key(state), depth)
         if key in self.memo:
             return self.memo[key]
@@ -124,17 +129,17 @@ class Search:
             factor = _factor(following)
             children.append((score + factor * _cheap(following), action, following, score, final, factor))
         children.sort(key=lambda c: c[0], reverse=True)
-        best = (float("-inf"), [])
+        best = (float("-inf"), 0.0, [])
         for _, action, following, score, final, factor in children[:self.beam if depth > 1 else self.leaf_beam]:
             if final:
-                total, rest = score + factor * self.leaf(following), []
+                total, sooner, rest = score + factor * self.leaf(following), score, []
             else:
-                later, rest = self.value(following, depth - 1)
-                total = score + factor * later
-            if total > best[0]:
-                best = (total, [(action, action.label(state))] + rest)
+                later, later_sooner, rest = self.value(following, depth - 1)
+                total, sooner = score + factor * later, score + SOONER * later_sooner
+            if (round(total, 6), sooner) > (round(best[0], 6), best[1]):
+                best = (total, sooner, [(action, action.label(state))] + rest)
         if best[0] == float("-inf"):
-            best = (self.leaf(state), [])
+            best = (self.leaf(state), 0.0, [])
         self.memo[key] = best
         return best
 
@@ -144,12 +149,14 @@ def line_for(state, action, depth, search):
     following, score, final, wasted = _turn(state, action, now=True)
     factor = _factor(following)
     if final or depth == 1:
-        later, rest = search.leaf(following), []
+        later, later_sooner, rest = search.leaf(following), 0.0, []
     else:
-        later, rest = search.value(following, depth - 1)
+        later, later_sooner, rest = search.value(following, depth - 1)
+    # Ties go to the line whose events come sooner, not to the position left after this turn, as F1 does: that kept
+    # tiles loaded and put a kill off turn after turn.
     return Line([action] + [a for a, _ in rest], score + factor * later,
                 [action.label(state)] + [label for _, label in rest],
-                {"this turn": score, "after": factor * later}, _cheap(following), wasted)
+                {"this turn": score, "after": factor * later}, score + SOONER * later_sooner, wasted)
 
 
 def _sorted(lines):

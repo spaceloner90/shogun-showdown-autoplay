@@ -82,5 +82,18 @@ class SearchTest(unittest.TestCase):
         self.assertEqual(lost, 0, line.labels)
 
 
+class TieTest(unittest.TestCase):
+    def test_a_kill_now_beats_the_same_kill_next_turn(self):
+        # logs/run14, fight 7 turn 20: firing now killed three, and waiting a turn to fire scored the same.
+        import json
+        from pathlib import Path
+        from rules import state_from_log
+        rows = (Path(__file__).resolve().parent.parent / "research" / "logs" / "run14" / "state.jsonl").read_text(
+            encoding="utf-8").splitlines()
+        row = next(json.loads(r) for r in rows if '"seq":2526,' in r)
+        best = search.rank_lines(state_from_log(row), 4)[0]
+        self.assertTrue(best.labels[0].startswith("Attack"), best.labels)
+
+
 if __name__ == "__main__":
     unittest.main()

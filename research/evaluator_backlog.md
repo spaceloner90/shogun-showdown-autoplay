@@ -275,3 +275,10 @@ Across the 310 positions of run 2, top choices only, not played fights:
 | Fires to kill | 64 | 64 |
 | Sends tiles back | 13 | 9 |
 | Takes a hit | 11 | 10 |
+
+## Waste: not spending a big setup when a small one does the job
+
+Seen in `logs/run12`'s opening: the Crossbow's bolt, 3 damage to two, spent on a 1 HP Charger a Swirl or the hook
+could have killed. A fix needs a sense of what each tile is for, weighed against what else could do the same, which
+F1 can't look far enough ahead to judge reliably. Held off by the player (v2.11), which made piercing tiles' potential
+worth more and so makes loading them up front a little more likely.

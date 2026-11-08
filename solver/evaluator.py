@@ -57,7 +57,7 @@ from rules import (ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP, SMOKE_BOMBS,
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.10"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.11"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -111,6 +111,11 @@ WEIGHTS = {
     # tile doing a point more damage. A Shockwave's chains need enemies bunched up. A curse's worth depends on who it
     # lands on, which the stack doesn't score.
     "loaded_effects": {"Shockwave": 0.5, "Curse": 0.5, "Ice": 0.5},
+    # How much more a tile that can hit two in a line is worth than its stated damage, where its potential is
+    # valued (loaded damage and reach), as with an effect: what it does when fired counts as it happens. First
+    # guesses: the Crossbow hits any 2 across its whole range, so it lines up a double far more often than the
+    # Spear, which needs them on the 2 cells ahead.
+    "pierce": {"Crossbow": 1.5, "Spear": 1.25},
     "escape_in_hand": 2 / 3,  # A tile in hand rather than loaded. Loading adds only a little, so it doesn't beat
                               # a high damage tile to the queue, since any attack would spend it.
     "escape_no_target": 1 / 3,  # One that acts on a target, with nobody it can act on.
@@ -484,7 +489,7 @@ def _reach_total(state, target, nodes, exclude=None):
                 continue
             damage = tile.attack.value + (state.sniper_bonus if reach >= SNIPER_DISTANCE else 0)
             closeness = max(0.0, 1.0 - WEIGHTS["reach_falloff"] * cost)
-            best = max(best, min(damage, hp) * closeness)
+            best = max(best, min(damage, hp) * closeness * WEIGHTS["pierce"].get(tile.attack.name, 1.0))
         waiting = 0 if tile.in_queue else max(0, tile.cooldown - tile.charge)
         total += best * WEIGHTS["future_discount"] ** waiting
     return total
@@ -685,7 +690,8 @@ def _kept_terms(state):
         "shield": _shield_value(state),
         "ready_tiles": WEIGHTS["ready_tile"] * sum(t.ready for t in state.tiles),
         # An attack can only fire what the queue holds, so anything beyond that adds nothing.
-        "loaded": WEIGHTS["loaded_damage"] * sum(sorted((a.value for a in fireable_attacks(state)), reverse=True)[:QUEUE_CAP]),
+        "loaded": WEIGHTS["loaded_damage"] * sum(sorted((a.value * WEIGHTS["pierce"].get(a.name, 1.0)
+                                                         for a in fireable_attacks(state)), reverse=True)[:QUEUE_CAP]),
         "swap_ready": WEIGHTS["swap_ready"] if state.swap_charge >= state.swap_cooldown else 0.0,
     }
     terms.update(_position_terms(state))

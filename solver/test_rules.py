@@ -3034,6 +3034,11 @@ class CrossbowTest(unittest.TestCase):
         self.assertEqual(outcome.wasted_attacks, 0)
         self.assertIn("Attack", [line.labels[0] for line in rank_actions(state)])
 
+    def test_its_pierce_is_worth_more_than_its_damage_loaded(self):
+        state = self.board(3, [enemy(5, hp=5)])
+        terms = leaf_terms(state)
+        self.assertAlmostEqual(terms["loaded"], WEIGHTS["loaded_damage"] * 3 * WEIGHTS["pierce"]["Crossbow"])
+
     def test_a_loaded_reload_is_worth_firing(self):
         # Nobody in range, so only the reload makes the stack worth anything.
         state = self.board(0, [])

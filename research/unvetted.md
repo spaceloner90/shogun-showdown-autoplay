@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.11: piercing tiles' potential
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **Crossbow counts 1.5 times its damage, Spear 1.25, in loaded damage and reach** | **Scoring** | **The player's idea; the sizes are first guesses** | **Double hits lined up and taken, without holding them back from easy kills** |
+
 ## New in v2.9: the Crossbow, and reach by real movement
 
 | Item | Kind | What's already confirmed | What to look for |

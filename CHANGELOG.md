@@ -9,6 +9,17 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.11 — piercing tiles' potential (2026-11-08)
+- **Scoring:** a tile that can hit two in a line counts for more than its stated damage where its potential is
+  valued, loaded damage and reach, as the player asked, like an effect: the Crossbow 1.5 times, since it hits any 2
+  across its range, and the Spear 1.25 times, needing them on the 2 cells ahead. First guesses. What either does
+  when fired counts as it happens.
+- As the player expected, this makes keeping and loading them a little more attractive, the Crossbow included.
+  Not using a big setup when a small one does the job needs a sense of waste that F1 can't see far enough for, so
+  that's held off.
+- Replay: no change on the Shadow's logs; 24 on the Wanderer's with the Spear, 2 fewer kills, both near-ties where
+  keeping the Spear's reach beat killing now (`run5_full` 21:21 and 17:25).
+
 ## v2.10 — a reload isn't a wasted attack (2026-11-08)
 - **Fix:** F1 drops any attack where a tile fires at nothing, and a Crossbow's reload hits nobody by design, so no
   attack that reloaded was ever offered. The stack still credited the reload, so in `logs/run12` F1 kept loading

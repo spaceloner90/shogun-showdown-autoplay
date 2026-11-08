@@ -282,3 +282,10 @@ Seen in `logs/run12`'s opening: the Crossbow's bolt, 3 damage to two, spent on a
 could have killed. A fix needs a sense of what each tile is for, weighed against what else could do the same, which
 F1 can't look far enough ahead to judge reliably. Held off by the player (v2.11), which made piercing tiles' potential
 worth more and so makes loading them up front a little more likely.
+
+## A Free Play Crossbow fired on a fight's first turn stayed charged
+
+`logs/run12`, seq 4469 and 6538: fired on turn 1, it was still charged the next turn, where it should have gone on
+its cooldown, as it did every other time, including a third first-turn shot. Not found in the tile code
+(`Tile.Played`, `OnEndOfTurn`, `CombatManager.OnPreciseKill` all ruled out or unclear); possibly a game bug, as the
+player suspects. Not simulated: 2 mispredictions in 658 turns.

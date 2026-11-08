@@ -143,7 +143,7 @@ def main():
         actions[action_name] += 1
         if problems:
             failed += 1
-            print(f"Turn {before['turn']} {action_name}{' ' + tile_name if tile_name else ''}"
+            print(f"Turn {before['turn']} (seq {before['seq']}) {action_name}{' ' + tile_name if tile_name else ''}"
                   f"{' (wave spawned)' if spawned else ''}:")
             for field, expected, actual in problems:
                 fields[field] += 1

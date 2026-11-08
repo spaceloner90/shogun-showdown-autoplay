@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.16"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.17"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -791,7 +791,7 @@ def _turn_result(state, line):
     return step(state, line.actions[0])[1]
 
 
-def potion_plan(state, ranked):
+def potion_plan(state, ranked, rank=None):
     """Which potion to use before this turn's action, if any, and why: the player's rules.
 
     Edamame heals once that wastes none of it. Shield, Freeze Time, Rain of Mirrors and Cool Up avoid damage: used
@@ -817,7 +817,7 @@ def potion_plan(state, ranked):
 
     def with_potion(name):
         after = apply_potion(state, name)
-        again = rank_actions(after, depth=1)
+        again = rank(after) if rank is not None else rank_actions(after, depth=1)
         return after, again, _turn_result(after, again[0])
 
     if now.hp_lost > 0:

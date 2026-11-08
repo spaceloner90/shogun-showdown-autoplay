@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.17: F2 to F4 search ahead
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **The search: no discount on known turns, a win only now, beam 4, full scores for the best 2 on the last turn** | **Scoring** | **The fight simulator: hits on 43 turns for F1, 19 for F3, 12 for F4, from 551 starts** | **Fewer hits in real fights, especially against bosses and waves, which the simulator leaves out** |
+| The solver server and the 0.45 s budget | Speed | Key presses of 0.25 to 0.5 s; F4 in time on about half, F3 nearly always | Whether F4's fallback to F3 happens often in play, and no stuck or stale servers |
+
 ## New in v2.16: the regular enemies' AI
 
 | Item | Kind | What's already confirmed | What to look for |

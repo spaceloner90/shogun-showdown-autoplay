@@ -1,7 +1,9 @@
 """Answers the mod's analysis request: reads a state as JSON on stdin and reports the best move per depth.
 
-The mod runs this as a new process for every request, so evaluator changes apply on the next key
-press without restarting the game.
+The mod runs this as a new process for every request. It hands the request to the solver server (server.py),
+which keeps worker processes warm for the deeper searches, starting one if none is running, and answers this
+request itself meanwhile. The server restarts when solver code changes, so changes apply on the next key press
+without restarting the game.
 
 Output is line based:
     VERSION <evaluator version>
@@ -17,12 +19,19 @@ import json
 import sys
 import time
 
-from evaluator import VERSION, potion_plan, rank_actions
-from review import board
-from rules import state_from_log, unmodeled_content
+import server
 
-# F2-F4 aren't being developed, so only depth 1 is searched. Those keys report no analysis.
-DEPTHS = (1,)
+# The solver itself is only imported when this process answers a request, not when it hands one to the server:
+# importing it takes longer than the server's whole answer.
+
+# F1 is the evaluator alone; F2 and deeper search ahead with the enemy AI (search.py). Without the server's workers,
+# F4 is too slow on one core, so a request answered here stops at F3, and the F4 key gets no analysis that time.
+DEPTHS = (1, 2, 3, 4)
+FALLBACK_DEPTHS = (1, 2, 3)
+# F2 to F4 get this long from the start of the answer. F4 usually finishes within it, but this laptop's slower cores
+# and throttling make it run over now and then; the F4 key then plays F3's choice, as the player asked, and so on
+# down. F1 always finishes.
+BUDGET = 0.45
 MAX_TABLE_ROWS = 8
 
 
@@ -49,6 +58,10 @@ def why_best(ranked):
 
 
 def build_report(row, state, by_depth, potion=None, potion_reason=None):
+    from evaluator import VERSION
+    from review import board
+    from rules import unmodeled_content
+    depths = tuple(by_depth)
     wave = row.get("wave")
     wave_text = ""
     if wave:
@@ -73,15 +86,15 @@ def build_report(row, state, by_depth, potion=None, potion_reason=None):
 
     # One row per move, ordered by depth 1, with a * on each depth's choice. Each depth's choice is
     # always shown, but there can be many ways to fire a full queue, so the rest are cut off.
-    ranked_labels = [line.labels[0] for line in by_depth[DEPTHS[0]]]
-    picks = {by_depth[depth][0].labels[0] for depth in DEPTHS}
+    ranked_labels = [line.labels[0] for line in by_depth[depths[0]]]
+    picks = {by_depth[depth][0].labels[0] for depth in depths}
     labels = [l for i, l in enumerate(ranked_labels) if i < MAX_TABLE_ROWS or l in picks]
     width = max(len(label) for label in labels)
-    lines.append("  " + "Move".ljust(width) + "".join(f"{'D' + str(d):>10}" for d in DEPTHS))
+    lines.append("  " + "Move".ljust(width) + "".join(f"{'D' + str(d):>10}" for d in depths))
     hidden = len(ranked_labels) - len(labels)
     for label in labels:
         row_text = "  " + label.ljust(width)
-        for depth in DEPTHS:
+        for depth in depths:
             ranked = by_depth[depth]
             line = next(l for l in ranked if l.labels[0] == label)
             mark = "*" if line is ranked[0] else " "
@@ -94,23 +107,40 @@ def build_report(row, state, by_depth, potion=None, potion_reason=None):
         lines.append(f"  Potions: {', '.join(state.potions)}")
     if potion:
         lines.append(f"  USE POTION {potion} first, on this key press: {potion_reason}")
-    for depth in DEPTHS:
+    for depth in depths:
         best = by_depth[depth][0]
         lines.append(f"  F{depth} {' -> '.join(best.labels)}")
         lines.append(f"     {why_best(by_depth[depth])}")
     return "\n".join(lines)
 
 
-def main():
-    row = json.loads(sys.stdin.read())
+def answer(row, pool=None, depths=DEPTHS):
+    """The whole answer to one request, as text. With a pool of worker processes, the deeper searches split this
+    turn's actions between them."""
+    from evaluator import VERSION, potion_plan, rank_actions
+    from rules import state_from_log
+    from search import rank_lines, submit_lines
+    out = []
+    print = out.append  # noqa: A001 - each line of the answer, in order
     state = state_from_log(row)
     started = time.perf_counter()
-    by_depth = {depth: rank_actions(state, depth=depth) for depth in DEPTHS}
-    potion, potion_reason, _ = potion_plan(state, by_depth[DEPTHS[0]])
+    late = []
+    if pool is not None:
+        # Every depth past F1 shares the budget; one that runs over plays the choice of the deepest that didn't.
+        deadline = time.time() + BUDGET
+        by_depth = submit_lines(state, depths, pool, deadlines={d: deadline for d in depths if d > 1})()
+        late = [d for d in depths if d not in by_depth]
+        for depth in sorted(late):
+            by_depth[depth] = by_depth[depth - 1]
+    else:
+        by_depth = {depth: rank_actions(state, depth=1) if depth == 1 else rank_lines(state, depth)
+                    for depth in depths}
+    rank = (lambda board: submit_lines(board, (1,), pool)()[1]) if pool is not None else None
+    potion, potion_reason, _ = potion_plan(state, by_depth[depths[0]], rank)
     elapsed = time.perf_counter() - started
 
     print(f"VERSION {VERSION}")
-    for depth in DEPTHS:
+    for depth in depths:
         best = by_depth[depth][0]
         action = best.actions[0]
         deck_index = action.tile if action.tile is not None else -1
@@ -126,18 +156,30 @@ def main():
         "evaluatorVersion": VERSION,
         "basedOnStateSeq": row.get("seq"),
         "seconds": round(elapsed, 3),
+        "outOfTime": late,
         "potion": {"name": potion, "why": potion_reason} if potion else None,
         "depths": {
             str(depth): [
                 {"line": l.labels, "score": round(l.score, 2), "terms": {k: round(v, 2) for k, v in l.terms.items() if v}}
                 for l in by_depth[depth]
             ]
-            for depth in DEPTHS
+            for depth in depths
         },
     }
     print("ANALYSIS " + json.dumps(analysis, separators=(",", ":")))
     print("REPORT")
     print(build_report(row, state, by_depth, potion, potion_reason))
+    for depth in late:
+        print(f"  F{depth} ran out of time ({BUDGET} s), so it plays the next depth down's choice.")
+    return "\n".join(out)
+
+
+def main():
+    row_text = sys.stdin.read()
+    text = server.ask(row_text)
+    if text is None:
+        text = answer(json.loads(row_text), depths=FALLBACK_DEPTHS)
+    sys.stdout.write(text + "\n")
 
 
 if __name__ == "__main__":

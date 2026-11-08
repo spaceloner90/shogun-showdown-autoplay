@@ -13,12 +13,12 @@ aim now is to beat the full game, with other heroes and kits.
 
 ## Ground rules
 
-- **Only what a player can see, or would know.** The live evaluator uses the board, the telegraphed enemy actions,
-  the tiles and the skills, and what an experienced player knows about every enemy: what each kind can do, such as
-  the tiles it plays. It never runs the enemy AI's code to predict moves live; that code may be read and rebuilt for
-  offline simulation and tuning.
-- **One turn ahead.** F1 looks at each action available now and scores where it leads. Searching deeper (F2 and
-  up) is paused. Everything a plan needs has to show up in how a position is scored.
+- **The enemy AI is fair game.** Since v2.16 the regular enemies' AI is ported from the game's code
+  (`solver/enemy_ai.py`) and runs live: the player dropped the earlier rule against it, to see how much better real
+  lookahead plays. What's hard to simulate (bosses, random choices, spawns) stays unknown for now.
+- **F1 looks one turn ahead; F2 to F4 search.** F1 scores each action available now by where it leads, so
+  everything a plan needs has to show up in how a position is scored. F2 and deeper (`solver/search.py`, see "The
+  search") play the next turns out with the enemy AI.
 - **Fuzzy, not exact.** Values are judgments with round numbers, guessed first and tuned against real play. Being
   roughly right everywhere beats being exact in the cases tested.
 - **Explainable.** A score is a sum of named terms, and the report and logs show them, with the version that made
@@ -180,6 +180,33 @@ next wave arrives on a timer, so leaving HP in the room costs more as it nears.
 Every weight is a first guess, kept in one place. Whenever one is tuned, what it trades against gets measured too,
 and a value that breaks something is recorded: crowding at -10 stalls fights, and a kept Smoke Bomb above 16 does
 too.
+
+## The search
+
+F2 to F4 play the hero's next turns out against the enemy AI (`solver/search.py`):
+
+- **What a line scores:** each turn's events, as F1 counts them, plus the position it ends in, scored as F1 scores
+  one, with the stack and the threat no answer removes. A turn whose enemy actions are all known counts in full, as
+  the player asked; a turn with an unknown (a boss, an enemy whose choice the board doesn't show, an unidentified
+  tile, a wave about to arrive) counts at F1's future discount, from there on.
+- **The win:** ending the fight at no HP cost beats anything only on the turn being chosen, as in F1. Counting it
+  later in a line too made every line ending in a win tie, and the search kept putting the win off.
+- **Speed:** every action this turn is searched, but deeper turns follow only the 4 best by a cheap score (the
+  turn's events and the position without its stack), the full position score is only taken for the 2 best on the
+  last turn, and a board reached by two orders is searched once. Boards are copied by `State.clone`, not deepcopy.
+- **The solver server** (`solver/server.py`) keeps worker processes warm and runs every depth at once, one job per
+  distinct action now (actions that leave the same board with the same events are searched once). The mod still
+  runs `analyze.py` on each key press, which hands the request to the server, starting one if none runs and
+  answering that press itself up to F3. The server restarts itself when solver code changes, and quits after 3 idle
+  hours. Killing it by hand leaves its workers behind; let it quit, or stop them too.
+- **The budget:** F2 to F4 get 0.45 s from the start of an answer. A depth that runs over plays the choice of the
+  deepest that didn't, and the report says so; F1 always finishes. On this laptop (a 14900HX, with slower efficiency
+  cores and throttling) F4 finished in time on about half of paced presses measured in a loaded state, F3 nearly
+  always, and whole key presses took 0.25 to 0.5 s.
+- **The fight simulator** (`tools/simulate.py`) plays whole fights offline from every logged fight and wave start
+  where all enemies are ported, with a chosen policy, and counts HP lost and the turns the hero was hit. Unlike a
+  replay, it shows how a whole fight goes. `tools/check_ai.py` checks the AI's telegraphs against the logs, and
+  `tools/time_search.py` times the search.
 
 ## Adding a mechanic
 

@@ -9,6 +9,18 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.17 — F2 to F4 search ahead with the enemy AI (2026-11-08)
+- **New:** the F2, F3 and F4 keys search that many turns ahead (`solver/search.py`), playing the turns out with
+  the ported enemy AI. A turn with every enemy action known counts in full, as the player asked; one with an unknown
+  counts at F1's future discount. A win only scores as a win on the turn chosen, as in F1, or the search puts it off.
+  F1 is unchanged.
+- **Speed:** `State.clone` instead of deepcopy, cheaper reach, a narrow last turn, merged duplicate lines, and a
+  solver server (`solver/server.py`) that keeps workers warm and runs every depth in parallel. F2 to F4 get 0.45 s;
+  a depth that runs over plays the next depth down's choice.
+- **The fight simulator** (`tools/simulate.py`): from all 551 logged fight and wave starts where every enemy is
+  ported, F1 was hit on 43 turns for 82 HP, F2 on 28 for 57, F3 on 19 for 34, F4 on 12 for 20. Every policy
+  cleared every start in time but F1 (1) and F2 (2). Waves to come aren't spawned there, and no potions are used.
+
 ## v2.16 — the regular enemies' AI (2026-11-08)
 - **Rule:** the AI of 14 regular enemy kinds is ported from the game's code (`solver/enemy_ai.py`): Ashigaru, Yari
   Master, Guardian, Twin Tachi, Sniper, Archer, Charger, Strider, Grappler, Shinobi, Warden, Shadow Dasher, Blight

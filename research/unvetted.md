@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.16: the regular enemies' AI
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| 14 kinds' next telegraphs, and the tiles they play | Rule | `tools/check_ai.py`: 99.8% of known telegraphs on every log | Stays exact; kinds still unknown are bosses, Kabukai, Shielder, Summoner, Swapper |
+
 ## New in v2.14: reach counts facing
 
 | Item | Kind | What's already confirmed | What to look for |

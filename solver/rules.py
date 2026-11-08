@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import copy
 import dataclasses
+
+import enemy_ai
 import itertools
 from dataclasses import dataclass, field
 
@@ -138,6 +140,10 @@ class Agent:
     freezable: bool = True  # Unfreezable enemies can't be frozen.
     inanimate: bool = False  # An object rather than a fighter, such as a Barricade. The game doesn't count it as a kill.
     elite: str = "None"  # The game's elite type. Heavy, Reactive Shield and Double Strike change the rules.
+    # Whether `action` is known: logged, or chosen by the ported AI (enemy_ai.py). An unknown one shows as Wait.
+    known: bool = True
+    tile_to_play: str | None = None  # For a PlayTile the AI chose, the tile; None if unknown.
+    last_tile: str | None = None  # The tile it last chose, which the Shinobi and Warden alternate on.
 
     @property
     def alive(self):
@@ -283,6 +289,15 @@ def state_from_log(row):
             elite=data.get("elite") or "None",
         )
 
+    def with_ai_memory(enemy):
+        """What the ported AI needs that the board shows only indirectly: the tile a logged PlayTile will play, and
+        the tile last chosen, from the queue."""
+        if enemy.queue:
+            enemy.last_tile = enemy.queue[-1].name
+        if enemy.action == "PlayTile":
+            enemy.tile_to_play = enemy_ai.tile_for(enemy)
+        return enemy
+
     tiles = [
         Tile(
             attack=attack(t["attack"]),
@@ -296,7 +311,7 @@ def state_from_log(row):
     ]
     hero = agent(row["hero"])
     hero.action = "Wait"
-    enemies = [agent(e) for e in row["enemies"]]
+    enemies = [with_ai_memory(agent(e)) for e in row["enemies"]]
     # The game locks a Volley onto the hero's cell as the turn it fires begins.
     for enemy in enemies:
         if enemy.action == "Attack":
@@ -1235,7 +1250,11 @@ def resolve_enemies(state, outcome):
             enemy.queue = [Attack(UNKNOWN_COPY, 0, []) for _ in range(copies)]
     for enemy in enemies:
         if enemy.alive and enemy.action == "PlayTile":
-            enemy.queue.append(Attack(UNKNOWN_TILE, 0, []))
+            if enemy.tile_to_play:
+                enemy.queue.append(enemy_ai.make_attack(enemy.kind, enemy.tile_to_play, enemy.elite))
+                enemy.last_tile = enemy.tile_to_play
+            else:
+                enemy.queue.append(Attack(UNKNOWN_TILE, 0, []))
 
 
 def end_turn(state, swapped):
@@ -1258,7 +1277,15 @@ def end_turn(state, swapped):
         # since a tile played this turn isn't identified yet.
         enemy.queue = [Attack(a.name, a.value + 1, a.range, a.first_target, a.effect, a.target_cell)
                        if a.name == "BladeOfPatience" else a for a in enemy.queue]
-        enemy.action = "Wait"  # What it does next isn't known until the game shows it.
+    # Each enemy then chooses what it telegraphs next, from the board as the turn leaves it (Enemy.DecideNextAction).
+    # Where the AI isn't ported, or depends on what the board doesn't show, it's unknown and shows as a wait.
+    for enemy in state.enemies:
+        previous = enemy.action
+        choice = enemy_ai.decide(state, enemy, previous) if state.hero.alive else None
+        enemy.action = choice.action if choice else "Wait"
+        enemy.tile_to_play = choice.tile if choice else None
+        enemy.known = choice is not None
+    for enemy in state.enemies:
         # A loaded Volley will lock onto wherever the hero ends this turn, leaving a turn to step off.
         aim_volleys(enemy, state.hero)
 

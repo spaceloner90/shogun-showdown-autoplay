@@ -9,6 +9,17 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.16 — the regular enemies' AI (2026-11-08)
+- **Rule:** the AI of 14 regular enemy kinds is ported from the game's code (`solver/enemy_ai.py`): Ashigaru, Yari
+  Master, Guardian, Twin Tachi, Sniper, Archer, Charger, Strider, Grappler, Shinobi, Warden, Shadow Dasher, Blight
+  Charger and Barricade. At each turn's end every enemy chooses its next telegraph from the board
+  (`Enemy.DecideNextAction`); bosses, the Kabukai, Shielder, Summoner and Swapper, and choices resting on something
+  the board doesn't show, stay unknown, as before. A tile an enemy plays is now the real one, not a placeholder.
+- The player lifted the rule that kept the enemy AI out of the live solver, for F2+ with real lookahead.
+- `tools/check_ai.py` checks the telegraphs against the logs: 99.8% of the 7,399 the AI claims to know are right,
+  72.5% of all enemy-turns; most misses are Chilling Combo freezes, which aren't simulated.
+- F1 replay: 14 of 833 core choices change, 3 fewer kills, all near-ties moved by enemies' tiles being known.
+
 ## v2.15 — Mamushi Move (2026-11-08)
 - **Rule:** with Mamushi Move, the special move poisons its target for the usual 3 turns, if it's still alive after
   Damaging Move's hit, and before a shove pushes it (`MamushiMoveSkill.SpecialMoveEffectOnTarget`,

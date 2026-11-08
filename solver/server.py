@@ -53,9 +53,11 @@ def _receive(sock):
 
 
 def start_in_background():
+    # A hidden console rather than none: a process with no console gives each worker it starts a console window of
+    # its own, which popped up on the player's screen.
     flags = 0
     if sys.platform == "win32":
-        flags = subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
+        flags = subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP
     with open(LOG, "ab") as log:
         subprocess.Popen([sys.executable, str(HERE / "server.py")], cwd=str(HERE), stdin=subprocess.DEVNULL,
                          stdout=log, stderr=log, creationflags=flags, close_fds=True)

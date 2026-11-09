@@ -10,6 +10,16 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.7 — potions for hits the hero can't avoid (2026-11-09)
+- **Potions: judged against the least HP any line loses without them**, not the best-scoring line's. In `run16`
+  turn 29 the best line took 1 HP on its 4th turn for a kill while another lost none, and Mass Curse was drunk to
+  save that HP.
+- **Potions: Rain of Mirrors, Shield and Freeze Time only for damage this turn**, as the player set: they answer
+  attacks already telegraphed, and one drunk for a hit turns ahead does nothing a later one couldn't. Rain of
+  Mirrors does most once an enemy has an attack charged. In `run16` turn 28 it was drunk for a hit on the line's 4th
+  turn. The combat potions (Cool Up, Mass Poison, Mass Curse) still look over the whole line.
+- Both turns now keep their potions.
+
 ## v3.6 — lines end at the wave (2026-11-09)
 - **Rule: a cleared room brings the next wave at once**, whatever the countdown, and a wave whose countdown runs out
   waits while the room is too crowded for it (`WaveRoom.ProcessTurn`). The countdown itself was already exact.

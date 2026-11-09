@@ -213,6 +213,17 @@ class PotionChoiceTest(unittest.TestCase):
         name, why = self.choose(self.board(["Shield"]))
         self.assertEqual(name, "Shield", why)
 
+    def test_an_immediate_potion_waits_for_the_turn_of_the_hit(self):
+        # The Ashigaru steps in this turn and strikes the next: nothing stops it, but a Shield drunk now does no more
+        # than one drunk next turn.
+        foe = ashigaru(2, queue=[KATANA], action="MoveLeft")
+        foe.hp = foe.max_hp = 9
+        state = make_state(hero_cell=0, enemies=[foe], swap_charge=0)
+        state.potions = ["Shield"]
+        self.assertIsNone(self.choose(state)[0])
+        after, _ = step(state, Action("Wait"))
+        self.assertEqual(self.choose(after)[0], "Shield")
+
     def test_freeze_first_before_the_shogun(self):
         state = self.board(["Shield", "MassIce"])
         state.before_final = True

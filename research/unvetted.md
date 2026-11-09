@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.7: potions for hits the hero can't avoid
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **Potions against the least HP lost without them; Rain of Mirrors, Shield, Freeze Time for this turn's damage only** | **Scoring** | **The player's call; `run16` turns 28 and 29 keep their potions; tests** | **Flips drunk as an attack is about to land; combat potions still used ahead of hits** |
+
 ## New in v3.6: lines end at the wave
 
 | Item | Kind | What's already confirmed | What to look for |

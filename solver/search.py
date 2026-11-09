@@ -242,12 +242,16 @@ def rank_lines_parallel(state, depth, pool, beam=BEAM, leaf_beam=LEAF_BEAM):
 # What a potion is for, in the order preferred among those that save as much HP over the line (the player's call):
 # the combat potions first, keeping the sure ones, Shield and Freeze Time, for when nothing else does it.
 POTION_PREFERENCE = ("CoolUp", "MassPoison", "MassCurse", "RainOfMirrors", "Shield", "MassIce")
+# Potions that answer attacks already telegraphed: turning everyone round, a shield, a freeze. Each is for damage
+# coming this turn, as the player set: one drunk for a hit turns ahead does nothing a later one couldn't. The others
+# hurt or recharge, which can head off a hit turns ahead, so they're judged on the whole line.
+IMMEDIATE_POTIONS = {"RainOfMirrors", "Shield", "MassIce"}
 
 
-def line_totals(state, line):
-    """HP the hero loses and kills made along a line, played out turn by turn."""
+def line_totals(state, line, turns=None):
+    """HP the hero loses and kills made along a line, played out turn by turn: its first `turns`, or all of it."""
     lost = kills = 0
-    for action in line.actions:
+    for action in line.actions[:turns]:
         state, outcome = step(state, action)
         lost += outcome.hp_lost
         kills += outcome.kills
@@ -256,14 +260,19 @@ def line_totals(state, line):
     return lost, kills
 
 
+def _least_lost(state, lines, turns=None):
+    """The least HP lost over any of the ranked lines: what the hero can keep without help, whichever it chooses."""
+    return min(line_totals(state, line, turns)[0] for line in lines)
+
+
 def potion_choice(state, lines, after_potion, depth):
     """Which potion to use before acting, judged on the best line over `depth` turns with and without it.
 
     `lines` ranks this board at that depth; `after_potion` maps each potion to the ranked lines after drinking it.
     Edamame heals once missing at least what it heals, or 6 with Triple Combo Heal, which heals well on its own. Any
-    potion that cuts the HP lost along the line is used, the one saving most, combat potions first on a tie, since a
-    hit seen coming turns ahead can often be headed off by them; in the fight before the Shogun's, Freeze Time
-    first, since it's useless against him. Never for kills alone, even with the bag full, as the player asked: a
+    potion that cuts the least HP the hero can lose is used, the one saving most, combat potions first on a tie,
+    since a hit seen coming turns ahead can often be headed off by them; the immediate ones (IMMEDIATE_POTIONS) only
+    for damage this turn; in the fight before the Shogun's, Freeze Time first, since it's useless against him. Never for kills alone, even with the bag full, as the player asked: a
     potion left on the ground pays a coin, and every potion is kept for heading off damage. D6, being random, is only the last resort against damage this turn that nothing else avoids. Returns
     (potion, reason) or (None, None).
     """
@@ -275,22 +284,24 @@ def potion_choice(state, lines, after_potion, depth):
     heal_at = WEIGHTS["heal_at_missing_combo"] if state.triple_heal else WEIGHTS["heal_at_missing"]
     if "Edamame" in held and hero.max_hp - hero.hp >= heal_at:
         return "Edamame", f"heal: HP {hero.hp}/{hero.max_hp}"
-    lost, kills = line_totals(state, lines[0])
-    saves, gains = [], []
+    # Each potion against the least HP any line loses without it, not the best line's: that one may take a hit for a
+    # kill, which a potion shouldn't pay for. Over the whole line, or this turn alone for the immediate ones.
+    saves = []
     for name, again in after_potion.items():
         if not again:
             continue
-        their_lost, their_kills = line_totals(apply_potion(state, name), again[0])
+        turns = 1 if name in IMMEDIATE_POTIONS else None
+        lost = _least_lost(state, lines, turns)
+        their_lost = _least_lost(apply_potion(state, name), again, turns)
         # In the fight before the Shogun's, Freeze Time comes first: it's no use against him (the player's call).
         order = (("MassIce",) + tuple(p for p in POTION_PREFERENCE if p != "MassIce")) if state.before_final             else POTION_PREFERENCE
         rank = order.index(name) if name in order else len(order)
         if their_lost < lost:
-            saves.append((their_lost, rank, name))
-        if their_kills > kills:
-            gains.append((-their_kills, -again[0].score, name))
+            saves.append((their_lost - lost, rank, name, lost, their_lost, turns))
     if saves:
-        their_lost, _, name = min(saves)
-        return name, f"over {depth} turns, {lost} HP lost without it, {their_lost} with it"
+        _, _, name, lost, their_lost, turns = min(saves)
+        span = "this turn" if turns == 1 else f"over {depth} turns"
+        return name, f"{span}, {lost} HP lost at best without it, {their_lost} with it"
     # No potion only for kills with the bag full any more, as the player asked: one left on the ground pays a coin,
     # and every potion is kept for heading off damage.
     now = step(state, lines[0].actions[0])[1]

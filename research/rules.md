@@ -214,6 +214,32 @@ Later bosses in that log, with the rules read from the game's code (simulated as
 - **Daisuke** (`DaisukeBoss.AIPickAction`): faces the hero first; steps back after attacking; waits a turn after
   playing a tile unless corrupted; plays a random tile into an empty queue and the Katana after a lone Charge; then
   attacks when threatening, or closes in. Corrupted, he has a trait. Ported as of v3.4.
+- **The other bosses** (each's `AIPickAction`), ported as of v3.14. Into an empty queue most play a random tile or
+  start a random pattern, which stays unknown until announced; otherwise each is a fixed rule list:
+  - **Rei:** with an ally in his way, targets it: Dragon Punch, swapped in for anything else. On his first turn,
+    Summon. A Back Charge is followed by a Summon, a lone Charge by Dragon Punch.
+  - **Kowa:** waits a turn after a tile or an attack, moves away whenever he can, plays a Shield unless his last
+    tile was one, else (corrupted, cut off, no wave sweeping) the wave, else Smoke Bomb. Summons on his own count.
+  - **The Statue:** three tiles by pattern (random; corrupted under a third of its HP, Origin, Swirl, Twin Tessen to
+    the center, then Arrow, Turn Around, Arrow), then an extra turn's wait unless corrupted, then fires.
+  - **The Twins:** wait on the first turn; blocked, back off or swap in a Spear; with the other twin blocked, flank
+    (Shadow Dash, or Dash then Swap Toss); else head on, a random tile then close in. Step toward the hero after an
+    attack.
+  - **Fumiko:** summons (2 tiles, 3 corrupted) when her countdown (3 attack patterns) runs out with at most one
+    other enemy; else attacks, then leaps away.
+  - **Baru:** after an offensive, builds a barricade (Dragon Punch against a wall, else Back Charge, then the
+    Barricade); otherwise offensive with the way clear, barricaded behind it (Summon, Volley, the wave).
+  - **Ieyasu:** random patterns: Dash and Blade of Patience then a step back; Summon (forced with only his Swapper
+    left); Origin of Symmetry; corrupted, Nagiboku from a striking position.
+  - **Hideyoshi:** random patterns, each up to three fixed tiles then the attack, no waits.
+  - **Nobunaga:** fires whenever anything he holds reaches the hero; after an attack, away (toward when corrupted).
+  - **Sato:** Copycat Mirror, then the copies from a striking position; once he has attacked in an act before the
+    fifth, Maku ends it. Which tile he copies stays unknown.
+  - **The Shogun:** first phase, random tiles, the Spear after a lone Charge, away after attacking. Second phase,
+    random patterns never twice running, Origin of Symmetry always after the Shuriken.
+
+  Every logged boss action they claim to know predicts right but where a summon has just changed the board, which
+  the simulation leaves out.
 - **Iwao** (`IwaoBoss.AIPickAction`, `DashPattern`): waits a turn after playing a tile unless corrupted. With a Dash
   in his queue he faces the hero, adds the Spear a turn later, then dashes and strikes whenever nobody is in
   between: the Dash carries him next to the hero from anywhere, so only someone in the way stops it. Otherwise he

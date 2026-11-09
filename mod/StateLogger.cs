@@ -26,7 +26,7 @@ using BepInEx;
 using HarmonyLib;
 using UnityEngine;
 
-[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.18.0")]
+[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.19.0")]
 public class StateLoggerPlugin : BaseUnityPlugin
 {
     private const float PollIntervalSeconds = 0.1f;
@@ -1136,22 +1136,43 @@ public class StateLoggerPlugin : BaseUnityPlugin
     }
 
     // What some enemies' AI remembers between turns, which the board doesn't show: the Shinobi's and Warden's last
-    // tile, the Summoners' and Swapper's countdowns. Only the fields an enemy has.
-    private static readonly string[] MemoryFields = { "prevAttack", "previousAttack", "waitBeforeSummoning", "waitCountdown" };
+    // tile, the Summoners' and Swapper's countdowns, and the bosses' counters and previous patterns. Only the fields
+    // an enemy has. Each is the field's name in the game's code and the key it's logged under.
+    private static readonly string[][] MemoryFields =
+    {
+        new[] { "prevAttack", "prevAttack" },
+        new[] { "previousAttack", "previousAttack" },
+        new[] { "waitBeforeSummoning", "waitBeforeSummoning" },
+        new[] { "waitCountdown", "waitCountdown" },
+        new[] { "<FirstTurn>k__BackingField", "firstTurn" },
+        new[] { "<Corrupted>k__BackingField", "corrupted" },
+        new[] { "<PreviousPattern>k__BackingField", "previousPattern" },
+        new[] { "extraWaitBeforeAttack", "extraWaitBeforeAttack" },
+        new[] { "summonPatternCooldown", "summonPatternCooldown" },
+        new[] { "iAct", "iAct" },
+        new[] { "alreadyAttackedInThisAct", "alreadyAttackedInThisAct" },
+    };
 
     private static string AiMemory(Enemy enemy)
     {
         List<string> parts = new List<string>();
         Traverse traverse = Traverse.Create(enemy);
-        foreach (string name in MemoryFields)
+        foreach (string[] entry in MemoryFields)
         {
-            Traverse field = traverse.Field(name);
+            Traverse field = traverse.Field(entry[0]);
             if (!field.FieldExists()) continue;
             object value = field.GetValue();
             if (value == null) continue;
-            bool number = value is int;
-            parts.Add(Str(name) + ":" + (number ? value.ToString() : Str(value.ToString())));
+            string text;
+            if (value is int || value is Enum) text = Convert.ToInt32(value).ToString();
+            else if (value is bool) text = (bool)value ? "true" : "false";
+            else text = Str(value.ToString());
+            parts.Add(Str(entry[1]) + ":" + text);
         }
+        // Enemy.LastTilePlayed, the last of the tiles it has played (Kowa and the Twins choose by it).
+        List<TileEnums.AttackEnum> played = traverse.Property("TilesPlayed").GetValue() as List<TileEnums.AttackEnum>;
+        if (played != null && played.Count > 0)
+            parts.Add(Str("lastTilePlayed") + ":" + Str(played[played.Count - 1].ToString()));
         Traverse wait = traverse.Property("TurnsToWaitBeforeSummoning");
         if (wait.PropertyExists())
         {

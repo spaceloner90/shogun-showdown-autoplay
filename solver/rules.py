@@ -157,6 +157,15 @@ class Agent:
     # the Summoner's full wait. None where not logged (before mod 0.17.0).
     ai_wait: int | None = None
     ai_wait_full: int | None = None
+    # A boss's current and previous pattern (Enemy.PatternIndex, logged; the previous since mod 0.19.0), whether it
+    # has yet to make its first choice (Enemy.FirstTurn), and the counters some keep: the Statue's extra wait, Fumiko's
+    # summon countdown (ai_count), Sato's act and whether he has attacked in it (ai_act, ai_flag). None where unknown.
+    pattern: int | None = None
+    prev_pattern: int | None = None
+    first_turn: bool = False
+    ai_count: int | None = None
+    ai_act: int | None = None
+    ai_flag: bool | None = None
 
     @property
     def alive(self):
@@ -350,7 +359,10 @@ def state_from_log(row):
             freezable="Unfreezable" not in (data.get("traits") or []),
             inanimate=bool(data.get("inanimate")),
             elite=data.get("elite") or "None",
-            corrupted=data["kind"] in TRAITS_ONLY_CORRUPTED and bool(data.get("traits")),
+            # Logged since mod 0.19.0 (Boss.Corrupted); before, only shown by the traits of Daisuke and Iwao.
+            corrupted=bool((data.get("memory") or {}).get(
+                "corrupted", data["kind"] in TRAITS_ONLY_CORRUPTED and bool(data.get("traits")))),
+            pattern=data.get("pattern"),
         )
 
     def with_ai_memory(enemy, data):
@@ -367,6 +379,14 @@ def state_from_log(row):
             enemy.ai_wait, enemy.ai_wait_full = memory["waitBeforeSummoning"], memory.get("turnsToWaitBeforeSummoning")
         elif "waitCountdown" in memory:
             enemy.ai_wait = memory["waitCountdown"]
+        if memory.get("lastTilePlayed"):
+            enemy.last_tile = memory["lastTilePlayed"]
+        # Enemy.FirstTurn holds until the end of the fight's first turn (the Twins wait then in every log).
+        enemy.first_turn = bool(memory.get("firstTurn", row.get("turn") == 1))
+        enemy.prev_pattern = memory.get("previousPattern")
+        enemy.ai_count = memory.get("extraWaitBeforeAttack", memory.get("summonPatternCooldown"))
+        enemy.ai_act = memory.get("iAct")
+        enemy.ai_flag = memory.get("alreadyAttackedInThisAct")
         if enemy.action == "PlayTile":
             logged = data.get("tileToPlay")
             enemy.tile_to_play = (logged if logged and enemy.kind in enemy_ai.PORTED and logged in enemy_ai.TILES
@@ -1518,6 +1538,7 @@ def resolve_enemies(state, outcome):
             # A Copycat Mirror leaves a copy of a hero tile in the queue, and which one isn't known yet.
             copies = sum(a.name == "CopycatMirror" for a in enemy.queue)
             enemy.queue = [Attack(UNKNOWN_COPY, 0, []) for _ in range(copies)]
+            enemy_ai.after_attack(enemy)
     for enemy in enemies:
         if enemy.alive and enemy.action == "PlayTile":
             if enemy.tile_to_play:

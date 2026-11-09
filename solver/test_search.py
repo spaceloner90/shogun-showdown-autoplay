@@ -100,6 +100,85 @@ class IwaoTest(unittest.TestCase):
         self.assertEqual((iwao.corrupted, iwao.tile_to_play), (True, "Spear"))
 
 
+class BossAITest(unittest.TestCase):
+    """The other bosses' AIPickAction in the game's code (v3.14). Hero on cell 2 unless said."""
+    SPEAR = Attack("Spear", 2, [1, 2])
+    DASH = Attack("Dash", 0, [], first_target=True)
+
+    def decide(self, kind, cell, queue=(), previous="Wait", facing=-1, hero_cell=2, others=(), **fields):
+        foe = Agent(kind, cell, facing, 20, 30, queue=list(queue))
+        for name, value in fields.items():
+            setattr(foe, name, value)
+        state = make_state(hero_cell=hero_cell, enemies=[foe, *others])
+        state.cells = 7
+        return enemy_ai.decide(state, foe, previous), foe
+
+    def test_rei_punches_an_ally_in_his_way(self):
+        choice, foe = self.decide("ReiBoss", 5, queue=[self.SPEAR], others=[enemy(4)])
+        self.assertEqual((choice.action, choice.tile, foe.queue), ("PlayTile", "DragonPunch", []))
+
+    def test_rei_summons_on_his_first_turn(self):
+        choice, _ = self.decide("ReiBoss", 5, first_turn=True)
+        self.assertEqual((choice.action, choice.tile), ("PlayTile", "Summon"))
+
+    def test_kowa_backs_off_whenever_he_can(self):
+        self.assertEqual(self.decide("KowaBoss", 4, last_tile="SmokeBomb")[0].action, "MoveRight")
+
+    def test_kowa_shields_unless_his_last_tile_was_a_shield(self):
+        self.assertEqual(self.decide("KowaBoss", 6, last_tile="SmokeBomb")[0].tile, "Shield")
+        self.assertEqual(self.decide("KowaBoss", 6, last_tile="Shield")[0].tile, "SmokeBomb")
+        self.assertIsNone(self.decide("KowaBoss", 6)[0])
+
+    def test_the_statue_waits_an_extra_turn_with_three_tiles(self):
+        three = [self.SPEAR] * 3
+        self.assertEqual(self.decide("StatueBoss", 5, three, "PlayTile", pattern=2)[0].action, "Wait")
+        choice, statue = self.decide("StatueBoss", 5, three, pattern=1, ai_count=0)
+        self.assertEqual((choice.action, statue.pattern), ("Attack", 0))
+        self.assertIsNone(self.decide("StatueBoss", 5, three, pattern=1)[0])
+
+    def test_a_twin_waits_on_its_first_turn(self):
+        self.assertEqual(self.decide("TwinMainBoss", 5, first_turn=True)[0].action, "Wait")
+
+    def test_a_twin_flanks_when_its_twin_is_blocked(self):
+        side = Agent("TwinSideBoss", 0, 1, 20, 30)
+        choice, _ = self.decide("TwinMainBoss", 5, [self.DASH], others=[side, enemy(1)])
+        self.assertEqual((choice.action, choice.tile), ("PlayTile", "SwapToss"))
+
+    def test_fumiko_summons_once_her_countdown_runs_out(self):
+        choice, fumiko = self.decide("FumikoBoss", 5, pattern=0, ai_count=0)
+        self.assertEqual((choice.tile, fumiko.ai_count), ("Summon", 3))
+        self.assertEqual(self.decide("FumikoBoss", 5, pattern=0, ai_count=2)[1].pattern, 1)
+
+    def test_baru_builds_a_barricade_after_an_offensive(self):
+        choice, baru = self.decide("BaruBoss", 6, pattern=0, prev_pattern=1)
+        self.assertEqual((choice.tile, baru.pattern), ("DragonPunch", 2))
+
+    def test_ieyasu_steps_back_after_blade_of_patience(self):
+        ieyasu = Agent("IeyasuBoss", 5, -1, 20, 30, pattern=1)
+        enemy_ai.after_attack(ieyasu)
+        self.assertEqual(ieyasu.pattern, 2)
+
+    def test_hideyoshi_follows_his_pattern(self):
+        choice, _ = self.decide("HideyoshiBoss", 5, [Attack("BackCharge", 1, [-1])], pattern=3)
+        self.assertEqual(choice.tile, "Mirror")
+
+    def test_nobunaga_backs_off_after_attacking_unless_corrupted(self):
+        self.assertEqual(self.decide("NobunagaBoss", 5, previous="Attack")[0].action, "MoveRight")
+        self.assertEqual(self.decide("NobunagaBoss", 5, previous="Attack", corrupted=True)[0].action, "MoveLeft")
+
+    def test_sato_ends_the_act_with_maku_once_he_has_attacked(self):
+        choice, sato = self.decide("SatoBoss", 5, [self.SPEAR], ai_act=2, ai_flag=True)
+        self.assertEqual((choice.tile, sato.queue), ("Maku", []))
+
+    def test_sato_strikes_from_a_striking_position(self):
+        choice, sato = self.decide("SatoBoss", 4, [self.SPEAR], ai_act=2, ai_flag=False)
+        self.assertEqual((choice.action, sato.ai_flag), ("Attack", True))
+
+    def test_the_second_phase_always_follows_the_shuriken_with_origin(self):
+        choice, shogun = self.decide("ShogunPhase2Boss", 5, pattern=0, prev_pattern=4)
+        self.assertEqual((choice.tile, shogun.pattern), ("OriginOfSymmetry", 5))
+
+
 class EnemyAITest(unittest.TestCase):
     """The Ashigaru's choices, read from AshigaruEnemy.AIPickAction."""
 
@@ -132,8 +211,8 @@ class EnemyAITest(unittest.TestCase):
         self.assertEqual(self.decide(foe, "Wait").action, "Wait")
 
     def test_an_unported_kind_is_unknown(self):
-        boss = Agent("NobunagaBoss", 3, -1, 30, 30)
-        self.assertIsNone(self.decide(boss, "Wait"))
+        foe = Agent("Kabukai", 3, -1, 3, 3)
+        self.assertIsNone(self.decide(foe, "Wait"))
 
     def test_the_simulation_carries_the_choice_into_next_turn(self):
         state = make_state(enemies=[ashigaru(4, action="PlayTile")])

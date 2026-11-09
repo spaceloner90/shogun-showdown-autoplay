@@ -42,6 +42,14 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.14: every boss ported; mod 0.19.0
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **All remaining bosses' AI** | **Rule** | **Game code; every logged boss action they claim to know, but 9 right after a summon** | **Corrupted versions (barely logged); Sato with mod 0.19.0's counters; striking positions (Sato, Ieyasu's Nagiboku)** |
+| A boss's first choice at the end of turn 1 | Rule | Every Twins fight waits then | Rei's opening Summon |
+| Mod 0.19.0's memory fields | Mod | Builds | Logged right in play: corrupted, firstTurn, previousPattern, lastTilePlayed, the counters |
+
 ## New in v3.13: Shield first among the save potions
 
 | Item | Kind | What's already confirmed | What to look for |

@@ -10,6 +10,19 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.14 — every boss ported; mod 0.19.0 (2026-11-09)
+- **Rule: the remaining bosses' AI is ported** from their `AIPickAction`: Rei, Kowa, the Statue, the Twins, Fumiko,
+  Baru, Ieyasu, Hideyoshi, Nobunaga, Sato and both Shogun phases, regular and corrupted. Before, each was guessed
+  and every later turn counted at 0.5. Their random tiles and patterns stay unknown until announced. Across every
+  log, the boss actions they claim to know predict right, but for 9 turns right after a summon (not simulated).
+  In run17, rollouts predict 87% of all windows exactly two turns ahead (81% before) and 68% four turns ahead (64%).
+- **Rule: a boss's first choice is made at the end of the fight's first turn** (Enemy.FirstTurn): the Twins wait
+  then, Rei summons.
+- **Mod 0.19.0** logs what the boss AI keeps hidden: whether it's corrupted, its first turn, previous pattern, last
+  tile played, and the Statue's, Fumiko's and Sato's counters. Without them some choices stay unknown (Kowa's
+  shield, the Statue's extra wait, Fumiko's summons, Baru's next pattern, everything Sato does); corruption shows
+  only for Daisuke and Iwao. It installs once the game is closed.
+
 ## v3.13 — Shield first among the save potions (2026-11-09)
 - **Potions: among those saving as much, Shield now comes before Rain of Mirrors and Freeze Time**, the player's
   call: those two also tend to leave the board better, which is why they're kept for worse spots. The combat

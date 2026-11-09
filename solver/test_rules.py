@@ -3462,6 +3462,45 @@ def chain_master(hero_cell=3, facing=1, enemies=(), swap_charge=4):
     return state
 
 
+SIGNATURE = Attack("SignatureMove", 0, [], first_target=True)
+
+
+class SignatureMoveTest(unittest.TestCase):
+    """SignatureMoveAttack in the game's code: the hero's special move, from a Free Play tile, its charge untouched."""
+
+    def test_it_swaps_with_the_special_move_uncharged(self):
+        after, outcome = fire(make_state(enemies=[enemy(3)], swap_charge=0), SIGNATURE)
+        self.assertEqual((after.hero.cell, after.enemies[0].cell, outcome.wasted_attacks), (3, 2, 0))
+        self.assertEqual(after.swap_charge, 1)  # Still recharging from 0, as if nothing used it.
+
+    def test_with_nobody_to_swap_it_does_nothing(self):
+        _, outcome = fire(make_state(enemies=[enemy(4)]), SIGNATURE)
+        self.assertEqual(outcome.wasted_attacks, 1)
+
+    def test_with_two_way_move_it_goes_back_if_it_must(self):
+        state = make_state(enemies=[enemy(1)])
+        state.two_way_swap = True
+        after, _ = fire(state, SIGNATURE)
+        self.assertEqual((after.hero.cell, after.enemies[0].cell), (1, 2))
+
+    def test_it_boosts_the_hits_after_it(self):
+        # The game raises its move-attack event when the special moves the hero (SignatureMoveAttack.PerformAttack).
+        # Swapped onto 3, the Katana then hits the enemy on 4, boosted.
+        state = make_state(enemies=[enemy(3, hp=9), enemy(4, hp=9)])
+        state.dynamic_bonus = 2
+        signature = Tile(SIGNATURE, cooldown=5, charge=5, in_queue=True)
+        katana = Tile(KATANA, cooldown=3, charge=3, in_queue=True)
+        state.tiles, state.queue_tiles, state.hero.queue = [signature, katana], [signature, katana], [SIGNATURE, KATANA]
+        after, _ = step(state, Action("Attack"))
+        self.assertEqual(sorted(e.hp for e in after.enemies), [9 - KATANA.value - 2, 9])
+
+    def test_ready_it_counts_as_another_special_move(self):
+        state = make_state(enemies=[enemy(4)], swap_charge=0)
+        without = leaf_terms(state).get("escape", 0)
+        state.tiles.append(Tile(SIGNATURE, cooldown=5, charge=5, free_play=True))
+        self.assertGreater(leaf_terms(state)["escape"], without)
+
+
 class SwapTossSpecialMoveTest(unittest.TestCase):
     """SwapTossSpecialMove in the game's code: the agents on either side of the hero trade places, the hero staying."""
 

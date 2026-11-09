@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.15: Signature Move
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| The special move from a Free Play tile, its charge untouched; a move attack for Dynamic Boost | Rule | Game code | The first log with it: tile name and Free Play as logged, the special's charge after |
+| Ready, worth a charged special move in the escape term | Scoring | Tied in code to the special's value | Kept for escapes rather than fired for nothing |
+
 ## New in v3.14: every boss ported; mod 0.19.0
 
 | Item | Kind | What's already confirmed | What to look for |

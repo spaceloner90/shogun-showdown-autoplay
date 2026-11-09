@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v3.14"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v3.15"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -640,6 +640,11 @@ def _pressure_terms(state):
 _MOVES_TARGET = SMOKE_BOMBS | {"DragonPunch", "GrapplingHook", "TwinTessen"}
 
 
+def _special_escape(state):
+    """A charged special move's escape value, more for one that also goes backward."""
+    return WEIGHTS["escape_values"][state.special] * (WEIGHTS["escape_two_way"] if state.two_way_swap else 1.0)
+
+
 def _kept_moves(state):
     """Repositioning moves kept, of the hero or of others, as escape and setup values.
 
@@ -663,9 +668,13 @@ def _kept_moves(state):
     kept = []
     for tile in state.tiles:
         name = tile.attack.name
-        if not tile.ready or (name not in escape_values and name not in setup_values):
+        # Signature Move is another use of the special move, worth what a charged one is.
+        signature = name == "SignatureMove" and state.special in escape_values
+        if not tile.ready or (name not in escape_values and name not in setup_values and not signature):
             continue
         uses = [(escape_values.get(name, 0.0), "escape"), (exploit * setup_values.get(name, 0.0), "setup")]
+        if signature:
+            uses = [(_special_escape(state), "escape")]
         value, term = max(uses)
         # A Free Play tile joins any attack from hand, so in hand it's as good as loaded.
         if not tile.in_queue and not tile.free_play:
@@ -675,7 +684,7 @@ def _kept_moves(state):
         # Its reach gain already pays for loading it, in the actions it counts.
         kept.append(max((value, term), (_reach_gain(state, tile), "move_reach")))
     if state.special in escape_values and state.swap_charge >= state.swap_cooldown:
-        escape = escape_values[state.special] * (WEIGHTS["escape_two_way"] if state.two_way_swap else 1.0)
+        escape = _special_escape(state)
         kept.append(max((escape, "escape"), (_reach_gain(state, "special"), "move_reach")))
     kept.sort(reverse=True)
     terms = {"escape": 0.0, "setup": 0.0, "move_reach": 0.0}

@@ -10,6 +10,12 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.15 — Signature Move (2026-11-09)
+- **Rule: Signature Move** performs the hero's special move, its own charge untouched, its usual way first and
+  then (with Two Way Move) the other, and counts as a move attack for Dynamic Boost (`SignatureMoveAttack`).
+- **Scoring: a ready Signature Move is worth what a charged special move is** in the escape term, as another use of
+  it, tied to the special's value in code.
+
 ## v3.14 — every boss ported; mod 0.19.0 (2026-11-09)
 - **Rule: the remaining bosses' AI is ported** from their `AIPickAction`: Rei, Kowa, the Statue, the Twins, Fumiko,
   Baru, Ieyasu, Hideyoshi, Nobunaga, Sato and both Shogun phases, regular and corrupted. Before, each was guessed

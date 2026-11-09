@@ -214,6 +214,10 @@ Later bosses in that log, with the rules read from the game's code (simulated as
 - **Daisuke** (`DaisukeBoss.AIPickAction`): faces the hero first; steps back after attacking; waits a turn after
   playing a tile unless corrupted; plays a random tile into an empty queue and the Katana after a lone Charge; then
   attacks when threatening, or closes in. Corrupted, he has a trait. Ported as of v3.4.
+- **Signature Move** (`SignatureMoveAttack`): a Free Play tile, cooldown 5, that performs the hero's special move
+  without touching its charge (`SpecialMove.Perform` with `depleteSpecialMoveCooldown` false): the special's usual
+  way, else with Two Way Move the other. A special that moves the hero raises the move-attack event, so Dynamic
+  Boost adds to the hits after it. Simulated as of v3.15; ready, it counts as another charged special move.
 - **The other bosses** (each's `AIPickAction`), ported as of v3.14. Into an empty queue most play a random tile or
   start a random pattern, which stays unknown until announced; otherwise each is a fixed rule list:
   - **Rei:** with an ally in his way, targets it: Dragon Punch, swapped in for anything else. On his first turn,

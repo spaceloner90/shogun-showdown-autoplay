@@ -17,7 +17,7 @@ ONE_ENEMY_WAVE_CAP = 6
 
 # Attacks whose behaviour is fully covered by their logged range, damage and first-target flag, plus
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
-MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb", "Barricade", "BladeOfPatience", "BlazingSuisei", "Bomb",
+MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb", "Barricade", "BladeOfPatience", "BlazingSuisei", "Bomb", "SignatureMove",
            "BossSwap", "Charge", "Crossbow",
            "CopycatMirror", "CorruptedBarrage", "CorruptedWaveL2R", "CorruptedWaveR2L", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Hookblade", "Katana", "Kunai", "Lightning", "Maku", "MeteorHammer", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Sai", "ScarStrike", "SmokeBomb", "Spear", "Summon", "SwapToss",
@@ -93,7 +93,8 @@ SMOKE_BOMBS = {"SmokeBomb", "BackSmokeBomb"}  # Trade places with the first targ
 # Attacks that move or turn the hero, which raise the game's move-attack event that Dynamic Boost listens for. Only
 # when they actually moved or turned it: a Smoke Bomb with nobody to trade places with does nothing.
 MOVE_ATTACKS = set(CHARGES) | set(PLAIN_DASHES) | set(SHADOW_DASHES) | SMOKE_BOMBS | {"TurnAround", "Mirror",
-                                                                                     "OriginOfSymmetry", "Hookblade"}
+                                                                                     "OriginOfSymmetry", "Hookblade",
+                                                                                     "SignatureMove"}
 
 # An enemy tile being played. Its identity isn't visible until it lands in the queue.
 UNKNOWN_TILE = "Unknown"
@@ -808,6 +809,22 @@ def is_tank(state, agent):
     return agent.kind in TANKS and any(e.alive and is_boss(e) for e in state.enemies)
 
 
+def signature_move(state, outcome):
+    """The hero's special move, its own charge untouched (SignatureMoveAttack: SpecialMove.Perform with
+    depleteSpecialMoveCooldown false): the special's usual way first, then, with Two Way Move, the other."""
+    charge = state.swap_charge
+    state.swap_charge = state.swap_cooldown
+    usual = -state.hero.facing if state.special == THROW else state.hero.facing
+    done = False
+    for direction in (usual, -usual):
+        if can_use_special(state, direction):
+            perform_special(state, direction, outcome)
+            done = True
+            break
+    state.swap_charge = charge
+    return done
+
+
 def swap_toss(state, attacker):
     """Swaps whoever is on the cells directly either side of the attacker, if both cells exist."""
     left_cell, right_cell = attacker.cell - 1, attacker.cell + 1
@@ -1018,6 +1035,10 @@ def _apply_attack(state, attacker, attack, outcome):
         return
     if attack.name == "BossSwap":
         boss_swap(state, attacker)
+        return
+    if attack.name == "SignatureMove":
+        if attacker is state.hero and not signature_move(state, outcome):
+            outcome.wasted_attacks += 1
         return
     if attack.name in ("SwapToss", "Mirror", "OriginOfSymmetry"):
         moves = {"SwapToss": swap_toss, "Mirror": mirror, "OriginOfSymmetry": origin_of_symmetry}

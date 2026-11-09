@@ -2,7 +2,7 @@
 
 At the end of every turn the game has each enemy choose its next action (Enemy.DecideNextAction): one with ice
 waits; otherwise its kind's AIPickAction picks one, and a move into a wall or an occupied cell becomes a wait.
-`decide` does the same. It returns None where the choice can't be known: a kind not ported (bosses, the Kabukai,
+`decide` does the same. It returns None where the choice can't be known: a kind not ported (bosses but Daisuke, the Kabukai,
 the Shielder, the Summoner, the Swapper), or one that depends on something the board doesn't show.
 
 The kinds share building blocks (Enemy.FaceTarget, MoveTowardsTarget, MoveAwayFromTarget,
@@ -36,7 +36,8 @@ PLAIN_EFFECT = {("Grappler", "GrapplingHook"), ("ShadowDasher", "Charge"), ("War
 FIRST_TILE = {"Ashigaru": "Katana", "YariMaster": "Spear", "Guardian": "Katana", "TwinTachi": "Swirl",
               "Sniper": "Volley", "Archer": "Arrow", "Charger": "Charge", "Strider": "Katana",
               "Grappler": "GrapplingHook", "Shinobi": None, "Warden": None, "ShadowDasher": "Charge",
-              "BlightCharger": "Charge", "Barricade": None, "Summoner": "Summon", "Swapper": "BossSwap"}
+              "BlightCharger": "Charge", "Barricade": None, "Summoner": "Summon", "Swapper": "BossSwap",
+              "DaisukeBoss": None}
 SWAPPER_WAIT = 3  # SwapperEnemy.get_NTurnsBetweenAttacks
 PORTED = set(FIRST_TILE)
 
@@ -144,6 +145,26 @@ def _pick(state, enemy, previous):
             enemy.ai_wait = enemy.ai_wait_full
             return Choice("Attack")
         return Choice("Wait")
+    if kind == "DaisukeBoss":
+        # DaisukeBoss.AIPickAction: turn to face the hero first; step back after attacking; a turn after playing a
+        # tile (unless corrupted); into an empty queue a random tile; after a lone Charge, the Katana; then attack
+        # when threatening, or close in. Corrupted, he never plays the Katana straight after a tile.
+        if not _facing_target(state, enemy):
+            return _face_target(state, enemy)
+        if previous == "Attack":
+            return _away(state, enemy)
+        if previous == "PlayTile" and not enemy.corrupted:
+            return Choice("Wait")
+        if tiles == 0:
+            return _play(None)
+        if tiles == 1 and enemy.queue[0].name == "Charge":
+            return Choice("Wait") if enemy.corrupted and previous == "PlayTile" else _play("Katana")
+        if _valued(enemy):
+            if _threatening(state, enemy):
+                return Choice("Attack")
+            if _path_free(state, enemy):
+                return _toward_striking_position(state, enemy)
+        return Choice("Attack") if any(a.name == "Summon" for a in enemy.queue) else Choice("Wait")
     if kind == "Swapper":
         # SwapperEnemy.AIPickAction: a turn after playing its tile, then fires it, then waits 3 turns, then plays it.
         if enemy.ai_wait is None:
@@ -270,6 +291,8 @@ def tile_for(enemy):
         return {0: "GrapplingHook", 1: "Katana"}.get(tiles)
     if enemy.kind == "ShadowDasher":
         return {0: "Charge", 1: "Katana"}.get(tiles)
+    if enemy.kind == "DaisukeBoss":
+        return "Katana" if tiles == 1 and enemy.queue[0].name == "Charge" else None
     if enemy.kind in ("Shinobi", "Warden"):
         if enemy.last_tile is None:
             return None

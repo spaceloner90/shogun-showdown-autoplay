@@ -3451,5 +3451,47 @@ class HookbladeTest(unittest.TestCase):
         self.assertEqual(after.tiles[-1].attack.value, 2)
 
 
+class ChikaraCrushTest(unittest.TestCase):
+    """ChikaraCrushSkill in the game's code: its level added to every push collision an enemy takes."""
+
+    def test_both_in_a_collision_take_more(self):
+        state = make_state(hero_cell=1, enemies=[enemy(2, hp=5), enemy(4, hp=5)])
+        state.chikara_bonus = 1
+        after, _ = fire(state, PUNCH)
+        # The punch's 1, then 2 each for the collision.
+        self.assertEqual(sorted(e.hp for e in after.enemies), [2, 3])
+
+    def test_not_on_a_hit_or_a_trap(self):
+        state = make_state(enemies=[enemy(3, hp=5)], queue=["Swirl"])
+        state.chikara_bonus = 2
+        after, _ = step(state, Action("Attack"))
+        self.assertEqual(after.enemies[0].hp, 3)
+
+    def test_read_from_the_log(self):
+        row = {"cells": 5, "tiles": [], "enemies": [], "skills": [{"name": "ChikaraCrush", "level": 2}],
+               "hero": {"kind": "H", "cell": 0, "facing": "Right", "hp": 9, "maxHp": 9, "shield": False, "queue": [],
+                        "action": "Wait", "special": {"charge": 3, "cooldown": 3}}}
+        self.assertEqual(state_from_log(row).chikara_bonus, 2)
+        self.assertNotIn("skill ChikaraCrush", unmodeled_content(row))
+
+
+class HookbladePerfectStrikeTest(unittest.TestCase):
+    """CombatManager.OnPreciseKill: any exact kill while a Perfect Strike tile is in progress recharges it, so a hit
+    anywhere along the Hookblade's chain counts."""
+
+    def charge_after(self, *hps):
+        hook = Attack("Hookblade", 2, [1], first_target=True, effect="PerfectStrike")
+        state = make_state(hero_cell=0, enemies=[enemy(i + 1, hp=hp) for i, hp in enumerate(hps)])
+        after, _ = fire(state, hook, cooldown=5)
+        return next(t for t in after.tiles if t.attack.name == "Hookblade").charge
+
+    def test_an_exact_kill_later_in_the_chain_counts(self):
+        # 2 overkills the first, then 1 kills the second exactly.
+        self.assertEqual(self.charge_after(1, 1), 5)
+
+    def test_overkills_alone_dont(self):
+        self.assertEqual(self.charge_after(1, 3), 0)
+
+
 if __name__ == "__main__":
     unittest.main()

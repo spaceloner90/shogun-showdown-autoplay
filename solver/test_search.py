@@ -14,6 +14,38 @@ def ashigaru(cell, facing=-1, queue=(), action="Wait"):
     return Agent("Ashigaru", cell, facing, 3, 3, queue=list(queue), action=action)
 
 
+class DaisukeTest(unittest.TestCase):
+    """DaisukeBoss.AIPickAction in the game's code."""
+
+    def decide(self, queue, previous, facing=-1, cell=3, traits=False):
+        foe = Agent("DaisukeBoss", cell, facing, 12, 15, queue=list(queue))
+        foe.corrupted = traits
+        return enemy_ai.decide(make_state(hero_cell=2, enemies=[foe]), foe, previous)
+
+    CHARGE = Attack("Charge", 1, list(range(1, 11)), first_target=True)
+
+    def test_he_turns_to_face_the_hero_first(self):
+        self.assertEqual(self.decide([self.CHARGE, KATANA], "Attack", facing=1).action, "FlipLeft")
+
+    def test_he_steps_back_after_attacking(self):
+        self.assertEqual(self.decide([self.CHARGE, KATANA], "Attack").action, "MoveRight")
+
+    def test_a_turn_after_playing_a_tile_unless_corrupted(self):
+        self.assertEqual(self.decide([self.CHARGE, KATANA], "PlayTile").action, "Wait")
+        self.assertEqual(self.decide([self.CHARGE, KATANA], "PlayTile", traits=True).action, "Attack")
+
+    def test_the_katana_follows_a_lone_charge(self):
+        choice = self.decide([self.CHARGE], "Wait")
+        self.assertEqual((choice.action, choice.tile), ("PlayTile", "Katana"))
+
+    def test_an_empty_queue_plays_an_unknown_tile(self):
+        choice = self.decide([], "Wait")
+        self.assertEqual((choice.action, choice.tile), ("PlayTile", None))
+
+    def test_he_attacks_when_threatening(self):
+        self.assertEqual(self.decide([self.CHARGE, KATANA], "Wait").action, "Attack")
+
+
 class EnemyAITest(unittest.TestCase):
     """The Ashigaru's choices, read from AshigaruEnemy.AIPickAction."""
 

@@ -10,6 +10,18 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.4 — Daisuke's AI; Chikara Crush (2026-11-09)
+- **Rule: Daisuke's AI is ported** (`DaisukeBoss.AIPickAction`): he turns to face the hero first, steps back after
+  attacking, waits a turn after playing a tile unless corrupted, plays the Katana after a lone Charge, and attacks
+  when threatening. Into an empty queue his tile is random, so it stays unknown. Corrupted, he has a trait, which is
+  how the log tells. In `logs/run16` the search guessed he'd wait while facing away, so it never saw him turn round,
+  and took 3 on turn 12; with him ported, F4 keeps full HP over its four turns from turns 8 and 9, and from turn 10
+  takes 1 instead of 3. 60 of his logged choices, all predicted right.
+- **Rule: Chikara Crush** adds its level to every push collision an enemy takes, whoever pushed it
+  (`ChikaraCrushSkill.ProcessAttack`; only `Agent.Pushed` builds collision hits, not traps, bombs or shockwaves).
+- Perfect Strike already counts any exact kill while its tile is in progress (`CombatManager.OnPreciseKill`), so a
+  Hookblade's chain or a Meteor Hammer's ricochet recharges it; tests added.
+
 ## v3.3 — the Chain Master (2026-11-09)
 - **Rule: Swap Toss**, the Chain Master's special move, is simulated: the agents on either side of the hero trade
   places, neither turning, and the special move's effect lands on each (`SwapTossSpecialMove`). Its escape value is

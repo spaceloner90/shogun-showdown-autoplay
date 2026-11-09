@@ -200,6 +200,12 @@ Later bosses in that log, with the rules read from the game's code (simulated as
 - **Close Combat** (the skill, `CloseCombatSkill`): its level added to each of the hero's hits on an enemy right
   beside it, if that tile didn't move the hero (`Agent.ExecuteTile` records the cell as each tile begins). Not on
   collisions. Simulated as of v2.22.
+- **Chikara Crush** (`ChikaraCrushSkill`): its level is added to every push collision an enemy takes, from anyone's
+  push. The game's collision hits are only the two a push makes when something stops it (`Agent.Pushed`); traps,
+  bombs and shockwaves aren't collisions. Simulated as of v3.4.
+- **Daisuke** (`DaisukeBoss.AIPickAction`): faces the hero first; steps back after attacking; waits a turn after
+  playing a tile unless corrupted; plays a random tile into an empty queue and the Katana after a lone Charge; then
+  attacks when threatening, or closes in. Corrupted, he has a trait. Ported as of v3.4.
 - **Swap Toss** (the Chain Master's special move, `SwapTossSpecialMove`): moving into an adjacent movable agent
   makes it and whoever is on the hero's other side trade places, neither turning, so the one tossed behind faces
   away from the hero. The hero stays put. Both cells beside the hero must exist, and the far one may be empty but

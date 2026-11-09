@@ -34,7 +34,7 @@ SNIPER_DISTANCE = 4  # Sniper adds its level to the hero's hits on targets at le
 # and Chilling Combo, which freezes enemies on a combo kill. Reactive Shield is simulated. Shield Retention keeps the
 # hero's shield from one fight to the next (ShieldRetentionSkill.PickUp), and Fortress shields it as a fight begins,
 # both of which show in the logged state.
-UNDERSTOOD_SKILLS = {"BigPockets", "ChillingCombo", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "BackStabber", "CloseCombat", "DynamicBoost", "Fortress", "Healthy", "MamushiMove", "Monomancer",
+UNDERSTOOD_SKILLS = {"BigPockets", "ChikaraCrush", "ChillingCombo", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "BackStabber", "CloseCombat", "DynamicBoost", "Fortress", "Healthy", "MamushiMove", "Monomancer",
                      "QuickRecovery", "ReactiveShield", "ShieldRetention", "Sniper", "TripleComboHeal", "TwoWayMove",
                      "UnfriendlyFire"}
 
@@ -146,6 +146,8 @@ class Agent:
     # Whether `action` is known: logged, or chosen by the ported AI (enemy_ai.py). An unknown one shows as Wait.
     known: bool = True
     tile_to_play: str | None = None  # For a PlayTile the AI chose, the tile; None if unknown.
+    # A corrupted boss, where the log shows it: Daisuke has a trait only when corrupted (DaisukeBoss.get_EnemyTraits).
+    corrupted: bool = False
     last_tile: str | None = None  # The tile it last chose, which the Shinobi and Warden alternate on.
     # A Summoner's turns left before it summons again, or a Swapper's before it swaps (their AI's countdowns), with
     # the Summoner's full wait. None where not logged (before mod 0.17.0).
@@ -177,6 +179,8 @@ class State:
     sniper_bonus: int = 0  # Extra damage on the hero's hits from 4 or more cells away, from Sniper.
     # Extra damage on the hero's hits on an adjacent enemy, from Close Combat, unless that tile moved the hero.
     close_bonus: int = 0
+    # Extra damage on every collision an enemy takes, whoever pushed it, from Chikara Crush: its level.
+    chikara_bonus: int = 0
     # Extra damage on the hero's directional hits on an enemy facing away from where the tile began, from Back Stabber.
     backstab_bonus: int = 0
     tile_start_cell: int | None = None  # Where the hero stood as its current tile began (Agent.CellBeforeExecution).
@@ -337,6 +341,7 @@ def state_from_log(row):
             freezable="Unfreezable" not in (data.get("traits") or []),
             inanimate=bool(data.get("inanimate")),
             elite=data.get("elite") or "None",
+            corrupted=data["kind"] == "DaisukeBoss" and bool(data.get("traits")),
         )
 
     def with_ai_memory(enemy, data):
@@ -417,6 +422,8 @@ def state_from_log(row):
                              if isinstance(s, dict) and s.get("name") == "BackStabber"), 0),
         close_bonus=next((s["level"] for s in row.get("skills") or []
                           if isinstance(s, dict) and s.get("name") == "CloseCombat"), 0),
+        chikara_bonus=next((s["level"] for s in row.get("skills") or []
+                            if isinstance(s, dict) and s.get("name") == "ChikaraCrush"), 0),
         sniper_bonus=next((s["level"] for s in row.get("skills") or []
                            if isinstance(s, dict) and s.get("name") == "Sniper"), 0),
         two_way_swap=any(isinstance(s, dict) and s.get("name") == "TwoWayMove" for s in row.get("skills") or []),
@@ -829,9 +836,16 @@ def push(state, attacker, target, direction, outcome, credit_distance=True):
     if credit_distance and attacker is state.hero and target.alive and not is_tank(state, target):
         outcome.shove_cells += min(abs(target.cell - start), MAX_SHOVE_CREDIT)
     if behind:
-        land_hit(state, attacker, behind[0], 1, outcome, collision=True)
+        land_hit(state, attacker, behind[0], _crash(state, behind[0]), outcome, collision=True)
         if target.alive:
-            land_hit(state, attacker, target, 1, outcome, collision=True)
+            land_hit(state, attacker, target, _crash(state, target), outcome, collision=True)
+
+
+def _crash(state, agent):
+    """A push collision's damage to one agent: 1, plus Chikara Crush's level on an enemy. Only these hits are the game's
+    collisions (Agent.Pushed builds them with IsCollision; ChikaraCrushSkill.ProcessAttack adds to those on enemies),
+    not a trap, a bomb or a shockwave."""
+    return 1 + (state.chikara_bonus if agent is not state.hero else 0)
 
 
 def shockwave(state, attacker, target, outcome):

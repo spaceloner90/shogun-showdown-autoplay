@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.4: Daisuke's AI; Chikara Crush
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Daisuke's AI | Rule | 60 of 60 logged choices (`run16` and earlier) | Corrupted Daisuke, never seen yet |
+| Chikara Crush on push collisions | Rule | Read from the code; tests | Collision damage exact in predictions |
+
 ## New in v3.3: the Chain Master
 
 | Item | Kind | What's already confirmed | What to look for |

@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.8: putting off the wave only when it's safe
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **The room-clearing kill put off only along a line known, HP-free and landing its wave in the horizon** | **Search** | **The player's rule; tests; `run16` turns 19-20 set up first** | **Waves met with tiles loaded and traps set; no hit taken while holding a last enemy** |
+
 ## New in v3.7: potions for hits the hero can't avoid
 
 | Item | Kind | What's already confirmed | What to look for |

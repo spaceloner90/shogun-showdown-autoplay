@@ -129,6 +129,47 @@ class WaveEndTest(unittest.TestCase):
         self.assertEqual(search._factor(state), 1.0)
 
 
+class WaveDelayGuaranteeTest(unittest.TestCase):
+    """Putting off the kill that clears the room, to meet the wave set up, only when sure to be safe until it lands."""
+
+    def board(self, known=True, held=False):
+        foe = ashigaru(3, queue=[], action="Wait")
+        foe.hp = 2
+        state = make_state(hero_cell=2, enemies=[foe], queue=["Swirl"])
+        state.turns_until_wave = 9
+        if not known:
+            foe.kind = "Mystery"  # No AI ported: its choices are guessed.
+        if held:
+            state.wave_held_at = 1
+        return state
+
+    def delay(self, state):
+        return search.Line([Action("Wait"), Action("Attack")], 0.0, ["Wait", "Attack"], {}, 0.0, False)
+
+    def test_a_known_safe_delay_is_allowed(self):
+        state = self.board()
+        self.assertTrue(search._clears_room(state, Action("Attack")))
+        self.assertTrue(search._guaranteed_delay(state, self.delay(state)))
+
+    def test_not_through_a_guessed_turn(self):
+        state = self.board(known=False)
+        self.assertFalse(search._guaranteed_delay(state, self.delay(state)))
+
+    def test_not_when_a_crowded_room_holds_the_wave(self):
+        state = self.board(held=True)
+        self.assertFalse(search._guaranteed_delay(state, self.delay(state)))
+
+    def test_not_if_the_wave_doesnt_land_within_the_line(self):
+        state = self.board()
+        line = search.Line([Action("Wait")], 0.0, ["Wait"], {}, 0.0, False)
+        self.assertFalse(search._guaranteed_delay(state, line))
+
+    def test_an_unsafe_delay_ranks_below_clearing_the_room(self):
+        state = self.board(known=False)
+        lines = search.rank_lines(state, 3)
+        self.assertTrue(search._clears_room(state, lines[0].actions[0]))
+
+
 class TieTest(unittest.TestCase):
     def test_a_kill_now_beats_the_same_kill_next_turn(self):
         # logs/run14, fight 7 turn 20: firing now killed three, and waiting a turn to fire scored the same.

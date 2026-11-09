@@ -10,6 +10,14 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.8 — putting off the wave only when it's safe (2026-11-09)
+- **Search: the kill that clears the room may be put off only along a guaranteed line**, as the player set: every
+  turn until the wave lands fully known, no HP lost, the arrival exact (not held by a crowded room), and the landing
+  within the line. Any other line goes below every line that clears the room now. Since v3.6 a line ends where its
+  wave lands, scored on that board, so within the horizon the search picks when to bring the wave for the best
+  setup (loaded tiles, ready tiles, traps), but a stall through guessed turns was only discounted, which halves a
+  guessed hit as well as the setup's worth. `run16` turn 19 now flips and loads the Kunai before the kill.
+
 ## v3.7 — potions for hits the hero can't avoid (2026-11-09)
 - **Potions: judged against the least HP any line loses without them**, not the best-scoring line's. In `run16`
   turn 29 the best line took 1 HP on its 4th turn for a kill while another lost none, and Mass Curse was drunk to

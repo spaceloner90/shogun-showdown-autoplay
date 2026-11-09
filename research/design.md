@@ -194,6 +194,10 @@ F2 to F4 play the hero's next turns out against the enemy AI (`solver/search.py`
   line's end and look free: in `run16` F4 spent the Mirror on a kill that cleared the room, and the wave came at
   once. The game brings it when its countdown runs out, unless the room is too crowded for it, and at once when the
   room is cleared. This replaced counting turns after a wave at 0.85.
+- **Putting off the wave** (v3.8): so the search can choose when to clear the room, to meet the wave set up. When a
+  move now clears it, a line holding off is kept only if every turn until its wave lands is fully known, loses no
+  HP, and lands it at an exact time within the line; any other ranks below every line clearing the room now. A hard
+  rule rather than a discount, since the 0.5 for a guessed turn halves a guessed hit too.
   An enemy whose AI isn't known is guessed to attack whenever what it holds would hit the hero, as such enemies
   did on 80% of those turns in the logs.
 - **Ties:** of two lines that score the same, the one whose events come sooner wins (events counted 0.9 per turn

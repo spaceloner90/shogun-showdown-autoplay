@@ -162,10 +162,43 @@ def line_for(state, action, depth, search):
                 {"this turn": score, "after": factor * later}, score + SOONER * later_sooner, wasted)
 
 
-def _sorted(lines):
+def _sorted(lines, state=None):
     lines = [line for line in lines if not line.wasted]
     lines.sort(key=lambda line: line.sort_key, reverse=True)
-    return lines
+    return _keep_the_guarantee(state, lines) if state is not None else lines
+
+
+def _clears_room(state, action):
+    """Whether this action now kills the last enemy with a wave still to come, which brings it at once."""
+    following, _ = step(state, action)
+    return following.wave_landed and not any(e.alive for e in following.enemies)
+
+
+def _guaranteed_delay(state, line):
+    """Whether a line holding off the kill that clears the room is sure to be safe until its wave lands: every turn
+    until then fully known, no HP lost, the wave's arrival exact (not held back by a crowded room, whose next wave's
+    size the log doesn't give), and the landing within the line."""
+    for action in line.actions:
+        if not _actions_known(state) or state.wave_held_at is not None:
+            return False
+        state, outcome = step(state, action)
+        if outcome.hp_lost or not state.hero.alive:
+            return False
+        if state.wave_landed:
+            return True
+    return False
+
+
+def _keep_the_guarantee(state, lines):
+    """When a move now clears the room, the search may still put the kill off to meet the wave better set up, as the
+    player asked, but only along a line guaranteed safe until the wave lands (`_guaranteed_delay`). Any other line
+    goes below every line that clears the room now, keeping its order."""
+    clears = {id(line): _clears_room(state, line.actions[0]) for line in lines}
+    if not any(clears.values()):
+        return lines
+    allowed = [line for line in lines if clears[id(line)] or _guaranteed_delay(state, line)]
+    kept = {id(line) for line in allowed}
+    return allowed + [line for line in lines if id(line) not in kept]
 
 
 def rank_lines(state, depth, beam=BEAM, leaf_beam=LEAF_BEAM, deadline=None):
@@ -173,7 +206,7 @@ def rank_lines(state, depth, beam=BEAM, leaf_beam=LEAF_BEAM, deadline=None):
     a `deadline` (a time.time()) passes first."""
     search = Search(beam, leaf_beam, deadline)
     try:
-        return _sorted([line_for(state, action, depth, search) for action in legal_actions(state)])
+        return _sorted([line_for(state, action, depth, search) for action in legal_actions(state)], state)
     except OutOfTime:
         return None
 
@@ -227,7 +260,8 @@ def submit_lines(state, depths, pool, beam=BEAM, leaf_beam=LEAF_BEAM, deadlines=
         for depth, jobs in futures.items():
             lines = {action: f.result() for action, f in jobs.items()}
             if all(line is not None for line in lines.values()):
-                found[depth] = _sorted([_as(lines[rep], state, a) for rep, members in groups.items() for a in members])
+                found[depth] = _sorted([_as(lines[rep], state, a) for rep, members in groups.items() for a in members],
+                                       state if depth > 1 else None)
         return found
     return collect
 
@@ -236,7 +270,7 @@ def rank_lines_parallel(state, depth, pool, beam=BEAM, leaf_beam=LEAF_BEAM):
     """rank_lines with each of this turn's actions searched by its own worker from `pool`. Boards reached under two
     different first actions get searched twice, the price of not sharing memory between workers."""
     jobs = [(state, action, depth, beam, leaf_beam, None) for action in legal_actions(state)]
-    return _sorted(list(pool.map(_line_task, jobs)))
+    return _sorted(list(pool.map(_line_task, jobs)), state)
 
 
 # What a potion is for, in the order preferred among those that save as much HP over the line (the player's call):

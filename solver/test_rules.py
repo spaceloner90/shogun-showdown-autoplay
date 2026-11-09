@@ -2988,11 +2988,13 @@ class PhaseSpecialMoveTest(unittest.TestCase):
         state.two_way_swap = True
         self.assertTrue(can_use_special(state, -1))
 
-    def test_damaging_move_hits_the_first_one_passed(self):
+    def test_damaging_move_hits_every_one_passed(self):
+        # PhaseSpecialMove.Perform applies the effect in a loop over the agents crossed; logs/run15 shows Mamushi
+        # Move poisoning both enemies a Phase passed.
         state = shadow(enemies=[enemy(3), enemy(4)])
         state.swap_damage = 1
         after, _ = step(state, Action("MoveRight"))
-        self.assertEqual([e.hp for e in after.enemies], [2, 3])
+        self.assertEqual([e.hp for e in after.enemies], [2, 2])
 
     def test_a_charged_phase_counts_as_escape(self):
         state = shadow(enemies=[enemy(3)])
@@ -3292,10 +3294,32 @@ class ComboTest(unittest.TestCase):
         _, outcome = step(self.triple(), Action("Attack"))
         self.assertEqual(outcome_terms(outcome, False)["healed"], -WEIGHTS["hp_lost"])
 
-    def test_combo_skills_value_each_combo_kill(self):
+    def test_random_combo_effects_are_valued(self):
         from evaluator import outcome_terms
-        _, outcome = step(self.triple(), Action("Attack"))
-        self.assertEqual(outcome_terms(outcome, False, 1, 2)["combos"], WEIGHTS["combo_skill"] * 2 * 2)
+        state = self.triple()
+        state.enemies.append(enemy(6, hp=5))
+        state.enemies.append(enemy(5, hp=5))
+        state.chilling_combo = state.combo_curse = True
+        _, outcome = step(state, Action("Attack"))
+        # Two combo kills, each with two enemies left to pick from, for each skill.
+        self.assertEqual(outcome_terms(outcome, False)["combos"], WEIGHTS["combo_skill"] * 4)
+
+    def test_one_possible_target_is_simulated(self):
+        state = self.triple()
+        state.enemies.append(enemy(6, hp=5))
+        state.chilling_combo = state.combo_curse = True
+        after, outcome = step(state, Action("Attack"))
+        # The first combo kill leaves two to pick from, random; the second leaves one, which gets both.
+        last = after.enemies[0]
+        self.assertEqual((last.ice > 0, last.curse, outcome.combo_random), (True, True, 2))
+
+    def test_combo_recharge_refills_the_tile_making_the_kill(self):
+        state = self.triple()
+        state.combo_recharge = 4
+        after, _ = step(state, Action("Attack"))
+        # Swirl (cooldown 3) killed two, the second a combo kill: 4 back, capped at 3. Arrow (cooldown 5) killed the
+        # third: 4 back, one short of ready.
+        self.assertEqual([t.charge for t in after.tiles], [3, 4])
 
 
 class MonomancerTest(unittest.TestCase):

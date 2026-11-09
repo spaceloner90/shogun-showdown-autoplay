@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.28: combo skills; no full-bag potions
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Combo Recharge; Chilling Combo and Combo Curse with one target; the Phase's effect on all it passes | Rule | `run15` and `run13` predictions: 859 and 854 exact, from 830 and 833 | Stays exact |
+| No potion for kills alone | Scoring | The player's call | Potions kept for damage |
+
 ## New in v2.27: potions over four turns
 
 | Item | Kind | What's already confirmed | What to look for |

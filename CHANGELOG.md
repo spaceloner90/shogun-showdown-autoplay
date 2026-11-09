@@ -9,6 +9,19 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.28 — combo skills simulated; no full-bag potions (2026-11-09)
+- **Rule: Combo Recharge** is simulated: each combo kill while one of the hero's tiles fires gives that tile 4 a
+  level back once it's done, capped at full (`ComboRechargeSkill.OnComboKill`,
+  `Tile.PostExecutionCooldownRechargeSequence`).
+- **Rule: Chilling Combo and Combo Curse** are simulated when exactly one enemy can be picked (alive with at most 1
+  ice; alive and not cursed), as the player suggested; otherwise their random effect keeps its small value.
+- **Rule fix: the Phase's effect lands on every agent it passes**, not just the first (`PhaseSpecialMove.Perform`
+  loops over them): `logs/run15` showed Mamushi Move poisoning two at once.
+- **Potions:** F2+ no longer drinks one only for kills when the bag is full, as the player asked: a potion left on
+  the ground pays a coin, and in `run15` a Freeze Time drunk that way in fight 9 was missing in fight 12.
+- `logs/run15`, the Shadow's day 3: two hits in fights. Predictions now 859 of 879 turns exact (830 on v2.27), the
+  rest almost all enemies arriving. Replay: 8 of 1,009 core choices change, kills even, no HP lost.
+
 ## v2.27 — potions judged over four turns (2026-11-09)
 - **Potions, as the player set:** with the solver server, each potion held gets its own F3 and F4 search of the
   board after drinking it, alongside the main ones, and is judged on HP lost and kills along the best line, at F4

@@ -185,6 +185,11 @@ Later bosses in that log, with the rules read from the game's code (simulated as
 - **Skill levels:** Back Stabber, Close Combat, Damaging Move, Dynamic Boost, Monomancer, Sniper and Unfriendly
   Fire add their level; Big Pockets a potion slot per level. The rest don't change with level, except Combo
   Recharge, which isn't simulated.
+- **Combo Recharge** (`ComboRechargeSkill`): each combo kill while a hero tile fires (`Agent.TileInProgress`) adds
+  4 a level to that tile's post-execution recharge; once done, its charge is that, capped at full. **Chilling
+  Combo** freezes, and **Combo Curse** curses, a random enemy: alive with at most 1 ice, and alive and not cursed.
+  Simulated as of v2.28, the last two only with one possible target.
+- **The Phase's effect** (Damaging Move, Mamushi Move) lands on every agent it passes (v2.28).
 - **The kill streak** (`CombatManager.KillStreak`): every enemy death in a turn, by anyone, not inanimate things;
   reset as each turn begins. From the second, each death is a combo kill, which Combo Curse, Chilling Combo, Combo
   Recharge, Combo Coin and Triple Combo Heal answer. **Triple Combo Heal** heals the hero 1 on each from the third,

@@ -184,6 +184,11 @@ class State:
     mono_active: bool = False  # Whether this turn's attack is a single tile, so Monomancer applies.
     triple_heal: bool = False  # Triple Combo Heal: each kill from the third in a turn heals the hero 1.
     combo_skills: int = 0  # How many of Combo Curse and Chilling Combo the hero has: random effects on combo kills.
+    chilling_combo: bool = False  # Chilling Combo: a combo kill freezes a random enemy with at most 1 ice.
+    combo_curse: bool = False  # Combo Curse: a combo kill curses a random enemy not cursed.
+    combo_recharge: int = 0  # Combo Recharge: charge a combo kill adds to the hero's tile making it (4 a level).
+    firing_tile: bool = False  # Whether a hero tile is firing now (Agent.TileInProgress).
+    tile_recharge: int = 0  # Charge Combo Recharge has given the firing tile so far.
     # This is the fight before the Shogun's, the castle's last room (mod 0.18.0's `progression`). He can't be
     # frozen, so Freeze Time is best spent here.
     before_final: bool = False
@@ -255,6 +260,7 @@ class Outcome:
     reloads: int = 0  # Crossbows reloaded.
     reloaded: int = 0  # Damage those reloads restored.
     combo_kills: int = 0  # Kills after the first in the turn, by anyone.
+    combo_random: int = 0  # Combo Curse and Chilling Combo effects on a random enemy, not simulated.
     healed: int = 0  # HP the hero gained, from Triple Combo Heal.
     unmodeled: list[str] = field(default_factory=list)
 
@@ -413,6 +419,10 @@ def state_from_log(row):
                            if isinstance(s, dict) and s.get("name") == "Sniper"), 0),
         two_way_swap=any(isinstance(s, dict) and s.get("name") == "TwoWayMove" for s in row.get("skills") or []),
         triple_heal=any(isinstance(s, dict) and s.get("name") == "TripleComboHeal" for s in row.get("skills") or []),
+        chilling_combo=any(isinstance(s, dict) and s.get("name") == "ChillingCombo" for s in row.get("skills") or []),
+        combo_curse=any(isinstance(s, dict) and s.get("name") == "ComboCurse" for s in row.get("skills") or []),
+        combo_recharge=4 * next((s.get("level") or 1 for s in row.get("skills") or []
+                                 if isinstance(s, dict) and s.get("name") == "ComboRecharge"), 0),
         combo_skills=sum(1 for s in row.get("skills") or []
                          if isinstance(s, dict) and s.get("name") in ("ComboCurse", "ChillingCombo")),
         reactive_shield=any(isinstance(s, dict) and s.get("name") == "ReactiveShield" for s in row.get("skills") or []),
@@ -568,8 +578,14 @@ def perform_special(state, direction, outcome):
     if state.special == PHASE:
         # The hero passes through and nobody moves. Damaging Move hits the agent it first passed
         # (PhaseSpecialMove.Perform: SpecialMove.ApplyEffectOnTargetAfterPositionCrossing on the hero's old neighbour).
-        hero.cell = phase_cell(state, direction)
-        special_effect(state, hero, occupant, outcome)
+        # The effect lands on every agent passed, not just the first (the loop in PhaseSpecialMove.Perform), so
+        # Mamushi Move poisons, and Damaging Move hits, each of them.
+        start, landing = hero.cell, phase_cell(state, direction)
+        passed = [state.occupant(c) for c in range(start + direction, landing, direction)]
+        hero.cell = landing
+        for agent in passed:
+            if agent is not None:
+                special_effect(state, hero, agent, outcome)
         return
     if state.special == THROW:
         # Over the hero to the cell on its other side, then pushed on that way as far as it goes, hitting whoever stops
@@ -1149,6 +1165,25 @@ def combo_kill(state, outcome):
     if state.triple_heal and state.kill_streak >= 3 and state.hero.alive and state.hero.hp < state.hero.max_hp:
         state.hero.hp += 1
         outcome.healed += 1
+    # Combo Recharge: the hero's tile firing now gets 4 a level back once it's done (ComboRechargeSkill.OnComboKill).
+    if state.combo_recharge and state.firing_tile:
+        state.tile_recharge += state.combo_recharge
+    # Chilling Combo and Combo Curse pick a random enemy, so they're simulated only when exactly one can be picked
+    # (ChillingComboSkill: alive with at most 1 ice; ComboCurseSkill: alive and not cursed). Otherwise counted.
+    if state.chilling_combo:
+        able = [e for e in state.enemies if e.alive and e.ice <= 1]
+        if len(able) == 1:
+            if able[0].freezable:
+                able[0].ice = ICE_TURNS
+                able[0].action = "Wait"
+        elif able:
+            outcome.combo_random += 1
+    if state.combo_curse:
+        able = [e for e in state.enemies if e.alive and not e.curse]
+        if len(able) == 1:
+            able[0].curse = True
+        elif able:
+            outcome.combo_random += 1
 
 
 def deal_damage(state, attacker, target, value, outcome, collision=False):
@@ -1249,10 +1284,13 @@ def fire_hero_queue(state, outcome, order=None):
     for tile in fired:
         exact_before = outcome.exact_hits
         before = enemy_cells(state)
+        state.firing_tile, state.tile_recharge = True, 0
         apply_attack(state, state.hero, tile.attack, outcome)
         spring_traps(state, outcome, before)
+        state.firing_tile = False
         fire_crossbow(tile, outcome)
-        tile.charge = 0
+        # Combo Recharge's charge, once the tile is done, capped at full (Tile.PostExecutionCooldownRechargeSequence).
+        tile.charge = min(tile.cooldown, state.tile_recharge)
         tile.just_played = True
         # Perfect Strike: an exact kill recharges the tile straight away.
         if tile.attack.effect == "PerfectStrike" and outcome.exact_hits > exact_before:

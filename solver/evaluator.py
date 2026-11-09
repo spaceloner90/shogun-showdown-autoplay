@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.27"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.28"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -122,8 +122,8 @@ WEIGHTS = {
     # guesses: the Crossbow hits any 2 across its whole range, so it lines up a double far more often than the
     # Spear, which needs them on the 2 cells ahead.
     "pierce": {"Crossbow": 1.5, "Spear": 1.25},
-    # Per combo kill, for each of Combo Curse and Chilling Combo held: they curse or freeze a random enemy then, which
-    # isn't simulated. A little, as the player asked, so the search sets up combos where it costs nothing else.
+    # Per Combo Curse or Chilling Combo effect on a random enemy, which isn't simulated (with one possible target it
+    # is). A little, as the player asked, so the search sets up combos where it costs nothing else.
     "combo_skill": 10.0,
     "escape_in_hand": 2 / 3,  # A tile in hand rather than loaded. Loading adds only a little, so it doesn't beat
                               # a high damage tile to the queue, since any attack would spend it.
@@ -754,7 +754,7 @@ def outcome_terms(outcome: Outcome, hero_dead: bool, cheapest_hit: int = 1, comb
         "reload": _reload_value(outcome),
         # HP gained is worth what HP lost costs, by Triple Combo Heal.
         "healed": -WEIGHTS["hp_lost"] * outcome.healed,
-        "combos": WEIGHTS["combo_skill"] * outcome.combo_kills * combo_skills,
+        "combos": WEIGHTS["combo_skill"] * outcome.combo_random,
     }
 
 

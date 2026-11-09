@@ -260,8 +260,8 @@ def potion_choice(state, lines, after_potion, depth):
     Edamame heals once missing at least what it heals, or 6 with Triple Combo Heal, which heals well on its own. Any
     potion that cuts the HP lost along the line is used, the one saving most, combat potions first on a tie, since a
     hit seen coming turns ahead can often be headed off by them; in the fight before the Shogun's, Freeze Time
-    first, since it's useless against him. With every slot full, one that adds kills is used,
-    as before. D6, being random, is only the last resort against damage this turn that nothing else avoids. Returns
+    first, since it's useless against him. Never for kills alone, even with the bag full, as the player asked: a
+    potion left on the ground pays a coin, and every potion is kept for heading off damage. D6, being random, is only the last resort against damage this turn that nothing else avoids. Returns
     (potion, reason) or (None, None).
     """
     from evaluator import WEIGHTS
@@ -288,11 +288,8 @@ def potion_choice(state, lines, after_potion, depth):
     if saves:
         their_lost, _, name = min(saves)
         return name, f"over {depth} turns, {lost} HP lost without it, {their_lost} with it"
-    full = len(held) >= state.potion_slots
-    if full and gains:
-        their_kills, _, name = min(gains)
-        return name, (f"every potion slot full ({len(held)}/{state.potion_slots}): over {depth} turns, {kills} kills "
-                      f"without it, {-their_kills} with it")
+    # No potion only for kills with the bag full any more, as the player asked: one left on the ground pays a coin,
+    # and every potion is kept for heading off damage.
     now = step(state, lines[0].actions[0])[1]
     if now.hp_lost > 0 and "D6" in held:
         return "D6", f"losing {now.hp_lost} HP this turn that nothing else avoids"

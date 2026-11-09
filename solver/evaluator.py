@@ -58,11 +58,13 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v3.17"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v3.18"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
-    "hp_lost": -100.0,        # Per HP. The goal is to clear the battle without losing any.
+    # Per HP lost at full health; each lower one costs max HP / HP that much more (hp_cost), the player's curve. The
+    # goal is to clear the battle without losing any.
+    "hp_lost": -100.0,
     "death": -10000.0,
     "enemy_damage": 10.0,     # Per enemy HP removed by the hero.
     "tank_damage": 2.5,       # Per HP removed from a tank that will die with its boss anyway.
@@ -132,7 +134,9 @@ WEIGHTS = {
     "curse": 0.5,             # Fraction of what a curse would add to the hero's next hit on that enemy.
     "wound": 0.5,             # With Scar Strike in the deck, the share of its damage on each wounded enemy, as the
                               # player asked: a 1-damage chip on an enemy at full health is worth half as much again.
-    "shield": 100.0,          # Holding a shield, worth about 1 HP. Hits average 1.4, but it may go unused.
+    # Holding a shield: a share of an HP at full, set below. Less than any real HP, as the player put it: giving one up
+    # loses nothing unless another hit comes this fight, and most fights bring at most one.
+    "shield_share": 0.5,
     "facing_ideal": 6.0,      # Facing the enemy we most want to hit.
     "facing_other": 2.0,      # Facing an enemy, but not that one.
     # Per point of damage a tile can deal the ideal target from where the hero stands, up to its HP, discounted per
@@ -150,6 +154,7 @@ WEIGHTS = {
 }
 
 # Values defined as equal to others are tied here, so changing one changes them all.
+WEIGHTS["shield"] = WEIGHTS["shield_share"] * -WEIGHTS["hp_lost"]
 _ESCAPES = WEIGHTS["escape_values"]
 _ESCAPES["PhaseSpecialMove"] = _ESCAPES["SwapSpecialMove"]
 _ESCAPES["ThrowSpecialMove"] = _ESCAPES["PushSpecialMove"]
@@ -224,11 +229,12 @@ def _effective_hp(state, enemy):
     return hp + (_cheapest_hit(state) if enemy.shield else 0)
 
 
-def _volley_value(outcome, cheapest_hit):
+def _volley_value(outcome, cheapest_hit, hero):
     broken = outcome.shields_broken * cheapest_hit * WEIGHTS["enemy_damage"]
+    healed = hp_gain(max(0, hero.hp - outcome.hp_lost), hero.max_hp, outcome.healed)
     return (outcome.enemy_damage * WEIGHTS["enemy_damage"] + outcome.tank_damage * WEIGHTS["tank_damage"]
             + outcome.kills * WEIGHTS["kill"] + broken + outcome.shove_cells * WEIGHTS["shove_cell"]
-            + _reload_value(outcome) - WEIGHTS["hp_lost"] * outcome.healed)
+            + _reload_value(outcome) + healed)
 
 
 def _loaded_worth(name, damage):
@@ -303,7 +309,8 @@ def _stack_value(state, kept_now):
         for tile in tiles:
             if tile.attack.name == "Crossbow" and tile.attack.value == 0:
                 fire_crossbow(copy.copy(tile), outcome)
-        done = _volley_value(outcome, cheapest_hit) + WEIGHTS["hp_lost"] * outcome.hp_lost
+        done = (_volley_value(outcome, cheapest_hit, state.hero)
+                - hp_cost(state.hero.hp, state.hero.max_hp, outcome.hp_lost))
         if not trial.hero.alive:
             return done + WEIGHTS["death"]
         key = _board_key(trial, tiles)
@@ -733,17 +740,13 @@ def _poison_value(state):
     """Poison still to come: good on an enemy, as far as its HP goes, and bad on the hero."""
     value = sum(min(e.poison, e.hp) * WEIGHTS["poison_turn"] for e in state.enemies
                 if e.alive and e.kind != "TwinSideBoss" and not is_tank(state, e))
-    return value + state.hero.poison * WEIGHTS["hp_lost"]
+    return value - hp_cost(state.hero.hp, state.hero.max_hp, state.hero.poison)
 
 
 def _shield_value(state):
-    """A shield blocks the next hit. With Reactive Shield, the next damage brings one anyway, so going without is
-    only half as bad: hits alternate between blocked and taken either way, and holding one now saves a hit only
-    when an odd number are left. So an unshielded hero with the skill holds half a shield's worth, and a hit costs
-    its HP less half a shield, never nothing."""
-    if state.hero.shield:
-        return WEIGHTS["shield"]
-    return WEIGHTS["shield"] / 2 if state.reactive_shield else 0.0
+    """A shield held, worth less than any real HP (WEIGHTS["shield"]). Since v3.18 that alone keeps Reactive Shield from
+    making a hit look worth taking for the shield it brings, which a half shield held without one used to do."""
+    return WEIGHTS["shield"] if state.hero.shield else 0.0
 
 
 def _kept_terms(state):
@@ -774,19 +777,47 @@ def leaf_terms(state: State) -> dict[str, float]:
     return terms
 
 
-def outcome_terms(outcome: Outcome, hero_dead: bool, cheapest_hit: int = 1, combo_skills: int = 0) -> dict[str, float]:
+def hp_cost(hp, max_hp, points):
+    """What losing `points` HP from `hp` costs: each by how low it leaves the hero, the player's curve. An HP lost at
+    full costs the base weight, and one lost at h HP max HP / h times that. Past the last HP, death prices it."""
+    unit = -WEIGHTS["hp_lost"]
+    if not max_hp:
+        return unit * points
+    return sum(unit * max_hp / h for h in range(hp, hp - points, -1) if h > 0)
+
+
+def hp_gain(hp, max_hp, points):
+    """HP healed from `hp` is worth what losing it back would cost, so more HP never scores lower."""
+    top = min(max_hp, hp + points) if max_hp else hp + points
+    return hp_cost(top, max_hp, top - hp)
+
+
+def hp_factor(state):
+    """How much an HP is worth now against one at full: max HP / HP."""
+    hero = state.hero
+    return hero.max_hp / hero.hp if hero.hp > 0 and hero.max_hp else 1.0
+
+
+def outcome_terms(outcome: Outcome, hero_dead: bool, cheapest_hit: int = 1, combo_skills: int = 0, hp=None,
+                  max_hp=None) -> dict[str, float]:
+    """A turn's events. `hp` and `max_hp` are the hero's as the turn began, which price the HP lost and healed."""
+    if hp is None:
+        lost, healed = -WEIGHTS["hp_lost"] * outcome.hp_lost, -WEIGHTS["hp_lost"] * outcome.healed
+    else:
+        lost = hp_cost(hp, max_hp, outcome.hp_lost)
+        healed = hp_gain(max(0, hp - outcome.hp_lost), max_hp, outcome.healed)
     return {
         "shields_broken": WEIGHTS["enemy_damage"] * cheapest_hit * outcome.shields_broken,
         "tank_damage": WEIGHTS["tank_damage"] * outcome.tank_damage,
         "shoves": WEIGHTS["shove_cell"] * outcome.shove_cells,
-        "hp_lost": WEIGHTS["hp_lost"] * outcome.hp_lost,
+        "hp_lost": -lost,
         "death": WEIGHTS["death"] if hero_dead else 0.0,
         "enemy_damage": WEIGHTS["enemy_damage"] * outcome.enemy_damage,
         "kills": WEIGHTS["kill"] * outcome.kills,
         "friendly_damage": WEIGHTS["friendly_damage"] * outcome.friendly_damage,
         "reload": _reload_value(outcome),
         # HP gained is worth what HP lost costs, by Triple Combo Heal.
-        "healed": -WEIGHTS["hp_lost"] * outcome.healed,
+        "healed": healed,
         "combos": outcome.combo_random,
     }
 
@@ -801,7 +832,8 @@ def _evaluate_action(state, action, depth, scale):
     next_state, outcome = step(state, action)
     dead = not next_state.hero.alive
     terms = {}
-    _merge(terms, outcome_terms(outcome, dead, _cheapest_hit(state), state.combo_skills), scale)
+    _merge(terms, outcome_terms(outcome, dead, _cheapest_hit(state), state.combo_skills, state.hero.hp,
+                                state.hero.max_hp), scale)
     # Ending the fight now, at no HP cost, beats anything. Only for the turn being chosen: a win later in a line, or
     # one a stack could make next turn, counts for what it does, like any other kill.
     if scale == 1.0 and fight_won(next_state) and outcome.hp_lost == 0:
@@ -812,7 +844,8 @@ def _evaluate_action(state, action, depth, scale):
     if not dead:
         position = sum(leaf_terms(next_state).values())
         # Checked at every step of the line, so a plan can't hide a risky middle.
-        _merge(terms, {"no_response": WEIGHTS["no_response"] * unanswerable_damage(next_state)}, future_scale)
+        _merge(terms, {"no_response": WEIGHTS["no_response"] * hp_factor(next_state) * unanswerable_damage(next_state)},
+               future_scale)
         if depth > 1:
             best = _best_line(next_state, depth - 1, future_scale)
             actions += best.actions

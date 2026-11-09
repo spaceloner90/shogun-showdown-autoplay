@@ -42,11 +42,18 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.18: HP worth more the lower it gets; the shield at half an HP
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **Each HP lost costs 100 × max HP / HP; healing, poison and unanswerable damage alike** | **Scoring** | **The player's curve; tests** | **Hits traded for kills at full HP but not when low; potions drunk sooner when low** |
+| A shield held worth 50, and no half shield with Reactive Shield | Scoring | The player's values | Shields given up for position; no hit taken for Reactive Shield's shield |
+
 ## New in v3.17: potions judged on the line we'd play
 
 | Item | Kind | What's already confirmed | What to look for |
 |---|---|---|---|
-| **Drunk when the best line with it loses less HP and scores higher** | **Scoring** | **The player's rule; `run18` turn 44 now drinks Freeze** | **Potions burned on hits the hero could have dodged for little; two in a row** |
+| **Drunk when the best line with it loses less HP and scores higher** | **Scoring** | **The player's rule; `run18` turn 44 now drinks Freeze; on 276 logged boards, none dropped and 8 more drunk** | **Potions burned on hits the hero could have dodged for little; two in a row** |
 
 ## New in v3.16: the Bo
 

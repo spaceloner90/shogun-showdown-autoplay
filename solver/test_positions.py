@@ -190,10 +190,14 @@ class SniperAsPlayed(unittest.TestCase):
             self.assertEqual(choice(fight, turn, "run4").terms.get("hp_lost", 0), 0, (fight, turn))
 
     def test_can_take_the_shot_to_clear_two_enemies_at_once(self):
-        # Fight 7, turn 15: firing kills the Archer and Ashigaru. Dodging leaves both, and the Archer's shot.
-        best = choice(7, 15, "run4")
+        # Fight 7, turn 15: firing kills the Archer and Ashigaru. Dodging leaves both, and the Archer's shot. At full
+        # HP the two kills are worth the 2 HP; at the 8 of 10 played, since v3.18's curve, they aren't.
+        state = position(7, 15, "run4")
+        state.hero.hp = state.hero.max_hp
+        best = rank_actions(state, depth=1)[0]
         self.assertEqual(best.actions[0].kind, "Attack")
         self.assertEqual(best.terms.get("kills", 0) / 60, 2)
+        self.assertEqual(choice(7, 15, "run4").actions[0].kind, "MoveRight")
 
     def test_stepping_off_dodged_it_as_played(self):
         # Turn 5 of fight 4: the hero moved right off cell 3, and the game showed no hit.

@@ -10,6 +10,19 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.18 — HP worth more the lower it gets; the shield at half an HP (2026-11-09)
+- **Scoring: each HP lost costs 100 × max HP / the HP it's lost at**, the player's curve: 100 from full, twice that
+  at half health, and death still prices the last. Healing (Triple Combo Heal) is worth the same in reverse, poison
+  on the hero is priced tick by tick down the curve, and the penalty for unanswerable damage scales by max HP / HP.
+  In `run4` fight 7 turn 15, at 8 of 10 HP, the 2 HP for two kills now cost 268 and the hero steps off; at full HP it
+  still takes the shot.
+- **Scoring: a shield held is worth half an HP at full (50), tied to the HP weight in code**, down from 100: giving one
+  up loses nothing unless another hit comes this fight, and most bring at most one. With Reactive Shield the half
+  shield an unshielded hero used to hold is gone: a shield worth less than any HP already keeps a hit from looking
+  worth taking for the shield it brings.
+- Potions (v3.17's rule) checked on the 276 logged boards with one held and a hit within four turns: none dropped,
+  8 more drunk (Cool Up 4, Mass Curse 2, Rain of Mirrors 1, Freeze at `run18` turn 44).
+
 ## v3.17 — potions judged on the line we'd play (2026-11-09)
 - **Potions: drunk when the best line after one loses less HP and scores higher than the best line without it**,
   the player's rule, for combat and save potions alike (save potions on this turn's damage, and not pushing it

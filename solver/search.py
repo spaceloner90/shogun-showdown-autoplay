@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import time
 
-from evaluator import (WEIGHTS, Line, _cheapest_hit, _kept_terms, fight_won, leaf_terms, outcome_terms,
+from evaluator import (WEIGHTS, Line, _cheapest_hit, hp_factor, _kept_terms, fight_won, leaf_terms, outcome_terms,
                        unanswerable_damage)
 from rules import SIMULATED_POTIONS, UNKNOWN_COPY, UNKNOWN_TILE, apply_potion, legal_actions, step
 
@@ -80,7 +80,8 @@ def _turn(state, action, now=False):
     hid their next attacks (v3.6 lost HP that way in the fight simulation)."""
     following, outcome = step(state, action)
     dead = not following.hero.alive
-    score = sum(outcome_terms(outcome, dead, _cheapest_hit(state), state.combo_skills).values())
+    score = sum(outcome_terms(outcome, dead, _cheapest_hit(state), state.combo_skills, state.hero.hp,
+                              state.hero.max_hp).values())
     won = not dead and fight_won(following)
     if now and won and outcome.hp_lost == 0:
         score += WEIGHTS["win"]
@@ -92,7 +93,7 @@ def _turn(state, action, now=False):
 def _leaf(state):
     if not state.hero.alive:
         return 0.0
-    return sum(leaf_terms(state).values()) + WEIGHTS["no_response"] * unanswerable_damage(state)
+    return sum(leaf_terms(state).values()) + WEIGHTS["no_response"] * hp_factor(state) * unanswerable_damage(state)
 
 
 def _cheap(state):

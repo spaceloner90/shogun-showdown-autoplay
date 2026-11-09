@@ -5,7 +5,7 @@ Run with: python solver/test_rules.py
 import dataclasses
 import unittest
 
-from evaluator import WEIGHTS, _volleys, _has_way_out, potion_plan, _threat_damage, ideal_target, leaf_terms, rank_actions, unanswerable_damage
+from evaluator import WEIGHTS, hp_cost, _volleys, _has_way_out, potion_plan, _threat_damage, ideal_target, leaf_terms, rank_actions, unanswerable_damage
 from rules import ICE_TURNS, can_use_special, fight_won, SIMULATED_POTIONS, Action, Agent, Attack, State, Tile, apply_potion, is_tank, legal_actions, state_from_log, step, unmodeled_content
 
 SWIRL = Attack("Swirl", 2, [-1, 1])
@@ -803,16 +803,23 @@ class ShieldValueTest(unittest.TestCase):
         state.hero.shield = shield
         return state
 
-    def test_a_shield_is_worth_about_one_hp(self):
+    def test_a_shield_is_worth_half_an_hp_at_full(self):
+        # The player: giving one up loses nothing unless another hit comes this fight, so it's worth less than any HP.
         with_shield = make_state(enemies=[enemy(4)])
         with_shield.hero.shield = True
         without = make_state(enemies=[enemy(4)])
-        self.assertEqual(leaf_terms(with_shield)["shield"] - leaf_terms(without)["shield"], 100)
+        self.assertEqual(leaf_terms(with_shield)["shield"] - leaf_terms(without)["shield"], 50)
+        self.assertEqual(WEIGHTS["shield"], WEIGHTS["shield_share"] * -WEIGHTS["hp_lost"])
+
+    def test_reactive_shield_makes_no_hit_worth_taking(self):
+        state = make_state(enemies=[enemy(4)])
+        state.reactive_shield = True
+        self.assertEqual(leaf_terms(state).get("shield", 0), 0)
 
     def test_dodges_rather_than_spend_a_shield_for_nothing(self):
         best = rank_actions(self._attacked(), depth=1)[0]
         self.assertEqual(best.actions[0].kind, "MoveLeft")
-        self.assertEqual(best.terms["shield"], 85)
+        self.assertEqual(best.terms["shield"], WEIGHTS["shield"] * WEIGHTS["future_discount"])
 
     def test_spends_a_shield_when_the_hit_cannot_be_dodged(self):
         # Backed into the corner with Swap charging, so the only question is what else to do.
@@ -830,7 +837,7 @@ class ShieldValueTest(unittest.TestCase):
         state.turns_until_wave = 5  # More to come, so the kill doesn't win the fight and the position still counts.
         best = rank_actions(state, depth=1)[0]
         self.assertEqual(best.actions[0].kind, "Attack")
-        self.assertEqual(best.terms["shield"], 85)
+        self.assertEqual(best.terms["shield"], WEIGHTS["shield"] * WEIGHTS["future_discount"])
 
 
 class EvaluatorTest(unittest.TestCase):
@@ -1633,7 +1640,10 @@ class PoisonTest(unittest.TestCase):
     def test_it_costs_the_hero(self):
         state = make_state(enemies=[enemy(4)])
         state.hero.poison = 2
-        self.assertEqual(leaf_terms(state)["poison"], -200)
+        # Each tick an HP lost on the curve: from full, 100 and then a little more (hp_cost).
+        hero = state.hero
+        self.assertAlmostEqual(leaf_terms(state)["poison"], -hp_cost(hero.hp, hero.max_hp, 2))
+        self.assertGreater(hp_cost(hero.hp, hero.max_hp, 2), 200)
 
     def test_a_loaded_poison_tile_beats_the_same_damage_without_it(self):
         def load_score(attack):
@@ -3016,13 +3026,14 @@ class ReactiveShieldTest(unittest.TestCase):
         after, outcome = step(state, Action("Wait"))
         self.assertEqual((outcome.hp_lost, after.hero.shield), (0, False))
 
-    def test_a_hit_still_costs_half_a_shield_or_more(self):
-        # The new shield doesn't make a hit free: going without one is worth half a shield with the skill.
+    def test_a_hit_never_pays_for_its_shield(self):
+        # The shield it brings is worth less than any HP the hit costs, at full health or below (the player's values).
         from evaluator import _shield_value
         before = self.board([KATANA])
-        after, _ = step(before, Action("Wait"))
-        self.assertEqual(_shield_value(after) - _shield_value(before), WEIGHTS["shield"] / 2)
-        self.assertGreater(-WEIGHTS["hp_lost"], WEIGHTS["shield"] / 2)
+        after, outcome = step(before, Action("Wait"))
+        gained = _shield_value(after) - _shield_value(before)
+        self.assertEqual(gained, WEIGHTS["shield"])
+        self.assertGreater(hp_cost(before.hero.hp, before.hero.max_hp, outcome.hp_lost), gained)
 
 
 def shadow(hero_cell=2, facing=1, enemies=(), swap_charge=4):

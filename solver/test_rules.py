@@ -3465,6 +3465,27 @@ def chain_master(hero_cell=3, facing=1, enemies=(), swap_charge=4):
 SIGNATURE = Attack("SignatureMove", 0, [], first_target=True)
 
 
+BO = Attack("Bo", 1, [1], first_target=True)
+
+
+class BoTest(unittest.TestCase):
+    """BoAttack.ApplyEffect in the game's code: hits the first agent in front, then turns it round if it's movable."""
+
+    def test_it_hits_and_turns_the_target_round(self):
+        after, _ = fire(make_state(enemies=[enemy(3, hp=3)]), BO)
+        self.assertEqual((after.enemies[0].hp, after.enemies[0].facing), (2, 1))
+
+    def test_its_attack_then_goes_the_other_way(self):
+        _, outcome = fire(make_state(enemies=[enemy(3, hp=3, action="Attack", queue=[KATANA])]), BO)
+        self.assertEqual(outcome.hp_lost, 0)
+
+    def test_a_heavy_enemy_stays_facing(self):
+        heavy = enemy(3, hp=3)
+        heavy.movable = False
+        after, _ = fire(make_state(enemies=[heavy]), BO)
+        self.assertEqual(after.enemies[0].facing, -1)
+
+
 class SignatureMoveTest(unittest.TestCase):
     """SignatureMoveAttack in the game's code: the hero's special move, from a Free Play tile, its charge untouched."""
 

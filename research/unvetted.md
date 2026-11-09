@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.16: the Bo
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Hits the first in front, then turns it round, its telegraphed action unchanged | Rule | Game code | An enemy's attack going the other way after a Bo; a turned enemy's next choice |
+
 ## New in v3.15: Signature Move
 
 | Item | Kind | What's already confirmed | What to look for |

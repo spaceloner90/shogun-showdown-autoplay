@@ -17,7 +17,7 @@ ONE_ENEMY_WAVE_CAP = 6
 
 # Attacks whose behaviour is fully covered by their logged range, damage and first-target flag, plus
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
-MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb", "Barricade", "BladeOfPatience", "BlazingSuisei", "Bomb", "SignatureMove",
+MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb", "Barricade", "BladeOfPatience", "BlazingSuisei", "Bo", "Bomb", "SignatureMove",
            "BossSwap", "Charge", "Crossbow",
            "CopycatMirror", "CorruptedBarrage", "CorruptedWaveL2R", "CorruptedWaveR2L", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Hookblade", "Katana", "Kunai", "Lightning", "Maku", "MeteorHammer", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Sai", "ScarStrike", "SmokeBomb", "Spear", "Summon", "SwapToss",
@@ -1087,6 +1087,10 @@ def _apply_attack(state, attacker, attack, outcome):
         hit_effect(state, attacker, target, attack.effect, outcome)
         if attack.name == "BlazingSuisei" and not target.alive:
             suisei_blast(state, attacker, target.cell, outcome)
+        # The Bo turns its target round (BoAttack.FlipTarget). Unlike Rain of Mirrors it leaves the telegraphed
+        # action as it is, so an attack shown toward the hero goes the other way.
+        if attack.name == "Bo" and target.alive and target.movable:
+            target.facing = -target.facing
         # A shield blocks the hook's damage, but not its pull.
         if attack.name == "GrapplingHook" and target.alive and target.movable:
             target.cell = attacker.cell + attacker.facing

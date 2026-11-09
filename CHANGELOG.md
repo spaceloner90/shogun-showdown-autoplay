@@ -10,6 +10,10 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.16 — the Bo (2026-11-09)
+- **Rule: the Bo** hits the first agent in front and turns it round if it's movable, its telegraphed action
+  unchanged, so an attack shown toward the hero goes the other way (`BoAttack.ApplyEffect`, `FlipTarget`).
+
 ## v3.15 — Signature Move (2026-11-09)
 - **Rule: Signature Move** performs the hero's special move, its own charge untouched, its usual way first and
   then (with Two Way Move) the other, and counts as a move attack for Dynamic Boost (`SignatureMoveAttack`).

@@ -214,6 +214,9 @@ Later bosses in that log, with the rules read from the game's code (simulated as
 - **Daisuke** (`DaisukeBoss.AIPickAction`): faces the hero first; steps back after attacking; waits a turn after
   playing a tile unless corrupted; plays a random tile into an empty queue and the Katana after a lone Charge; then
   attacks when threatening, or closes in. Corrupted, he has a trait. Ported as of v3.4.
+- **Bo** (`BoAttack`): hits the first agent in front (range 1, cooldown 5), then turns it round if it's movable
+  (`FlipTarget`). Its telegraphed action stays as it was, unlike Rain of Mirrors, so an attack shown toward the
+  hero goes the other way. Simulated as of v3.16.
 - **Signature Move** (`SignatureMoveAttack`): a Free Play tile, cooldown 5, that performs the hero's special move
   without touching its charge (`SpecialMove.Perform` with `depleteSpecialMoveCooldown` false): the special's usual
   way, else with Two Way Move the other. A special that moves the hero raises the move-attack event, so Dynamic

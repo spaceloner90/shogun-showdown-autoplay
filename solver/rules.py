@@ -17,7 +17,7 @@ ONE_ENEMY_WAVE_CAP = 6
 
 # Attacks whose behaviour is fully covered by their logged range, damage and first-target flag, plus
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
-MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb", "Barricade", "BladeOfPatience", "Bomb",
+MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb", "Barricade", "BladeOfPatience", "BlazingSuisei", "Bomb",
            "BossSwap", "Charge", "Crossbow",
            "CopycatMirror", "CorruptedBarrage", "CorruptedWaveL2R", "CorruptedWaveR2L", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Hookblade", "Katana", "Kunai", "Lightning", "Maku", "MeteorHammer", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Sai", "ScarStrike", "SmokeBomb", "Spear", "Summon", "SwapToss",
@@ -51,6 +51,7 @@ BARRICADE_HP = 5
 MAX_SHOVE_CREDIT = 3  # A shove counts for at most this many cells: further than that gains little.
 SHOCKWAVE_DAMAGE = 1  # Stored in the game's assets, not its code. Seen in logs/run7.
 WARDEN_EXPLOSION = 2  # What a dying Warden deals to its cell and both beside it. In the game's code.
+SUISEI_BLAST = 2  # What Blazing Suisei deals to both cells beside a target it kills (BlazingSuiseiAttack).
 
 # Each hero has one special move, triggered by moving into an occupied cell. Swap is the Wanderer's, Shove the
 # Ronin's, Throw the Jujitsuka's, Phase the Shadow's and Swap Toss the Chain Master's. Any other isn't simulated, so
@@ -1043,6 +1044,8 @@ def _apply_attack(state, attacker, attack, outcome):
             value *= 2
         land_hit(state, attacker, target, value, outcome)
         hit_effect(state, attacker, target, attack.effect, outcome)
+        if attack.name == "BlazingSuisei" and not target.alive:
+            suisei_blast(state, attacker, target.cell, outcome)
         # A shield blocks the hook's damage, but not its pull.
         if attack.name == "GrapplingHook" and target.alive and target.movable:
             target.cell = attacker.cell + attacker.facing
@@ -1363,6 +1366,15 @@ def deal_damage(state, attacker, target, value, outcome, collision=False):
         end_of_boss(state, attacker is state.hero, outcome)
     if damage and not target.alive and target.kind == "Warden":
         explode(state, target, outcome)
+
+
+def suisei_blast(state, attacker, cell, outcome):
+    """Blazing Suisei killing its target explodes on both cells beside it, whoever is there, its user included, as
+    its user's hit (BlazingSuiseiAttack.PerformAttack: a plain 2-damage Hit to each neighbour's agent)."""
+    for side in (cell - 1, cell + 1):
+        agent = state.occupant(side) if 0 <= side < state.cells else None
+        if agent is not None:
+            land_hit(state, attacker, agent, SUISEI_BLAST, outcome)
 
 
 def explode(state, warden, outcome):

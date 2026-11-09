@@ -977,6 +977,39 @@ PUNCH = Attack("DragonPunch", 1, [1], first_target=True)
 BARRAGE = Attack("CorruptedBarrage", 3, [-1, 1])
 
 
+SUISEI = Attack("BlazingSuisei", 2, [1, 2, 3], first_target=True)
+
+
+class BlazingSuiseiTest(unittest.TestCase):
+    """BlazingSuiseiAttack.PerformAttack in the game's code: the first target within 3; killing it, 2 to each agent
+    on the cells beside it."""
+
+    def fumiko(self, hero_cell, others):
+        fumiko = Agent("FumikoBoss", 0, 1, 7, 28, queue=[SUISEI], action="Attack")
+        return make_state(hero_cell=hero_cell, enemies=[fumiko, *others])
+
+    def test_killing_her_summon_blasts_the_hero_beside_it(self):
+        # logs/run17: corrupted Fumiko throws it with her 1-HP Blight Chargers about.
+        after, outcome = step(self.fumiko(3, [enemy(2, hp=1)]), Action("Wait"))
+        self.assertEqual((outcome.hp_lost, [e.kind for e in after.enemies]), (2, ["FumikoBoss"]))
+
+    def test_the_blast_hits_its_user_too(self):
+        after, _ = step(self.fumiko(4, [enemy(1, hp=1)]), Action("Wait"))
+        self.assertEqual(after.enemies[0].hp, 5)
+
+    def test_no_kill_no_blast(self):
+        after, outcome = step(self.fumiko(3, [enemy(2, hp=3)]), Action("Wait"))
+        self.assertEqual((outcome.hp_lost, after.enemies[1].hp), (0, 1))
+
+    def test_a_plain_hit_on_the_hero(self):
+        _, outcome = step(self.fumiko(3, []), Action("Wait"))
+        self.assertEqual(outcome.hp_lost, 2)
+
+    def test_the_hero_killing_with_it_blasts_the_one_behind(self):
+        after, outcome = fire(make_state(hero_cell=1, enemies=[enemy(2, hp=2), enemy(3, hp=3)]), SUISEI)
+        self.assertEqual([(e.cell, e.hp) for e in after.enemies], [(3, 1)])
+
+
 WAVE_R2L = Attack("CorruptedWaveR2L", 1, list(range(1, 11)))
 WAVE_L2R = Attack("CorruptedWaveL2R", 1, list(range(1, 11)))
 

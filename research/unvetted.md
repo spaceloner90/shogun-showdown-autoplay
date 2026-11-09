@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.12: Blazing Suisei's blast
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Killing its target hits both cells beside it for 2 | Rule | Game code | No blast logged yet; whether the hero's skill bonuses (Sniper and others) apply to it, assumed yes as for any hit of theirs |
+
 ## New in v3.11: Iwao ported, the Corrupted Wave simulated
 
 | Item | Kind | What's already confirmed | What to look for |

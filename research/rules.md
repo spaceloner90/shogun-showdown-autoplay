@@ -222,6 +222,9 @@ Later bosses in that log, with the rules read from the game's code (simulated as
   Spear 1, Earth Impale 1, Summon 0.25 (only alone); corrupted, also Dash 0.25 and the Corrupted Wave 1 (not while
   one is still sweeping), the one starting from the far side. Corrupted, he has a trait. Ported as of v3.11; every
   logged Iwao action in 11 logs predicts right.
+- **Blazing Suisei** (`BlazingSuiseiAttack`, Fumiko's when corrupted, and a hero tile): hits the first agent within
+  3 cells for its value. If that kills it, both cells beside the target take 2, whoever is there, its user
+  included. Fumiko's 1-HP Blight Chargers make that a hit on a hero standing next to one. Simulated as of v3.12.
 - **Corrupted Wave** (`CorruptionAttackCombatTask.InitializeRightToLeft` / `LeftToRight`): strikes the far end cell
   at once, then the next cell along each turn to the other end, 1 damage. Like the barrage, it heals a boss on a
   struck cell: Iwao's ends on his own side, healing him if he stays (`logs/run17` turn 26, 3 HP to 4). Simulated

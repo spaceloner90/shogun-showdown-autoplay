@@ -10,6 +10,12 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.12 — Blazing Suisei's blast (2026-11-09)
+- **Rule: Blazing Suisei** (corrupted Fumiko's, and a hero tile) killing its target hits both cells beside it for 2,
+  its user included (`BlazingSuiseiAttack.PerformAttack`). Its plain hit was already simulated from the logged
+  range and damage: `run17` turn 17 dodged it. The blast matters when she kills one of her 1-HP Blight Chargers
+  next to the hero, or when the hero kills with it.
+
 ## v3.11 — Iwao ported, the Corrupted Wave simulated (2026-11-09)
 - **Rule: Iwao's AI is ported** from `IwaoBoss.AIPickAction`, regular and corrupted, including the corrupted Dash
   pattern: Dash, then Spear a turn later, then a strike from anywhere with nobody in between. Every logged Iwao

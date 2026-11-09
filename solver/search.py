@@ -283,8 +283,10 @@ def rank_lines_parallel(state, depth, pool, beam=BEAM, leaf_beam=LEAF_BEAM):
 
 
 # What a potion is for, in the order preferred among those that save as much HP over the line (the player's call):
-# the combat potions first, keeping the sure ones, Shield and Freeze Time, for when nothing else does it.
-POTION_PREFERENCE = ("CoolUp", "MassPoison", "MassCurse", "RainOfMirrors", "Shield", "MassIce")
+# the combat potions first (Cool Up, Mass Poison, Mass Curse); then the save potions, Shield first, since it only
+# saves the hit. Rain of Mirrors and Freeze Time also tend to leave the board better, which is why they're kept for
+# worse spots (the player, after run17 turn 18 used Rain of Mirrors with a Shield that did as well).
+POTION_PREFERENCE = ("CoolUp", "MassPoison", "MassCurse", "Shield", "RainOfMirrors", "MassIce")
 # Potions that answer attacks already telegraphed: turning everyone round, a shield, a freeze. Each is for damage
 # coming this turn, as the player set: one drunk for a hit turns ahead does nothing a later one couldn't. The others
 # hurt or recharge, which can head off a hit turns ahead, so they're judged on the whole line.

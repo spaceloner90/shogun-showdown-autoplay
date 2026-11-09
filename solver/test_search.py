@@ -336,6 +336,12 @@ class PotionChoiceTest(unittest.TestCase):
         after, _ = step(state, Action("Wait"))
         self.assertEqual(self.choose(after)[0], "Shield")
 
+    def test_of_the_save_potions_the_shield_goes_first(self):
+        # logs/run17 turn 18: Rain of Mirrors was drunk with a Shield that saved as much. Flipping everyone also tends
+        # to leave the board better, which is why the player keeps it for worse spots.
+        name, why = self.choose(self.board(["RainOfMirrors", "Shield"]))
+        self.assertEqual(name, "Shield", why)
+
     def test_freeze_first_before_the_shogun(self):
         state = self.board(["Shield", "MassIce"])
         state.before_final = True

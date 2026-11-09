@@ -10,6 +10,12 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.13 — Shield first among the save potions (2026-11-09)
+- **Potions: among those saving as much, Shield now comes before Rain of Mirrors and Freeze Time**, the player's
+  call: those two also tend to leave the board better, which is why they're kept for worse spots. The combat
+  potions still come first. `run17` turn 18 drank Rain of Mirrors against a certain 2 HP hit that the Shield
+  stopped as well; it now drinks the Shield.
+
 ## v3.12 — Blazing Suisei's blast (2026-11-09)
 - **Rule: Blazing Suisei** (corrupted Fumiko's, and a hero tile) killing its target hits both cells beside it for 2,
   its user included (`BlazingSuiseiAttack.PerformAttack`). Its plain hit was already simulated from the logged

@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.13: Shield first among the save potions
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| On a tie, Shield before Rain of Mirrors and Freeze Time | Scoring | The player's rule; `run17` turn 18 now drinks the Shield | Rain and Freeze kept for spots the Shield can't save |
+
 ## New in v3.12: Blazing Suisei's blast
 
 | Item | Kind | What's already confirmed | What to look for |

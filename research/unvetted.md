@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.11: Iwao ported, the Corrupted Wave simulated
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Iwao's AI, regular and corrupted | Rule | Game code; all 229 logged Iwao actions in 11 logs | His random tile is still unknown until announced; misses on Summon turns |
+| The Corrupted Wave's sweep and heal | Rule | Game code; `run17` turn 20's warnings and turn 26's heal | L2R never logged yet |
+
 ## New in v3.10: equal lines go to the one doing more now
 
 | Item | Kind | What's already confirmed | What to look for |

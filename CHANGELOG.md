@@ -10,6 +10,15 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.11 — Iwao ported, the Corrupted Wave simulated (2026-11-09)
+- **Rule: Iwao's AI is ported** from `IwaoBoss.AIPickAction`, regular and corrupted, including the corrupted Dash
+  pattern: Dash, then Spear a turn later, then a strike from anywhere with nobody in between. Every logged Iwao
+  action in 11 logs (229) predicts right. Before, he was guessed, and the guess ignored both his announced tile and
+  the Dash moving him first: on `run17` turn 13 the search saw no threat in a hit the Dash made certain.
+- **Rule: the Corrupted Wave** (L2R and R2L) strikes the far end cell when fired, then one cell a turn to the other
+  end, healing a boss it lands on. Before, only its warnings were read once fired. `run17` turn 20 predicts the
+  logged warnings exactly.
+
 ## v3.10 — equal lines go to the one doing more now (2026-11-09)
 - **Search: the last tie-break is the position after this turn, as F1 sees it**, after the existing one (events
   sooner). Exact ties otherwise went to Wait, the first move listed: in `run17` F4 waited on an empty queue 23

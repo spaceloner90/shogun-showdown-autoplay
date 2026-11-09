@@ -29,6 +29,11 @@ TILES = {
     "Curse": (0, list(range(1, 11)), True),
     "Summon": (0, [], True),
     "BossSwap": (0, [], True),
+    # Iwao's, as logged.
+    "EarthImpale": (2, [-2, 2], False),
+    "Dash": (0, [], True),
+    "CorruptedWaveL2R": (1, list(range(1, 11)), False),
+    "CorruptedWaveR2L": (1, list(range(1, 11)), False),
 }
 PLAIN_EFFECT = {("Grappler", "GrapplingHook"), ("ShadowDasher", "Charge"), ("Warden", "Summon")}
 
@@ -37,7 +42,7 @@ FIRST_TILE = {"Ashigaru": "Katana", "YariMaster": "Spear", "Guardian": "Katana",
               "Sniper": "Volley", "Archer": "Arrow", "Charger": "Charge", "Strider": "Katana",
               "Grappler": "GrapplingHook", "Shinobi": None, "Warden": None, "ShadowDasher": "Charge",
               "BlightCharger": "Charge", "Barricade": None, "Summoner": "Summon", "Swapper": "BossSwap",
-              "DaisukeBoss": None}
+              "DaisukeBoss": None, "IwaoBoss": None}
 SWAPPER_WAIT = 3  # SwapperEnemy.get_NTurnsBetweenAttacks
 PORTED = set(FIRST_TILE)
 
@@ -120,6 +125,41 @@ def _play(tile):
     return Choice("PlayTile", tile)
 
 
+def _holds(enemy, name):
+    return any(a.name == name for a in enemy.queue)
+
+
+def _iwao(state, enemy, previous):
+    """IwaoBoss.AIPickAction: a turn after playing a tile (unless corrupted); with a Dash, its pattern; attack when
+    threatening; turn to face the hero; step back after attacking; into an empty queue a random tile (Spear, Earth
+    Impale, Summon, and corrupted, Dash and the wave); Swirl after a lone Earth Impale with the hero adjacent; close
+    in; fire a Summon."""
+    tiles = len(enemy.queue)
+    if previous == "PlayTile" and not enemy.corrupted:
+        return Choice("Wait")
+    if _holds(enemy, "Dash"):
+        # IwaoBoss.DashPattern: face the hero, add the Spear a turn after the Dash, then dash and strike whenever
+        # nobody is in between. The Dash carries him next to the hero from anywhere.
+        if not _facing_target(state, enemy):
+            return _face_target(state, enemy)
+        if tiles == 1:
+            return Choice("Wait") if previous == "PlayTile" else _play("Spear")
+        return Choice("Attack") if tiles == 2 and _path_free(state, enemy) else Choice("Wait")
+    if _valued(enemy) and _threatening(state, enemy):
+        return Choice("Attack")
+    if not _facing_target(state, enemy):
+        return _face_target(state, enemy)
+    if previous == "Attack":
+        return _away(state, enemy)
+    if tiles == 0:
+        return _play(None)
+    if tiles == 1 and _holds(enemy, "EarthImpale") and _distance(state, enemy) == 1:
+        return _play("Swirl")
+    if _valued(enemy) and _path_free(state, enemy):
+        return _toward_striking_position(state, enemy)
+    return Choice("Attack") if _holds(enemy, "Summon") else Choice("Wait")
+
+
 def _pick(state, enemy, previous):
     """The kind's AIPickAction, by `previous`, the action it took this turn. None where it can't be known."""
     kind = enemy.kind
@@ -165,6 +205,8 @@ def _pick(state, enemy, previous):
             if _path_free(state, enemy):
                 return _toward_striking_position(state, enemy)
         return Choice("Attack") if any(a.name == "Summon" for a in enemy.queue) else Choice("Wait")
+    if kind == "IwaoBoss":
+        return _iwao(state, enemy, previous)
     if kind == "Swapper":
         # SwapperEnemy.AIPickAction: a turn after playing its tile, then fires it, then waits 3 turns, then plays it.
         if enemy.ai_wait is None:
@@ -293,6 +335,11 @@ def tile_for(enemy):
         return {0: "Charge", 1: "Katana"}.get(tiles)
     if enemy.kind == "DaisukeBoss":
         return "Katana" if tiles == 1 and enemy.queue[0].name == "Charge" else None
+    if enemy.kind == "IwaoBoss":
+        # A second tile is the Spear after a Dash, or Swirl after Earth Impale; into an empty queue, random.
+        if tiles == 1:
+            return {"Dash": "Spear", "EarthImpale": "Swirl"}.get(enemy.queue[0].name)
+        return None
     if enemy.kind in ("Shinobi", "Warden"):
         if enemy.last_tile is None:
             return None

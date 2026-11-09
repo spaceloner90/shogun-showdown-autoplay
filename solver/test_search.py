@@ -47,6 +47,59 @@ class DaisukeTest(unittest.TestCase):
         self.assertEqual(self.decide([self.CHARGE, KATANA], "Wait").action, "Attack")
 
 
+class IwaoTest(unittest.TestCase):
+    """IwaoBoss.AIPickAction and DashPattern in the game's code."""
+    DASH = Attack("Dash", 0, [], first_target=True)
+    SPEAR = Attack("Spear", 2, [1, 2])
+    IMPALE = Attack("EarthImpale", 2, [-2, 2])
+
+    def decide(self, queue, previous, facing=-1, cell=5, hero_cell=2, corrupted=False, others=()):
+        foe = Agent("IwaoBoss", cell, facing, 12, 22, queue=list(queue))
+        foe.corrupted = corrupted
+        return enemy_ai.decide(make_state(hero_cell=hero_cell, enemies=[foe, *others]), foe, previous)
+
+    def test_a_turn_after_playing_a_tile_unless_corrupted(self):
+        self.assertEqual(self.decide([self.SPEAR], "PlayTile", cell=3).action, "Wait")
+        self.assertEqual(self.decide([self.SPEAR], "PlayTile", cell=3, corrupted=True).action, "Attack")
+
+    def test_the_spear_follows_a_dash_a_turn_later(self):
+        self.assertEqual(self.decide([self.DASH], "PlayTile", corrupted=True).action, "Wait")
+        choice = self.decide([self.DASH], "Wait", corrupted=True)
+        self.assertEqual((choice.action, choice.tile), ("PlayTile", "Spear"))
+
+    def test_with_dash_and_spear_he_strikes_from_anywhere(self):
+        # logs/run17 turn 14: from cell 0, with the hero anywhere, nothing in between.
+        self.assertEqual(self.decide([self.DASH, self.SPEAR], "Wait", corrupted=True).action, "Attack")
+
+    def test_but_not_through_someone(self):
+        self.assertEqual(self.decide([self.DASH, self.SPEAR], "Wait", corrupted=True,
+                                     others=[enemy(4)]).action, "Wait")
+
+    def test_with_a_dash_he_turns_to_face_the_hero_first(self):
+        self.assertEqual(self.decide([self.DASH, self.SPEAR], "Wait", facing=1, corrupted=True).action, "FlipLeft")
+
+    def test_he_steps_back_after_attacking(self):
+        self.assertEqual(self.decide([], "Attack", cell=3).action, "MoveRight")
+
+    def test_an_empty_queue_plays_an_unknown_tile(self):
+        choice = self.decide([], "Wait")
+        self.assertEqual((choice.action, choice.tile), ("PlayTile", None))
+
+    def test_swirl_follows_earth_impale_with_the_hero_adjacent(self):
+        choice = self.decide([self.IMPALE], "Wait", cell=3)
+        self.assertEqual((choice.action, choice.tile), ("PlayTile", "Swirl"))
+
+    def test_a_logged_tile_to_play_is_used(self):
+        from rules import state_from_log
+        import json
+        from pathlib import Path
+        rows = (Path(__file__).resolve().parent.parent / "research" / "logs" / "run17" / "state.jsonl").read_text(
+            encoding="utf-8").splitlines()
+        row = next(json.loads(r) for r in rows if '"seq":1633,' in r)
+        iwao = state_from_log(row).enemies[0]
+        self.assertEqual((iwao.corrupted, iwao.tile_to_play), (True, "Spear"))
+
+
 class EnemyAITest(unittest.TestCase):
     """The Ashigaru's choices, read from AshigaruEnemy.AIPickAction."""
 

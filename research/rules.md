@@ -214,6 +214,18 @@ Later bosses in that log, with the rules read from the game's code (simulated as
 - **Daisuke** (`DaisukeBoss.AIPickAction`): faces the hero first; steps back after attacking; waits a turn after
   playing a tile unless corrupted; plays a random tile into an empty queue and the Katana after a lone Charge; then
   attacks when threatening, or closes in. Corrupted, he has a trait. Ported as of v3.4.
+- **Iwao** (`IwaoBoss.AIPickAction`, `DashPattern`): waits a turn after playing a tile unless corrupted. With a Dash
+  in his queue he faces the hero, adds the Spear a turn later, then dashes and strikes whenever nobody is in
+  between: the Dash carries him next to the hero from anywhere, so only someone in the way stops it. Otherwise he
+  attacks when threatening, faces the hero, steps back after attacking, plays a random tile into an empty queue,
+  plays Swirl after a lone Earth Impale with the hero adjacent, closes in, and fires a Summon. His random pool:
+  Spear 1, Earth Impale 1, Summon 0.25 (only alone); corrupted, also Dash 0.25 and the Corrupted Wave 1 (not while
+  one is still sweeping), the one starting from the far side. Corrupted, he has a trait. Ported as of v3.11; every
+  logged Iwao action in 11 logs predicts right.
+- **Corrupted Wave** (`CorruptionAttackCombatTask.InitializeRightToLeft` / `LeftToRight`): strikes the far end cell
+  at once, then the next cell along each turn to the other end, 1 damage. Like the barrage, it heals a boss on a
+  struck cell: Iwao's ends on his own side, healing him if he stays (`logs/run17` turn 26, 3 HP to 4). Simulated
+  as of v3.11.
 - **Swap Toss** (the Chain Master's special move, `SwapTossSpecialMove`): moving into an adjacent movable agent
   makes it and whoever is on the hero's other side trade places, neither turning, so the one tossed behind faces
   away from the hero. The hero stays put. Both cells beside the hero must exist, and the far one may be empty but

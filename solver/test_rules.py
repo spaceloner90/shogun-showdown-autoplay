@@ -977,6 +977,45 @@ PUNCH = Attack("DragonPunch", 1, [1], first_target=True)
 BARRAGE = Attack("CorruptedBarrage", 3, [-1, 1])
 
 
+WAVE_R2L = Attack("CorruptedWaveR2L", 1, list(range(1, 11)))
+WAVE_L2R = Attack("CorruptedWaveL2R", 1, list(range(1, 11)))
+
+
+class CorruptedWaveTest(unittest.TestCase):
+    """BaseCorruptedWaveAttack and CorruptionAttackCombatTask.InitializeRightToLeft/LeftToRight in the game's code."""
+
+    def wave(self, hero_cell, attack=WAVE_R2L, iwao_cell=0):
+        iwao = Agent("IwaoBoss", iwao_cell, 1, 9, 22, queue=[attack], action="Attack")
+        state = make_state(hero_cell=hero_cell, enemies=[iwao])
+        state.cells = 7
+        return state
+
+    def test_right_to_left_strikes_the_far_cell_now_then_sweeps_left(self):
+        # logs/run17 turn 20: fired from cell 0, and the next turn's warnings were cells 5 down to 0.
+        after, outcome = step(self.wave(6), Action("Wait"))
+        self.assertEqual(outcome.hp_lost, 1)
+        self.assertEqual(after.hazards, [{"damage": 1, "groups": [[5], [4], [3], [2], [1], [0]]}])
+
+    def test_left_to_right_is_the_mirror_image(self):
+        after, outcome = step(self.wave(1, WAVE_L2R, iwao_cell=6), Action("Wait"))
+        self.assertEqual(outcome.hp_lost, 0)
+        self.assertEqual(after.hazards, [{"damage": 1, "groups": [[1], [2], [3], [4], [5], [6]]}])
+
+    def test_it_reaches_the_hero_a_cell_a_turn_later(self):
+        state, first = step(self.wave(4), Action("Wait"))
+        state, second = step(state, Action("Wait"))
+        state, third = step(state, Action("Wait"))
+        self.assertEqual((first.hp_lost, second.hp_lost, third.hp_lost), (0, 0, 1))
+
+    def test_it_heals_iwao_at_the_end(self):
+        # logs/run17 turn 26: the wave's last cell was his, and he went from 3 HP to 4.
+        state = self.wave(6)
+        state.enemies[0].queue, state.enemies[0].action, state.enemies[0].hp = [], "Wait", 3
+        state.hazards = [{"damage": 1, "groups": [[0]]}]
+        after, _ = step(state, Action("Wait"))
+        self.assertEqual(after.enemies[0].hp, 4)
+
+
 class SwapAndMoveAttackTest(unittest.TestCase):
     def test_smoke_bomb_trades_places_then_hits(self):
         after, outcome = fire(make_state(enemies=[enemy(4)]), SMOKE_BOMB)

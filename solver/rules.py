@@ -19,7 +19,7 @@ ONE_ENEMY_WAVE_CAP = 6
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
 MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb", "Barricade", "BladeOfPatience", "Bomb",
            "BossSwap", "Charge", "Crossbow",
-           "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Hookblade", "Katana", "Kunai", "Lightning", "Maku", "MeteorHammer", "Mirror", "OriginOfSymmetry", "Shield",
+           "CopycatMirror", "CorruptedBarrage", "CorruptedWaveL2R", "CorruptedWaveR2L", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Hookblade", "Katana", "Kunai", "Lightning", "Maku", "MeteorHammer", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Sai", "ScarStrike", "SmokeBomb", "Spear", "Summon", "SwapToss",
            "Swirl", "Tetsubo", "Trap", "TurnAround", "TwinTessen", "Volley"}
 
@@ -85,6 +85,9 @@ TANKS = {"ShogunSummoner", "Swapper"}
 CHARGES = {"Charge": 1, "BackCharge": -1}  # Run to the last free cell, and hit whatever is next.
 PLAIN_DASHES = {"Dash": 1}                 # Run to the last free cell, and hit nothing.
 SHADOW_DASHES = {"ShadowDash": 1, "BackShadowDash": -1}  # Land behind a target, hitting all they pass.
+CORRUPTED_WAVES = {"CorruptedWaveL2R": 1, "CorruptedWaveR2L": -1}  # Corrupted Iwao's: sweeps the board one cell a turn.
+# Bosses with no traits but when corrupted, so a trait in the log means corrupted.
+TRAITS_ONLY_CORRUPTED = {"DaisukeBoss", "IwaoBoss"}
 SMOKE_BOMBS = {"SmokeBomb", "BackSmokeBomb"}  # Trade places with the first target, then hit it.
 # Attacks that move or turn the hero, which raise the game's move-attack event that Dynamic Boost listens for. Only
 # when they actually moved or turned it: a Smoke Bomb with nobody to trade places with does nothing.
@@ -146,7 +149,7 @@ class Agent:
     # Whether `action` is known: logged, or chosen by the ported AI (enemy_ai.py). An unknown one shows as Wait.
     known: bool = True
     tile_to_play: str | None = None  # For a PlayTile the AI chose, the tile; None if unknown.
-    # A corrupted boss, where the log shows it: Daisuke has a trait only when corrupted (DaisukeBoss.get_EnemyTraits).
+    # A corrupted boss, where the log shows it: Daisuke and Iwao have a trait only when corrupted (get_EnemyTraits).
     corrupted: bool = False
     last_tile: str | None = None  # The tile it last chose, which the Shinobi and Warden alternate on.
     # A Summoner's turns left before it summons again, or a Swapper's before it swaps (their AI's countdowns), with
@@ -346,7 +349,7 @@ def state_from_log(row):
             freezable="Unfreezable" not in (data.get("traits") or []),
             inanimate=bool(data.get("inanimate")),
             elite=data.get("elite") or "None",
-            corrupted=data["kind"] == "DaisukeBoss" and bool(data.get("traits")),
+            corrupted=data["kind"] in TRAITS_ONLY_CORRUPTED and bool(data.get("traits")),
         )
 
     def with_ai_memory(enemy, data):
@@ -902,6 +905,16 @@ def strike_cell(state, attacker, cell, damage, outcome, heals_boss=True):
         land_hit(state, attacker, agent, damage, outcome, collision=True)
 
 
+def corrupted_wave(state, attacker, attack, outcome):
+    """CorruptionAttackCombatTask.InitializeRightToLeft (or LeftToRight): strikes the far end cell now, then the next
+    cell along each turn, to the other end. Like the barrage, it heals a boss on a struck cell."""
+    step_dir = CORRUPTED_WAVES[attack.name]
+    cells = list(range(state.cells)) if step_dir > 0 else list(range(state.cells - 1, -1, -1))
+    strike_cell(state, attacker, cells[0], attack.value, outcome)
+    if len(cells) > 1:
+        state.hazards = state.hazards + [{"damage": attack.value, "groups": [[c] for c in cells[1:]]}]
+
+
 def corrupted_barrage(state, attacker, attack, outcome):
     """Strikes the cells beside the attacker now, then one cell further out each turn."""
     origin = attacker.cell
@@ -992,6 +1005,9 @@ def _apply_attack(state, attacker, attack, outcome):
         return
     if attack.name == "CorruptedBarrage":
         corrupted_barrage(state, attacker, attack, outcome)
+        return
+    if attack.name in CORRUPTED_WAVES:
+        corrupted_wave(state, attacker, attack, outcome)
         return
     if attack.name == "Curse":
         # A projectile rather than a hit, so a shield neither stops it nor is used up by it.

@@ -45,8 +45,11 @@ def certain(state):
 
 
 def _factor(state):
-    """A turn whose enemy actions are guessed counts for less. A wave's arrival isn't discounted: the line ends there."""
-    return 1.0 if _actions_known(state) else UNKNOWN_ACTION
+    """A turn whose enemy actions are guessed counts for less, and so does one with a wave about to arrive among
+    enemies still there, as the player set: who comes isn't simulated. A wave into a cleared room ends the line."""
+    if not _actions_known(state):
+        return UNKNOWN_ACTION
+    return WEIGHTS["future_discount"] if _wave_coming(state) else 1.0
 
 
 def state_key(state):
@@ -71,9 +74,10 @@ def _turn(state, action, now=False):
     the fight at no HP cost beats anything only on the turn being chosen (`now`): a win later in a line counts for
     its kills, or every line ending in one would tie, and the search would keep putting it off.
 
-    A line also ends where the next wave arrives, scored by the board it lands on: who comes isn't simulated, so
-    playing on would score a board missing them, where a tile spent would be back before the end of the line and
-    look free."""
+    A line also ends where the next wave arrives in a cleared room, scored by the board it lands on: who comes isn't
+    simulated, so playing on scored an empty board, where a tile spent would be back before the end of the line and
+    look free. A wave landing among enemies still there doesn't end it: what they do next is known, and ending there
+    hid their next attacks (v3.6 lost HP that way in the fight simulation)."""
     following, outcome = step(state, action)
     dead = not following.hero.alive
     score = sum(outcome_terms(outcome, dead, _cheapest_hit(state), state.combo_skills).values())
@@ -81,7 +85,8 @@ def _turn(state, action, now=False):
     if now and won and outcome.hp_lost == 0:
         score += WEIGHTS["win"]
     wasted = action.kind == "Attack" and outcome.wasted_attacks > 0
-    return following, score, dead or won or following.wave_landed, wasted
+    cleared = following.wave_landed and not any(e.alive for e in following.enemies)
+    return following, score, dead or won or cleared, wasted
 
 
 def _leaf(state):
@@ -169,9 +174,11 @@ def _sorted(lines, state=None):
 
 
 def _clears_room(state, action):
-    """Whether this action now kills the last enemy with a wave still to come, which brings it at once."""
-    following, _ = step(state, action)
-    return following.wave_landed and not any(e.alive for e in following.enemies)
+    """Whether this action now kills the last enemy with a wave still to come, which brings it at once, at no HP
+    cost: the player's condition for weighing whether to put it off is that the wave can be finished without losing
+    life. Clearing it at a cost is no reason to hold back the lines that don't."""
+    following, outcome = step(state, action)
+    return following.wave_landed and not any(e.alive for e in following.enemies) and outcome.hp_lost == 0
 
 
 def _guaranteed_delay(state, line):

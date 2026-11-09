@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.9: waves end lines only in a cleared room
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| A wave among enemies still there plays on at 0.85; the guarantee only when the room clears now at no HP cost | Search | Fight simulation: F4 16 HP against v3.5's 18, worse on no start | Kills that clear the room at a cost no longer forced |
+
 ## New in v3.8: putting off the wave only when it's safe
 
 | Item | Kind | What's already confirmed | What to look for |

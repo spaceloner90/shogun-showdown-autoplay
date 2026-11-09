@@ -189,13 +189,16 @@ F2 to F4 play the hero's next turns out against the enemy AI (`solver/search.py`
   one, with the stack and the threat no answer removes. A turn whose enemy actions are all known counts in full, as
   the player asked, and one with a guessed enemy action (a boss, an enemy whose choice the board doesn't show, an
   unidentified tile) at 0.5, from there on.
-- **Waves end a line** (v3.6): where the next wave arrives, the line stops and is scored by the board it lands on.
-  Who comes isn't simulated, so playing on scored a board missing them, where a tile spent would be back before the
-  line's end and look free: in `run16` F4 spent the Mirror on a kill that cleared the room, and the wave came at
-  once. The game brings it when its countdown runs out, unless the room is too crowded for it, and at once when the
-  room is cleared. This replaced counting turns after a wave at 0.85.
+- **A wave into a cleared room ends a line** (v3.6, narrowed in v3.9): the line stops and is scored by the board it
+  lands on. Who comes isn't simulated, so playing on scored an empty board, where a tile spent would be back before
+  the line's end and look free: in `run16` F4 spent the Mirror on a kill that cleared the room, and the wave came at
+  once. The game brings a wave when its countdown runs out, unless the room is too crowded for it, and at once when
+  the room is cleared. A wave landing among enemies still there doesn't end the line, and the turns after it count
+  at 0.85, as before: what those enemies do is known, and ending there (v3.6 to v3.8) hid their next attacks, which
+  doubled the HP lost in the fight simulation.
 - **Putting off the wave** (v3.8): so the search can choose when to clear the room, to meet the wave set up. When a
-  move now clears it, a line holding off is kept only if every turn until its wave lands is fully known, loses no
+  move now clears it at no HP cost (v3.9: a clear that costs HP, like killing a Warden next to the hero, is no
+  reason to hold back other lines), a line holding off is kept only if every turn until its wave lands is fully known, loses no
   HP, and lands it at an exact time within the line; any other ranks below every line clearing the room now. A hard
   rule rather than a discount, since the 0.5 for a guessed turn halves a guessed hit too.
   An enemy whose AI isn't known is guessed to attack whenever what it holds would hit the hero, as such enemies

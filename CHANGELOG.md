@@ -10,6 +10,14 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.9 — waves end lines only in a cleared room (2026-11-09)
+- **Search: only a wave into a cleared room ends a line.** One landing among enemies still there plays on at 0.85
+  again, as before v3.6: what they do next is known, and ending there hid their next attacks.
+- **Search: the guarantee only applies when the room can be cleared now at no HP cost**, the player's condition. In
+  v3.8 a throw killing a Warden next to the hero, whose death blast costs 2 HP, outranked a safe line scoring higher.
+- Fight simulation, 710 starts (logs to `run15`): F4 16 HP lost over 10 hits against v3.5's 18 over 11, worse on
+  none; F3 unchanged at 32 over 18; 3-4% more turns. v3.8 had lost 36 over 17 (F4) and 54 over 26 (F3).
+
 ## v3.8 — putting off the wave only when it's safe (2026-11-09)
 - **Search: the kill that clears the room may be put off only along a guaranteed line**, as the player set: every
   turn until the wave lands fully known, no HP lost, the arrival exact (not held by a crowded room), and the landing
@@ -35,8 +43,7 @@ Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulatio
   playing on at 0.85 a turn. Who comes isn't simulated, so playing on scored a board missing them: in `run16` turn
   12, F4 spent the Mirror on a kill that cleared the room (it would be back by the line's end), and the wave came at
   once with the hero flanked. Now it keeps it. The rule alone, with the 0.85, made F4 put the kill off instead.
-- Not yet checked on the 551-start fight simulation: stopped, since it starved the live solver of CPU. To run while
-  the game isn't being played.
+- Checked on the fight simulation with v3.9, which narrowed it: see there.
 
 ## v3.5 — Kunai (2026-11-09)
 - **Rule: Kunai** throws as many knives as its value, each a hit of 1 with the tile's effect on the first agent

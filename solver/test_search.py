@@ -6,6 +6,7 @@ import unittest
 
 import enemy_ai
 import search
+from evaluator import WEIGHTS
 from rules import Action, Agent, Attack, State, Tile, step
 from test_rules import KATANA, SWIRL, enemy, make_state
 
@@ -123,10 +124,13 @@ class WaveEndTest(unittest.TestCase):
         line = next(l for l in search.rank_lines(state, 4) if l.actions[0].kind == "Attack")
         self.assertEqual(len(line.actions), 1)
 
-    def test_no_discount_on_the_turn_before_it(self):
-        state = make_state(enemies=[enemy(4)])
+    def test_a_wave_among_enemies_still_there_doesnt_end_the_line(self):
+        # The Ashigaru stays out of reach; the wave lands on the first turn, and the line plays on at a discount.
+        state = make_state(hero_cell=0, enemies=[enemy(4, hp=9)])
         state.turns_until_wave = 1
-        self.assertEqual(search._factor(state), 1.0)
+        line = search.rank_lines(state, 3)[0]
+        self.assertEqual(len(line.actions), 3)
+        self.assertEqual(search._factor(state), WEIGHTS["future_discount"])
 
 
 class WaveDelayGuaranteeTest(unittest.TestCase):

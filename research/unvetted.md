@@ -46,13 +46,13 @@ enemies appeared, and the player confirmed the hook looks right.
 
 | Item | Kind | What's already confirmed | What to look for |
 |---|---|---|---|
-| Hits the first in front, then turns it round, its telegraphed action unchanged | Rule | Game code | An enemy's attack going the other way after a Bo; a turned enemy's next choice |
+| Hits the first in front, then turns it round, its telegraphed action unchanged | Rule | Game code; `run18` turn 26 predicted exactly (the Yari Master turned) | An enemy's attack going the other way after a Bo; a turned enemy's next choice |
 
 ## New in v3.15: Signature Move
 
 | Item | Kind | What's already confirmed | What to look for |
 |---|---|---|---|
-| The special move from a Free Play tile, its charge untouched; a move attack for Dynamic Boost | Rule | Game code | The first log with it: tile name and Free Play as logged, the special's charge after |
+| The special move from a Free Play tile, its charge untouched; a move attack for Dynamic Boost | Rule | Game code; `run18` turns 2, 13 and 26 predicted exactly: Phase both ways, Mamushi Move poisoning each passed, Dynamic Boost on the hits after, the special's charge unchanged | |
 | Ready, worth a charged special move in the escape term | Scoring | Tied in code to the special's value | Kept for escapes rather than fired for nothing |
 
 ## New in v3.14: every boss ported; mod 0.19.0

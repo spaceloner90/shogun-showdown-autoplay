@@ -421,6 +421,20 @@ class PotionChoiceTest(unittest.TestCase):
         name, why = self.choose(self.board(["RainOfMirrors", "Shield"]))
         self.assertEqual(name, "Shield", why)
 
+    def test_a_potion_that_keeps_the_attack_without_the_hit(self):
+        # logs/run18 turn 44: the best line attacked Sato and took 2 HP for two kills, while stepping away took
+        # none. Freeze keeps the attack without the hits and scores higher, so it's drunk (the player's rule).
+        import json
+        from pathlib import Path
+        from rules import apply_potion, state_from_log
+        rows = (Path(__file__).resolve().parent.parent / "research" / "logs" / "run18" / "state.jsonl").read_text(
+            encoding="utf-8").splitlines()
+        state = state_from_log(next(json.loads(r) for r in rows if '"seq":7992,' in r))
+        state.potions = ["MassIce"]
+        lines = search.rank_lines(state, 4)
+        after = {"MassIce": search.rank_lines(apply_potion(state, "MassIce"), 4)}
+        self.assertEqual(search.potion_choice(state, lines, after, 4)[0], "MassIce")
+
     def test_freeze_first_before_the_shogun(self):
         state = self.board(["Shield", "MassIce"])
         state.before_final = True

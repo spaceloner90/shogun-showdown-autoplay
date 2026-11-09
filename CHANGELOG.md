@@ -10,6 +10,14 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.17 — potions judged on the line we'd play (2026-11-09)
+- **Potions: drunk when the best line after one loses less HP and scores higher than the best line without it**,
+  the player's rule, for combat and save potions alike (save potions on this turn's damage, and not pushing it
+  later). Since v3.7 a potion was judged on the least HP any line lost, so one was kept whenever some line dodged,
+  even at the cost of the attack the best line made: `run18` turn 44 took 2 HP from Sato and a Guardian for two
+  kills, where Freeze would have kept the attack without the hits (357 against 148). The score has to rise as well
+  because a potion costs nothing in it. The line's discount stays: a frozen turn is certain, and worth it.
+
 ## v3.16 — the Bo (2026-11-09)
 - **Rule: the Bo** hits the first agent in front and turns it round if it's movable, its telegraphed action
   unchanged, so an attack shown toward the hero goes the other way (`BoAttack.ApplyEffect`, `FlipTarget`).

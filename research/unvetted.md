@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.17: potions judged on the line we'd play
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **Drunk when the best line with it loses less HP and scores higher** | **Scoring** | **The player's rule; `run18` turn 44 now drinks Freeze** | **Potions burned on hits the hero could have dodged for little; two in a row** |
+
 ## New in v3.16: the Bo
 
 | Item | Kind | What's already confirmed | What to look for |

@@ -26,7 +26,7 @@ using BepInEx;
 using HarmonyLib;
 using UnityEngine;
 
-[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.17.0")]
+[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.18.0")]
 public class StateLoggerPlugin : BaseUnityPlugin
 {
     private const float PollIntervalSeconds = 0.1f;
@@ -570,6 +570,8 @@ public class StateLoggerPlugin : BaseUnityPlugin
         AppendTraps(sb, room.Grid);
         sb.Append(",\"litCells\":");
         AppendLitCells(sb);
+        sb.Append(",\"progression\":");
+        AppendProgression(sb);
         // Nobunaga's spotlights move on his turn whenever his HP has changed since his last one.
         NobunagaBoss nobunaga = UnityEngine.Object.FindObjectOfType<NobunagaBoss>();
         sb.Append(",\"nobunagaHpLastTurn\":");
@@ -631,6 +633,27 @@ public class StateLoggerPlugin : BaseUnityPlugin
     // Traps on the ground that haven't gone off. A Trap doesn't keep its cell, so it's the cell nearest to where it
     // lies. By the code, only an enemy entering it sets it off, once, for its damage and effect.
     // Nobunaga's spotlit cells, where he can be hurt: the game shows them as spotlights. Null without Nobunaga.
+    // Where the run is: the day, the island (7 is the Shogun's castle, Progression.InShogunCastle), and the room's
+    // place in its location, so the solver can tell the fight before the Shogun.
+    private static void AppendProgression(StringBuilder sb)
+    {
+        Progression progression = Progression.Instance;
+        if (progression == null || progression.CurrentLocation == null)
+        {
+            sb.Append("null");
+            return;
+        }
+        Location location = progression.CurrentLocation;
+        Traverse traverse = Traverse.Create(progression);
+        sb.Append("{\"day\":").Append(Globals.Day);
+        sb.Append(",\"island\":").Append((int)Traverse.Create(location).Field("island").GetValue<ProgressionEnums.IslandEnum>());
+        sb.Append(",\"location\":").Append(Str(Traverse.Create(location).Field("locationEnum").GetValue().ToString()));
+        sb.Append(",\"room\":").Append(traverse.Field("iRoom").GetValue<int>());
+        sb.Append(",\"rooms\":").Append(location.NRooms);
+        sb.Append(",\"inShogunCastle\":").Append(Bool(progression.InShogunCastle));
+        sb.Append("}");
+    }
+
     private static void AppendLitCells(StringBuilder sb)
     {
         NobunagaBoss boss = UnityEngine.Object.FindObjectOfType<NobunagaBoss>();

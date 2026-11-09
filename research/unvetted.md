@@ -42,6 +42,14 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v2.27: potions over four turns
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **Potions used when they cut HP lost along the F4 line; combat potions first on ties** | **Scoring** | **The player's rules; tests** | **Potions spent ahead of hits seen coming, Cool Up used, Shield and Freeze Time kept for when nothing else works** |
+| Freeze Time first in the fight before the Shogun's (mod 0.18.0 `progression`) | Rule | Read from `Progression` | `progression` logged, and the flag set in the castle's second-to-last room |
+| Edamame at 6 missing with Triple Combo Heal | Scoring | The player's call | — |
+
 ## New in v2.26: hidden AI memory, Summoner and Swapper
 
 | Item | Kind | What's already confirmed | What to look for |

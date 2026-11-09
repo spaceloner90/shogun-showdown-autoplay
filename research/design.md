@@ -204,6 +204,9 @@ F2 to F4 play the hero's next turns out against the enemy AI (`solver/search.py`
   runs `analyze.py` on each key press, which hands the request to the server, starting one if none runs and
   answering that press itself, F2 to F4 sharing 1 s on one core. The server restarts itself when solver code changes, and quits after 3 idle
   hours. Killing it by hand leaves its workers behind; let it quit, or stop them too.
+- **Potions** are judged on the deepest search: each potion held gets its own search of the board after drinking
+  it, in parallel, and any that cuts the HP lost along the best line is used, combat potions first on a tie, Freeze
+  Time first in the fight before the Shogun's (`search.potion_choice`).
 - **The budget:** F2 to F4 get 0.45 s from the start of an answer. A depth that runs over plays the choice of the
   deepest that didn't, and the report says so; F1 always finishes. On this laptop (a 14900HX, with slower efficiency
   cores and throttling) F4 finished in time on about half of paced presses measured in a loaded state, F3 nearly

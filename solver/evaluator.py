@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v2.26"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v2.27"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -71,6 +71,7 @@ WEIGHTS = {
                               # nothing for 4 turns, which in practice is nearly as good. Less as its ice runs out.
     # Potions. Each is used on a key press of its own, and the next press analyzes the board it leaves.
     "heal_at_missing": EDAMAME_HEAL,  # Use Edamame once the hero is missing at least what it heals, so none is wasted.
+    "heal_at_missing_combo": 6,  # With Triple Combo Heal, which heals well on its own, as the player set.
     "trap_planted": 0.4,      # A trap on the ground, as a share of what its damage is worth. Only enemies set
                               # one off, so it's all upside: the player's read is a third to half.
     "shove_cell": 4.0,        # Per cell an enemy is shoved. Space to load in, but melee wants them close too.

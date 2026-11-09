@@ -9,6 +9,19 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v2.27 — potions judged over four turns (2026-11-09)
+- **Potions, as the player set:** with the solver server, each potion held gets its own F3 and F4 search of the
+  board after drinking it, alongside the main ones, and is judged on HP lost and kills along the best line, at F4
+  if everything finished in time, else F3. Any potion that cuts the HP lost is used, the one saving most; on a tie,
+  combat potions first (Cool Up, Mass Poison, Mass Curse), then Rain of Mirrors, then Shield and Freeze Time. Cool
+  Up is back in play, since recharged tiles pay off over later turns. With every slot full, one adding kills is
+  used, as before. D6 stays the last resort against damage this turn; a potion takes the key press, so the next
+  one looks again.
+- **Edamame:** with Triple Combo Heal, used once 6 HP are missing, not 3.
+- **The fight before the Shogun's:** Freeze Time first among potions that save HP, since he can't be frozen. Mod
+  0.18.0 logs `progression` (day, island, room and room count, whether in the Shogun's castle) to tell it.
+- Without the server, potions use the old one-turn rules. Potions don't appear in replays, which use F1.
+
 ## v2.26 — enemies' hidden AI memory; the Summoner and Swapper (2026-11-09)
 - **Mod 0.17.0** logs what some enemies' AI remembers between turns (`memory`): the Shinobi's and Warden's last
   tile (`prevAttack`, `previousAttack`), the Summoners' countdown and full wait (`waitBeforeSummoning`,

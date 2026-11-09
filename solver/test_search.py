@@ -146,5 +146,49 @@ class HiddenMemoryTest(unittest.TestCase):
         self.assertIsNone(enemy_ai.decide(state, state.enemies[0], "Wait"))
 
 
+class PotionChoiceTest(unittest.TestCase):
+    """Potions judged over the deepest line, as the player set (v2.27)."""
+
+    def board(self, potions):
+        # The hero cornered, the special move uncharged, and an Ashigaru beside it about to strike: no way out.
+        state = make_state(hero_cell=0, enemies=[ashigaru(1, queue=[KATANA], action="Attack")], swap_charge=0)
+        state.potions = list(potions)
+        return state
+
+    def choose(self, state, depth=2):
+        from rules import apply_potion
+        lines = search.rank_lines(state, depth)
+        after = {name: search.rank_lines(apply_potion(state, name), depth) for name in set(state.potions)
+                 if name in search.POTION_PREFERENCE}
+        return search.potion_choice(state, lines, after, depth)
+
+    def test_a_potion_that_saves_hp_over_the_line_is_used(self):
+        name, why = self.choose(self.board(["Shield"]))
+        self.assertEqual(name, "Shield", why)
+
+    def test_freeze_first_before_the_shogun(self):
+        state = self.board(["Shield", "MassIce"])
+        state.before_final = True
+        self.assertEqual(self.choose(state)[0], "MassIce")
+
+    def test_edamame_waits_for_six_with_triple_combo_heal(self):
+        state = self.board(["Edamame"])
+        state.hero.hp = 6
+        state.triple_heal = True
+        self.assertNotEqual(self.choose(state)[0], "Edamame")
+        state.hero.hp = 4
+        self.assertEqual(self.choose(state)[0], "Edamame")
+
+    def test_progression_marks_the_fight_before_the_shogun(self):
+        from rules import state_from_log
+        row = {"cells": 5, "hero": {"kind": "Wanderer", "cell": 0, "facing": "Right", "hp": 10, "maxHp": 10,
+               "shield": False, "queue": [], "action": "Wait", "special": {"name": "SwapSpecialMove", "charge": 4,
+               "cooldown": 4}}, "enemies": [], "tiles": [], "skills": [],
+               "progression": {"day": 1, "island": 7, "room": 2, "rooms": 4, "inShogunCastle": True}}
+        self.assertTrue(state_from_log(row).before_final)
+        row["progression"]["room"] = 3
+        self.assertFalse(state_from_log(row).before_final)
+
+
 if __name__ == "__main__":
     unittest.main()

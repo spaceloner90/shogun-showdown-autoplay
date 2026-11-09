@@ -16,7 +16,7 @@ import time
 
 from evaluator import (WEIGHTS, Line, _cheapest_hit, _kept_terms, fight_won, leaf_terms, outcome_terms,
                        unanswerable_damage)
-from rules import UNKNOWN_COPY, UNKNOWN_TILE, legal_actions, step
+from rules import SIMULATED_POTIONS, UNKNOWN_COPY, UNKNOWN_TILE, apply_potion, legal_actions, step
 
 # What a turn counts for when something in it isn't known. A wave about to arrive keeps F1's future discount: new
 # enemies do nothing the turn they come in and don't change what's already there. An enemy whose action is only
@@ -234,3 +234,66 @@ def rank_lines_parallel(state, depth, pool, beam=BEAM, leaf_beam=LEAF_BEAM):
     different first actions get searched twice, the price of not sharing memory between workers."""
     jobs = [(state, action, depth, beam, leaf_beam, None) for action in legal_actions(state)]
     return _sorted(list(pool.map(_line_task, jobs)))
+
+
+# What a potion is for, in the order preferred among those that save as much HP over the line (the player's call):
+# the combat potions first, keeping the sure ones, Shield and Freeze Time, for when nothing else does it.
+POTION_PREFERENCE = ("CoolUp", "MassPoison", "MassCurse", "RainOfMirrors", "Shield", "MassIce")
+
+
+def line_totals(state, line):
+    """HP the hero loses and kills made along a line, played out turn by turn."""
+    lost = kills = 0
+    for action in line.actions:
+        state, outcome = step(state, action)
+        lost += outcome.hp_lost
+        kills += outcome.kills
+        if not state.hero.alive:
+            break
+    return lost, kills
+
+
+def potion_choice(state, lines, after_potion, depth):
+    """Which potion to use before acting, judged on the best line over `depth` turns with and without it.
+
+    `lines` ranks this board at that depth; `after_potion` maps each potion to the ranked lines after drinking it.
+    Edamame heals once missing at least what it heals, or 6 with Triple Combo Heal, which heals well on its own. Any
+    potion that cuts the HP lost along the line is used, the one saving most, combat potions first on a tie, since a
+    hit seen coming turns ahead can often be headed off by them; in the fight before the Shogun's, Freeze Time
+    first, since it's useless against him. With every slot full, one that adds kills is used,
+    as before. D6, being random, is only the last resort against damage this turn that nothing else avoids. Returns
+    (potion, reason) or (None, None).
+    """
+    from evaluator import WEIGHTS
+    held = state.potions
+    if not held:
+        return None, None
+    hero = state.hero
+    heal_at = WEIGHTS["heal_at_missing_combo"] if state.triple_heal else WEIGHTS["heal_at_missing"]
+    if "Edamame" in held and hero.max_hp - hero.hp >= heal_at:
+        return "Edamame", f"heal: HP {hero.hp}/{hero.max_hp}"
+    lost, kills = line_totals(state, lines[0])
+    saves, gains = [], []
+    for name, again in after_potion.items():
+        if not again:
+            continue
+        their_lost, their_kills = line_totals(apply_potion(state, name), again[0])
+        # In the fight before the Shogun's, Freeze Time comes first: it's no use against him (the player's call).
+        order = (("MassIce",) + tuple(p for p in POTION_PREFERENCE if p != "MassIce")) if state.before_final             else POTION_PREFERENCE
+        rank = order.index(name) if name in order else len(order)
+        if their_lost < lost:
+            saves.append((their_lost, rank, name))
+        if their_kills > kills:
+            gains.append((-their_kills, -again[0].score, name))
+    if saves:
+        their_lost, _, name = min(saves)
+        return name, f"over {depth} turns, {lost} HP lost without it, {their_lost} with it"
+    full = len(held) >= state.potion_slots
+    if full and gains:
+        their_kills, _, name = min(gains)
+        return name, (f"every potion slot full ({len(held)}/{state.potion_slots}): over {depth} turns, {kills} kills "
+                      f"without it, {-their_kills} with it")
+    now = step(state, lines[0].actions[0])[1]
+    if now.hp_lost > 0 and "D6" in held:
+        return "D6", f"losing {now.hp_lost} HP this turn that nothing else avoids"
+    return None, None

@@ -184,6 +184,9 @@ class State:
     mono_active: bool = False  # Whether this turn's attack is a single tile, so Monomancer applies.
     triple_heal: bool = False  # Triple Combo Heal: each kill from the third in a turn heals the hero 1.
     combo_skills: int = 0  # How many of Combo Curse and Chilling Combo the hero has: random effects on combo kills.
+    # This is the fight before the Shogun's, the castle's last room (mod 0.18.0's `progression`). He can't be
+    # frozen, so Freeze Time is best spent here.
+    before_final: bool = False
     dynamic_bonus: int = 0  # Extra damage on the hero's hits after a move attack this turn, from Dynamic Boost.
     boosted: bool = False  # Whether a move attack has turned Dynamic Boost on this turn.
     reactive_shield: bool = False  # Reactive Shield: taking damage shields the hero.
@@ -421,6 +424,8 @@ def state_from_log(row):
         hazards=[dict(h, groups=[list(g) for g in h["groups"]]) for h in row.get("hazards") or []],
         potions=list(row.get("potions") or []),
         lit_cells=row.get("litCells"),
+        before_final=bool(row.get("progression") and row["progression"].get("inShogunCastle")
+                          and row["progression"].get("room") == row["progression"].get("rooms", 0) - 2),
         nobunaga_hp_last_turn=row.get("nobunagaHpLastTurn"),
         traps=[{"cell": t["cell"], "damage": t["damage"], "effect": t.get("effect") or "None"}
                for t in row.get("traps") or []],

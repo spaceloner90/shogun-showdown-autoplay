@@ -120,16 +120,22 @@ def answer(row, pool=None, depths=DEPTHS):
     turn's actions between them."""
     from evaluator import VERSION, potion_plan, rank_actions
     from rules import state_from_log
-    from search import rank_lines, submit_lines
+    from rules import apply_potion
+    from search import POTION_PREFERENCE, potion_choice, rank_lines, submit_lines
     out = []
     print = out.append  # noqa: A001 - each line of the answer, in order
     state = state_from_log(row)
     started = time.perf_counter()
     late = []
+    potion_jobs = {}
     if pool is not None:
         # Every depth past F1 shares the budget; one that runs over plays the choice of the deepest that didn't.
         deadline = time.time() + BUDGET
-        by_depth = submit_lines(state, depths, pool, deadlines={d: deadline for d in depths if d > 1})()
+        collect = submit_lines(state, depths, pool, deadlines={d: deadline for d in depths if d > 1})
+        # Each potion held gets its own search of the board after drinking it, at F3 and F4, alongside.
+        potion_jobs = {name: submit_lines(apply_potion(state, name), (3, 4), pool, deadlines={3: deadline, 4: deadline})
+                       for name in sorted(set(state.potions)) if name in POTION_PREFERENCE}
+        by_depth = collect()
         late = [d for d in depths if d not in by_depth]
         for depth in sorted(late):
             by_depth[depth] = by_depth[depth - 1]
@@ -142,8 +148,14 @@ def answer(row, pool=None, depths=DEPTHS):
                 late.append(depth)
                 lines = by_depth[depth - 1]
             by_depth[depth] = lines
-    rank = (lambda board: submit_lines(board, (1,), pool)()[1]) if pool is not None else None
-    potion, potion_reason, _ = potion_plan(state, by_depth[depths[0]], rank)
+    if pool is not None and potion_jobs:
+        # Each potion judged at the deepest depth that finished in time for it and for the board without it.
+        found = {name: collect() for name, collect in potion_jobs.items()}
+        depth = 4 if 4 not in late and all(4 in f for f in found.values()) else 3
+        after = {name: f.get(depth) for name, f in found.items()}
+        potion, potion_reason = potion_choice(state, by_depth[depth], after, depth)
+    else:
+        potion, potion_reason, _ = potion_plan(state, by_depth[depths[0]])
     elapsed = time.perf_counter() - started
 
     print(f"VERSION {VERSION}")

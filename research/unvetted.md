@@ -1,8 +1,8 @@
 # What real logs haven't confirmed
 
 Changes to rules and scoring that real play hasn't shown working yet. `evaluator-v1` won day 1 with the Wanderer
-(`logs/run5_full`, fights 9 to 30), `evaluator-v2.0` day 2 (`logs/run8` and `logs/run8_part2`), and `evaluator-v2.5`
-day 1 with the Jujitsuka (`logs/run10`, killing the Shogun with 9 of 10 HP, 1 HP lost to bosses), and those stand:
+(`logs/run5_full`, fights 9 to 30), `evaluator-v2.0` day 2 (`logs/run8` and `logs/run8_part2`), `evaluator-v2.5`
+day 1 with the Jujitsuka, and `evaluator-v3.0` (v2.27) day 3 with the Shadow (`logs/run15`, two hits in fights) (`logs/run10`, killing the Shogun with 9 of 10 HP, 1 HP lost to bosses), and those stand:
 later versions aren't held to winning them again. A win doesn't vet the items below either: each needs a log
 showing that change working. Passing tests
 and replaying old logs doesn't vet a change, because old logs can't show new behavior. An item leaves this list

@@ -2,14 +2,16 @@
 
 Every evaluator version, newest first: what it changed and why. Each is tagged `evaluator-<version>`, and its commit
 message has the details and the replay numbers. `evaluator-v1` is the version that won day 1 with the Wanderer, and
-`evaluator-v2.0` the one that finished day 2 with it, killing the Shogun. `evaluator-v2.5` won day 1 with the
+`evaluator-v2.0` the one that finished day 2 with it, killing the Shogun, and `evaluator-v3.0` the one that won
+day 3 with the Shadow, searching four turns ahead. `evaluator-v2.5` won day 1 with the
 Jujitsuka, a weaker hero to start, in `logs/run10`. Each item is unvetted until real play
 confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
-## v2.28 — combo skills simulated; no full-bag potions (2026-11-09)
+## v3.1 — combo skills simulated; no full-bag potions (2026-11-09)
+Tagged `evaluator-v2.28` first, then renamed when v2.27 became v3.0.
 - **Rule: Combo Recharge** is simulated: each combo kill while one of the hero's tiles fires gives that tile 4 a
   level back once it's done, capped at full (`ComboRechargeSkill.OnComboKill`,
   `Tile.PostExecutionCooldownRechargeSequence`).
@@ -21,6 +23,11 @@ Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulatio
   the ground pays a coin, and in `run15` a Freeze Time drunk that way in fight 9 was missing in fight 12.
 - `logs/run15`, the Shadow's day 3: two hits in fights. Predictions now 859 of 879 turns exact (830 on v2.27), the
   rest almost all enemies arriving. Replay: 8 of 1,009 core choices change, kills even, no HP lost.
+
+## v3.0 — won day 3 with the Shadow (2026-11-09)
+`evaluator-v3.0` is v2.27, unchanged, renamed by the player: it won day 3 with the Shadow in `logs/run15` with two
+hits taken in fights, the first full run on F4, the search ahead with the ported enemy AI (v2.16 to v2.27). Below
+are the versions that made it.
 
 ## v2.27 — potions judged over four turns (2026-11-09)
 - **Potions, as the player set:** with the solver server, each potion held gets its own F3 and F4 search of the

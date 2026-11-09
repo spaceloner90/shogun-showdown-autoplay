@@ -3301,8 +3301,20 @@ class ComboTest(unittest.TestCase):
         state.enemies.append(enemy(5, hp=5))
         state.chilling_combo = state.combo_curse = True
         _, outcome = step(state, Action("Attack"))
-        # Two combo kills, each with two enemies left to pick from, for each skill.
-        self.assertEqual(outcome_terms(outcome, False)["combos"], WEIGHTS["combo_skill"] * 4)
+        # Two combo kills, each with enemies left to pick from: each effect counts its worst case, more than nothing.
+        self.assertGreater(outcome_terms(outcome, False)["combos"], 0)
+
+    def test_a_random_effect_counts_its_least_valuable_target(self):
+        from evaluator import freeze_worth
+        state = self.triple()
+        state.enemies.append(enemy(6, hp=5))
+        state.enemies.append(enemy(5, hp=2))
+        state.chilling_combo = True
+        _, outcome = step(state, Action("Attack"))
+        # First combo kill: the 1 HP enemy, the 2 HP one and the 5 HP one could be frozen; the least is the 1 HP one.
+        # Second: the 2 HP one and the 5 HP one; the least, the 2 HP one.
+        least = freeze_worth(state, enemy(0, hp=1)) + freeze_worth(state, enemy(0, hp=2))
+        self.assertAlmostEqual(outcome.combo_random, least)
 
     def test_one_possible_target_is_simulated(self):
         state = self.triple()
@@ -3311,7 +3323,7 @@ class ComboTest(unittest.TestCase):
         after, outcome = step(state, Action("Attack"))
         # The first combo kill leaves two to pick from, random; the second leaves one, which gets both.
         last = after.enemies[0]
-        self.assertEqual((last.ice > 0, last.curse, outcome.combo_random), (True, True, 2))
+        self.assertEqual((last.ice > 0, last.curse, outcome.combo_random > 0), (True, True, True))
 
     def test_combo_recharge_refills_the_tile_making_the_kill(self):
         state = self.triple()

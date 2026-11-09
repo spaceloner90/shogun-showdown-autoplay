@@ -10,6 +10,13 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.2 — random combo effects at their worst case (2026-11-09)
+- **Scoring:** a Chilling Combo or Combo Curse effect with more than one enemy to pick from now counts what it's
+  worth on the least valuable of them, as the player chose, rather than a flat 10: a certain one is never worth less
+  than a random one, and the search won't plan around a lucky freeze. A freeze is worth 35 to 55 on a board, a curse
+  0 to 35, by what it makes of the hero's next hit. The freeze's worth is the ice value's own formula, shared.
+- Replay: 2 of 1,009 core choices change, no kills or HP lost.
+
 ## v3.1 — combo skills simulated; no full-bag potions (2026-11-09)
 Tagged `evaluator-v2.28` first, then renamed when v2.27 became v3.0.
 - **Rule: Combo Recharge** is simulated: each combo kill while one of the hero's tiles fires gives that tile 4 a

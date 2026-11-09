@@ -260,7 +260,7 @@ class Outcome:
     reloads: int = 0  # Crossbows reloaded.
     reloaded: int = 0  # Damage those reloads restored.
     combo_kills: int = 0  # Kills after the first in the turn, by anyone.
-    combo_random: int = 0  # Combo Curse and Chilling Combo effects on a random enemy, not simulated.
+    combo_random: float = 0.0  # Worth of Combo Curse and Chilling Combo effects on a random enemy, not simulated.
     healed: int = 0  # HP the hero gained, from Triple Combo Heal.
     unmodeled: list[str] = field(default_factory=list)
 
@@ -1170,6 +1170,8 @@ def combo_kill(state, outcome):
         state.tile_recharge += state.combo_recharge
     # Chilling Combo and Combo Curse pick a random enemy, so they're simulated only when exactly one can be picked
     # (ChillingComboSkill: alive with at most 1 ice; ComboCurseSkill: alive and not cursed). Otherwise counted.
+    # With more than one to pick from, the effect isn't simulated; it counts what it's worth on the least valuable
+    # enemy it could land on, as the player chose, so a random one never beats a certain one.
     if state.chilling_combo:
         able = [e for e in state.enemies if e.alive and e.ice <= 1]
         if len(able) == 1:
@@ -1177,13 +1179,15 @@ def combo_kill(state, outcome):
                 able[0].ice = ICE_TURNS
                 able[0].action = "Wait"
         elif able:
-            outcome.combo_random += 1
+            import evaluator
+            outcome.combo_random += min(evaluator.freeze_worth(state, e) for e in able)
     if state.combo_curse:
         able = [e for e in state.enemies if e.alive and not e.curse]
         if len(able) == 1:
             able[0].curse = True
         elif able:
-            outcome.combo_random += 1
+            import evaluator
+            outcome.combo_random += min(evaluator.curse_worth(state, e) for e in able)
 
 
 def deal_damage(state, attacker, target, value, outcome, collision=False):

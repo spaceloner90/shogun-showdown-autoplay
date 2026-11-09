@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v3.1"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v3.2"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -122,9 +122,6 @@ WEIGHTS = {
     # guesses: the Crossbow hits any 2 across its whole range, so it lines up a double far more often than the
     # Spear, which needs them on the 2 cells ahead.
     "pierce": {"Crossbow": 1.5, "Spear": 1.25},
-    # Per Combo Curse or Chilling Combo effect on a random enemy, which isn't simulated (with one possible target it
-    # is). A little, as the player asked, so the search sets up combos where it costs nothing else.
-    "combo_skill": 10.0,
     "escape_in_hand": 2 / 3,  # A tile in hand rather than loaded. Loading adds only a little, so it doesn't beat
                               # a high damage tile to the queue, since any attack would spend it.
     "escape_no_target": 1 / 3,  # One that acts on a target, with nobody it can act on.
@@ -331,6 +328,22 @@ def _stack_value(state, kept_now):
 def _hit_value(enemy, damage):
     value = min(damage, enemy.hp) * WEIGHTS["enemy_damage"]
     return value + WEIGHTS["kill"] if damage >= enemy.hp else value
+
+
+def freeze_worth(state, enemy):
+    """What freezing this enemy now would add on the board: its ice value for a fresh freeze (see _ice_value)."""
+    if not enemy.freezable or is_tank(state, enemy):
+        return 0.0
+    return _frozen_worth(enemy)
+
+
+def curse_worth(state, enemy):
+    """What cursing this enemy now would add on the board (see _curse_value)."""
+    before = _curse_value(state)
+    enemy.curse = True
+    after = _curse_value(state)
+    enemy.curse = False
+    return after - before
 
 
 def _curse_value(state):
@@ -678,9 +691,13 @@ def _ice_value(state):
     for enemy in state.enemies:
         if not enemy.alive or enemy.ice <= 0 or is_tank(state, enemy):
             continue
-        kill = WEIGHTS["kill"] + WEIGHTS["enemy_damage"] * enemy.hp
-        total += WEIGHTS["ice_vs_kill"] * kill * min(1.0, enemy.ice / (ICE_TURNS - 1))
+        total += _frozen_worth(enemy) * min(1.0, enemy.ice / (ICE_TURNS - 1))
     return total
+
+
+def _frozen_worth(enemy):
+    """A fresh freeze's worth: a share of killing the enemy."""
+    return WEIGHTS["ice_vs_kill"] * (WEIGHTS["kill"] + WEIGHTS["enemy_damage"] * enemy.hp)
 
 
 def _wound_value(state):
@@ -754,7 +771,7 @@ def outcome_terms(outcome: Outcome, hero_dead: bool, cheapest_hit: int = 1, comb
         "reload": _reload_value(outcome),
         # HP gained is worth what HP lost costs, by Triple Combo Heal.
         "healed": -WEIGHTS["hp_lost"] * outcome.healed,
-        "combos": WEIGHTS["combo_skill"] * outcome.combo_random,
+        "combos": outcome.combo_random,
     }
 
 

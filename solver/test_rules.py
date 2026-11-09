@@ -3493,5 +3493,30 @@ class HookbladePerfectStrikeTest(unittest.TestCase):
         self.assertEqual(self.charge_after(1, 3), 0)
 
 
+class KunaiTest(unittest.TestCase):
+    """KunaiAttack in the game's code: its value in knives, each a hit of 1 on the first agent ahead."""
+    KUNAI = Attack("Kunai", 2, list(range(1, 11)), first_target=True)
+
+    def test_each_knife_hits_for_one(self):
+        after, outcome = fire(make_state(enemies=[enemy(4, hp=3)]), self.KUNAI)
+        self.assertEqual((after.enemies[0].hp, outcome.enemy_damage), (1, 2))
+
+    def test_a_shield_stops_only_one_knife(self):
+        foe = enemy(4, hp=3)
+        foe.shield = True
+        after, _ = fire(make_state(enemies=[foe]), self.KUNAI)
+        self.assertEqual((after.enemies[0].hp, after.enemies[0].shield), (2, False))
+
+    def test_a_kill_sends_the_rest_on_behind(self):
+        after, _ = fire(make_state(enemies=[enemy(3, hp=1), enemy(4, hp=3)]), self.KUNAI)
+        self.assertEqual([e.hp for e in after.enemies if e.alive], [2])
+
+    def test_each_knife_gets_the_bonus(self):
+        state = make_state(enemies=[enemy(3, hp=5)])
+        state.close_bonus = 1
+        after, _ = fire(state, self.KUNAI)
+        self.assertEqual(after.enemies[0].hp, 1)
+
+
 if __name__ == "__main__":
     unittest.main()

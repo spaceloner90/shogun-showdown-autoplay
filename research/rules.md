@@ -200,6 +200,9 @@ Later bosses in that log, with the rules read from the game's code (simulated as
 - **Close Combat** (the skill, `CloseCombatSkill`): its level added to each of the hero's hits on an enemy right
   beside it, if that tile didn't move the hero (`Agent.ExecuteTile` records the cell as each tile begins). Not on
   collisions. Simulated as of v2.22.
+- **Kunai** (`KunaiAttack`, 2 to start, cooldown 7): throws as many knives as its value, each a separate hit of 1,
+  with the tile's effect, on the first agent ahead at any range. So shields, curses and the hero's damage bonuses
+  apply knife by knife. Simulated as of v3.5.
 - **Chikara Crush** (`ChikaraCrushSkill`): its level is added to every push collision an enemy takes, from anyone's
   push. The game's collision hits are only the two a push makes when something stops it (`Agent.Pushed`); traps,
   bombs and shockwaves aren't collisions. Simulated as of v3.4.

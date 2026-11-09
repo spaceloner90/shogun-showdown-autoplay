@@ -10,6 +10,12 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.5 — Kunai (2026-11-09)
+- **Rule: Kunai** throws as many knives as its value, each a hit of 1 with the tile's effect on the first agent
+  ahead at any range (`KunaiAttack`). A shield stops one knife, a curse doubles one, and each gets the hero's bonuses.
+  The game aims each 0.25 s apart; the simulation lets each land before the next is aimed.
+- Replay: no past log has it, so no core choice changes.
+
 ## v3.4 — Daisuke's AI; Chikara Crush (2026-11-09)
 - **Rule: Daisuke's AI is ported** (`DaisukeBoss.AIPickAction`): he turns to face the hero first, steps back after
   attacking, waits a turn after playing a tile unless corrupted, plays the Katana after a lone Charge, and attacks

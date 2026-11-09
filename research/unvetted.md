@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.5: Kunai
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Kunai: value in 1-damage knives at the first agent ahead | Rule | Read from the code; tests | A knife after a kill hitting the one behind, as simulated, rather than the dead one (the game aims each as thrown, before the last lands at range) |
+
 ## New in v3.4: Daisuke's AI; Chikara Crush
 
 | Item | Kind | What's already confirmed | What to look for |

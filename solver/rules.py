@@ -19,7 +19,7 @@ ONE_ENEMY_WAVE_CAP = 6
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
 MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb", "Barricade", "BladeOfPatience", "Bomb",
            "BossSwap", "Charge", "Crossbow",
-           "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Hookblade", "Katana", "Lightning", "Maku", "MeteorHammer", "Mirror", "OriginOfSymmetry", "Shield",
+           "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Hookblade", "Katana", "Kunai", "Lightning", "Maku", "MeteorHammer", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Sai", "ScarStrike", "SmokeBomb", "Spear", "Summon", "SwapToss",
            "Swirl", "Tetsubo", "Trap", "TurnAround", "TwinTessen", "Volley"}
 
@@ -1002,6 +1002,9 @@ def _apply_attack(state, attacker, attack, outcome):
     if attack.name == "Hookblade":
         hookblade(state, attacker, attack, outcome)
         return
+    if attack.name == "Kunai":
+        kunai(state, attacker, attack, outcome)
+        return
     hits = attack_hits(state, attacker, attack)
     # An attack that moved or turned the hero still did something, even if it hit nothing, and so does a reload.
     reload = attack.name == "Crossbow" and attack.value == 0
@@ -1055,6 +1058,23 @@ def hookblade(state, attacker, attack, outcome):
         if not targets_of(state, attacker, attack):
             return
         value -= 1
+
+
+def kunai(state, attacker, attack, outcome):
+    """The Kunai throws as many knives as its value, each a hit of 1 on the first agent ahead at any range, with the
+    tile's effect (KunaiAttack.PerformAttack, ThrowKunai). So a shield stops one knife, a curse doubles one, and each
+    knife gets the hero's bonuses. Each is aimed as it's thrown, 0.25 s apart; simulated as if each landed before the
+    next is aimed, so a knife that kills sends the rest on to whoever is behind."""
+    landed = False
+    for _ in range(attack.value):
+        targets = targets_of(state, attacker, attack)[:1]
+        if not targets:
+            break
+        landed = True
+        land_hit(state, attacker, targets[0], 1, outcome)
+        hit_effect(state, attacker, targets[0], attack.effect, outcome)
+    if not landed and attacker is state.hero:
+        outcome.wasted_attacks += 1
 
 
 def hit_effect(state, attacker, target, effect, outcome):

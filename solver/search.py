@@ -161,10 +161,12 @@ def line_for(state, action, depth, search):
     else:
         later, later_sooner, rest = search.value(following, depth - 1)
     # Ties go to the line whose events come sooner, not to the position left after this turn, as F1 does: that kept
-    # tiles loaded and put a kill off turn after turn.
+    # tiles loaded and put a kill off turn after turn. Only lines equal in that too go by that position: otherwise
+    # Wait, listed first, won them, with a tile left to load later in the line (logs/run17).
     return Line([action] + [a for a, _ in rest], score + factor * later,
                 [action.label(state)] + [label for _, label in rest],
-                {"this turn": score, "after": factor * later}, score + SOONER * later_sooner, wasted)
+                {"this turn": score, "after": factor * later}, score + SOONER * later_sooner, wasted,
+                _leaf(following))
 
 
 def _sorted(lines, state=None):
@@ -248,7 +250,7 @@ def _distinct(state, actions):
 def _as(line, state, action):
     """A line found for one action of a group, given to another of that group."""
     return Line([action] + line.actions[1:], line.score, [action.label(state)] + line.labels[1:], line.terms,
-                line.position_next_turn, line.wasted)
+                line.position_next_turn, line.wasted, line.position_after)
 
 
 def submit_lines(state, depths, pool, beam=BEAM, leaf_beam=LEAF_BEAM, deadlines=None):

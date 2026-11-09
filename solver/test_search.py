@@ -186,6 +186,20 @@ class TieTest(unittest.TestCase):
         best = search.rank_lines(state_from_log(row), 4)[0]
         self.assertTrue(best.labels[0].startswith("Attack"), best.labels)
 
+    def test_of_equal_lines_the_one_loading_now_wins(self):
+        # logs/run17: Wait, listed first, won exact ties with Back Shadow Dash ready, loading it later in the line.
+        # The player: loading now is never worse, and the next turn may show a play that wants it loaded.
+        import json
+        from pathlib import Path
+        from rules import state_from_log
+        rows = (Path(__file__).resolve().parent.parent / "research" / "logs" / "run17" / "state.jsonl").read_text(
+            encoding="utf-8").splitlines()
+        row = next(json.loads(r) for r in rows if '"seq":716,' in r)
+        lines = search.rank_lines(state_from_log(row), 4)
+        waits = next(l for l in lines if l.labels[0] == "Wait")
+        self.assertEqual(lines[0].labels[0], "PlayTile BackShadowDash")
+        self.assertEqual(round(lines[0].score, 2), round(waits.score, 2))
+
 
 class HiddenMemoryTest(unittest.TestCase):
     """Since mod 0.17.0 the log gives what some enemies' AI remembers, so their choices are known."""

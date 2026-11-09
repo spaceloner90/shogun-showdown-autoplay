@@ -273,6 +273,32 @@ class RulesTest(unittest.TestCase):
         after, outcome = self._fire_shadow_dash(1, [enemy(0, facing=1)])
         self.assertEqual((after.hero.cell, outcome.enemy_damage), (1, 0))
 
+    def _fire_back_shadow_dash(self, hero_cell, enemies):
+        # The game logs backward tiles with negative offsets, as BackCharge's [-1..-10].
+        back = Attack("BackShadowDash", 2, [-r for r in range(1, 11)], first_target=True)
+        state = make_state(hero_cell=hero_cell, facing=1, enemies=enemies)
+        state.tiles[0].attack = back
+        state.tiles[0].in_queue = True
+        state.queue_tiles = [state.tiles[0]]
+        state.hero.queue = [back]
+        return step(state, Action("Attack"))
+
+    def test_back_shadow_dash_passes_through_everyone_behind(self):
+        after, outcome = self._fire_back_shadow_dash(4, [enemy(3), enemy(2)])
+        self.assertEqual((after.hero.cell, after.hero.facing, outcome.enemy_damage), (1, 1, 4))
+
+    def test_back_shadow_dash_reaches_a_target_at_any_distance(self):
+        after, outcome = self._fire_back_shadow_dash(5, [enemy(2)])
+        self.assertEqual((after.hero.cell, outcome.enemy_damage), (1, 2))
+
+    def test_back_shadow_dash_ignores_whoever_is_in_front(self):
+        after, outcome = self._fire_back_shadow_dash(1, [enemy(3)])
+        self.assertEqual((after.hero.cell, outcome.enemy_damage), (1, 0))
+
+    def test_back_shadow_dash_fails_with_no_free_cell_behind_the_target(self):
+        after, outcome = self._fire_back_shadow_dash(3, [enemy(0)])
+        self.assertEqual((after.hero.cell, outcome.enemy_damage, outcome.wasted_attacks), (3, 0, 1))
+
     def test_two_tiles_of_a_name_are_told_apart(self):
         weak = Attack("Swirl", 2, [-1, 1])
         strong = Attack("Swirl", 3, [-1, 1])

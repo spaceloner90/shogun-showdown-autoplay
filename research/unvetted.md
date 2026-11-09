@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.10: equal lines go to the one doing more now
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Of lines equal in score and timing, the one with the best position after this turn wins | Search | The player's rule; `run17`: 14 of 23 waits now load or move instead | Tiles loaded on the first free turn; no kill put off for it |
+
 ## New in v3.9: waves end lines only in a cleared room
 
 | Item | Kind | What's already confirmed | What to look for |

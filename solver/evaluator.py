@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v3.9"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v3.10"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -174,10 +174,14 @@ class Line:
     # Whether the first action fires a tile that does nothing. Sending it back instead is a free queue edit that
     # leaves the board the same and the tile ready, so such a line is never the better one, and it's left out.
     wasted: bool = False
+    # F2+ only, the last tie-break: the position right after the first action, as F1 sees it. position_next_turn
+    # there is when the line's events come. Of lines equal in both, the one doing more now wins: a tile loaded now
+    # rather than later in the line is ready for whatever the next turn shows that the search couldn't.
+    position_after: float = 0.0
 
     @property
     def sort_key(self):
-        return round(self.score, 2), self.position_next_turn
+        return round(self.score, 2), round(self.position_next_turn, 6), round(self.position_after, 6)
 
 
 def _light_copy(state):

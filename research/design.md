@@ -205,7 +205,9 @@ F2 to F4 play the hero's next turns out against the enemy AI (`solver/search.py`
   did on 80% of those turns in the logs.
 - **Ties:** of two lines that score the same, the one whose events come sooner wins (events counted 0.9 per turn
   later, for the tie only). Breaking ties on the position after this turn, as F1 does, kept tiles loaded and put
-  kills off indefinitely, since known turns aren't discounted.
+  kills off indefinitely, since known turns aren't discounted. Lines equal in that too go by the position after
+  this turn (since v3.10): otherwise Wait, listed first, won them, loading a ready tile only later in the line,
+  where the next turn might show a play that wanted it loaded.
 - **The win:** ending the fight at no HP cost beats anything only on the turn being chosen, as in F1. Counting it
   later in a line too made every line ending in a win tie, and the search kept putting the win off.
 - **Speed:** every action this turn is searched, but deeper turns follow only the 4 best by a cheap score (the

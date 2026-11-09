@@ -10,6 +10,13 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.10 — equal lines go to the one doing more now (2026-11-09)
+- **Search: the last tie-break is the position after this turn, as F1 sees it**, after the existing one (events
+  sooner). Exact ties otherwise went to Wait, the first move listed: in `run17` F4 waited on an empty queue 23
+  times with a tile ready; 14 of those boards now load or move first, and the rest hold only the Mirror, which is
+  never loaded ahead, or lost the load-now line to the beam. Loading now is never worse, and the next turn may show a play that wants it
+  loaded. A kill now still beats loading, since timing comes first.
+
 ## v3.9 — waves end lines only in a cleared room (2026-11-09)
 - **Search: only a wave into a cleared room ends a line.** One landing among enemies still there plays on at 0.85
   again, as before v3.6: what they do next is known, and ending there hid their next attacks.

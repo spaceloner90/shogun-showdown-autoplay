@@ -200,6 +200,11 @@ Later bosses in that log, with the rules read from the game's code (simulated as
 - **Close Combat** (the skill, `CloseCombatSkill`): its level added to each of the hero's hits on an enemy right
   beside it, if that tile didn't move the hero (`Agent.ExecuteTile` records the cell as each tile begins). Not on
   collisions. Simulated as of v2.22.
+- **Waves** (`WaveRoom.ProcessTurn`): the countdown ticks every turn, capped at 6 with one enemy left. The next wave
+  comes when it runs out, unless the room would be too crowded for it (more than half the cells, rounded up, with
+  the wave's enemies), and then as soon as it isn't. A cleared room brings it at the end of that turn, whatever the
+  countdown. Each wave's enemies are fixed in advance (`Wave.enemiesToSpawn`), not logged; their cells are a weighted
+  random pick. Simulated as of v3.6, except who comes.
 - **Kunai** (`KunaiAttack`, 2 to start, cooldown 7): throws as many knives as its value, each a separate hit of 1,
   with the tile's effect, on the first agent ahead at any range. So shields, curses and the hero's damage bonuses
   apply knife by knife. Simulated as of v3.5.

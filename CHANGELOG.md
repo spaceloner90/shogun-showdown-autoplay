@@ -10,6 +10,16 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.6 — lines end at the wave (2026-11-09)
+- **Rule: a cleared room brings the next wave at once**, whatever the countdown, and a wave whose countdown runs out
+  waits while the room is too crowded for it (`WaveRoom.ProcessTurn`). The countdown itself was already exact.
+- **Search: a line ends where its wave arrives**, scored by the board it lands on, as the player chose, instead of
+  playing on at 0.85 a turn. Who comes isn't simulated, so playing on scored a board missing them: in `run16` turn
+  12, F4 spent the Mirror on a kill that cleared the room (it would be back by the line's end), and the wave came at
+  once with the hero flanked. Now it keeps it. The rule alone, with the 0.85, made F4 put the kill off instead.
+- Not yet checked on the 551-start fight simulation: stopped, since it starved the live solver of CPU. To run while
+  the game isn't being played.
+
 ## v3.5 — Kunai (2026-11-09)
 - **Rule: Kunai** throws as many knives as its value, each a hit of 1 with the tile's effect on the first agent
   ahead at any range (`KunaiAttack`). A shield stops one knife, a curse doubles one, and each gets the hero's bonuses.

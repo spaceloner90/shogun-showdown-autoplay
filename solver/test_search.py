@@ -114,6 +114,21 @@ class SearchTest(unittest.TestCase):
         self.assertEqual(lost, 0, line.labels)
 
 
+class WaveEndTest(unittest.TestCase):
+    """A line ends where the next wave arrives, scored on the board it lands on."""
+
+    def test_a_kill_that_brings_the_wave_ends_the_line(self):
+        state = make_state(enemies=[enemy(3, hp=2)], queue=["Swirl"])
+        state.turns_until_wave = 9
+        line = next(l for l in search.rank_lines(state, 4) if l.actions[0].kind == "Attack")
+        self.assertEqual(len(line.actions), 1)
+
+    def test_no_discount_on_the_turn_before_it(self):
+        state = make_state(enemies=[enemy(4)])
+        state.turns_until_wave = 1
+        self.assertEqual(search._factor(state), 1.0)
+
+
 class TieTest(unittest.TestCase):
     def test_a_kill_now_beats_the_same_kill_next_turn(self):
         # logs/run14, fight 7 turn 20: firing now killed three, and waiting a turn to fire scored the same.

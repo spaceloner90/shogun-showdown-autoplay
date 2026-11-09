@@ -173,6 +173,11 @@ class State:
     swap_charge: int  # The charge and cooldown of the hero's special move, whichever that is.
     swap_cooldown: int
     turns_until_wave: int | None = None
+    # A wave whose countdown has run out still waits while the room is too crowded for it
+    # (WaveRoom.NextWaveWouldBeTooCrowded). The log says whether that's so, not the next wave's size, so it's taken
+    # as held while at least this many enemies are left, the number when logged, and free once fewer are: the sooner.
+    wave_held_at: int | None = None
+    wave_landed: bool = False  # Whether the next wave arrived at the end of the turn just played.
     last_wave: bool = False
     swap_damage: int = 0  # What a swap deals to the enemy passed through, from Damaging Move.
     friendly_bonus: int = 0  # Extra damage when enemies hit each other, from Unfriendly Fire.
@@ -410,6 +415,7 @@ def state_from_log(row):
         swap_cooldown=special.get("cooldown", 4),
         turns_until_wave=wave["turnsUntilNext"] if wave else None,
         last_wave=wave["isLast"] if wave else False,
+        wave_held_at=len(row.get("enemies") or []) if wave and wave.get("nextBlockedByCrowding") else None,
         swap_damage=next((s["level"] for s in row.get("skills") or []
                           if isinstance(s, dict) and s.get("name") == "DamagingMove"), 0),
         friendly_bonus=next((s["level"] for s in row.get("skills") or []
@@ -1502,10 +1508,21 @@ def end_turn(state, swapped):
     if not swapped and state.swap_charge < state.swap_cooldown:
         state.swap_charge += 1
     state.enemies = sorted((e for e in state.enemies if e.alive), key=lambda e: e.cell)
+    # The wave room's turn (WaveRoom.ProcessTurn): with one enemy left the countdown is capped, and it ticks every
+    # turn. The next wave comes when it runs out, unless the room is too crowded for it, and then as soon as it isn't;
+    # a cleared room brings it at once, whatever the countdown. Who comes isn't simulated, only that they do.
+    state.wave_landed = False
     if state.turns_until_wave is not None:
         if len(state.enemies) == 1:
             state.turns_until_wave = min(state.turns_until_wave, ONE_ENEMY_WAVE_CAP)
         state.turns_until_wave -= 1
+        was_held = state.wave_held_at is not None
+        held = was_held and len(state.enemies) >= state.wave_held_at
+        if not held:
+            state.wave_held_at = None
+        if not state.last_wave and (not state.enemies or (
+                state.turns_until_wave <= 0 and not held and (state.turns_until_wave == 0 or was_held))):
+            state.wave_landed = True
     for enemy in state.enemies:
         enemy.moved = False
         enemy.ice = max(0, enemy.ice - 1)

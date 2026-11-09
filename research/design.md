@@ -187,8 +187,13 @@ F2 to F4 play the hero's next turns out against the enemy AI (`solver/search.py`
 
 - **What a line scores:** each turn's events, as F1 counts them, plus the position it ends in, scored as F1 scores
   one, with the stack and the threat no answer removes. A turn whose enemy actions are all known counts in full, as
-  the player asked; a turn with a wave about to arrive counts at F1's future discount (0.85), and one with a guessed
-  enemy action (a boss, an enemy whose choice the board doesn't show, an unidentified tile) at 0.5, from there on.
+  the player asked, and one with a guessed enemy action (a boss, an enemy whose choice the board doesn't show, an
+  unidentified tile) at 0.5, from there on.
+- **Waves end a line** (v3.6): where the next wave arrives, the line stops and is scored by the board it lands on.
+  Who comes isn't simulated, so playing on scored a board missing them, where a tile spent would be back before the
+  line's end and look free: in `run16` F4 spent the Mirror on a kill that cleared the room, and the wave came at
+  once. The game brings it when its countdown runs out, unless the room is too crowded for it, and at once when the
+  room is cleared. This replaced counting turns after a wave at 0.85.
   An enemy whose AI isn't known is guessed to attack whenever what it holds would hit the hero, as such enemies
   did on 80% of those turns in the logs.
 - **Ties:** of two lines that score the same, the one whose events come sooner wins (events counted 0.9 per turn

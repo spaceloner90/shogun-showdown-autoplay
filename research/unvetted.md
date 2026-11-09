@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.6: lines end at the wave
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| A cleared room brings the next wave at once; a crowded room holds it | Rule | Read from the code; countdown predictions still exact on `run14` to `run16` | Waves arriving when predicted |
+| **A line ends where its wave arrives, replacing 0.85 for turns after** | **Search** | **The player's call; `run16` turn 12 keeps the Mirror** | **Escape tiles kept for the wave; kills taken, not put off; a last enemy left alive only while it can't hurt** |
+
 ## New in v3.5: Kunai
 
 | Item | Kind | What's already confirmed | What to look for |

@@ -45,9 +45,8 @@ def certain(state):
 
 
 def _factor(state):
-    if not _actions_known(state):
-        return UNKNOWN_ACTION
-    return WEIGHTS["future_discount"] if _wave_coming(state) else 1.0
+    """A turn whose enemy actions are guessed counts for less. A wave's arrival isn't discounted: the line ends there."""
+    return 1.0 if _actions_known(state) else UNKNOWN_ACTION
 
 
 def state_key(state):
@@ -58,7 +57,7 @@ def state_key(state):
         hero.cell, hero.facing, hero.hp, hero.shield, hero.curse, hero.poison, hero.ice,
         tuple((t.attack.name, t.attack.value, t.charge, t.in_queue, t.just_played) for t in state.tiles),
         tuple(index[id(t)] for t in state.queue_tiles),
-        state.swap_charge, state.turns_until_wave, tuple(state.potions),
+        state.swap_charge, state.turns_until_wave, state.wave_held_at, tuple(state.potions),
         tuple(state.lit_cells) if state.lit_cells is not None else None, state.nobunaga_hp_last_turn,
         repr(state.traps), repr(state.hazards),
         tuple((e.kind, e.cell, e.facing, e.hp, e.max_hp, e.shield, e.curse, e.poison, e.ice, e.action, e.known,
@@ -70,7 +69,11 @@ def state_key(state):
 def _turn(state, action, now=False):
     """One turn: the next board, what it scored, and whether the line ends there or wastes a tile. As in F1, ending
     the fight at no HP cost beats anything only on the turn being chosen (`now`): a win later in a line counts for
-    its kills, or every line ending in one would tie, and the search would keep putting it off."""
+    its kills, or every line ending in one would tie, and the search would keep putting it off.
+
+    A line also ends where the next wave arrives, scored by the board it lands on: who comes isn't simulated, so
+    playing on would score a board missing them, where a tile spent would be back before the end of the line and
+    look free."""
     following, outcome = step(state, action)
     dead = not following.hero.alive
     score = sum(outcome_terms(outcome, dead, _cheapest_hit(state), state.combo_skills).values())
@@ -78,7 +81,7 @@ def _turn(state, action, now=False):
     if now and won and outcome.hp_lost == 0:
         score += WEIGHTS["win"]
     wasted = action.kind == "Attack" and outcome.wasted_attacks > 0
-    return following, score, dead or won, wasted
+    return following, score, dead or won or following.wave_landed, wasted
 
 
 def _leaf(state):

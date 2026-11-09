@@ -3518,5 +3518,42 @@ class KunaiTest(unittest.TestCase):
         self.assertEqual(after.enemies[0].hp, 1)
 
 
+class WaveArrivalTest(unittest.TestCase):
+    """WaveRoom.ProcessTurn in the game's code: when the next wave comes."""
+
+    def landed(self, enemies, countdown, held_at=None, last=False):
+        state = make_state(enemies=enemies)
+        state.turns_until_wave, state.wave_held_at, state.last_wave = countdown, held_at, last
+        after, _ = step(state, Action("Wait"))
+        return after.wave_landed
+
+    def test_when_the_countdown_runs_out(self):
+        self.assertTrue(self.landed([enemy(4), enemy(0, facing=1)], 1))
+        self.assertFalse(self.landed([enemy(4), enemy(0, facing=1)], 2))
+
+    def test_a_cleared_room_brings_it_at_once(self):
+        state = make_state(enemies=[enemy(3, hp=2)], queue=["Swirl"])
+        state.turns_until_wave = 9
+        after, _ = step(state, Action("Attack"))
+        self.assertTrue(after.wave_landed)
+
+    def test_not_after_the_last_wave(self):
+        state = make_state(enemies=[enemy(3, hp=2)], queue=["Swirl"])
+        state.turns_until_wave, state.last_wave = 9, True
+        after, _ = step(state, Action("Attack"))
+        self.assertFalse(after.wave_landed)
+
+    def test_a_crowded_room_holds_it_until_someone_dies(self):
+        self.assertFalse(self.landed([enemy(4), enemy(0, facing=1)], 1, held_at=2))
+        state = make_state(enemies=[enemy(3, hp=2), enemy(6)], queue=["Swirl"])
+        state.cells = 7
+        state.turns_until_wave, state.wave_held_at = -2, 2
+        after, _ = step(state, Action("Attack"))
+        self.assertTrue(after.wave_landed)
+
+    def test_only_on_the_turn_it_comes(self):
+        self.assertFalse(self.landed([enemy(4), enemy(0, facing=1)], -1))
+
+
 if __name__ == "__main__":
     unittest.main()

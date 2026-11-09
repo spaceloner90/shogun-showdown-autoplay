@@ -200,6 +200,16 @@ Later bosses in that log, with the rules read from the game's code (simulated as
 - **Close Combat** (the skill, `CloseCombatSkill`): its level added to each of the hero's hits on an enemy right
   beside it, if that tile didn't move the hero (`Agent.ExecuteTile` records the cell as each tile begins). Not on
   collisions. Simulated as of v2.22.
+- **Swap Toss** (the Chain Master's special move, `SwapTossSpecialMove`): moving into an adjacent movable agent
+  makes it and whoever is on the hero's other side trade places, neither turning, so the one tossed behind faces
+  away from the hero. The hero stays put. Both cells beside the hero must exist, and the far one may be empty but
+  not Heavy. Only the way the hero faces unless Two Way Move. The special move's effect (Damaging Move, Mamushi
+  Move) lands on each agent moved. Simulated as of v3.3.
+- **Meteor Hammer** (`MeteorHammerAttack`, 2 damage, cooldown 5): strikes the first agent in its range ahead and,
+  only if there was one, ricochets onto whoever is right behind its user. Simulated as of v3.3.
+- **Hookblade** (`HookbladeAttack`, 2 damage, cooldown 5, range 1): strikes the agent in front. Each time that kills
+  it, other than a boss, the user steps into its cell and, with someone in front again, strikes once more for 1
+  less. The tile's damage is restored afterward. Simulated as of v3.3.
 - **Twin Tessen** (`TwinTessenAttack`): hits the agent on each side for its damage (1 to start, cooldown 6), then
   pushes each movable one it hit away from the hero, as far as it goes, dead or not, as Dragon Punch does: whoever
   stops one and it take 1 each. Simulated as of v2.19.
@@ -386,8 +396,8 @@ The Ronin, read from the code (simulated as of v1.2):
   put, and the target goes as far as it can, as with Dragon Punch. If someone stops it, they each take 1.
 - It needs a movable target and a cell behind that target, which someone may be standing on. So a target
   against the wall can't be shoved.
-- The other heroes' special moves (Phase, Swap Toss, Throw) aren't simulated. F1 won't use them, and the
-  report warns.
+- Every hero's special move is simulated now (Throw v2.1, Phase v2.7, Swap Toss v3.3); one the solver doesn't
+  know isn't offered, and the report warns.
 
 ## Not confirmed yet
 

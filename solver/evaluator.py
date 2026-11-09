@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v3.2"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v3.3"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -101,6 +101,8 @@ WEIGHTS = {
                                                     # first guess, the Shadow Dash's.
         "PushSpecialMove": 6.0,                     # Pushes an adjacent enemy away, without a tile. Not past it.
         # The Throw: the enemy behind over to the front and away, a shove from behind (tied to the shove below).
+        # The Swap Toss: the enemy in front over to the hero's other side, trading places with whoever's there, and
+        # facing away from the hero after it. Not past it, and not away. A first guess, tied to the Throw below.
         "Dash": 6.0,                                # Away to the last free cell, but only into open space.
         "DragonPunch": 4.0,                         # Pushes the target away, as a tile.
         "TwinTessen": 4.0,                          # Pushes both neighbours away, as a tile. A first guess, Dragon
@@ -151,6 +153,7 @@ WEIGHTS = {
 _ESCAPES = WEIGHTS["escape_values"]
 _ESCAPES["PhaseSpecialMove"] = _ESCAPES["SwapSpecialMove"]
 _ESCAPES["ThrowSpecialMove"] = _ESCAPES["PushSpecialMove"]
+_ESCAPES["SwapTossSpecialMove"] = _ESCAPES["ThrowSpecialMove"]
 for _name in ("SmokeBomb", "ShadowDash", "Charge"):
     _ESCAPES["Back" + _name] = _ESCAPES[_name]
 

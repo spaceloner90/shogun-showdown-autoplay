@@ -10,6 +10,15 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.3 — the Chain Master (2026-11-09)
+- **Rule: Swap Toss**, the Chain Master's special move, is simulated: the agents on either side of the hero trade
+  places, neither turning, and the special move's effect lands on each (`SwapTossSpecialMove`). Its escape value is
+  tied to the Throw's, a first guess.
+- **Rule: Meteor Hammer** strikes the first agent in range ahead and, only then, whoever is right behind its user.
+- **Rule: Hookblade** steps into each enemy it kills and strikes the next one in front for 1 less, while each hit
+  kills (`HookbladeAttack`). It counts as a move attack for Dynamic Boost when it moves the hero.
+- Replay: no past log has these, so no core choice changes.
+
 ## v3.2 — random combo effects at their worst case (2026-11-09)
 - **Scoring:** a Chilling Combo or Combo Curse effect with more than one enemy to pick from now counts what it's
   worth on the least valuable of them, as the player chose, rather than a flat 10: a certain one is never worth less

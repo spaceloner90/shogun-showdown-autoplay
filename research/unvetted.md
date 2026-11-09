@@ -42,6 +42,14 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.3: the Chain Master
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| Swap Toss, Meteor Hammer's ricochet, Hookblade's chain | Rule | Read from the code; tests | Predictions exact on turns using them |
+| Swap Toss escape value tied to the Throw's (6) | Scoring | A first guess | It gets used to turn an attacker away, and isn't hoarded or wasted |
+| Meteor Hammer at its stated damage, with no extra for the ricochet | Scoring | Like any tile; the second hit needs an enemy behind, a poor spot anyway | Whether it should get a pierce-like premium |
+
 ## New in v2.28: combo skills; no full-bag potions
 
 | Item | Kind | What's already confirmed | What to look for |

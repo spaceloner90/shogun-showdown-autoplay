@@ -3356,5 +3356,100 @@ class MonomancerTest(unittest.TestCase):
         self.assertEqual(state_from_log(row).potion_slots, 5)
 
 
+def chain_master(hero_cell=3, facing=1, enemies=(), swap_charge=4):
+    state = make_state(hero_cell=hero_cell, facing=facing, enemies=enemies, swap_charge=swap_charge)
+    state.cells = 7
+    state.hero.kind = "ChainMaster"
+    state.special = "SwapTossSpecialMove"
+    return state
+
+
+class SwapTossSpecialMoveTest(unittest.TestCase):
+    """SwapTossSpecialMove in the game's code: the agents on either side of the hero trade places, the hero staying."""
+
+    def test_the_enemy_in_front_goes_behind_facing_away(self):
+        after, _ = step(chain_master(enemies=[enemy(4)]), Action("MoveRight"))
+        self.assertEqual((after.hero.cell, after.enemies[0].cell, after.enemies[0].facing, after.swap_charge),
+                         (3, 2, -1, 0))
+
+    def test_both_sides_trade_places(self):
+        after, _ = step(chain_master(enemies=[enemy(4, hp=1), enemy(2, facing=1, hp=2)]), Action("MoveRight"))
+        self.assertEqual(sorted((e.cell, e.hp) for e in after.enemies), [(2, 1), (4, 2)])
+
+    def test_damaging_move_hits_each_one_moved(self):
+        state = chain_master(enemies=[enemy(4), enemy(2, facing=1)])
+        state.swap_damage = 1
+        after, outcome = step(state, Action("MoveRight"))
+        self.assertEqual(outcome.enemy_damage, 2)
+
+    def test_needs_both_cells_beside_the_hero(self):
+        self.assertFalse(can_use_special(chain_master(hero_cell=0, enemies=[enemy(1)]), 1))
+
+    def test_a_heavy_one_on_either_side_stops_it(self):
+        heavy = enemy(2, facing=1)
+        heavy.movable = False
+        self.assertFalse(can_use_special(chain_master(enemies=[enemy(4), heavy]), 1))
+        self.assertTrue(can_use_special(chain_master(enemies=[enemy(4)]), 1))
+
+    def test_only_the_way_the_hero_faces_without_two_way_move(self):
+        state = chain_master(enemies=[enemy(2, facing=1)])
+        self.assertFalse(can_use_special(state, -1))
+        state.two_way_swap = True
+        self.assertTrue(can_use_special(state, -1))
+
+    def test_the_label_says_swap_toss(self):
+        self.assertEqual(Action("MoveRight").label(chain_master(enemies=[enemy(4)])), "MoveRight (swap toss)")
+
+
+class MeteorHammerTest(unittest.TestCase):
+    """MeteorHammerAttack in the game's code: the first agent in range ahead, then, only if there was one, whoever is
+    right behind the attacker."""
+    HAMMER = Attack("MeteorHammer", 2, [1, 2, 3], first_target=True)
+
+    def test_it_ricochets_onto_the_one_behind(self):
+        after, outcome = fire(make_state(enemies=[enemy(4), enemy(1, facing=1)]), self.HAMMER)
+        self.assertEqual(sorted((e.cell, e.hp) for e in after.enemies), [(1, 1), (4, 1)])
+        self.assertEqual(outcome.enemy_damage, 4)
+
+    def test_no_ricochet_with_nobody_in_front(self):
+        after, outcome = fire(make_state(enemies=[enemy(1, facing=1)]), self.HAMMER)
+        self.assertEqual((after.enemies[0].hp, outcome.wasted_attacks), (3, 1))
+
+    def test_only_the_first_ahead(self):
+        after, _ = fire(make_state(enemies=[enemy(3), enemy(4)]), self.HAMMER)
+        self.assertEqual(sorted(e.hp for e in after.enemies), [1, 3])
+
+
+class HookbladeTest(unittest.TestCase):
+    """HookbladeAttack in the game's code: on each kill the attacker steps into the cell and strikes again for 1 less,
+    while someone is in front."""
+    HOOK = Attack("Hookblade", 2, [1], first_target=True)
+
+    def test_a_kill_steps_in_and_strikes_the_next_for_less(self):
+        state = make_state(hero_cell=1, enemies=[enemy(2, hp=2), enemy(3, hp=3)])
+        after, outcome = fire(state, self.HOOK)
+        self.assertEqual((after.hero.cell, [e.hp for e in after.enemies if e.alive]), (2, [2]))
+        self.assertEqual(outcome.kills, 1)
+
+    def test_it_chains_while_each_hit_kills(self):
+        state = make_state(hero_cell=0, enemies=[enemy(1, hp=2), enemy(2, hp=1), enemy(3, hp=3)])
+        after, _ = fire(state, self.HOOK)
+        # 2 kills the first, 1 the second, and the third takes 0.
+        self.assertEqual((after.hero.cell, [e.hp for e in after.enemies if e.alive]), (2, [3]))
+
+    def test_no_kill_no_step(self):
+        after, _ = fire(make_state(hero_cell=1, enemies=[enemy(2, hp=3)]), self.HOOK)
+        self.assertEqual((after.hero.cell, after.enemies[0].hp), (1, 1))
+
+    def test_a_kill_with_nobody_next_still_steps_in(self):
+        after, _ = fire(make_state(hero_cell=1, enemies=[enemy(2, hp=2), enemy(4)]), self.HOOK)
+        self.assertEqual(after.hero.cell, 2)
+
+    def test_the_tile_keeps_its_value(self):
+        state = make_state(hero_cell=0, enemies=[enemy(1, hp=2), enemy(2, hp=3)])
+        after, _ = fire(state, self.HOOK)
+        self.assertEqual(after.tiles[-1].attack.value, 2)
+
+
 if __name__ == "__main__":
     unittest.main()

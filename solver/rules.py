@@ -19,7 +19,7 @@ ONE_ENEMY_WAVE_CAP = 6
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
 MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb", "Barricade", "BladeOfPatience", "Bomb",
            "BossSwap", "Charge", "Crossbow",
-           "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Katana", "Lightning", "Maku", "Mirror", "OriginOfSymmetry", "Shield",
+           "CopycatMirror", "CorruptedBarrage", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Hookblade", "Katana", "Lightning", "Maku", "MeteorHammer", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Sai", "ScarStrike", "SmokeBomb", "Spear", "Summon", "SwapToss",
            "Swirl", "Tetsubo", "Trap", "TurnAround", "TwinTessen", "Volley"}
 
@@ -53,13 +53,15 @@ SHOCKWAVE_DAMAGE = 1  # Stored in the game's assets, not its code. Seen in logs/
 WARDEN_EXPLOSION = 2  # What a dying Warden deals to its cell and both beside it. In the game's code.
 
 # Each hero has one special move, triggered by moving into an occupied cell. Swap is the Wanderer's, Shove the
-# Ronin's, Throw the Jujitsuka's and Phase the Shadow's. Any other isn't simulated, so it isn't offered as an action.
+# Ronin's, Throw the Jujitsuka's, Phase the Shadow's and Swap Toss the Chain Master's. Any other isn't simulated, so
+# it isn't offered as an action.
 SWAP = "SwapSpecialMove"
 SHOVE = "PushSpecialMove"
 THROW = "ThrowSpecialMove"  # The Jujitsuka's: throws the enemy behind the hero over to the front.
 PHASE = "PhaseSpecialMove"  # The Shadow's: passes through the line of agents ahead to the first free cell.
-SPECIAL_MOVES = {SWAP, SHOVE, THROW, PHASE}
-SPECIAL_LABELS = {SWAP: "swap", SHOVE: "shove", THROW: "throw", PHASE: "phase"}
+SWAP_TOSS = "SwapTossSpecialMove"  # The Chain Master's: trades the agents on either side of the hero, who stays put.
+SPECIAL_MOVES = {SWAP, SHOVE, THROW, PHASE, SWAP_TOSS}
+SPECIAL_LABELS = {SWAP: "swap", SHOVE: "shove", THROW: "throw", PHASE: "phase", SWAP_TOSS: "swap toss"}
 
 # Enemy traits that need no warning. Heavy, Explosive (the Warden's) and Dash (the Strider's) are modeled, and the
 # others haven't changed any prediction.
@@ -87,7 +89,7 @@ SMOKE_BOMBS = {"SmokeBomb", "BackSmokeBomb"}  # Trade places with the first targ
 # Attacks that move or turn the hero, which raise the game's move-attack event that Dynamic Boost listens for. Only
 # when they actually moved or turned it: a Smoke Bomb with nobody to trade places with does nothing.
 MOVE_ATTACKS = set(CHARGES) | set(PLAIN_DASHES) | set(SHADOW_DASHES) | SMOKE_BOMBS | {"TurnAround", "Mirror",
-                                                                                     "OriginOfSymmetry"}
+                                                                                     "OriginOfSymmetry", "Hookblade"}
 
 # An enemy tile being played. Its identity isn't visible until it lands in the queue.
 UNKNOWN_TILE = "Unknown"
@@ -515,6 +517,12 @@ def can_use_special(state, direction):
         landing = state.hero.cell - direction
         if not 0 <= landing < state.cells or state.occupant(landing) is not None:
             return False
+    # A Swap Toss needs both cells beside the hero, and whoever is on the far one movable too; that one can be empty
+    # (SwapTossSpecialMove.Allowed).
+    if state.special == SWAP_TOSS:
+        far = state.hero.cell - direction
+        if not 0 <= far < state.cells or (state.occupant(far) is not None and not state.occupant(far).movable):
+            return False
     allowed_way = -state.hero.facing if state.special == THROW else state.hero.facing
     return (
         state.special in SPECIAL_MOVES
@@ -594,6 +602,17 @@ def perform_special(state, direction, outcome):
         special_effect(state, hero, occupant, outcome)
         if occupant.alive:
             push(state, hero, occupant, -direction, outcome, credit_distance=False)
+        return
+    if state.special == SWAP_TOSS:
+        # The two beside the hero trade places, nobody turning, and the effect lands on each one moved
+        # (SwapTossSpecialMove.Perform). The hero stays put.
+        far = state.occupant(hero.cell - direction)
+        occupant.cell = hero.cell - direction
+        if far is not None:
+            far.cell = target_cell
+        for agent in (occupant, far):
+            if agent is not None:
+                special_effect(state, hero, agent, outcome)
         return
     occupant.cell = hero.cell
     special_effect(state, hero, occupant, outcome)
@@ -725,6 +744,12 @@ def attack_hits(state, attacker, attack):
     # the volley can add to them (ScarStrikeAttack.Begin). Only the hero can use it.
     if attack.name == "ScarStrike":
         return [e for e in state.enemies if e.alive and e.hp < e.max_hp] if attacker is state.hero else []
+    # The Meteor Hammer strikes the first agent in range ahead and, only if there was one, ricochets onto whoever is
+    # right behind its user (MeteorHammerAttack.PerformAttack: targetInFront, then CellBehind's agent).
+    if attack.name == "MeteorHammer":
+        front = targets_of(state, attacker, attack)[:1]
+        behind = state.occupant(attacker.cell - attacker.facing) if front else None
+        return front + ([behind] if behind is not None and behind is not front[0] else [])
     # Sharp Turn turns its user around first, then strikes what's in range in the new direction.
     if attack.name == "TurnAround":
         attacker.facing = -attacker.facing
@@ -960,6 +985,9 @@ def _apply_attack(state, attacker, attack, outcome):
     if attacker is state.hero:
         state.tile_start_cell = start_cell
         state.tile_directional = attack.directional
+    if attack.name == "Hookblade":
+        hookblade(state, attacker, attack, outcome)
+        return
     hits = attack_hits(state, attacker, attack)
     # An attack that moved or turned the hero still did something, even if it hit nothing, and so does a reload.
     reload = attack.name == "Crossbow" and attack.value == 0
@@ -989,6 +1017,30 @@ def _apply_attack(state, attacker, attack, outcome):
         for target in hits:
             if target.movable:
                 push(state, attacker, target, 1 if target.cell > attacker.cell else -1, outcome)
+
+
+def hookblade(state, attacker, attack, outcome):
+    """The Hookblade strikes the agent in front. Each time that kills it, the attacker steps into its cell and, with
+    someone in front again, strikes once more for 1 less (HookbladeAttack.PerformAttack and its coroutine). A kill
+    on a boss, or the attacker dying, ends it. The tile's value is restored afterward, so the loss doesn't last."""
+    value = attack.value
+    while True:
+        targets = targets_of(state, attacker, attack)[:1]
+        if not targets:
+            if value == attack.value and attacker is state.hero:
+                outcome.wasted_attacks += 1
+            return
+        target = targets[0]
+        cell = target.cell
+        land_hit(state, attacker, target, max(0, value), outcome)
+        hit_effect(state, attacker, target, attack.effect, outcome)
+        if target.alive or is_boss(target) or not attacker.alive:
+            return
+        if state.occupant(cell) is None:
+            attacker.cell = cell
+        if not targets_of(state, attacker, attack):
+            return
+        value -= 1
 
 
 def hit_effect(state, attacker, target, effect, outcome):

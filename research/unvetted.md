@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.23: a Summon going off costs half a kill
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **Each enemy Summon that goes off costs 30, half a kill** | **Scoring** | **The player's value; tests** | **Summoners and Wardens killed before they summon; HP or position given up to stop a summon that mattered little** |
+
 ## New in v3.22: the last three enemies' AI
 
 | Item | Kind | What's already confirmed | What to look for |

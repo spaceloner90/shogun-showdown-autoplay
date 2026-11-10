@@ -10,6 +10,14 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.23 — a Summon going off costs half a kill (2026-11-10)
+- **Scoring: each enemy Summon that goes off costs 30**, half a kill and tied to it in code. Who arrives and where
+  is random, so the arrival still isn't simulated; the penalty makes killing a summoner before it summons worth
+  that much more than killing one that waits, as the player asked. It applies to any enemy whose Summon tile is
+  identified: Summoners, Wardens, bosses, and a Shogun's Summoner once its tile shows.
+- A Shielder needs no such term: its allied Shield was already simulated and a shielded enemy counts as more HP
+  left in the room, so with its AI known (v3.22) stopping the shield already scores higher.
+
 ## v3.22 — the last three enemies' AI: Kabukai, Shielder, Shogun's Summoner (2026-11-10)
 - **Rule: the Kabukai's AI**, from `KabukaiEnemy.AIPickAction`. Only the tile it copies is random. With an empty
   queue it faces the hero and plays the Copycat Mirror (backing away first after an attack); it fires the Mirror

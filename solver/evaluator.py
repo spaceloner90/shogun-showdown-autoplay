@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v3.22"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v3.23"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -80,6 +80,9 @@ WEIGHTS = {
                               # one off, so it's all upside: the player's read is a third to half.
     "shove_cell": 4.0,        # Per cell an enemy is shoved. Space to load in, but melee wants them close too.
     "kill": 60.0,
+    # An enemy's Summon going off, as a share of a kill, set below: the player asked that killing a summoner before
+    # it summons be worth more than killing one that waits. The arrival isn't simulated, so this is all it costs.
+    "summon_share": 0.5,
     "win": 10000.0,           # Winning the fight this turn at no HP cost, in effect infinite: nothing beats it, as the
                               # player put it. A win that costs HP this turn earns nothing extra, so a safe win a turn
                               # later can still come first, rather than spend HP that carries into the next fight.
@@ -157,6 +160,7 @@ WEIGHTS = {
 }
 
 # Values defined as equal to others are tied here, so changing one changes them all.
+WEIGHTS["summon"] = -WEIGHTS["summon_share"] * WEIGHTS["kill"]
 _ESCAPES = WEIGHTS["escape_values"]
 _ESCAPES["PhaseSpecialMove"] = _ESCAPES["SwapSpecialMove"]
 _ESCAPES["ThrowSpecialMove"] = _ESCAPES["PushSpecialMove"]
@@ -825,6 +829,7 @@ def outcome_terms(outcome: Outcome, hero_dead: bool, cheapest_hit: int = 1, comb
         # HP gained is worth what HP lost costs, by Triple Combo Heal.
         "healed": healed,
         "combos": outcome.combo_random,
+        "summons": WEIGHTS["summon"] * outcome.summons,
     }
 
 

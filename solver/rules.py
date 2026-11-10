@@ -288,6 +288,7 @@ class Outcome:
     combo_kills: int = 0  # Kills after the first in the turn, by anyone.
     combo_random: float = 0.0  # Worth of Combo Curse and Chilling Combo effects on a random enemy, not simulated.
     healed: int = 0  # HP the hero gained, from Triple Combo Heal.
+    summons: int = 0  # Enemy Summons that went off. Who arrives and where is random, so it isn't simulated.
     unmodeled: list[str] = field(default_factory=list)
 
 
@@ -1043,6 +1044,9 @@ def _apply_attack(state, attacker, attack, outcome):
     # Copycat Mirror only gives its user a copy of a hero tile, which resolve_enemies keeps track of.
     # Maku, Sato's, ends the act and sets up a new battlefield, which only matters to a deeper search.
     if attack.name in ("Summon", "CopycatMirror", "Maku"):
+        # The summon itself is counted, so that stopping one is worth something (v3.23).
+        if attack.name == "Summon" and attacker is not state.hero:
+            outcome.summons += 1
         return
     if attack.name == "Barricade":
         spawn_barricade(state, attacker)

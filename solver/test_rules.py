@@ -3564,6 +3564,33 @@ class TanegashimaTest(unittest.TestCase):
         self.assertFalse(state.boosted)
 
 
+class SummonTest(unittest.TestCase):
+    """An enemy's Summon going off costs half a kill, so stopping one is worth that (the player's value, v3.23)."""
+
+    def summoner(self, hp=1):
+        return enemy(3, hp=hp, action="Attack", queue=[Attack("Summon", 0, [], first_target=True)])
+
+    def test_a_summon_going_off_is_counted_and_priced(self):
+        from evaluator import outcome_terms
+        _, outcome = step(make_state(enemies=[self.summoner()]), Action("Wait"))
+        self.assertEqual(outcome.summons, 1)
+        self.assertEqual(outcome_terms(outcome, False)["summons"], -WEIGHTS["summon_share"] * WEIGHTS["kill"])
+
+    def test_killing_the_summoner_first_stops_it(self):
+        _, outcome = step(make_state(enemies=[self.summoner()], queue=["Swirl"]), Action("Attack"))
+        self.assertEqual((outcome.kills, outcome.summons), (1, 0))
+
+    def test_a_kill_before_the_summon_beats_the_same_kill_of_one_waiting(self):
+        from evaluator import outcome_terms
+        waiting = enemy(3, hp=1)
+        def gain(foe):
+            state = make_state(enemies=[foe], queue=["Swirl"])
+            kill = sum(outcome_terms(step(state, Action("Attack"))[1], False).values())
+            wait = sum(outcome_terms(step(state, Action("Wait"))[1], False).values())
+            return kill - wait
+        self.assertEqual(gain(self.summoner()) - gain(waiting), -WEIGHTS["summon"])
+
+
 class BoTest(unittest.TestCase):
     """BoAttack.ApplyEffect in the game's code: hits the first agent in front, then turns it round if it's movable."""
 

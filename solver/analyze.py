@@ -32,7 +32,7 @@ FALLBACK_BUDGET = 1.0
 # F2 to F4 get this long from the start of the answer. F4 usually finishes within it, but this laptop's slower cores
 # and throttling make it run over now and then; the F4 key then plays F3's choice, as the player asked, and so on
 # down. F1 always finishes.
-BUDGET = 0.45
+BUDGET = 1.0
 MAX_TABLE_ROWS = 8
 
 

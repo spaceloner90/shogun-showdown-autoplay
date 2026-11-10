@@ -10,6 +10,10 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.30 — F2 to F4 get 1 second (2026-11-10)
+- **Speed: the budget for F2 to F4 goes from 0.45 s to 1 s**, the player's call for day 7. In `run19` F4 ran out of
+  time on 108 of 632 turns and played F3's choice. No scoring or rule changes.
+
 ## v3.29 — day 7's Corrupted elites and the Progeny they leave (2026-11-10)
 - **Rule: a Corrupted elite leaves a Corrupted Progeny on its cell as it dies**, from `Enemy.Die` and
   `SpawnCorruptedProgeny`. From day 7 ("corruption everywhere") any regular enemy that isn't summoned or another

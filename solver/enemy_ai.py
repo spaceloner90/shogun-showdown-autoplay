@@ -2,9 +2,9 @@
 
 At the end of every turn the game has each enemy choose its next action (Enemy.DecideNextAction): one with ice
 waits; otherwise its kind's AIPickAction picks one, and a move into a wall or an occupied cell becomes a wait.
-`decide` does the same. It returns None where the choice can't be known: a kind not ported (the Kabukai, the
-Shielder, the Shogun's Summoners), or one that depends on something the board doesn't show, such as a boss's random
-pattern or tile, or a counter older logs lack (mod 0.19.0 logs them).
+`decide` does the same. It returns None where the choice can't be known: one that depends on something the board
+doesn't show, such as a boss's random pattern or tile, the tile a Kabukai copied, or a counter older logs lack (mod
+0.19.0 logs them). Every kind is ported since v3.22.
 
 The kinds share building blocks (Enemy.FaceTarget, MoveTowardsTarget, MoveAwayFromTarget,
 MoveTowardsStrikingPosition, IsThreatheningTarget) and differ in order and in which tile each plays. Their target is
@@ -69,6 +69,11 @@ FIRST_TILE = {"Ashigaru": "Katana", "YariMaster": "Spear", "Guardian": "Katana",
 BOSSES = ("ReiBoss", "KowaBoss", "StatueBoss", "TwinMainBoss", "TwinSideBoss", "FumikoBoss", "BaruBoss", "IeyasuBoss",
           "HideyoshiBoss", "NobunagaBoss", "SatoBoss", "ShogunPhase1Boss", "ShogunPhase2Boss")
 FIRST_TILE.update({kind: None for kind in BOSSES})
+# Ported in v3.22. The Shielder's tile depends on its allies, and the Shogun's Summoner's is random.
+FIRST_TILE.update({"Kabukai": "CopycatMirror", "Shielder": None, "ShogunSummoner": None})
+# Kinds whose choice doesn't always need the tile they hold identified.
+DECIDES_BLIND = {"Kabukai", "ShogunSummoner"}
+SHOGUN_SUMMONER_WAIT = {True: 7, False: 4}  # nTurnsBetweenAttacksEasy with both Summoners alive, Hard with one.
 SWAPPER_WAIT = 3  # SwapperEnemy.get_NTurnsBetweenAttacks
 PORTED = set(FIRST_TILE)
 
@@ -685,6 +690,101 @@ BOSS_AI = {"ReiBoss": _rei, "KowaBoss": _kowa, "StatueBoss": _statue, "TwinMainB
            "ShogunPhase2Boss": _shogun_two}
 
 
+def _unidentified(attack):
+    from rules import UNKNOWN_COPY, UNKNOWN_TILE
+    return attack.name in (UNKNOWN_TILE, UNKNOWN_COPY)
+
+
+def _turn_around(enemy):
+    return Choice("FlipLeft" if enemy.facing > 0 else "FlipRight")
+
+
+def _kabukai(state, enemy, previous):
+    """KabukaiEnemy.AIPickAction. With an empty queue: wait on its first turn, face the hero, back away after an
+    attack, else play the Copycat Mirror. Holding the Mirror: fire it if the hero's hand has a tile to copy, else
+    face the hero and back away. Holding a copy: a turn's wait after the Mirror (unless Quick), fire a tile without
+    a range at once, else go to where it would hit the hero and fire from there. Which tile it copies is random."""
+    if len(enemy.queue) != 1:
+        if enemy.first_turn:
+            return Choice("Wait")
+        if not _facing_target(state, enemy):
+            return _face_target(state, enemy)
+        return _away(state, enemy) if previous == "Attack" else _play("CopycatMirror")
+    attack = enemy.queue[0]
+    if attack.name == "CopycatMirror":
+        # KabukaiEnemy.get_CopyableTiles: the hero's hand, less seven attacks it avoids, which the code's text doesn't
+        # show. Taken as any tile in the hand.
+        if any(not tile.in_queue for tile in state.tiles):
+            return Choice("Attack")
+        return _away(state, enemy) if _facing_target(state, enemy) else _face_target(state, enemy)
+    if previous == "Attack" and enemy.elite != "Quick":
+        return Choice("Wait")
+    if _unidentified(attack):
+        return None
+    if not attack.range:
+        return Choice("Attack")
+    positions = _striking_positions(state, attack, state.hero)
+    if not positions:
+        return Choice("Wait")
+    if (enemy.cell, enemy.facing) in positions:
+        return Choice("Attack")
+    return _toward_closest_striking_position(state, enemy, positions)
+
+
+def _shield_itself(enemy, otherwise):
+    """The end of the Shielder's patterns with no ally to shield: fire a Shield it holds; without a shield, drop an
+    allied one and play its own; shielded already, `otherwise`."""
+    if _holds(enemy, "Shield"):
+        return Choice("Attack")
+    if not enemy.shield:
+        if _holds(enemy, "ShieldAllied"):
+            enemy.queue = []
+        return _play("Shield")
+    return otherwise
+
+
+def _shielder(state, enemy, previous):
+    """ShielderEnemy.AIPickAction. Waits on its first turn, after an attack, and after playing a tile (unless
+    Quick). Alone but for Thorns: backs away from the hero, and cornered shields itself. With every ally shielded:
+    the same, facing the hero. Otherwise it turns to the nearest unshielded ally ahead, or behind if none is ahead,
+    plays the allied Shield and fires it."""
+    if enemy.first_turn or previous == "Attack" or (previous == "PlayTile" and enemy.elite != "Quick"):
+        return Choice("Wait")
+    others = [e for e in state.enemies if e.alive and e is not enemy]
+    if all(e.kind == "Thorns" for e in others):
+        if _can_move_away(state, enemy):
+            return _away(state, enemy) if _facing_target(state, enemy) else _face_target(state, enemy)
+        return _shield_itself(enemy, _turn_around(enemy))
+    unshielded = [e for e in others if not e.shield]
+    if not unshielded:
+        if not _facing_target(state, enemy):
+            return _face_target(state, enemy)
+        if _can_move_away(state, enemy):
+            return _away(state, enemy)
+        return _shield_itself(enemy, Choice("Wait"))
+    if not any((e.cell - enemy.cell) * enemy.facing > 0 for e in unshielded):
+        return _turn_around(enemy)
+    return Choice("Attack") if enemy.queue else _play("ShieldAllied")
+
+
+def _shogun_summoner(state, enemy, previous):
+    """ShogunSummonerEnemy.AIPickAction: a turn after playing a tile, then fires it, Summon or allied Shield, and
+    starts its countdown: 7 turns with both Summoners alive, 4 with one. Then plays one of the two at random."""
+    if previous == "PlayTile":
+        return Choice("Wait")
+    if enemy.queue:
+        # Either tile it can hold is fired the same way, so an unidentified one is too.
+        summoners = sum(e.alive and e.kind == "ShogunSummoner" for e in state.enemies)
+        enemy.ai_wait = SHOGUN_SUMMONER_WAIT[summoners == 2]
+        return Choice("Attack")
+    if enemy.ai_wait is None:
+        return None
+    if enemy.ai_wait > 0:
+        enemy.ai_wait -= 1
+        return Choice("Wait")
+    return _play(None)
+
+
 def after_attack(enemy):
     """What a boss does once its attack has gone off (PostAttackEvents): Baru and Hideyoshi start a new pattern, Ieyasu
     steps back after his Blade of Patience."""
@@ -745,6 +845,12 @@ def _pick(state, enemy, previous):
         return _iwao(state, enemy, previous)
     if kind in BOSS_AI:
         return BOSS_AI[kind](state, enemy, previous)
+    if kind == "Kabukai":
+        return _kabukai(state, enemy, previous)
+    if kind == "Shielder":
+        return _shielder(state, enemy, previous)
+    if kind == "ShogunSummoner":
+        return _shogun_summoner(state, enemy, previous)
     if kind == "Swapper":
         # SwapperEnemy.AIPickAction: a turn after playing its tile, then fires it, then waits 3 turns, then plays it.
         if enemy.ai_wait is None:
@@ -904,9 +1010,8 @@ def decide(state, enemy, previous):
         return None
     if enemy.ice > 0:
         return Choice("Wait")
-    # A tile it holds that isn't identified leaves its choice unknown too.
-    from rules import UNKNOWN_COPY, UNKNOWN_TILE
-    if any(a.name in (UNKNOWN_TILE, UNKNOWN_COPY) for a in enemy.queue):
+    # A tile it holds that isn't identified leaves its choice unknown too, for most kinds.
+    if enemy.kind not in DECIDES_BLIND and any(_unidentified(a) for a in enemy.queue):
         return None
     choice = _pick(state, enemy, previous)
     if choice is None:

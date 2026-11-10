@@ -210,8 +210,8 @@ class EnemyAITest(unittest.TestCase):
         foe.ice = 2
         self.assertEqual(self.decide(foe, "Wait").action, "Wait")
 
-    def test_an_unported_kind_is_unknown(self):
-        foe = Agent("Kabukai", 3, -1, 3, 3)
+    def test_a_kind_the_game_has_no_ai_for_here_is_unknown(self):
+        foe = Agent("Dummy", 3, -1, 3, 3)
         self.assertIsNone(self.decide(foe, "Wait"))
 
     def test_the_simulation_carries_the_choice_into_next_turn(self):
@@ -220,6 +220,96 @@ class EnemyAITest(unittest.TestCase):
         after, _ = step(state, Action("Wait"))
         foe = after.enemies[0]
         self.assertEqual(([a.name for a in foe.queue], foe.action, foe.known), (["Katana"], "Wait", True))
+
+
+GUN = Attack("Tanegashima", 4, list(range(1, 11)), first_target=True)
+
+
+class LastEnemiesAITest(unittest.TestCase):
+    """KabukaiEnemy, ShielderEnemy and ShogunSummonerEnemy.AIPickAction, ported in v3.22."""
+
+    def decide(self, foe, previous, hero_cell=2, others=(), cells=7):
+        state = make_state(hero_cell=hero_cell, enemies=[foe, *others])
+        state.cells = cells
+        return enemy_ai.decide(state, foe, previous), foe
+
+    def kabukai(self, cell=4, facing=-1, queue=(), **fields):
+        return Agent("Kabukai", cell, facing, 5, 5, queue=list(queue), **fields)
+
+    def test_a_kabukai_plays_its_mirror(self):
+        choice, _ = self.decide(self.kabukai(), "Wait")
+        self.assertEqual((choice.action, choice.tile), ("PlayTile", "CopycatMirror"))
+
+    def test_a_kabukai_waits_on_its_first_turn(self):
+        self.assertEqual(self.decide(self.kabukai(first_turn=True), "Wait")[0].action, "Wait")
+
+    def test_a_kabukai_fires_the_mirror_with_a_tile_to_copy(self):
+        mirror = Attack("CopycatMirror", 0, [1], first_target=True)
+        self.assertEqual(self.decide(self.kabukai(queue=[mirror]), "PlayTile")[0].action, "Attack")
+
+    def test_a_kabukai_waits_a_turn_after_copying_whatever_it_copied(self):
+        from rules import UNKNOWN_COPY as name
+        self.assertEqual(self.decide(self.kabukai(queue=[Attack(name, 0, [])]), "Attack")[0].action, "Wait")
+        self.assertIsNone(self.decide(self.kabukai(queue=[Attack(name, 0, [])]), "Wait")[0])
+
+    def test_a_kabukai_turns_to_the_hero_and_then_fires(self):
+        # The last fight of the day 6 run: the hero had gone past it, and it turned and shot.
+        self.assertEqual(self.decide(self.kabukai(facing=1, queue=[GUN]), "Wait")[0].action, "FlipLeft")
+        self.assertEqual(self.decide(self.kabukai(queue=[GUN]), "FlipLeft")[0].action, "Attack")
+
+    def test_a_kabukai_closes_in_with_a_short_tile(self):
+        self.assertEqual(self.decide(self.kabukai(cell=5, queue=[KATANA]), "Wait")[0].action, "MoveLeft")
+
+    def test_a_kabukai_fires_a_tile_with_no_range_at_once(self):
+        self.assertEqual(self.decide(self.kabukai(queue=[Attack("Mirror", 0, [])]), "Wait")[0].action, "Attack")
+
+    def test_a_shielder_shields_an_ally_ahead(self):
+        shielder = Agent("Shielder", 5, -1, 4, 4)
+        choice, _ = self.decide(shielder, "Wait", others=[ashigaru(3)])
+        self.assertEqual((choice.action, choice.tile), ("PlayTile", "ShieldAllied"))
+        shielder.queue = [Attack("ShieldAllied", 0, [1])]
+        self.assertEqual(self.decide(shielder, "PlayTile", others=[ashigaru(3)])[0].action, "Wait")
+        self.assertEqual(self.decide(shielder, "Wait", others=[ashigaru(3)])[0].action, "Attack")
+
+    def test_a_shielder_turns_to_an_ally_behind_it(self):
+        choice, _ = self.decide(Agent("Shielder", 4, -1, 4, 4), "Wait", others=[ashigaru(6)])
+        self.assertEqual(choice.action, "FlipRight")
+
+    def test_a_shielder_alone_backs_away_and_cornered_shields_itself(self):
+        self.assertEqual(self.decide(Agent("Shielder", 4, -1, 4, 4), "Wait")[0].action, "MoveRight")
+        choice, _ = self.decide(Agent("Shielder", 6, -1, 4, 4), "Wait")
+        self.assertEqual((choice.action, choice.tile), ("PlayTile", "Shield"))
+
+    def test_a_shielder_with_every_ally_shielded_drops_the_allied_shield_for_its_own(self):
+        ally = ashigaru(5)
+        ally.shield = True
+        shielder = Agent("Shielder", 6, -1, 4, 4, queue=[Attack("ShieldAllied", 0, [1])])
+        choice, shielder = self.decide(shielder, "Wait", others=[ally])
+        self.assertEqual((choice.tile, shielder.queue), ("Shield", []))
+
+    def test_a_shogun_summoner_fires_whatever_it_played_and_counts_down(self):
+        from rules import UNKNOWN_TILE as name
+        one = Agent("ShogunSummoner", 6, -1, 9, 9, queue=[Attack(name, 0, [])])
+        two = Agent("ShogunSummoner", 0, 1, 9, 9)
+        self.assertEqual(self.decide(one, "PlayTile", others=[two])[0].action, "Wait")
+        choice, one = self.decide(one, "Wait", others=[two])
+        self.assertEqual((choice.action, one.ai_wait), ("Attack", 7))
+        choice, one = self.decide(one, "Wait")
+        self.assertEqual(one.ai_wait, 4)  # Alone, it comes round faster.
+
+    def test_a_shogun_summoner_plays_a_tile_when_its_countdown_ends(self):
+        waiting = Agent("ShogunSummoner", 6, -1, 9, 9, ai_wait=1)
+        choice, waiting = self.decide(waiting, "Wait")
+        self.assertEqual((choice.action, waiting.ai_wait), ("Wait", 0))
+        choice, _ = self.decide(waiting, "Wait")
+        self.assertEqual((choice.action, choice.tile), ("PlayTile", None))
+        self.assertIsNone(self.decide(Agent("ShogunSummoner", 6, -1, 9, 9), "Wait")[0])
+
+    def test_the_first_turn_ends_once_a_choice_is_made(self):
+        state = make_state(enemies=[self.kabukai(first_turn=True)])
+        state.cells = 7
+        after, _ = step(state, Action("Wait"))
+        self.assertEqual((after.enemies[0].action, after.enemies[0].first_turn), ("Wait", False))
 
 
 class SearchTest(unittest.TestCase):

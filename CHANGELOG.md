@@ -10,6 +10,23 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.22 — the last three enemies' AI: Kabukai, Shielder, Shogun's Summoner (2026-11-10)
+- **Rule: the Kabukai's AI**, from `KabukaiEnemy.AIPickAction`. Only the tile it copies is random. With an empty
+  queue it faces the hero and plays the Copycat Mirror (backing away first after an attack); it fires the Mirror
+  when the hero's hand has a tile to copy; after copying it waits a turn (unless Quick), then goes to where the copy
+  would hit the hero and fires, or fires at once a tile with no range. In the day 6 run a Kabukai holding the hero's
+  Tanegashima turned and shot while the search took it to wait: on that board the search now sees the line it
+  played cost an HP, and picks one that costs none. Right on 434 of 435 logged turns; the miss was a random freeze.
+- **Rule: the Shielder's AI**, from `ShielderEnemy.AIPickAction`: it shields the nearest unshielded ally ahead, or
+  turns to one behind; with every ally shielded, or alone, it backs away from the hero and, cornered, shields
+  itself. Right on 202 of 202 logged turns it claims; 48 more hold a tile older logs don't name.
+- **Rule: the Shogun's Summoner's AI**, from `ShogunSummonerEnemy.AIPickAction`: a turn after playing a tile it
+  fires it, then waits 7 turns with both Summoners alive, 4 with one. Which of Summon and the allied Shield it
+  plays is random, but both are fired alike. Right on 195 of 195 logged turns with the countdown logged.
+- **Rule: an enemy's first turn ends once it has chosen**, as `Enemy.DecideNextAction` does, so a boss's opening
+  rule no longer repeats on later turns of a line searched from turn 1.
+- Every enemy kind in the logs is now ported: 95.2% of 17,379 logged enemy turns are known, 99.9% of those right.
+
 ## v3.21 — Kobushi Combo (2026-11-10)
 - **Rule: Kobushi Combo**, from `KobushiComboSkill`: on each kill after the first in a turn, by anyone, every tile
   in the hand that isn't fully charged is recharged in full. Tiles in the attack queue aren't in the hand, so the

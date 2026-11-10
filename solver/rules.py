@@ -1649,6 +1649,7 @@ def end_turn(state, swapped):
             choice = enemy_ai.guess(state, enemy)
         enemy.action = choice.action
         enemy.tile_to_play = choice.tile
+        enemy.first_turn = False  # Enemy.DecideNextAction clears it once the first choice is made.
     for enemy in state.enemies:
         # A loaded Volley will lock onto wherever the hero ends this turn, leaving a turn to step off.
         aim_volleys(enemy, state.hero)

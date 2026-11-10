@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.22: the last three enemies' AI
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **Kabukai, Shielder and Shogun's Summoner AI** | **Rule** | **The game's code; 434/435, 202/202 and 195/195 logged turns; 9/9 Kabukai turns in the day 6 run** | **Misses in `tools/check_ai.py`; a Kabukai holding the Mirror that doesn't fire it (the seven tiles it won't copy aren't known)** |
+| An enemy's first turn ends once it has chosen | Rule | The game's code; tests | Boss predictions on turns 2 to 4 of a fight |
+
 ## New in v3.21: Kobushi Combo
 
 | Item | Kind | What's already confirmed | What to look for |

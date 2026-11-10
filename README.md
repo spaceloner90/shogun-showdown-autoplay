@@ -13,8 +13,6 @@ This is an unofficial fan project, not affiliated with the game's developers. No
 - **`solver/evaluator.py`** scores a position. The weights are hand-set.
 - **`solver/search.py`** looks up to four turns ahead within a second.
 
-[`HANDOVER.md`](HANDOVER.md) sums up what the project learned.
-
 ## Versions
 
 Each version that can change a choice is tagged `evaluator-<version>`, and the logs record which one made each decision. [`CHANGELOG.md`](CHANGELOG.md) lists what every version changed.

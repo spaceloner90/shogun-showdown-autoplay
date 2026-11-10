@@ -2,17 +2,18 @@
 
 An exercise in building an AI to play Shogun Showdown, one turn at a time, with a key press for each decision and a log of where it came from.
 
-It has beaten the game: `evaluator-v1` played a whole run on unlocked content, 22 fights and 926 moves, with the player only using healing potions between fights. The log is in `research/logs/run5_full`, fights 9 to 30.
+It has beaten everything in the game: `evaluator-v4.0` won day 7 and then the Corrupted Soul (`research/logs/run20`, `run21`). The first win was `evaluator-v1`, which played a whole run on unlocked content, 22 fights and 926 moves, with the player only using healing potions between fights. The log is in `research/logs/run5_full`, fights 9 to 30.
 
 This is an unofficial fan project, not affiliated with the game's developers. No game files or game code are included.
 
 ## How it works
 
 - **`mod/`** is a BepInEx plugin. It logs each game state, asks the solver on a key press, and plays the answer.
-- **`solver/rules.py`** simulates a turn. Enemies do what they've telegraphed, and after that they're treated as waiting.
-- **`solver/evaluator.py`** looks one turn ahead and scores where each action leads. The weights are hand-set.
+- **`solver/rules.py`** simulates a turn, and **`solver/enemy_ai.py`** is the enemies' and bosses' decision code, ported from the game's.
+- **`solver/evaluator.py`** scores a position. The weights are hand-set.
+- **`solver/search.py`** looks up to four turns ahead within a second.
 
-The live evaluator only uses what a player can see, so it doesn't run the enemy AI to predict moves.
+[`HANDOVER.md`](HANDOVER.md) sums up what the project learned.
 
 ## Versions
 

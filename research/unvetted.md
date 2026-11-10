@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.25: Nobunaga's lights known where the game has no choice
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **New lights known when no more free cells than lights** | **Rule** | **The game's code; tests** | **The lights after a hit matching the cells predicted** |
+
 ## New in v3.24: load before waiting; two fixes
 
 | Item | Kind | What's already confirmed | What to look for |

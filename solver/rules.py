@@ -1290,14 +1290,25 @@ def armored(state, agent):
 
 def relocate_lights(state, nobunaga):
     """At the end of each turn, his spotlights move if his HP has dropped since the last, to random cells other than
-    the ones lit and his own (NobunagaBoss.ProcessTurn, which the room runs after the agents' end of turn). Where is
-    unknown, so none counts as lit from then on."""
+    the ones lit and his own (NobunagaBoss.ProcessTurn, which the room runs after the agents' end of turn;
+    GetNextVulnerableCells). How many depends on his HP: 3 above two thirds, 2 above one third, then 1, and corrupted
+    2 and then 1 (get_NumberOfVulnerableCells). With no more cells to choose from than lights, where they go is
+    certain, as when he has stepped off a lit cell in a room of 7. Otherwise it's unknown, and none counts as lit."""
     if state.lit_cells is None or not nobunaga.alive:
         return
     last = state.nobunaga_hp_last_turn
     if last is not None and nobunaga.hp < last:
-        state.lit_cells = []
+        free = [c for c in range(state.cells) if c not in state.lit_cells and c != nobunaga.cell]
+        state.lit_cells = free if state.lit_cells and len(free) <= nobunaga_lights(nobunaga) else []
     state.nobunaga_hp_last_turn = nobunaga.hp
+
+
+def nobunaga_lights(nobunaga):
+    """How many cells are lit at his HP (NobunagaBoss.get_NumberOfVulnerableCells)."""
+    third = 0.333 * nobunaga.max_hp
+    if nobunaga.corrupted:
+        return 2 if nobunaga.hp > third else 1
+    return 3 if nobunaga.hp > 0.666 * nobunaga.max_hp else 2 if nobunaga.hp > third else 1
 
 
 def land_hit(state, attacker, target, value, outcome, collision=False):

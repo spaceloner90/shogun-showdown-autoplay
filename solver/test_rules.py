@@ -1846,6 +1846,24 @@ class NobunagaTest(unittest.TestCase):
         after, _ = fire(self.board(lit=[3]), KATANA)
         self.assertEqual(after.lit_cells, [])
 
+    def test_with_no_other_cells_to_go_to_the_new_lights_are_known(self):
+        # GetNextVulnerableCells: three lights above two thirds HP, on cells not lit before and not his own.
+        from rules import nobunaga_lights, relocate_lights
+        state = self.board(lit=[0, 3, 4], boss_cell=1, hp=39)
+        state.cells, state.nobunaga_hp_last_turn = 7, 40
+        relocate_lights(state, state.enemies[0])
+        self.assertEqual(state.lit_cells, [2, 5, 6])
+        # Still on a lit cell, four cells are free for three lights: unknown.
+        state = self.board(lit=[0, 3, 4], boss_cell=0, hp=39)
+        state.cells, state.nobunaga_hp_last_turn = 7, 40
+        relocate_lights(state, state.enemies[0])
+        self.assertEqual(state.lit_cells, [])
+        boss = state.enemies[0]
+        boss.hp = 26
+        self.assertEqual(nobunaga_lights(boss), 2)
+        boss.hp, boss.corrupted = 13, True
+        self.assertEqual(nobunaga_lights(boss), 1)
+
     def test_the_lights_stay_while_he_isnt_hurt(self):
         after, _ = step(self.board(lit=[0, 5]), Action("Wait"))
         self.assertEqual(after.lit_cells, [0, 5])

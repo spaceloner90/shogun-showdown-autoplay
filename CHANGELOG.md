@@ -10,6 +10,14 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.25 — Nobunaga's lights known where the game has no choice (2026-11-10)
+- **Rule: when Nobunaga's lights move, the new cells are known if there are no more free cells than lights**, from
+  `NobunagaBoss.GetNextVulnerableCells` and `get_NumberOfVulnerableCells`: they go to cells not lit before and not
+  his own, 3 of them above two thirds HP, 2 above one third, then 1 (corrupted: 2, then 1). In a room of 7 with 3
+  lit, a hit on him followed by his stepping off the light leaves exactly 3 cells. Otherwise still unknown, with
+  none counting as lit. This doesn't yet change the day 6 run's turn 12, where a sure 6 damage was passed up: there
+  his HP dropped to two lights among three cells.
+
 ## v3.24 — load before waiting; two cases of a score depending on earlier searches (2026-11-10)
 - **Search: a best line that waits and then loads a tile is swapped for the same line loading first**, when both
   play out the same: every turn scoring alike and the same board once both are done. v3.10's tie-break already

@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v3.30"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v3.31"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -157,6 +157,11 @@ WEIGHTS = {
                               # from further away stands off. Small, so a melee kit still closes in.
     "enemy_hp_left": -4.0,    # Per enemy HP still in the room.
     "wave_pressure": -3.0,    # Per enemy HP in the room, scaled up as the next wave gets close.
+    # Per turn the last wave is past its countdown with enemies still in the room. Without it a fight that can only
+    # be ended at a cost never is: at 5 max HP a Corrupted elite's Progeny costs an HP for sure, worth more than the
+    # kills, and the hero dodged its last enemy for 35 turns (logs/run20, day 7's first fight). It grows until
+    # ending the fight wins, and never outweighs dying.
+    "overtime": -10.0,
 }
 
 # Values defined as equal to others are tied here, so changing one changes them all.
@@ -656,6 +661,8 @@ def _pressure_terms(state):
     if state.turns_until_wave is not None and not state.last_wave:
         closeness = 1.0 - max(0, min(state.turns_until_wave, ONE_ENEMY_WAVE_CAP)) / ONE_ENEMY_WAVE_CAP
         terms["wave_pressure"] = WEIGHTS["wave_pressure"] * hp_left * closeness
+    if state.last_wave and state.turns_until_wave is not None and state.turns_until_wave < 0 and not fight_won(state):
+        terms["overtime"] = WEIGHTS["overtime"] * -state.turns_until_wave
     return terms
 
 

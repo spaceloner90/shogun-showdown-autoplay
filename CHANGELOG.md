@@ -10,6 +10,16 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.31 — a fight that can only be ended at a cost is ended (2026-11-10)
+- **Scoring: each turn the last wave is past its countdown with enemies left costs 10 more**, in the position's
+  score. In day 7's first fight the hero had only the Spear to deal damage, at 5 max HP. The last enemy was a
+  Corrupted Twin Tachi at 1 HP: killing it leaves a Progeny whose explosion couldn't be stopped before the Spear
+  was back, an HP worth 200 against 120 for the two kills. So the hero held the loaded Spear and dodged it from
+  turn 29 to turn 64, when the player took over. With this it attacks on turn 43, ten turns past the countdown.
+  It never outweighs dying.
+- That fight also confirmed v3.29's Progeny: it waited, loaded and blew on the third turn, died in its own
+  explosion, and hit the hero across the room. Its trait is Quick.
+
 ## v3.30 — F2 to F4 get 1 second (2026-11-10)
 - **Speed: the budget for F2 to F4 goes from 0.45 s to 1 s**, the player's call for day 7. In `run19` F4 ran out of
   time on 108 of 632 turns and played F3's choice. No scoring or rule changes.

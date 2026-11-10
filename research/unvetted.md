@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.31: a fight that can only be ended at a cost is ended
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **10 a turn once the last wave is past its countdown with enemies left** | **Scoring** | **Day 7's first fight replayed: attacks on turn 43, not never; tests** | **HP given up too early on a last wave that could have been finished clean; a stall in a boss room, which has no countdown and isn't covered** |
+
 ## New in v3.29: day 7's Corrupted elites and the Progeny they leave
 
 | Item | Kind | What's already confirmed | What to look for |

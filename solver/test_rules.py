@@ -3709,6 +3709,43 @@ class CorruptedEliteTest(unittest.TestCase):
         self.assertEqual(search.line_totals(state, best)[0], 0)
 
 
+class OvertimeTest(unittest.TestCase):
+    """A last wave past its countdown with enemies left costs more each turn, so a fight that can only be ended at
+    a cost is ended (v3.31): at 5 max HP the hero dodged a Corrupted elite for 35 turns rather than take its
+    Progeny's explosion."""
+
+    def board(self, overdue, last=True):
+        foe = enemy(3, hp=1)
+        foe.elite = "Corrupted"
+        state = make_state(enemies=[foe], queue=["Swirl"])
+        state.cells = 7
+        state.hero.hp = state.hero.max_hp = 5
+        # One tile that deals damage, and it won't be back before the Progeny blows.
+        state.tiles = list(state.queue_tiles)
+        state.tiles[0].cooldown = state.tiles[0].charge = 8
+        state.swap_charge = 0
+        state.turns_until_wave, state.last_wave = -overdue, last
+        return state
+
+    def test_it_grows_with_each_turn_overdue(self):
+        self.assertNotIn("overtime", leaf_terms(self.board(0)))
+        self.assertEqual(leaf_terms(self.board(3))["overtime"], 3 * WEIGHTS["overtime"])
+        self.assertEqual(leaf_terms(self.board(20))["overtime"], 20 * WEIGHTS["overtime"])
+
+    def test_only_on_the_last_wave_with_enemies_left(self):
+        self.assertNotIn("overtime", leaf_terms(self.board(5, last=False)))
+        cleared = self.board(5)
+        cleared.enemies[0].hp = 0
+        self.assertNotIn("overtime", leaf_terms(cleared))
+
+    def test_the_search_ends_the_fight_once_it_has_gone_on_long_enough(self):
+        import search
+        early = search.rank_lines(self.board(1), 4)[0]
+        late = search.rank_lines(self.board(30), 4)[0]
+        self.assertNotEqual(early.actions[0].kind, "Attack")
+        self.assertEqual(late.actions[0].kind, "Attack")
+
+
 class SummonTest(unittest.TestCase):
     """An enemy's Summon going off costs half a kill, so stopping one is worth that (the player's value, v3.23)."""
 

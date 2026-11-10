@@ -29,12 +29,12 @@ MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb
 SNIPER_DISTANCE = 4  # Sniper adds its level to the hero's hits on targets at least this many cells away.
 # Combo Curse curses a random enemy on each kill after the first in a turn, by anyone: which one can't be predicted,
 # like where a summon lands, so it isn't simulated, only valued a little per combo kill, as is Chilling Combo. Triple
-# Combo Heal is simulated (combo_kill). Combo Coin isn't simulated or valued. Nor is Combo Recharge, which
-# takes 4 a level off the cooldown of a tile making a kill after the first in a turn (ComboRechargeSkill.OnComboKill),
-# and Chilling Combo, which freezes enemies on a combo kill. Reactive Shield is simulated. Shield Retention keeps the
+# Combo Heal is simulated (combo_kill), as are Combo Recharge, which takes 4 a level off the cooldown of a tile making a
+# kill after the first in a turn (ComboRechargeSkill.OnComboKill), and Kobushi Combo, which fully recharges every tile
+# in the hand on one (KobushiComboSkill.PerformCooldownRecharge). Combo Coin isn't simulated or valued. Reactive Shield is simulated. Shield Retention keeps the
 # hero's shield from one fight to the next (ShieldRetentionSkill.PickUp), and Fortress shields it as a fight begins,
 # both of which show in the logged state.
-UNDERSTOOD_SKILLS = {"BigPockets", "ChikaraCrush", "ChillingCombo", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "BackStabber", "CloseCombat", "DynamicBoost", "Fortress", "Healthy", "MamushiMove", "Monomancer",
+UNDERSTOOD_SKILLS = {"BigPockets", "ChikaraCrush", "ChillingCombo", "ComboCoin", "ComboCurse", "ComboRecharge", "DamagingMove", "BackStabber", "CloseCombat", "DynamicBoost", "Fortress", "Healthy", "KobushiCombo", "MamushiMove", "Monomancer",
                      "QuickRecovery", "ReactiveShield", "ShieldRetention", "Sniper", "TripleComboHeal", "TwoWayMove",
                      "UnfriendlyFire"}
 
@@ -212,6 +212,7 @@ class State:
     chilling_combo: bool = False  # Chilling Combo: a combo kill freezes a random enemy with at most 1 ice.
     combo_curse: bool = False  # Combo Curse: a combo kill curses a random enemy not cursed.
     combo_recharge: int = 0  # Combo Recharge: charge a combo kill adds to the hero's tile making it (4 a level).
+    kobushi_combo: bool = False  # Kobushi Combo: a combo kill fully recharges every tile in the hand.
     firing_tile: bool = False  # Whether a hero tile is firing now (Agent.TileInProgress).
     tile_recharge: int = 0  # Charge Combo Recharge has given the firing tile so far.
     # This is the fight before the Shogun's, the castle's last room (mod 0.18.0's `progression`). He can't be
@@ -463,6 +464,7 @@ def state_from_log(row):
         combo_curse=any(isinstance(s, dict) and s.get("name") == "ComboCurse" for s in row.get("skills") or []),
         combo_recharge=4 * next((s.get("level") or 1 for s in row.get("skills") or []
                                  if isinstance(s, dict) and s.get("name") == "ComboRecharge"), 0),
+        kobushi_combo=any(isinstance(s, dict) and s.get("name") == "KobushiCombo" for s in row.get("skills") or []),
         combo_skills=sum(1 for s in row.get("skills") or []
                          if isinstance(s, dict) and s.get("name") in ("ComboCurse", "ChillingCombo")),
         reactive_shield=any(isinstance(s, dict) and s.get("name") == "ReactiveShield" for s in row.get("skills") or []),
@@ -1351,6 +1353,12 @@ def combo_kill(state, outcome):
     # Combo Recharge: the hero's tile firing now gets 4 a level back once it's done (ComboRechargeSkill.OnComboKill).
     if state.combo_recharge and state.firing_tile:
         state.tile_recharge += state.combo_recharge
+    # Kobushi Combo: every tile in the hand that isn't fully charged is, whoever made the kill. Tiles in the attack
+    # queue aren't in the hand, so not the volley being fired (KobushiComboSkill.PerformCooldownRecharge).
+    if state.kobushi_combo:
+        for tile in state.tiles:
+            if not tile.in_queue:
+                tile.charge = tile.cooldown
     # Chilling Combo and Combo Curse pick a random enemy, so they're simulated only when exactly one can be picked
     # (ChillingComboSkill: alive with at most 1 ice; ComboCurseSkill: alive and not cursed). Otherwise counted.
     # With more than one to pick from, the effect isn't simulated; it counts what it's worth on the least valuable

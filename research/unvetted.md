@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.21: Kobushi Combo
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **Kobushi Combo: a combo kill fully recharges every tile in the hand, not the volley** | **Rule** | **The game's code; the player's reading; tests** | **Tile charges after a combo kill matching the log, also on a combo kill in the enemies' phase; fired tiles left uncharged** |
+
 ## New in v3.20: the Tanegashima
 
 | Item | Kind | What's already confirmed | What to look for |

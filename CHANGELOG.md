@@ -10,6 +10,12 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.21 — Kobushi Combo (2026-11-10)
+- **Rule: Kobushi Combo**, from `KobushiComboSkill`: on each kill after the first in a turn, by anyone, every tile
+  in the hand that isn't fully charged is recharged in full. Tiles in the attack queue aren't in the hand, so the
+  volley making the kill gets nothing. Simulated, so a second kill that brings spent tiles back shows in the
+  position it leaves.
+
 ## v3.20 — the Tanegashima (2026-11-10)
 - **Rule: the Tanegashima**, from `TanegashimaAttack`: 4 damage to the first agent ahead at any range, cooldown 7.
   It kicks a movable target one cell away, dead or not, and then its user one cell back, target or none. A kick

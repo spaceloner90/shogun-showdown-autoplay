@@ -3456,6 +3456,22 @@ class ComboTest(unittest.TestCase):
         # third: 4 back, one short of ready.
         self.assertEqual([t.charge for t in after.tiles], [3, 4])
 
+    def test_kobushi_combo_refills_the_hand_but_not_the_volley(self):
+        # KobushiComboSkill.PerformCooldownRecharge: on a combo kill, every tile in the hand not fully charged is.
+        state = self.triple()
+        state.kobushi_combo = True
+        state.tiles.append(Tile(KATANA, cooldown=4, charge=0))
+        after, _ = step(state, Action("Attack"))
+        self.assertEqual([t.charge for t in after.tiles], [0, 0, 4])
+
+    def test_kobushi_combo_needs_a_combo_kill(self):
+        state = make_state(enemies=[enemy(3, hp=1), enemy(6, hp=5)], queue=["Swirl"])
+        state.cells = 8
+        state.kobushi_combo = True
+        state.tiles.append(Tile(KATANA, cooldown=4, charge=0))
+        after, _ = step(state, Action("Attack"))
+        self.assertLess(after.tiles[-1].charge, 4)
+
 
 class MonomancerTest(unittest.TestCase):
     """MonomancerSkill in the game's code: its level added to the hero's hits on an attack with one tile queued."""

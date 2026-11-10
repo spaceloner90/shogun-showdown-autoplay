@@ -49,6 +49,8 @@ TILES = {
     "Shield": (0, [], True),
     "ShadowDash": (1, list(range(1, 11)), True),
     "CopycatMirror": (0, [1], True),
+    "TaintedTriad": (2, [], False),     # Under the Corrupted Soul and both cells beside it (rules.tainted_triad).
+    "CorruptedPulse": (3, [], False),   # Its cells come as a hazard, which the log shows once it is on its way.
     # The whole room, both ways, so anything asking whom it threatens finds the hero wherever it stands.
     "CorruptedExplosion": (1, [o for o in range(-10, 11) if o], False),
     "Maku": (0, [], True),
@@ -76,6 +78,8 @@ FIRST_TILE.update({"Kabukai": "CopycatMirror", "Shielder": None, "ShogunSummoner
                    "CorruptedProgeny": "CorruptedExplosion"})
 # Kinds whose choice doesn't always need the tile they hold identified.
 DECIDES_BLIND = {"Kabukai", "ShogunSummoner"}
+FIRST_TILE["CorruptedSoulBoss"] = None
+SOUL_TRIAD, SOUL_SUMMON, SOUL_PULSE = 1, 2, 3  # CorruptedSoulBoss.PatternEnum
 SHOGUN_SUMMONER_WAIT = {True: 7, False: 4}  # nTurnsBetweenAttacksEasy with both Summoners alive, Hard with one.
 SWAPPER_WAIT = 3  # SwapperEnemy.get_NTurnsBetweenAttacks
 PORTED = set(FIRST_TILE)
@@ -788,6 +792,60 @@ def _shogun_summoner(state, enemy, previous):
     return _play(None)
 
 
+def soul_pattern(enemy, pattern):
+    """CorruptedSoulBoss.set_Pattern: the pattern it leaves is kept as the previous one, unless it had none."""
+    if enemy.pattern:
+        enemy.prev_pattern = enemy.pattern
+    enemy.pattern = pattern
+
+
+def _soul(state, enemy, previous):
+    """CorruptedSoulBoss.AIPickAction. With no pattern it starts one: Tainted Triad after a Summon, else Summon,
+    each for two rounds. In its first phase it waits a turn after playing a tile.
+
+    Tainted Triad: down, it waits out its countdown, and on the last turn marks itself to go back up, ending the
+    pattern if its rounds are done or it is alone on the board. Up, it plays the tile, then moves over the hero's
+    cell or the one beside it, and attacks from there. Summon: plays it and fires it. Corrupted Pulse, which its
+    second phase opens with: plays it and fires it. Its state is logged since mod 0.20.0."""
+    if enemy.pattern is None or enemy.ai_wait is None:
+        return None
+    if enemy.pattern == 0:
+        soul_pattern(enemy, SOUL_TRIAD if enemy.prev_pattern == SOUL_SUMMON else SOUL_SUMMON)
+        if enemy.pattern == SOUL_SUMMON:
+            enemy.ai_count = 2
+        else:
+            enemy.ai_act = 2
+    tiles = len(enemy.queue)
+    rests = enemy.phase == 1 and previous == "PlayTile"
+    if enemy.pattern == SOUL_TRIAD:
+        if rests:
+            return Choice("Wait")
+        if enemy.ai_wait > 0:
+            enemy.ai_flag = enemy.ai_wait == 1
+            enemy.ai_wait -= 1
+            alone = sum(e.alive for e in state.enemies) <= 1
+            if enemy.ai_flag and ((enemy.ai_act or 0) <= 0 or alone):
+                soul_pattern(enemy, 0)
+            return Choice("Wait")
+        if tiles == 0:
+            return _play("TaintedTriad")
+        hero = state.hero.cell
+        if _holds(enemy, "TaintedTriad") and abs(enemy.cell - hero) <= 1:
+            enemy.ai_act = (enemy.ai_act or 0) - 1
+            return Choice("Attack")
+        return Choice("MoveRight" if enemy.cell < hero else "MoveLeft" if enemy.cell > hero else "Wait")
+    if enemy.pattern == SOUL_SUMMON:
+        if rests:
+            return Choice("Wait")
+        if tiles == 0:
+            return _play("Summon")
+        enemy.ai_count = (enemy.ai_count or 0) - 1
+        return Choice("Attack")
+    if enemy.pattern == SOUL_PULSE:
+        return Choice("Attack") if tiles else _play("CorruptedPulse")
+    return Choice("Wait")
+
+
 def after_attack(enemy):
     """What a boss does once its attack has gone off (PostAttackEvents): Baru and Hideyoshi start a new pattern, Ieyasu
     steps back after his Blade of Patience."""
@@ -797,6 +855,13 @@ def after_attack(enemy):
         enemy.pattern = 0
     elif enemy.kind == "IeyasuBoss" and enemy.pattern is not None:
         enemy.pattern = IEYASU_STEP_BACK if enemy.pattern == IEYASU_BLADE else 0
+    elif enemy.kind == "CorruptedSoulBoss" and enemy.pattern is not None:
+        # CorruptedSoulBoss.PostAttackEvents: the pattern ends unless a Summon has rounds left, or a Tainted Triad
+        # has rounds left or has just brought it down.
+        more = ((enemy.pattern == SOUL_SUMMON and (enemy.ai_count or 0) > 0)
+                or (enemy.pattern == SOUL_TRIAD and ((enemy.ai_wait or 0) > 0 or (enemy.ai_act or 0) > 0)))
+        if not more:
+            soul_pattern(enemy, 0)
 
 
 def _pick(state, enemy, previous):
@@ -853,6 +918,8 @@ def _pick(state, enemy, previous):
         return _iwao(state, enemy, previous)
     if kind in BOSS_AI:
         return BOSS_AI[kind](state, enemy, previous)
+    if kind == "CorruptedSoulBoss":
+        return _soul(state, enemy, previous)
     if kind == "Kabukai":
         return _kabukai(state, enemy, previous)
     if kind == "Shielder":
@@ -1024,8 +1091,8 @@ def decide(state, enemy, previous):
     choice = _pick(state, enemy, previous)
     if choice is None:
         return None
-    # A move needs a free cell that way (Enemy.CanPerformAction).
-    if choice.action in ("MoveLeft", "MoveRight"):
+    # A move needs a free cell that way (Enemy.CanPerformAction). Not the Corrupted Soul's, above the board.
+    if choice.action in ("MoveLeft", "MoveRight") and enemy.kind != "CorruptedSoulBoss":
         cell = enemy.cell + (-1 if choice.action == "MoveLeft" else 1)
         if not 0 <= cell < state.cells or state.occupant(cell) is not None:
             return Choice("Wait")

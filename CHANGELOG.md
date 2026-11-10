@@ -10,6 +10,22 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.32 — the Corrupted Soul; mod 0.20.0 (2026-11-10)
+- **Mod 0.20.0: the Corrupted Soul is logged while it hovers.** The game takes it out of its enemy list then
+  (`CorruptedSoulBoss.SwitchToUpMode`), so the log had the summoned enemies and no boss. It's now listed, with a
+  `soul` block: up or down, the cell it's over, its phase, how long it stays down, its pattern and counters.
+- **Rule: the Corrupted Soul**, from `CorruptedSoulBoss` and `TaintedTriadAttack`. Hovering, it's kept off the
+  board, where nothing reaches or is blocked by it (`State.soul`). A move it has chosen is made straight after the
+  hero acts. Tainted Triad hits the cell under it and both beside it for 2, then brings it down on that cell for
+  four turns if nobody is there. Its time done, it goes back up, sheds ice, poison and curse, and below half HP
+  enters its second phase with Corrupted Pulse.
+- **Rule: its AI**, from `AIPickAction`: Summon and Tainted Triad in turn, two rounds each; a turn's wait after
+  playing a tile in its first phase; for the Triad it moves over the hero's cell or the one beside it and attacks.
+- Its Summon counts as two summons (it has Double Strike). Corrupted Pulse's cells aren't simulated before the
+  log shows them as a hazard: 3 damage on even cells, then odd, then even.
+- From the code only: no log has the boss yet. Not known: whether it chooses twice on the turn it lands, which
+  would shorten its time down by a turn, and the turn the Pulse's first cells strike.
+
 ## v3.31 — a fight that can only be ended at a cost is ended (2026-11-10)
 - **Scoring: each turn the last wave is past its countdown with enemies left costs 10 more**, in the position's
   score. In day 7's first fight the hero had only the Spear to deal damage, at 5 max HP. The last enemy was a

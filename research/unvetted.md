@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.32: the Corrupted Soul; mod 0.20.0
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **The Corrupted Soul: hovering off the board, following moves, Tainted Triad and the landing, its AI** | **Rule** | **The game's code; tests. No log yet** | **`soul` blocks in the log against the predicted cell, action and counters each turn; how many turns it stays down; hits the solver didn't predict** |
+| Corrupted Pulse only once it's logged as a hazard | Rule | The hazard format is the one Corrupted Wave uses | The turn its first cells strike; 3 damage taken on a cell the solver thought safe |
+
 ## New in v3.31: a fight that can only be ended at a cost is ended
 
 | Item | Kind | What's already confirmed | What to look for |

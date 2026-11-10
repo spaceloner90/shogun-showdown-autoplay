@@ -26,7 +26,7 @@ using BepInEx;
 using HarmonyLib;
 using UnityEngine;
 
-[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.19.0")]
+[BepInPlugin("local.shogunautoplay.statelogger", "Shogun State Logger", "0.20.0")]
 public class StateLoggerPlugin : BaseUnityPlugin
 {
     private const float PollIntervalSeconds = 0.1f;
@@ -598,12 +598,30 @@ public class StateLoggerPlugin : BaseUnityPlugin
             sb.Append(",\"pattern\":").Append(PatternIndex(enemy));
             sb.Append(",\"tileToPlay\":").Append(Str(TileToPlay(enemy)));
             sb.Append(",\"memory\":").Append(AiMemory(enemy));
+            if (enemy is CorruptedSoulBoss) sb.Append(",\"soul\":").Append(SoulState(enemy));
             // The game numbers its attack-order badges this way in SetEnemiesAttackOrderUI.
             bool attacking = enemy.Action == CombatEnums.ActionEnum.Attack;
             sb.Append(",\"attackOrder\":").Append(attacking ? attackOrder.ToString() : "null");
             if (attacking) attackOrder++;
             sb.Append(",\"threatens\":[").Append(string.Join(",", ToStrings(ThreatenedCells(enemy, room.Grid)))).Append("]");
             sb.Append("}");
+        }
+        // The Corrupted Soul leaves the game's enemy list while it hovers above the board
+        // (CorruptedSoulBoss.SwitchToUpMode), so it's added here: its "soul" block says it's up and over which cell.
+        CorruptedSoulBoss hovering = UnityEngine.Object.FindObjectOfType<CorruptedSoulBoss>();
+        if (hovering != null && hovering.IsAlive && !combat.Enemies.Contains(hovering))
+        {
+            if (!first) sb.Append(",");
+            first = false;
+            AppendAgent(sb, hovering, hovering.EnemyEnum.ToString());
+            sb.Append(",\"elite\":").Append(Str(hovering.EliteType.ToString()));
+            sb.Append(",\"inanimate\":").Append(Bool(hovering.Inanimate));
+            sb.Append(",\"traits\":[").Append(JoinEnums(Traits(hovering))).Append("]");
+            sb.Append(",\"pattern\":").Append(PatternIndex(hovering));
+            sb.Append(",\"tileToPlay\":").Append(Str(TileToPlay(hovering)));
+            sb.Append(",\"memory\":").Append(AiMemory(hovering));
+            sb.Append(",\"soul\":").Append(SoulState(hovering));
+            sb.Append(",\"attackOrder\":null,\"threatens\":[]}");
         }
         sb.Append("]");
 
@@ -1180,6 +1198,23 @@ public class StateLoggerPlugin : BaseUnityPlugin
             if (value != null) parts.Add(Str("turnsToWaitBeforeSummoning") + ":" + value.ToString());
         }
         return "{" + string.Join(",", parts.ToArray()) + "}";
+    }
+
+    // The Corrupted Soul's state that the board doesn't show: whether it hovers and over which cell (its pseudo
+    // cell), its phase, how long it stays down, and its pattern counters.
+    private static string SoulState(Enemy soul)
+    {
+        Traverse t = Traverse.Create(soul);
+        Cell pseudo = t.Field("pseudoCell").GetValue<Cell>();
+        return "{\"up\":" + Bool(Convert.ToInt32(t.Property("Mode").GetValue()) == 0)
+            + ",\"cell\":" + (pseudo != null ? pseudo.IndexInGrid.ToString() : "null")
+            + ",\"phase\":" + Convert.ToInt32(t.Property("Phase").GetValue())
+            + ",\"stayDown\":" + Convert.ToInt32(t.Property("StayDownCountdown").GetValue())
+            + ",\"pattern\":" + Convert.ToInt32(t.Field("_pattern").GetValue())
+            + ",\"previousPattern\":" + Convert.ToInt32(t.Field("previousPattern").GetValue())
+            + ",\"summonRepeats\":" + t.Field("nSummonPatternRepeats").GetValue<int>()
+            + ",\"triadRepeats\":" + t.Field("nTaintedTriadPatternRepeats").GetValue<int>()
+            + ",\"goUp\":" + Bool(t.Field("goUpTrigger").GetValue<bool>()) + "}";
     }
 
     private static string PatternIndex(Enemy enemy)

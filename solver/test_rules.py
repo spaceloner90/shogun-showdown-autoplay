@@ -3,7 +3,9 @@
 Run with: python solver/test_rules.py
 """
 import dataclasses
+import json
 import unittest
+from pathlib import Path
 
 import enemy_ai
 
@@ -3744,6 +3746,90 @@ class OvertimeTest(unittest.TestCase):
         late = search.rank_lines(self.board(30), 4)[0]
         self.assertNotEqual(early.actions[0].kind, "Attack")
         self.assertEqual(late.actions[0].kind, "Attack")
+
+
+class CorruptedSoulTest(unittest.TestCase):
+    """CorruptedSoulBoss in the game's code: it hovers above the board, out of the enemy list, over a cell it
+    moves along; its Tainted Triad hits that cell and both beside it, and brings it down for four turns."""
+
+    def soul(self, cell, action="Wait", queue=(), **fields):
+        from rules import SOUL
+        given = dict(pattern=1, prev_pattern=2, ai_count=0, ai_act=2, ai_wait=0, ai_flag=False)
+        given.update(fields)
+        return Agent(SOUL, cell, -1, 60, 60, action=action, queue=list(queue), up=True, **given)
+
+    def board(self, soul, hero_cell=4, enemies=()):
+        state = make_state(hero_cell=hero_cell, enemies=list(enemies))
+        state.cells = 9
+        state.soul = soul
+        return state
+
+    TRIAD = Attack("TaintedTriad", 2, [])
+
+    def test_a_hovering_soul_keeps_the_fight_going_and_blocks_nothing(self):
+        state = self.board(self.soul(4))
+        self.assertFalse(fight_won(state))
+        self.assertIs(state.occupant(4), state.hero)
+
+    def test_it_follows_straight_after_the_hero_acts(self):
+        after, _ = step(self.board(self.soul(2, action="MoveRight", queue=[self.TRIAD])), Action("Wait"))
+        self.assertEqual((after.soul.cell, after.soul.action), (3, "Attack"))
+
+    def test_tainted_triad_hits_three_cells_and_brings_it_down(self):
+        bystander = enemy(2, hp=5)
+        state = self.board(self.soul(3, action="Attack", queue=[self.TRIAD]), enemies=[bystander])
+        after, outcome = step(state, Action("Wait"))
+        landed = next(e for e in after.enemies if e.kind == "CorruptedSoulBoss")
+        self.assertEqual((outcome.hp_lost, after.soul, landed.cell, landed.up), (2, None, 3, False))
+        self.assertEqual(next(e.hp for e in after.enemies if e.kind == "Ashigaru"), 3)
+        self.assertEqual(landed.ai_wait, 3)  # Four turns down, the first counted at the end of this one.
+
+    def test_it_stays_up_with_someone_under_it(self):
+        after, outcome = step(self.board(self.soul(4, action="Attack", queue=[self.TRIAD])), Action("Wait"))
+        self.assertEqual((outcome.hp_lost, after.soul.cell), (2, 4))
+
+    def test_two_cells_away_is_safe(self):
+        after, outcome = step(self.board(self.soul(3, action="Attack", queue=[self.TRIAD])), Action("MoveRight"))
+        self.assertEqual((after.hero.cell, outcome.hp_lost), (5, 0))
+
+    def test_it_goes_back_up_when_its_time_is_done(self):
+        soul = self.soul(3, ai_wait=4)
+        soul.up = False
+        state = self.board(None, enemies=[soul])
+        for _ in range(4):
+            self.assertIsNone(state.soul)
+            state, _ = step(state, Action("Wait"))
+        state, _ = step(state, Action("Wait"))
+        self.assertEqual((state.soul.cell, state.soul.up, [e for e in state.enemies if e.alive]), (3, True, []))
+
+    def test_below_half_hp_it_opens_its_second_phase_with_the_pulse(self):
+        soul = self.soul(3, ai_wait=0, ai_flag=True, pattern=0)
+        soul.up, soul.hp = False, 20
+        state, _ = step(self.board(None, enemies=[soul]), Action("Wait"))
+        self.assertEqual((state.soul.phase, state.soul.pattern, state.soul.tile_to_play), (2, 3, "CorruptedPulse"))
+
+    def test_the_search_steps_out_from_under_it(self):
+        import search
+        state = self.board(self.soul(3, action="Attack", queue=[self.TRIAD]))
+        best = search.rank_lines(state, 4)[0]
+        self.assertEqual(search.line_totals(state, best)[0], 0)
+
+    def test_it_is_read_from_the_log_while_it_hovers(self):
+        row = json.loads((Path(__file__).resolve().parent.parent / "research" / "logs" / "run20" / "state.jsonl")
+                         .read_text(encoding="utf-8").splitlines()[-1])
+        self.assertEqual(row["type"], "state")
+        row["enemies"].append({
+            "kind": "CorruptedSoulBoss", "cell": 8, "facing": "Left", "action": "PlayTile", "alive": True, "hp": 60,
+            "maxHp": 60, "shield": False, "ice": 0, "poison": 0, "curse": False, "queue": [], "elite": "None",
+            "inanimate": False, "traits": [], "pattern": 2, "tileToPlay": "Summon", "memory": {"firstTurn": False},
+            "soul": {"up": True, "cell": 4, "phase": 1, "stayDown": 0, "pattern": 2, "previousPattern": 0,
+                     "summonRepeats": 1, "triadRepeats": 0, "goUp": False},
+            "attackOrder": None, "threatens": []})
+        state = state_from_log(row)
+        self.assertEqual((state.soul.cell, state.soul.up, state.soul.ai_count), (4, True, 1))
+        self.assertNotIn("CorruptedSoulBoss", [e.kind for e in state.enemies])
+        after, outcome = step(state, Action("Wait"))
+        self.assertEqual(([a.name for a in after.soul.queue], after.soul.action), (["Summon"], "Wait"))
 
 
 class SummonTest(unittest.TestCase):

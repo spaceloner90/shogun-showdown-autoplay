@@ -66,6 +66,10 @@ def state_key(state):
         state.swap_charge, state.turns_until_wave, state.wave_held_at, tuple(state.potions),
         tuple(state.lit_cells) if state.lit_cells is not None else None, state.nobunaga_hp_last_turn,
         state.lights_guessed,
+        None if state.soul is None else (
+            state.soul.cell, state.soul.hp, state.soul.action, state.soul.phase, state.soul.pattern,
+            state.soul.prev_pattern, state.soul.ai_count, state.soul.ai_act, state.soul.tile_to_play,
+            tuple(a.name for a in state.soul.queue)),
         repr(state.traps), repr(state.hazards),
         tuple((e.kind, e.cell, e.facing, e.hp, e.max_hp, e.shield, e.curse, e.poison, e.ice, e.action, e.known,
                e.tile_to_play, e.last_tile, e.elite, tuple((a.name, a.value, a.target_cell) for a in e.queue))

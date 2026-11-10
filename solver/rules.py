@@ -19,7 +19,7 @@ ONE_ENEMY_WAVE_CAP = 6
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
 MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb", "Barricade", "BladeOfPatience", "BlazingSuisei", "Bo", "Bomb", "SignatureMove",
            "BossSwap", "Charge", "Crossbow",
-           "CopycatMirror", "CorruptedBarrage", "CorruptedExplosion", "CorruptedWaveL2R", "CorruptedWaveR2L", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Hookblade", "Katana", "Kunai", "Lightning", "Maku", "MeteorHammer", "Mirror", "OriginOfSymmetry", "Shield",
+           "CopycatMirror", "CorruptedBarrage", "CorruptedExplosion", "CorruptedPulse", "TaintedTriad", "CorruptedWaveL2R", "CorruptedWaveR2L", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Hookblade", "Katana", "Kunai", "Lightning", "Maku", "MeteorHammer", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Sai", "ScarStrike", "SmokeBomb", "Spear", "Summon", "SwapToss",
            "Swirl", "Tanegashima", "Tetsubo", "Trap", "TurnAround", "TwinTessen", "Volley"}
 
@@ -88,6 +88,8 @@ PLAIN_DASHES = {"Dash": 1}                 # Run to the last free cell, and hit 
 SHADOW_DASHES = {"ShadowDash": 1, "BackShadowDash": -1}  # Land behind a target, hitting all they pass.
 CORRUPTED_ELITE = "Corrupted"  # The elite type that leaves a Corrupted Progeny when it dies.
 PROGENY = "CorruptedProgeny"
+SOUL = "CorruptedSoulBoss"
+SOUL_STAYS_DOWN = 4  # Turns the Corrupted Soul stays down after landing (TaintedTriadAttack.ApplyEffect).
 CORRUPTED_WAVES = {"CorruptedWaveL2R": 1, "CorruptedWaveR2L": -1}  # Corrupted Iwao's: sweeps the board one cell a turn.
 # Bosses with no traits but when corrupted, so a trait in the log means corrupted.
 TRAITS_ONLY_CORRUPTED = {"DaisukeBoss", "IwaoBoss"}
@@ -169,6 +171,9 @@ class Agent:
     ai_count: int | None = None
     ai_act: int | None = None
     ai_flag: bool | None = None
+    # The Corrupted Soul: its phase, and whether it hovers above the board, over `cell`, where nothing reaches it.
+    phase: int = 1
+    up: bool = False
 
     @property
     def alive(self):
@@ -240,6 +245,9 @@ class State:
     potion_slots: int = POTION_SLOTS  # How many potions the hero can hold.
     # Nobunaga's spotlit cells, the only ones where he can be hurt, or None without him. Empty once they've moved
     # within a simulated turn, since where they go is random.
+    # The Corrupted Soul while it hovers: the game takes it out of its enemy list then, and so does this
+    # (CorruptedSoulBoss.SwitchToUpMode). Down, it is among the enemies like any other.
+    soul: Agent | None = None
     lit_cells: list[int] | None = None
     lights_guessed: bool = False  # His lights moved to cells not known within this line, so every cell counts as lit.
     nobunaga_hp_last_turn: int | None = None  # His HP at his last turn: the lights move when it has changed.
@@ -255,6 +263,9 @@ class State:
             twin = copy.copy(enemy)
             twin.queue = list(enemy.queue)
             new.enemies.append(twin)
+        if self.soul is not None:
+            new.soul = copy.copy(self.soul)
+            new.soul.queue = list(self.soul.queue)
         tiles = {id(t): copy.copy(t) for t in self.tiles}
         new.tiles = [tiles[id(t)] for t in self.tiles]
         new.queue_tiles = [tiles[id(t)] for t in self.queue_tiles]
@@ -417,6 +428,19 @@ def state_from_log(row):
     hero = agent(row["hero"])
     hero.action = "Wait"
     enemies = [with_ai_memory(agent(e), e) for e in row["enemies"]]
+    # The Corrupted Soul's own state, logged since mod 0.20.0, which also lists it while it hovers.
+    soul = None
+    for enemy, data in zip(list(enemies), row["enemies"]):
+        logged = data.get("soul") if data["kind"] == SOUL else None
+        if not logged:
+            continue
+        enemy.phase, enemy.ai_wait, enemy.ai_flag = logged["phase"], logged["stayDown"], logged["goUp"]
+        enemy.pattern, enemy.prev_pattern = logged["pattern"], logged["previousPattern"]
+        enemy.ai_count, enemy.ai_act = logged["summonRepeats"], logged["triadRepeats"]
+        if logged["up"]:
+            enemy.up, enemy.cell = True, logged["cell"]
+            enemies = [e for e in enemies if e is not enemy]
+            soul = enemy
     # The game locks a Volley onto the hero's cell as the turn it fires begins.
     for enemy in enemies:
         if enemy.action == "Attack":
@@ -443,6 +467,7 @@ def state_from_log(row):
         cells=row["cells"],
         hero=hero,
         enemies=enemies,
+        soul=soul,
         tiles=tiles,
         queue_tiles=queue_tiles,
         swap_charge=special.get("charge", 0),
@@ -967,6 +992,73 @@ def corrupted_explosion(state, attacker, attack, outcome):
         strike_cell(state, attacker, cell, attack.value, outcome)
 
 
+def soul_follow(state):
+    """A hovering Corrupted Soul whose action is a move makes it straight after the hero acts, one cell, staying
+    over the board (CorruptedSoulBoss.HeroPerformedCombatAction, Move)."""
+    soul = state.soul
+    if soul is not None and soul.move_dir:
+        cell = soul.cell + soul.move_dir
+        if 0 <= cell < state.cells:
+            soul.cell = cell
+
+
+def tainted_triad(state, soul, attack, outcome):
+    """TaintedTriadAttack.ApplyEffect: hits whoever is on the cell under the Soul and on both cells beside it. Then,
+    with nobody under it, it comes down on that cell for four turns, where it can be hit."""
+    for cell in (soul.cell, soul.cell - 1, soul.cell + 1):
+        agent = state.occupant(cell) if 0 <= cell < state.cells else None
+        if agent is not None:
+            land_hit(state, soul, agent, attack.value, outcome)
+    if state.occupant(soul.cell) is None:
+        soul.up, soul.ai_wait = False, SOUL_STAYS_DOWN
+        state.soul = None
+        state.enemies.append(soul)
+
+
+def _soul_decides(state, soul, previous):
+    choice = enemy_ai.decide(state, soul, previous) if state.hero.alive else None
+    soul.known = choice is not None
+    choice = choice or enemy_ai.Choice("Wait")
+    soul.action, soul.tile_to_play, soul.first_turn = choice.action, choice.tile, False
+
+
+def soul_turn(state, outcome):
+    """The Corrupted Soul's own turn, which the room runs after everyone else's (CorruptedSoulBoss.ProcessTurn).
+    Hovering, it fires or plays its tile and chooses its next action there and then (ProcessTurnInUpMode); a move
+    was made already, after the hero's action. Down, it only acts once its time is up: it goes back up over its
+    cell, shedding ice, poison and curse, enters its second phase below half HP, and chooses again. A Soul that
+    lands this turn is left to choose with the other enemies, at the end of the turn."""
+    soul = state.soul
+    if soul is None:
+        down = next((e for e in state.enemies if e.kind == SOUL and e.alive and e.ai_flag), None)
+        if down is None:
+            return
+        state.enemies = [e for e in state.enemies if e is not down]
+        state.soul = down
+        down.up, down.ai_flag, down.ice, down.poison, down.curse = True, False, 0, 0, False
+        if down.phase == 1 and down.hp < down.max_hp // 2:
+            down.phase = 2
+            enemy_ai.soul_pattern(down, enemy_ai.SOUL_PULSE)
+        _soul_decides(state, down, down.action)
+        return
+    if not state.hero.alive:
+        return
+    previous = soul.action
+    if previous == "Attack":
+        for attack in soul.queue:
+            if attack.name == "TaintedTriad":
+                tainted_triad(state, soul, attack, outcome)
+            elif attack.name == "Summon":
+                outcome.summons += 2  # Its Summon has Double Strike: two arrive. Who and where isn't simulated.
+        soul.queue = []
+        enemy_ai.after_attack(soul)
+    elif previous == "PlayTile" and soul.tile_to_play:
+        soul.queue.append(enemy_ai.make_attack(soul.kind, soul.tile_to_play, soul.elite))
+        soul.last_tile = soul.tile_to_play
+    if state.soul is soul:
+        _soul_decides(state, soul, previous)
+
+
 def place_bomb(state, attacker, attack):
     """Puts a bomb on the cell in front of the attacker. It blasts that cell and both neighbours."""
     cell = attacker.cell + attacker.facing
@@ -1382,7 +1474,8 @@ def fight_won(state):
     waves."""
     if state.fight_won:
         return True
-    return not any(e.alive for e in state.enemies) and (state.turns_until_wave is None or state.last_wave)
+    return (not any(e.alive for e in state.enemies) and state.soul is None
+            and (state.turns_until_wave is None or state.last_wave))
 
 
 def kobushi_recharge(state):
@@ -1750,6 +1843,7 @@ def step(state, action):
     next_state.ice_pending = next_state.curse_pending = None
     next_state.kobushi_due = False
     swapped = hero_action(next_state, action, outcome)
+    soul_follow(next_state)
     already_on_the_way = len(next_state.hazards)
     resolve_enemies(next_state, outcome)
     tick_poison(next_state, outcome)
@@ -1759,6 +1853,7 @@ def step(state, action):
     for enemy in list(next_state.enemies):
         if enemy.kind == "NobunagaBoss":
             relocate_lights(next_state, enemy)
+    soul_turn(next_state, outcome)
     kobushi_recharge(next_state)  # For combo kills outside the hero's volley, the fired tiles now back in the hand.
     end_turn(next_state, swapped)
     return next_state, outcome

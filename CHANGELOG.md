@@ -10,6 +10,14 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.19 — the HP curve no longer follows max HP (2026-11-10)
+- **Scoring: each HP lost costs 1000 / the HP it's lost at, whatever the max HP**: the curve a 10 max HP hero had,
+  applied to all. At 5 max HP on day 6 the first HP was still priced at 100, as if the hero were safe; it now costs
+  200, what the fifth of ten does. A hero with 12 max HP pays 83 for its first. Healing, hero poison and the penalty
+  for unanswerable damage (now 10 / HP) follow.
+- **Scoring: a shield held is worth half the first HP off the hero's max HP**, computed from the curve: 50 at 10 max
+  HP as before, 100 at 5. It stays below any real HP at every max HP.
+
 ## v3.18 — HP worth more the lower it gets; the shield at half an HP (2026-11-09)
 - **Scoring: each HP lost costs 100 × max HP / the HP it's lost at**, the player's curve: 100 from full, twice that
   at half health, and death still prices the last. Healing (Triple Combo Heal) is worth the same in reverse, poison

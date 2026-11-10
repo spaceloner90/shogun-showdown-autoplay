@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.19: the HP curve no longer follows max HP
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **Each HP lost costs 1000 / HP whatever the max HP; a shield half the first HP off the max** | **Scoring** | **The player's values, at 5 max HP on day 6; tests** | **At low max HP: hits no longer traded for kills at full health, potions drunk sooner; play too timid to kill before the next wave** |
+
 ## New in v3.18: HP worth more the lower it gets; the shield at half an HP
 
 | Item | Kind | What's already confirmed | What to look for |

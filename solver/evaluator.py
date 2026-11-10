@@ -58,13 +58,15 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v3.18"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v3.19"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
-    # Per HP lost at full health; each lower one costs max HP / HP that much more (hp_cost), the player's curve. The
-    # goal is to clear the battle without losing any.
+    # Per HP lost at hp_scale HP; one lost at h HP costs hp_scale / h times that (hp_cost), the player's curve, whatever
+    # the max HP: a hero with 5 max HP is as close to death at full as one with 10 max is at 5. The goal is to clear
+    # the battle without losing any.
     "hp_lost": -100.0,
+    "hp_scale": 10,
     "death": -10000.0,
     "enemy_damage": 10.0,     # Per enemy HP removed by the hero.
     "tank_damage": 2.5,       # Per HP removed from a tank that will die with its boss anyway.
@@ -134,8 +136,9 @@ WEIGHTS = {
     "curse": 0.5,             # Fraction of what a curse would add to the hero's next hit on that enemy.
     "wound": 0.5,             # With Scar Strike in the deck, the share of its damage on each wounded enemy, as the
                               # player asked: a 1-damage chip on an enemy at full health is worth half as much again.
-    # Holding a shield: a share of an HP at full, set below. Less than any real HP, as the player put it: giving one up
-    # loses nothing unless another hit comes this fight, and most fights bring at most one.
+    # Holding a shield: a share of what the first HP off the hero's max HP costs (_shield_value). Less than any real
+    # HP, as the player put it: giving one up loses nothing unless another hit comes this fight, and most fights bring
+    # at most one.
     "shield_share": 0.5,
     "facing_ideal": 6.0,      # Facing the enemy we most want to hit.
     "facing_other": 2.0,      # Facing an enemy, but not that one.
@@ -154,7 +157,6 @@ WEIGHTS = {
 }
 
 # Values defined as equal to others are tied here, so changing one changes them all.
-WEIGHTS["shield"] = WEIGHTS["shield_share"] * -WEIGHTS["hp_lost"]
 _ESCAPES = WEIGHTS["escape_values"]
 _ESCAPES["PhaseSpecialMove"] = _ESCAPES["SwapSpecialMove"]
 _ESCAPES["ThrowSpecialMove"] = _ESCAPES["PushSpecialMove"]
@@ -744,9 +746,14 @@ def _poison_value(state):
 
 
 def _shield_value(state):
-    """A shield held, worth less than any real HP (WEIGHTS["shield"]). Since v3.18 that alone keeps Reactive Shield from
-    making a hit look worth taking for the shield it brings, which a half shield held without one used to do."""
-    return WEIGHTS["shield"] if state.hero.shield else 0.0
+    """A shield held: a share of the first HP off the hero's max HP, so worth less than any real HP. Since v3.18 that
+    alone keeps Reactive Shield from making a hit look worth taking for the shield it brings."""
+    return shield_worth(state.hero) if state.hero.shield else 0.0
+
+
+def shield_worth(hero):
+    """What holding a shield is worth to this hero, tied to the HP curve: shield_share of the cheapest HP it has."""
+    return WEIGHTS["shield_share"] * hp_cost(hero.max_hp, hero.max_hp, 1) if hero.max_hp else         WEIGHTS["shield_share"] * -WEIGHTS["hp_lost"]
 
 
 def _kept_terms(state):
@@ -779,11 +786,10 @@ def leaf_terms(state: State) -> dict[str, float]:
 
 def hp_cost(hp, max_hp, points):
     """What losing `points` HP from `hp` costs: each by how low it leaves the hero, the player's curve. An HP lost at
-    full costs the base weight, and one lost at h HP max HP / h times that. Past the last HP, death prices it."""
-    unit = -WEIGHTS["hp_lost"]
-    if not max_hp:
-        return unit * points
-    return sum(unit * max_hp / h for h in range(hp, hp - points, -1) if h > 0)
+    hp_scale HP costs the base weight, and one lost at h HP hp_scale / h times that, whatever the max HP. Past the last
+    HP, death prices it."""
+    unit = -WEIGHTS["hp_lost"] * WEIGHTS["hp_scale"]
+    return sum(unit / h for h in range(hp, hp - points, -1) if h > 0)
 
 
 def hp_gain(hp, max_hp, points):
@@ -793,9 +799,9 @@ def hp_gain(hp, max_hp, points):
 
 
 def hp_factor(state):
-    """How much an HP is worth now against one at full: max HP / HP."""
+    """How much an HP is worth now against the base weight: hp_scale / HP."""
     hero = state.hero
-    return hero.max_hp / hero.hp if hero.hp > 0 and hero.max_hp else 1.0
+    return WEIGHTS["hp_scale"] / hero.hp if hero.hp > 0 else 1.0
 
 
 def outcome_terms(outcome: Outcome, hero_dead: bool, cheapest_hit: int = 1, combo_skills: int = 0, hp=None,

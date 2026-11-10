@@ -5,7 +5,7 @@ Run with: python solver/test_rules.py
 import dataclasses
 import unittest
 
-from evaluator import WEIGHTS, hp_cost, _volleys, _has_way_out, potion_plan, _threat_damage, ideal_target, leaf_terms, rank_actions, unanswerable_damage
+from evaluator import WEIGHTS, hp_cost, shield_worth, _volleys, _has_way_out, potion_plan, _threat_damage, ideal_target, leaf_terms, rank_actions, unanswerable_damage
 from rules import ICE_TURNS, can_use_special, fight_won, SIMULATED_POTIONS, Action, Agent, Attack, State, Tile, apply_potion, is_tank, legal_actions, state_from_log, step, unmodeled_content
 
 SWIRL = Attack("Swirl", 2, [-1, 1])
@@ -809,7 +809,21 @@ class ShieldValueTest(unittest.TestCase):
         with_shield.hero.shield = True
         without = make_state(enemies=[enemy(4)])
         self.assertEqual(leaf_terms(with_shield)["shield"] - leaf_terms(without)["shield"], 50)
-        self.assertEqual(WEIGHTS["shield"], WEIGHTS["shield_share"] * -WEIGHTS["hp_lost"])
+        hero = with_shield.hero
+        self.assertEqual(shield_worth(hero), WEIGHTS["shield_share"] * hp_cost(hero.max_hp, hero.max_hp, 1))
+
+    def test_a_shield_follows_the_first_hp_of_the_max(self):
+        # The player, at 5 max HP on day 6: the first HP there costs what the fifth of ten does, and the shield half it.
+        state = make_state(enemies=[enemy(4)])
+        state.hero.shield = True
+        state.hero.hp = state.hero.max_hp = 5
+        self.assertEqual(hp_cost(5, 5, 1), 200)
+        self.assertEqual(leaf_terms(state)["shield"], 100)
+
+    def test_an_hp_costs_the_same_whatever_the_max(self):
+        self.assertEqual(hp_cost(5, 5, 2), hp_cost(5, 10, 2))
+        self.assertEqual(hp_cost(10, 10, 1), -WEIGHTS["hp_lost"])
+        self.assertLess(hp_cost(12, 12, 1), -WEIGHTS["hp_lost"])
 
     def test_reactive_shield_makes_no_hit_worth_taking(self):
         state = make_state(enemies=[enemy(4)])
@@ -819,7 +833,7 @@ class ShieldValueTest(unittest.TestCase):
     def test_dodges_rather_than_spend_a_shield_for_nothing(self):
         best = rank_actions(self._attacked(), depth=1)[0]
         self.assertEqual(best.actions[0].kind, "MoveLeft")
-        self.assertEqual(best.terms["shield"], WEIGHTS["shield"] * WEIGHTS["future_discount"])
+        self.assertEqual(best.terms["shield"], shield_worth(make_state().hero) * WEIGHTS["future_discount"])
 
     def test_spends_a_shield_when_the_hit_cannot_be_dodged(self):
         # Backed into the corner with Swap charging, so the only question is what else to do.
@@ -837,7 +851,7 @@ class ShieldValueTest(unittest.TestCase):
         state.turns_until_wave = 5  # More to come, so the kill doesn't win the fight and the position still counts.
         best = rank_actions(state, depth=1)[0]
         self.assertEqual(best.actions[0].kind, "Attack")
-        self.assertEqual(best.terms["shield"], WEIGHTS["shield"] * WEIGHTS["future_discount"])
+        self.assertEqual(best.terms["shield"], shield_worth(make_state().hero) * WEIGHTS["future_discount"])
 
 
 class EvaluatorTest(unittest.TestCase):
@@ -3032,7 +3046,7 @@ class ReactiveShieldTest(unittest.TestCase):
         before = self.board([KATANA])
         after, outcome = step(before, Action("Wait"))
         gained = _shield_value(after) - _shield_value(before)
-        self.assertEqual(gained, WEIGHTS["shield"])
+        self.assertEqual(gained, shield_worth(after.hero))
         self.assertGreater(hp_cost(before.hero.hp, before.hero.max_hp, outcome.hp_lost), gained)
 
 

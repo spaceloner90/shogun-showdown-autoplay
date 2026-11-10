@@ -236,6 +236,7 @@ class State:
     # Nobunaga's spotlit cells, the only ones where he can be hurt, or None without him. Empty once they've moved
     # within a simulated turn, since where they go is random.
     lit_cells: list[int] | None = None
+    lights_guessed: bool = False  # His lights moved to cells not known within this line, so every cell counts as lit.
     nobunaga_hp_last_turn: int | None = None  # His HP at his last turn: the lights move when it has changed.
     fight_won: bool = False  # Set when a boss dies, which ends the fight. See fight_won() for the rest.
 
@@ -1293,13 +1294,19 @@ def relocate_lights(state, nobunaga):
     the ones lit and his own (NobunagaBoss.ProcessTurn, which the room runs after the agents' end of turn;
     GetNextVulnerableCells). How many depends on his HP: 3 above two thirds, 2 above one third, then 1, and corrupted
     2 and then 1 (get_NumberOfVulnerableCells). With no more cells to choose from than lights, where they go is
-    certain, as when he has stepped off a lit cell in a room of 7. Otherwise it's unknown, and none counts as lit."""
+    certain, as when he has stepped off a lit cell in a room of 7. Otherwise it's unknown: from then on every cell
+    counts as lit and the lights as guessed, which the search counts at half like any guessed turn (the player's
+    call, v3.26: counting none as lit made a sure hit now look worse than holding, since every tile lost its worth
+    once the lights had moved)."""
     if state.lit_cells is None or not nobunaga.alive:
         return
     last = state.nobunaga_hp_last_turn
-    if last is not None and nobunaga.hp < last:
+    if last is not None and nobunaga.hp < last and not state.lights_guessed:
         free = [c for c in range(state.cells) if c not in state.lit_cells and c != nobunaga.cell]
-        state.lit_cells = free if state.lit_cells and len(free) <= nobunaga_lights(nobunaga) else []
+        if len(free) <= nobunaga_lights(nobunaga):
+            state.lit_cells = free
+        else:
+            state.lit_cells, state.lights_guessed = list(range(state.cells)), True
     state.nobunaga_hp_last_turn = nobunaga.hp
 
 

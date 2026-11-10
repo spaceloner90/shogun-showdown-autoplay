@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.26: Nobunaga can be hit anywhere once his lights have moved unknown
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **Every cell lit, at half weight, after an unknown light move** | **Scoring** | **The player's rule; day 6 run turn 12 now scores the shot at 70, from -10; tests** | **Sure hits on him still passed up; lines counting on a second hit that the real lights then deny** |
+
 ## New in v3.25: Nobunaga's lights known where the game has no choice
 
 | Item | Kind | What's already confirmed | What to look for |

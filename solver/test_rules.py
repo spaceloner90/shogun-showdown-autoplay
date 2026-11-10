@@ -1842,9 +1842,15 @@ class NobunagaTest(unittest.TestCase):
         after, _ = step(state, Action("Wait"))
         self.assertEqual(after.enemies[0].hp, 39)
 
-    def test_once_hurt_the_lights_move_and_nothing_counts_as_lit(self):
+    def test_once_hurt_the_lights_move_and_every_cell_counts_as_lit_as_a_guess(self):
+        # The player's call (v3.26): where they went isn't known, so he can be hit anywhere from then on, and the
+        # search counts those turns at half, like any guessed turn.
         after, _ = fire(self.board(lit=[3]), KATANA)
-        self.assertEqual(after.lit_cells, [])
+        self.assertEqual((after.lit_cells, after.lights_guessed), (list(range(after.cells)), True))
+        import search
+        self.assertEqual(search._factor(after), search.UNKNOWN_ACTION)
+        again, outcome = fire(after, KATANA)
+        self.assertEqual((outcome.enemy_damage > 0, again.lights_guessed), (True, True))
 
     def test_with_no_other_cells_to_go_to_the_new_lights_are_known(self):
         # GetNextVulnerableCells: three lights above two thirds HP, on cells not lit before and not his own.
@@ -1857,7 +1863,7 @@ class NobunagaTest(unittest.TestCase):
         state = self.board(lit=[0, 3, 4], boss_cell=0, hp=39)
         state.cells, state.nobunaga_hp_last_turn = 7, 40
         relocate_lights(state, state.enemies[0])
-        self.assertEqual(state.lit_cells, [])
+        self.assertEqual((state.lit_cells, state.lights_guessed), (list(range(7)), True))
         boss = state.enemies[0]
         boss.hp = 26
         self.assertEqual(nobunaga_lights(boss), 2)
@@ -1880,7 +1886,7 @@ class NobunagaTest(unittest.TestCase):
         state = self.board(lit=[3])
         state.enemies[0].poison = 2
         after, _ = fire(state, KATANA)
-        self.assertEqual((after.enemies[0].hp, after.lit_cells, after.nobunaga_hp_last_turn), (37, [], 37))
+        self.assertEqual((after.enemies[0].hp, after.lights_guessed, after.nobunaga_hp_last_turn), (37, True, 37))
 
     def test_f1_goes_for_another_enemy_while_he_is_dark(self):
         state = self.board(lit=[0])

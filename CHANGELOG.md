@@ -10,6 +10,14 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.26 — Nobunaga can be hit anywhere once his lights have moved unknown (2026-11-10)
+- **Rule and scoring: when his lights move to cells the solver can't know, every cell counts as lit from then on
+  in that line, and those turns count at half**, like any guessed turn (the player's call). Before, none counted as
+  lit, so every loaded tile and all reach lost their worth after a hit on him, and a sure hit now scored below
+  holding. In the day 6 run (turn 12 of his fight) the hero held a loaded Tanegashima while he stood in the light
+  and stepped off: shooting scored -10 and now scores 70. It is still second there, to a line that blocks him on
+  his lit corner cell and hits for 10 three turns later, all on known turns (87).
+
 ## v3.25 — Nobunaga's lights known where the game has no choice (2026-11-10)
 - **Rule: when Nobunaga's lights move, the new cells are known if there are no more free cells than lights**, from
   `NobunagaBoss.GetNextVulnerableCells` and `get_NumberOfVulnerableCells`: they go to cells not lit before and not

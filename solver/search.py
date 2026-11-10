@@ -31,6 +31,9 @@ LEAF_BEAM = 2  # On the last turn, only this many of the BEAM get the full posit
 
 
 def _actions_known(state):
+    # Nobunaga's lights moved somewhere unknown earlier in the line: what hits him from here on is a guess.
+    if state.lights_guessed:
+        return False
     return all(e.known and not any(a.name in (UNKNOWN_TILE, UNKNOWN_COPY) for a in e.queue)
                for e in state.enemies if e.alive)
 
@@ -62,6 +65,7 @@ def state_key(state):
         tuple(index[id(t)] for t in state.queue_tiles),
         state.swap_charge, state.turns_until_wave, state.wave_held_at, tuple(state.potions),
         tuple(state.lit_cells) if state.lit_cells is not None else None, state.nobunaga_hp_last_turn,
+        state.lights_guessed,
         repr(state.traps), repr(state.hazards),
         tuple((e.kind, e.cell, e.facing, e.hp, e.max_hp, e.shield, e.curse, e.poison, e.ice, e.action, e.known,
                e.tile_to_play, e.last_tile, e.elite, tuple((a.name, a.value, a.target_cell) for a in e.queue))

@@ -313,40 +313,52 @@ class LastEnemiesAITest(unittest.TestCase):
 
 
 class LoadFirstTest(unittest.TestCase):
-    """A best line that waits and then loads a tile is swapped for its twin that loads first, when both play out
-    the same (v3.24): the beam often cuts the twin."""
+    """When the best line begins with a wait, the lines loading a tile in its place are scored in full and put in
+    (v3.24, widened in v3.27): the beam often cuts them."""
 
-    def lines(self, enemies):
-        from evaluator import Line
+    def board(self):
         from rules import legal_actions
-        state = make_state(enemies=enemies)
+        state = make_state(enemies=[enemy(8)])
         state.cells = 9
-        load = next(a for a in legal_actions(state) if a.kind == "PlayTile")
-        wait = Action("Wait")
-        top = Line([wait, load], 50.0, ["Wait", "PlayTile"], {}, 10.0, False, 1.0)
-        other = Line([load, Action("Flip")], 20.0, ["PlayTile", "Flip"], {}, 5.0, False, 2.0)
-        return state, load, wait, search._load_first(state, [top, other])
+        loads = [a for a in legal_actions(state) if a.kind == "PlayTile"]
+        return state, loads
 
-    def test_the_load_moves_ahead_of_the_wait(self):
-        state, load, wait, lines = self.lines([enemy(8)])
-        self.assertEqual(lines[1].actions, [load, wait])
-        self.assertEqual((lines[1].score, lines[1].position_next_turn), (50.0, 10.0))
-        ranked = sorted(lines, key=lambda line: line.sort_key, reverse=True)
-        self.assertEqual(ranked[0].actions[0], load)
+    def test_a_replayed_line_scores_as_the_search_scored_it(self):
+        state, _ = self.board()
+        for line in search.rank_lines(state, 3)[:4]:
+            again = search._replay(state, line.actions)
+            self.assertAlmostEqual(again.score, line.score)
+            self.assertAlmostEqual(again.position_next_turn, line.position_next_turn)
 
-    def test_not_when_the_two_orders_play_out_differently(self):
-        # A Kabukai fires its Mirror only with a tile in the hero's hand to copy, so loading the last one first
-        # changes what it does.
-        state, load, wait, lines = self.lines([enemy(8)])
-        state.tiles = [t for t in state.tiles if state.tiles.index(t) == load.tile]
-        mirror = Attack("CopycatMirror", 0, [1], first_target=True)
-        state.enemies = [Agent("Kabukai", 8, -1, 5, 5, queue=[mirror], action="Wait")]
+    def test_a_load_later_in_the_line_moves_ahead_of_the_wait(self):
         from evaluator import Line
-        load = Action("PlayTile", tile=0)
-        top = Line([wait, load], 50.0, ["Wait", "PlayTile"], {}, 10.0, False, 1.0)
-        other = Line([load, Action("Flip")], 20.0, ["PlayTile", "Flip"], {}, 5.0, False, 2.0)
-        lines = search._load_first(state, [top, other])
-        self.assertEqual(lines[1].actions[1].kind, "Flip")
+        state, loads = self.board()
+        wait = Action("Wait")
+        top = search._replay(state, [wait, loads[0]])
+        low = Line([loads[0], Action("Flip")], top.score - 30, ["PlayTile", "Flip"], {}, 0.0, False, 0.0)
+        lines = search._load_first(state, [top, low])
+        self.assertEqual(lines[1].actions, [loads[0], wait])
+        self.assertAlmostEqual(lines[1].score, top.score)
+        ranked = sorted(lines, key=lambda line: line.sort_key, reverse=True)
+        self.assertEqual(ranked[0].actions[0], loads[0])
+
+    def test_another_tile_is_loaded_in_place_of_the_wait(self):
+        # The Shogun's fight in logs/run19, turn 16: the tile the line wanted wasn't charged yet, and another was.
+        from evaluator import Line
+        state, loads = self.board()
+        wait = Action("Wait")
+        top = search._replay(state, [wait, loads[0]])
+        low = Line([loads[1], Action("Flip")], top.score - 30, ["PlayTile", "Flip"], {}, 0.0, False, 0.0)
+        lines = search._load_first(state, [top, low])
+        self.assertEqual([a.kind for a in lines[1].actions], ["PlayTile", "PlayTile"])
+        self.assertEqual(lines[1].actions[0], loads[1])
+        self.assertGreaterEqual(round(lines[1].score, 2), round(top.score, 2))
+
+    def test_a_line_that_doesnt_begin_with_a_wait_is_left_alone(self):
+        state, loads = self.board()
+        lines = search.rank_lines(state, 2)
+        moved = [line for line in lines if line.actions[0].kind != "Wait"]
+        self.assertEqual(search._load_first(state, moved), moved)
 
 
 class SearchTest(unittest.TestCase):

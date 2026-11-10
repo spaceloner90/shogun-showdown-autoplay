@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.27: any tile loaded in place of a wait
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **A best line's opening wait replaced by each loadable tile, scored in full** | **Scoring** | **`run19` Shogun fight turn 16 now loads Meteor Hammer; fight 18 turn 2 still loads first; tests** | **A wait with a ready tile in hand and room in the queue; a tile loaded that the next turn then had to send back at a cost** |
+
 ## New in v3.26: Nobunaga can be hit anywhere once his lights have moved unknown
 
 | Item | Kind | What's already confirmed | What to look for |

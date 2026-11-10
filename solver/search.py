@@ -184,37 +184,50 @@ def _sorted(lines, state=None):
     return _keep_the_guarantee(state, lines)
 
 
+def _replay(state, actions):
+    """The Line for playing exactly these actions, scored as the search scores a line, or None if one of them isn't
+    legal where it comes or fires a tile that does nothing."""
+    turns, labels, board, after = [], [], state, None
+    for i, action in enumerate(actions):
+        if action not in legal_actions(board):
+            return None
+        labels.append(action.label(board))
+        board, score, final, wasted = _turn(board, action, now=i == 0)
+        if wasted:
+            return None
+        turns.append((score, _factor(board)))
+        after = after if after is not None else board
+        if final:
+            break
+    total, sooner = _leaf(board), 0.0
+    for score, factor in reversed(turns):
+        total, sooner = score + factor * total, score + SOONER * sooner
+    first = turns[0][0]
+    return Line(list(actions[:len(turns)]), total, labels, {"this turn": first, "after": total - first}, sooner, False,
+                _leaf(after))
+
+
 def _load_first(state, lines):
-    """When the best line waits and then loads a tile, the same line with the load moved to the front, if that
-    plays out the same: every turn scoring the same and the same board once both are done. The beam often cuts that
-    twin, since a loaded queue offers attacks that look better than a wait, and the wait then won with the tile
-    still in hand (logs/run19, fight 18 turn 2). Put in, it ties and wins on having the tile loaded sooner, which is
-    ready for whatever the next turn shows that the search couldn't."""
-    if not lines:
+    """When the best line begins with a wait, the lines that load a tile in its place are scored too, each played
+    out in full: the wait swapped with a load that comes later in the line, and the wait replaced by each tile that
+    can be loaded now, the rest of the line as it was. The beam often cuts these: a loaded queue offers attacks that
+    look better than the wait or the next load, though the tile can go back to the hand for free when the attack
+    comes. One that scores the same as the wait wins the tie on having a tile loaded sooner, ready for whatever the
+    next turn shows that the search couldn't (logs/run19: fight 18 turn 2, and the Shogun's fight turn 16)."""
+    if not lines or lines[0].actions[0].kind != "Wait":
         return lines
     top = lines[0]
-    waits = next((i for i, action in enumerate(top.actions) if action.kind != "Wait"), 0)
-    if waits == 0 or top.actions[waits].kind != "PlayTile":
-        return lines
-    load = top.actions[waits]
-    slot = next((i for i, line in enumerate(lines) if line.actions[0] == load), None)
-    if slot is None:
-        return lines
-    twin = [load] + top.actions[:waits] + top.actions[waits + 1:]
-    ours, theirs, labels, after_load = state, state, [], None
-    for mine, other in zip(twin[:waits + 1], top.actions[:waits + 1]):
-        labels.append(mine.label(ours))
-        ours, our_score, our_end, _ = _turn(ours, mine)
-        theirs, their_score, their_end, _ = _turn(theirs, other)
-        after_load = after_load or ours
-        if our_score != their_score or our_end or their_end or _factor(ours) != _factor(theirs):
-            return lines
-    if state_key(ours) != state_key(theirs):
-        return lines
-    line = Line(twin, top.score, labels + top.labels[waits + 1:], top.terms, top.position_next_turn, False,
-                _leaf(after_load))
-    if line.sort_key > lines[slot].sort_key:
-        lines = lines[:slot] + [line] + lines[slot + 1:]
+    rest = top.actions[1:]
+    tries = [[action] + rest for action in legal_actions(state) if action.kind == "PlayTile" and action.replace is None]
+    load = next((i for i, action in enumerate(rest) if action.kind != "Wait"), None)
+    if load is not None and rest[load].kind == "PlayTile":
+        tries.append([rest[load], top.actions[0]] + rest[:load] + rest[load + 1:])
+    lines = list(lines)
+    for actions in tries:
+        line = _replay(state, actions)
+        slot = next((i for i, other in enumerate(lines) if other.actions[0] == actions[0]), None)
+        if line is not None and slot is not None and line.sort_key > lines[slot].sort_key:
+            lines[slot] = line
     return lines
 
 

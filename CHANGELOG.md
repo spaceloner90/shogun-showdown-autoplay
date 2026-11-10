@@ -10,6 +10,17 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.27 — any tile loaded in place of a wait (2026-11-10)
+- **Search: when the best line begins with a wait, every line that loads a tile in its place is scored in full and
+  put in**: the wait replaced by each tile that can be loaded now, the rest of the line as it was, as well as
+  v3.24's swap with a load later in the line. A tile loaded and not wanted goes back to the hand for free when the
+  attack comes, so such a line scores the same and wins the tie on having a tile loaded sooner. The beam cut it: in
+  the day 6 run's Shogun fight (turn 16) the tile the line wanted wasn't charged yet, the hero waited with Meteor
+  Hammer and the Grappling Hook ready, and after loading one the next load ranked 9th of 13 where the beam keeps 4.
+  It now loads Meteor Hammer, for the same score. The variants are replayed rather than assumed equal, so one that
+  plays out differently gets its own score.
+- `logs/run19`: day 6 with the Shadow, won. 24 fights, 4 hits taken.
+
 ## v3.26 — Nobunaga can be hit anywhere once his lights have moved unknown (2026-11-10)
 - **Rule and scoring: when his lights move to cells the solver can't know, every cell counts as lit from then on
   in that line, and those turns count at half**, like any guessed turn (the player's call). Before, none counted as

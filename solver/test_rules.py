@@ -6,7 +6,7 @@ import dataclasses
 import unittest
 
 from evaluator import WEIGHTS, hp_cost, shield_worth, _volleys, _has_way_out, potion_plan, _threat_damage, ideal_target, leaf_terms, rank_actions, unanswerable_damage
-from rules import ICE_TURNS, can_use_special, fight_won, SIMULATED_POTIONS, Action, Agent, Attack, State, Tile, apply_potion, is_tank, legal_actions, state_from_log, step, unmodeled_content
+from rules import ICE_TURNS, Outcome, can_use_special, fight_won, SIMULATED_POTIONS, Action, Agent, Attack, State, Tile, apply_potion, is_tank, legal_actions, state_from_log, step, unmodeled_content
 
 SWIRL = Attack("Swirl", 2, [-1, 1])
 ARROW = Attack("Arrow", 2, list(range(1, 11)), first_target=True)
@@ -3468,9 +3468,57 @@ class ComboTest(unittest.TestCase):
         state.enemies.append(enemy(6, hp=5))
         state.chilling_combo = state.combo_curse = True
         after, outcome = step(state, Action("Attack"))
-        # The first combo kill leaves two to pick from, random; the second leaves one, which gets both.
+        # The first combo kill leaves two to pick from, random; the second leaves one, which has both either way.
+        # What the first counted is taken back, now that the effect is simulated.
         last = after.enemies[0]
-        self.assertEqual((last.ice > 0, last.curse, outcome.combo_random > 0), (True, True, True))
+        self.assertEqual((last.ice > 0, last.curse, outcome.combo_random), (True, True, 0))
+
+    def test_two_combo_kills_with_two_enemies_left_give_both_the_effect(self):
+        # logs/run19, fight 22 turn 31: three kills, and both Guardians left were cursed. Each pick takes one out.
+        # The one killed last was cursed already, as there, so neither pick could be spent on it.
+        state = self.triple()
+        state.cells = 9
+        state.enemies[2].curse = True
+        state.enemies.append(enemy(7, hp=5))
+        state.enemies.append(enemy(8, hp=5))
+        state.combo_curse = True
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual(([e.curse for e in after.enemies], outcome.combo_random), ([True, True], 0))
+        # Not cursed, the first pick may have gone to it: nothing is sure.
+        state = self.triple()
+        state.cells = 9
+        state.enemies.append(enemy(7, hp=5))
+        state.enemies.append(enemy(8, hp=5))
+        state.combo_curse = True
+        after, outcome = step(state, Action("Attack"))
+        self.assertEqual([e.curse for e in after.enemies], [False, False])
+        self.assertGreater(outcome.combo_random, 0)
+
+    def test_a_pick_made_before_a_later_kill_may_have_been_spent_on_it(self):
+        # The player's point: the first combo's pick could land on the enemy killed next. Here the first combo kill
+        # comes while the third victim is alive, so two picks among the two survivors aren't both sure.
+        from rules import combo_kill
+        state = make_state(enemies=[enemy(3, hp=5), enemy(4, hp=5), enemy(1, hp=1)])
+        state.combo_curse = True
+        state.kill_streak = 1
+        outcome = Outcome()
+        combo_kill(state, outcome)             # a pick among all three
+        state.enemies[2].hp = 0
+        combo_kill(state, outcome)             # the third dies: a pick among the two left
+        self.assertEqual([e.curse for e in state.enemies[:2]], [False, False])
+        combo_kill(state, outcome)             # a second pick among the same two
+        self.assertEqual([e.curse for e in state.enemies[:2]], [True, True])
+
+    def test_an_enemy_that_cant_be_frozen_keeps_freezes_unsure(self):
+        from rules import combo_kill
+        state = make_state(enemies=[enemy(3, hp=5), enemy(4, hp=5)])
+        state.enemies[0].freezable = False
+        state.chilling_combo = True
+        state.kill_streak = 1
+        outcome = Outcome()
+        combo_kill(state, outcome)
+        combo_kill(state, outcome)
+        self.assertEqual([e.ice for e in state.enemies], [0, 0])
 
     def test_combo_recharge_refills_the_tile_making_the_kill(self):
         state = self.triple()

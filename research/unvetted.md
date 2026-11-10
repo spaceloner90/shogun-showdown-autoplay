@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.28: combo effects simulated when several kills make them sure
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **Curse and freeze on all enemies left after as many picks as enemies, among the same ones** | **Rule** | **`run19` fight 22 turn 31's two curses; tests** | **A predicted curse or freeze that didn't happen; `check_predictions` ice and curse misses on turns with two combo kills** |
+| Kobushi Combo recharging the tile whose collision made the combo kill | Rule | Seen once, `run19` fight 9 turn 23; not modeled | Meteor Hammer or Tanegashima charged after a kill by collision |
+
 ## New in v3.27: any tile loaded in place of a wait
 
 | Item | Kind | What's already confirmed | What to look for |

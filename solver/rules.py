@@ -214,6 +214,9 @@ class State:
     combo_recharge: int = 0  # Combo Recharge: charge a combo kill adds to the hero's tile making it (4 a level).
     kobushi_combo: bool = False  # Kobushi Combo: a combo kill fully recharges every tile in the hand.
     kobushi_due: bool = False  # A combo kill has happened and the hand hasn't been recharged for it yet.
+    # This turn's Chilling Combo and Combo Curse picks not yet simulated: see _combo_pick.
+    ice_pending: tuple | None = None
+    curse_pending: tuple | None = None
     firing_tile: bool = False  # Whether a hero tile is firing now (Agent.TileInProgress).
     tile_recharge: int = 0  # Charge Combo Recharge has given the firing tile so far.
     # This is the fight before the Shogun's, the castle's last room (mod 0.18.0's `progression`). He can't be
@@ -1392,26 +1395,53 @@ def combo_kill(state, outcome):
     # board's tiles, and a score could depend on what had been evaluated before it.
     if state.kobushi_combo:
         state.kobushi_due = True
-    # Chilling Combo and Combo Curse pick a random enemy, so they're simulated only when exactly one can be picked
-    # (ChillingComboSkill: alive with at most 1 ice; ComboCurseSkill: alive and not cursed). Otherwise counted.
-    # With more than one to pick from, the effect isn't simulated; it counts what it's worth on the least valuable
-    # enemy it could land on, as the player chose, so a random one never beats a certain one.
+    # Chilling Combo and Combo Curse pick a random enemy (ChillingComboSkill: alive with at most 1 ice;
+    # ComboCurseSkill: alive and not cursed), so each is simulated only where the result is sure. Otherwise it
+    # counts what it's worth on the least valuable enemy it could land on, as the player chose, so a random one
+    # never beats a certain one.
+    import evaluator
     if state.chilling_combo:
+        def freeze(enemy):
+            if enemy.freezable:
+                enemy.ice = ICE_TURNS
+                enemy.action = "Wait"
         able = [e for e in state.enemies if e.alive and e.ice <= 1]
-        if len(able) == 1:
-            if able[0].freezable:
-                able[0].ice = ICE_TURNS
-                able[0].action = "Wait"
-        elif able:
-            import evaluator
-            outcome.combo_random += min(evaluator.freeze_worth(state, e) for e in able)
+        # One that can't be frozen stays there to be picked again, so nothing is sure with it among them.
+        state.ice_pending = _combo_pick(state, outcome, able, state.ice_pending, freeze,
+                                        lambda e: evaluator.freeze_worth(state, e), all(e.freezable for e in able))
     if state.combo_curse:
+        def curse(enemy):
+            enemy.curse = True
         able = [e for e in state.enemies if e.alive and not e.curse]
-        if len(able) == 1:
-            able[0].curse = True
-        elif able:
-            import evaluator
-            outcome.combo_random += min(evaluator.curse_worth(state, e) for e in able)
+        state.curse_pending = _combo_pick(state, outcome, able, state.curse_pending, curse,
+                                          lambda e: evaluator.curse_worth(state, e), True)
+
+
+def _combo_pick(state, outcome, able, pending, apply, worth, exhausts):
+    """One combo kill's random effect among the enemies `able` to take it. Sure with one of them: it has it either
+    way, whether an earlier pick this turn found it or this one does. Sure for all of them once there have been as
+    many picks this turn as enemies, among the same enemies each time, since each pick takes one out (`exhausts`):
+    two combo kills with two enemies left gives both the effect (logs/run19, fight 22 turn 31). A pick made while
+    an enemy killed later in the turn was still alive doesn't count toward that, as the player pointed out: it may
+    have landed on that one. Until then each
+    pick counts its worth on the least valuable, which is taken back once the effect is simulated instead. Returns
+    what's pending for the turn's later picks: (the enemies, picks so far, worth counted)."""
+    if not able:
+        return pending
+    among = frozenset(id(e) for e in able)
+    first, picks, counted = pending or (among, 0, 0.0)
+    if among != first:
+        # One of them has died since: an earlier pick may have been spent on it, so the count starts again.
+        first, picks = among, 0
+    picks += 1
+    if len(able) == 1 or (exhausts and picks >= len(able)):
+        for enemy in able:
+            apply(enemy)
+        outcome.combo_random -= counted
+        return None
+    least = min(worth(e) for e in able)
+    outcome.combo_random += least
+    return (first, picks, counted + least)
 
 
 def deal_damage(state, attacker, target, value, outcome, collision=False):
@@ -1694,6 +1724,7 @@ def step(state, action):
     next_state = state.clone()
     outcome = Outcome()
     next_state.kill_streak = 0  # Reset as each turn begins (CombatManager.ProcessTurn).
+    next_state.ice_pending = next_state.curse_pending = None
     next_state.kobushi_due = False
     swapped = hero_action(next_state, action, outcome)
     already_on_the_way = len(next_state.hazards)

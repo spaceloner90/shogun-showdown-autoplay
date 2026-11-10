@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v3.27"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v3.28"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -207,6 +207,7 @@ def _preview_fire(state, attacks, cell=None, flip=False):
     """Fires these attacks on a copy of the board, from `cell` if given. Returns the copy and the outcome."""
     trial = _light_copy(state)
     trial.kill_streak = 0  # A volley fires on a turn of its own.
+    trial.ice_pending = trial.curse_pending = None
     trial.mono_active = len(attacks) == 1
     if cell is not None:
         trial.hero.cell = cell

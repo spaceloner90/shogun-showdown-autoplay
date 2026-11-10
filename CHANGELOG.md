@@ -10,6 +10,19 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.28 — combo effects simulated when several kills make them sure (2026-11-10)
+- **Rule: Combo Curse and Chilling Combo are simulated on every enemy left once a turn has had as many picks as
+  enemies able to take the effect, among the same enemies each time.** Each pick takes one out, so two combo kills
+  with two enemies left gives both the effect. In `run19` (fight 22, turn 31) three kills left two Guardians, and
+  both were cursed: the curse is now predicted. A pick made while an enemy killed later that turn was still alive
+  doesn't count, as the player pointed out, since it may have been spent on that one: there the freeze stays
+  unsure, the Archer killed third having been able to take the first one. An enemy that can't be frozen keeps
+  freezes unsure, since it can be picked again. What an unsure pick counted is taken back once the effect is
+  simulated instead.
+- `run19` checked: 796 of 827 turns predicted exactly. The rest are summons, waves, Sato's change of act, random
+  combo effects, and one Meteor Hammer recharged by Kobushi Combo though it made the kill (fight 9 turn 23: the
+  second kill came from its collision, after the tile was back in the hand; not modeled).
+
 ## v3.27 — any tile loaded in place of a wait (2026-11-10)
 - **Search: when the best line begins with a wait, every line that loads a tile in its place is scored in full and
   put in**: the wait replaced by each tile that can be loaded now, the rest of the line as it was, as well as

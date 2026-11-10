@@ -5,6 +5,8 @@ Run with: python solver/test_rules.py
 import dataclasses
 import unittest
 
+import enemy_ai
+
 from evaluator import WEIGHTS, hp_cost, shield_worth, _volleys, _has_way_out, potion_plan, _threat_damage, ideal_target, leaf_terms, rank_actions, unanswerable_damage
 from rules import ICE_TURNS, Outcome, can_use_special, fight_won, SIMULATED_POTIONS, Action, Agent, Attack, State, Tile, apply_potion, is_tank, legal_actions, state_from_log, step, unmodeled_content
 
@@ -3645,6 +3647,66 @@ class TanegashimaTest(unittest.TestCase):
         state = self.board(hero_cell=0, enemies=[enemy(5, hp=9)])
         apply_attack(state, state.hero, GUN, Outcome())
         self.assertFalse(state.boosted)
+
+
+class CorruptedEliteTest(unittest.TestCase):
+    """Day 7's Corrupted elites, from Enemy.Die, CorruptedProgenyEnemy and CorruptionAttackCombatTask: one leaves a
+    Corrupted Progeny on its cell as it dies, which waits a turn, plays Corrupted Explosion and fires it: 1 damage
+    on every cell of the room."""
+
+    def board(self, *others, queue=("Swirl",)):
+        foe = enemy(3, hp=1)
+        foe.elite = "Corrupted"
+        state = make_state(enemies=[foe, *others], queue=list(queue))
+        state.cells = 7
+        return state
+
+    def test_it_leaves_a_progeny_on_its_cell(self):
+        after, outcome = step(self.board(), Action("Attack"))
+        progeny = after.enemies[-1]
+        self.assertEqual((progeny.kind, progeny.cell, progeny.hp, progeny.facing, outcome.kills),
+                         ("CorruptedProgeny", 3, 1, -1, 1))
+        self.assertFalse(fight_won(after))
+
+    def test_another_elite_leaves_nothing(self):
+        state = self.board()
+        state.enemies[0].elite = "Quick"
+        after, _ = step(state, Action("Attack"))
+        self.assertEqual([e for e in after.enemies if e.alive], [])
+
+    def test_the_progeny_waits_loads_and_blows(self):
+        state, _ = step(self.board(), Action("Attack"))
+        seen = []
+        for _ in range(3):
+            seen.append(next(e.action for e in state.enemies if e.alive))
+            state, outcome = step(state, Action("Wait"))
+        self.assertEqual(seen, ["Wait", "PlayTile", "Attack"])
+        self.assertEqual((outcome.hp_lost, [e for e in state.enemies if e.alive]), (1, []))
+
+    def test_the_explosion_reaches_the_whole_room_and_heals_a_boss(self):
+        far = enemy(6, hp=3)
+        boss = enemy(0, facing=1, hp=10)
+        boss.kind, boss.max_hp = "DaisukeBoss", 20
+        state = make_state(hero_cell=2, enemies=[Agent("CorruptedProgeny", 4, -1, 1, 1, action="Attack",
+                                                         queue=[enemy_ai.make_attack("CorruptedProgeny", "CorruptedExplosion", None)]),
+                                                 far, boss])
+        state.cells = 7
+        after, outcome = step(state, Action("Wait"))
+        self.assertEqual(outcome.hp_lost, 1)
+        self.assertEqual({e.kind: e.hp for e in after.enemies if e.alive}, {"Ashigaru": 2, "DaisukeBoss": 11})
+
+    def test_a_shield_takes_it(self):
+        state, _ = step(self.board(), Action("Attack"))
+        state.hero.shield = True
+        for _ in range(3):
+            state, outcome = step(state, Action("Wait"))
+        self.assertEqual((outcome.hp_lost, state.hero.shield), (0, False))
+
+    def test_the_search_kills_the_progeny_before_it_blows(self):
+        import search
+        state, _ = step(self.board(), Action("Attack"))
+        best = search.rank_lines(state, 4)[0]
+        self.assertEqual(search.line_totals(state, best)[0], 0)
 
 
 class SummonTest(unittest.TestCase):

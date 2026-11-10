@@ -19,7 +19,7 @@ ONE_ENEMY_WAVE_CAP = 6
 # the dashes below. Anything else may do more than the simulator knows, and gets a warning.
 MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb", "Barricade", "BladeOfPatience", "BlazingSuisei", "Bo", "Bomb", "SignatureMove",
            "BossSwap", "Charge", "Crossbow",
-           "CopycatMirror", "CorruptedBarrage", "CorruptedWaveL2R", "CorruptedWaveR2L", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Hookblade", "Katana", "Kunai", "Lightning", "Maku", "MeteorHammer", "Mirror", "OriginOfSymmetry", "Shield",
+           "CopycatMirror", "CorruptedBarrage", "CorruptedExplosion", "CorruptedWaveL2R", "CorruptedWaveR2L", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Hookblade", "Katana", "Kunai", "Lightning", "Maku", "MeteorHammer", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Sai", "ScarStrike", "SmokeBomb", "Spear", "Summon", "SwapToss",
            "Swirl", "Tanegashima", "Tetsubo", "Trap", "TurnAround", "TwinTessen", "Volley"}
 
@@ -71,7 +71,7 @@ UNDERSTOOD_TRAITS = {"Aggro", "Dash", "Explosive", "Heavy", "Quick", "Unfreezabl
 # Elite types that need no warning. Heavy can't be pushed or pulled, Reactive Shield gains a shield when hit, and
 # Double Strike gives its attacks the Double Strike effect: all simulated. Quick only changes the enemy's AI, how soon
 # it chooses to attack, so what it telegraphs plays out as usual.
-KNOWN_ELITES = ("Heavy", "ReactiveShield", "DoubleStrike", "Quick")
+KNOWN_ELITES = ("Heavy", "ReactiveShield", "DoubleStrike", "Quick", "Corrupted")
 
 # Enemies whose move runs them to the last free cell that way, rather than one cell: StriderEnemy.Move and
 # FumikoBoss.Move in the code. The Strider's Dash trait is shown for it.
@@ -86,6 +86,8 @@ TANKS = {"ShogunSummoner", "Swapper"}
 CHARGES = {"Charge": 1, "BackCharge": -1}  # Run to the last free cell, and hit whatever is next.
 PLAIN_DASHES = {"Dash": 1}                 # Run to the last free cell, and hit nothing.
 SHADOW_DASHES = {"ShadowDash": 1, "BackShadowDash": -1}  # Land behind a target, hitting all they pass.
+CORRUPTED_ELITE = "Corrupted"  # The elite type that leaves a Corrupted Progeny when it dies.
+PROGENY = "CorruptedProgeny"
 CORRUPTED_WAVES = {"CorruptedWaveL2R": 1, "CorruptedWaveR2L": -1}  # Corrupted Iwao's: sweeps the board one cell a turn.
 # Bosses with no traits but when corrupted, so a trait in the log means corrupted.
 TRAITS_ONLY_CORRUPTED = {"DaisukeBoss", "IwaoBoss"}
@@ -949,6 +951,22 @@ def spawn_barricade(state, attacker):
         state.enemies.append(Agent("Barricade", cell, facing, BARRICADE_HP, BARRICADE_HP, inanimate=True))
 
 
+def spawn_progeny(state, cell):
+    """A Corrupted elite leaves a Corrupted Progeny on its cell as it dies (Enemy.Die, SpawnCorruptedProgeny): 1 HP,
+    facing the hero (CorruptedProgenyEnemy.Start). From day 7 any regular enemy can be one. It makes its first
+    choice at the end of that turn, a wait."""
+    facing = 1 if state.hero.cell > cell else -1
+    state.enemies.append(Agent(PROGENY, cell, facing, 1, 1, first_turn=True))
+
+
+def corrupted_explosion(state, attacker, attack, outcome):
+    """CorruptionAttackCombatTask.CorruptedExplosionCoroutine: strikes its user's own cell, then the cells on both
+    sides, one further each step, to both ends of the room, all in the one turn. Like the other corruption it heals
+    a boss on a struck cell. Its user is taken to be hit like anyone else, which kills a Progeny."""
+    for cell in sorted(range(state.cells), key=lambda c: (abs(c - attacker.cell), c)):
+        strike_cell(state, attacker, cell, attack.value, outcome)
+
+
 def place_bomb(state, attacker, attack):
     """Puts a bomb on the cell in front of the attacker. It blasts that cell and both neighbours."""
     cell = attacker.cell + attacker.facing
@@ -1079,6 +1097,9 @@ def _apply_attack(state, attacker, attack, outcome):
         return
     if attack.name in CORRUPTED_WAVES:
         corrupted_wave(state, attacker, attack, outcome)
+        return
+    if attack.name == "CorruptedExplosion":
+        corrupted_explosion(state, attacker, attack, outcome)
         return
     if attack.name == "Curse":
         # A projectile rather than a hit, so a shield neither stops it nor is used up by it.
@@ -1479,6 +1500,8 @@ def deal_damage(state, attacker, target, value, outcome, collision=False):
     target.hp -= damage
     if target is not state.hero and not target.alive and not target.inanimate:
         combo_kill(state, outcome)
+    if target is not state.hero and not target.alive and target.elite == CORRUPTED_ELITE:
+        spawn_progeny(state, target.cell)
     if target is state.hero:
         outcome.hp_lost += damage
         # Reactive Shield shields the hero once it takes damage and lives, if it has no shield

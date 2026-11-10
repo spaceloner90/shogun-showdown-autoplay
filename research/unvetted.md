@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.29: day 7's Corrupted elites and the Progeny they leave
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **A Corrupted elite leaves a Progeny; it waits, loads and fires Corrupted Explosion over the whole room** | **Rule** | **The game's code; tests. No log yet** | **The turn the explosion comes (taken as the third after the parent dies); whether the Progeny dies in it; its trait; a Progeny spawned onto a cell something else then needed** |
+| The Corrupted Soul boss, with Tainted Triad and Corrupted Pulse | Rule | Not ported | Unmodeled warnings in a fight with it |
+
 ## New in v3.28: combo effects simulated when several kills make them sure
 
 | Item | Kind | What's already confirmed | What to look for |

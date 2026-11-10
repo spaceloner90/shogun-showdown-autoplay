@@ -10,6 +10,18 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.29 — day 7's Corrupted elites and the Progeny they leave (2026-11-10)
+- **Rule: a Corrupted elite leaves a Corrupted Progeny on its cell as it dies**, from `Enemy.Die` and
+  `SpawnCorruptedProgeny`. From day 7 ("corruption everywhere") any regular enemy that isn't summoned or another
+  elite type can be one (`Enemy.PotentiallyPromoteToElite`), and every boss is corrupted. The Progeny has 1 HP and
+  faces the hero.
+- **Rule: the Progeny's AI**, from `CorruptedProgenyEnemy.AIPickAction`: it waits on its first turn, plays
+  Corrupted Explosion, and fires it. So the explosion comes on the third turn after its parent dies.
+- **Rule: Corrupted Explosion**, from `CorruptionAttackCombatTask.CorruptedExplosionCoroutine`: 1 damage on its
+  user's cell and then every cell outward to both ends of the room, in one turn. It heals a boss, like the other
+  corruption. Its user is taken to be hit too, which kills a Progeny.
+- Read from the code only: no log has a Corrupted elite yet. The Corrupted Soul boss in the code isn't ported.
+
 ## v3.28 — combo effects simulated when several kills make them sure (2026-11-10)
 - **Rule: Combo Curse and Chilling Combo are simulated on every enemy left once a turn has had as many picks as
   enemies able to take the effect, among the same enemies each time.** Each pick takes one out, so two combo kills

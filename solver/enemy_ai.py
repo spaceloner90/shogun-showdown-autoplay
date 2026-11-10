@@ -49,6 +49,8 @@ TILES = {
     "Shield": (0, [], True),
     "ShadowDash": (1, list(range(1, 11)), True),
     "CopycatMirror": (0, [1], True),
+    # The whole room, both ways, so anything asking whom it threatens finds the hero wherever it stands.
+    "CorruptedExplosion": (1, [o for o in range(-10, 11) if o], False),
     "Maku": (0, [], True),
     "Sai": (2, [1], True),
     "TwinTessen": (1, [-1, 1], False),
@@ -70,7 +72,8 @@ BOSSES = ("ReiBoss", "KowaBoss", "StatueBoss", "TwinMainBoss", "TwinSideBoss", "
           "HideyoshiBoss", "NobunagaBoss", "SatoBoss", "ShogunPhase1Boss", "ShogunPhase2Boss")
 FIRST_TILE.update({kind: None for kind in BOSSES})
 # Ported in v3.22. The Shielder's tile depends on its allies, and the Shogun's Summoner's is random.
-FIRST_TILE.update({"Kabukai": "CopycatMirror", "Shielder": None, "ShogunSummoner": None})
+FIRST_TILE.update({"Kabukai": "CopycatMirror", "Shielder": None, "ShogunSummoner": None,
+                   "CorruptedProgeny": "CorruptedExplosion"})
 # Kinds whose choice doesn't always need the tile they hold identified.
 DECIDES_BLIND = {"Kabukai", "ShogunSummoner"}
 SHOGUN_SUMMONER_WAIT = {True: 7, False: 4}  # nTurnsBetweenAttacksEasy with both Summoners alive, Hard with one.
@@ -803,6 +806,11 @@ def _pick(state, enemy, previous):
     tiles = len(enemy.queue)
     if kind == "Barricade":
         return Choice("Wait")
+    if kind == "CorruptedProgeny":
+        # CorruptedProgenyEnemy.AIPickAction: waits on its first turn, plays Corrupted Explosion and fires it.
+        if enemy.first_turn:
+            return Choice("Wait")
+        return Choice("Attack") if tiles else _play("CorruptedExplosion")
     if kind == "Summoner":
         # SummonerEnemy.AIPickAction: waits out its countdown, a turn after attacking or playing a tile, then plays
         # Summon and fires it, which starts the countdown again. The countdown is only known since mod 0.17.0.

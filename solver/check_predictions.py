@@ -99,7 +99,18 @@ def compare(predicted, actual_row, spawned):
     if predicted.turns_until_wave is not None and wave and not spawned:
         check("wave countdown", predicted.turns_until_wave, wave["turnsUntilNext"])
 
-    enemies = sorted(actual_row["enemies"], key=lambda e: e["cell"])
+    # The Corrupted Soul is logged with the enemies while it hovers, and kept apart from them in the rules.
+    hovering = next((e for e in actual_row["enemies"] if (e.get("soul") or {}).get("up")), None)
+    check("Soul hovering", predicted.soul is not None, hovering is not None)
+    if predicted.soul is not None and hovering is not None:
+        soul, logged = predicted.soul, hovering["soul"]
+        check("Soul cell", soul.cell, logged["cell"])
+        check("Soul hp", soul.hp, hovering["hp"])
+        check("Soul action", soul.action, hovering["action"])
+        check("Soul queue", [a.name for a in soul.queue], [a["name"] for a in hovering["queue"]])
+        check("Soul pattern", (soul.phase, soul.pattern, soul.ai_count, soul.ai_act),
+              (logged["phase"], logged["pattern"], logged["summonRepeats"], logged["triadRepeats"]))
+    enemies = sorted((e for e in actual_row["enemies"] if e is not hovering), key=lambda e: e["cell"])
     actual_cells = {e["cell"]: e for e in enemies}
     for enemy in predicted.enemies:
         logged = actual_cells.get(enemy.cell)
@@ -108,6 +119,8 @@ def compare(predicted, actual_row, spawned):
                              [f"{e['kind']}@{e['cell']}" for e in enemies]))
             continue
         check(f"{enemy.kind} hp", enemy.hp, logged["hp"])
+        if "soul" in logged:
+            check("Soul turns down", (enemy.ai_wait, enemy.ai_flag), (logged["soul"]["stayDown"], logged["soul"]["goUp"]))
         check(f"{enemy.kind} facing", "Left" if enemy.facing < 0 else "Right", logged["facing"])
         check(f"{enemy.kind} curse", enemy.curse, bool(logged.get("curse")))
         check(f"{enemy.kind} shield", enemy.shield, bool(logged.get("shield")))
@@ -140,8 +153,9 @@ def main():
             skipped.append(before["turn"])
             continue
         state = state_from_log(before)
-        predicted, _ = step(state, to_action(state, action_name, tile_name, after))
-        problems = compare(predicted, after, spawned)
+        predicted, outcome = step(state, to_action(state, action_name, tile_name, after))
+        # A Summon's arrivals aren't predicted, like a wave's.
+        problems = compare(predicted, after, spawned or outcome.summons > 0)
         total += 1
         actions[action_name] += 1
         if problems:

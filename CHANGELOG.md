@@ -3,14 +3,28 @@
 Every evaluator version, newest first: what it changed and why. Each is tagged `evaluator-<version>`, and its commit
 message has the details and the replay numbers. `evaluator-v1` is the version that won day 1 with the Wanderer, and
 `evaluator-v2.0` the one that finished day 2 with it, killing the Shogun, and `evaluator-v3.0` the one that won
-day 3 with the Shadow, searching four turns ahead. `evaluator-v2.5` won day 1 with the
+day 3 with the Shadow, searching four turns ahead. `evaluator-v4.0` beat the Corrupted Soul after day 7, the last thing in the game. `evaluator-v2.5` won day 1 with the
 Jujitsuka, a weaker hero to start, in `logs/run10`. Each item is unvetted until real play
 confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
-## v3.32 — the Corrupted Soul; mod 0.20.0 (2026-11-10)
+## v4.0 — the whole game is beaten (2026-11-10)
+The version that beat the Corrupted Soul after day 7 with the Shadow (`logs/run21`, no HP lost), which leaves
+nothing in the game unbeaten. Two corrections from that fight:
+- **Rule: the Corrupted Soul stays down three turns, not four.** It counts one off on the turn it lands, as
+  suspected in v3.32.
+- **Rule: landing sets off every trap on its cell.** Three Poison traps took 12 HP as it came down, four took 16.
+  Unmodeled in v3.32, where the traps were laid for other reasons.
+- With both, all 103 turns of the fight are predicted exactly but one, where a Shield potion was drunk
+  (`solver/check_predictions.py`, which now compares the hovering Soul too). Its AI was right on every turn.
+  Corrupted Pulse's first cells strike on the turn it fires, the turn after its cells are first shown.
+- Not fixed: with the board empty the fight stalls. The Soul only attacks from over the hero or beside it, and the
+  hero stayed clear, laying traps, for forty turns until moved by hand (turns 15 to 55). The overtime cost of
+  v3.31 only counts in wave rooms.
+
+— the Corrupted Soul; mod 0.20.0 (2026-11-10)
 - **Mod 0.20.0: the Corrupted Soul is logged while it hovers.** The game takes it out of its enemy list then
   (`CorruptedSoulBoss.SwitchToUpMode`), so the log had the summoned enemies and no boss. It's now listed, with a
   `soul` block: up or down, the cell it's over, its phase, how long it stays down, its pattern and counters.

@@ -28,7 +28,9 @@ def check(log, show):
         if before["room"] == "CampRoom" or spawned or after["turn"] != before["turn"] + 1:
             continue
         state = state_from_log(before)
-        predicted, _ = step(state, to_action(state, action_name, tile_name, after))
+        predicted, outcome = step(state, to_action(state, action_name, tile_name, after))
+        if outcome.summons:  # A Summon's arrivals change the board, like a wave's.
+            continue
         logged = {(e["kind"], e["cell"]): e for e in after["enemies"]}
         for enemy in predicted.enemies:
             actual = logged.get((enemy.kind, enemy.cell))

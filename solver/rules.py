@@ -89,7 +89,9 @@ SHADOW_DASHES = {"ShadowDash": 1, "BackShadowDash": -1}  # Land behind a target,
 CORRUPTED_ELITE = "Corrupted"  # The elite type that leaves a Corrupted Progeny when it dies.
 PROGENY = "CorruptedProgeny"
 SOUL = "CorruptedSoulBoss"
-SOUL_STAYS_DOWN = 4  # Turns the Corrupted Soul stays down after landing (TaintedTriadAttack.ApplyEffect).
+# Turns the Corrupted Soul stays down after landing: TaintedTriadAttack.ApplyEffect sets 4, and it counts one off
+# at once, on the turn it lands (run21: 2 left at the start of the next turn, back up after three).
+SOUL_STAYS_DOWN = 4
 CORRUPTED_WAVES = {"CorruptedWaveL2R": 1, "CorruptedWaveR2L": -1}  # Corrupted Iwao's: sweeps the board one cell a turn.
 # Bosses with no traits but when corrupted, so a trait in the log means corrupted.
 TRAITS_ONLY_CORRUPTED = {"DaisukeBoss", "IwaoBoss"}
@@ -1004,15 +1006,18 @@ def soul_follow(state):
 
 def tainted_triad(state, soul, attack, outcome):
     """TaintedTriadAttack.ApplyEffect: hits whoever is on the cell under the Soul and on both cells beside it. Then,
-    with nobody under it, it comes down on that cell for four turns, where it can be hit."""
+    with nobody under it, it comes down on that cell, where it can be hit, and sets off every trap there (run21:
+    three Poison traps took 12 HP as it landed)."""
     for cell in (soul.cell, soul.cell - 1, soul.cell + 1):
         agent = state.occupant(cell) if 0 <= cell < state.cells else None
         if agent is not None:
             land_hit(state, soul, agent, attack.value, outcome)
     if state.occupant(soul.cell) is None:
-        soul.up, soul.ai_wait = False, SOUL_STAYS_DOWN
+        before = enemy_cells(state)
+        soul.up, soul.ai_wait = False, SOUL_STAYS_DOWN - 1
         state.soul = None
         state.enemies.append(soul)
+        spring_traps(state, outcome, before)
 
 
 def _soul_decides(state, soul, previous):

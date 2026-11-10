@@ -3782,7 +3782,30 @@ class CorruptedSoulTest(unittest.TestCase):
         landed = next(e for e in after.enemies if e.kind == "CorruptedSoulBoss")
         self.assertEqual((outcome.hp_lost, after.soul, landed.cell, landed.up), (2, None, 3, False))
         self.assertEqual(next(e.hp for e in after.enemies if e.kind == "Ashigaru"), 3)
-        self.assertEqual(landed.ai_wait, 3)  # Four turns down, the first counted at the end of this one.
+        self.assertEqual(landed.ai_wait, 2)  # run21: two left as the next turn starts, back up after three.
+
+    def test_landing_sets_off_every_trap_on_its_cell(self):
+        state = self.board(self.soul(3, action="Attack", queue=[self.TRIAD]), hero_cell=6)
+        state.traps = [{"cell": 3, "damage": 4, "effect": "Poison"}] * 3 + [{"cell": 7, "damage": 4, "effect": "None"}]
+        after, _ = step(state, Action("Wait"))
+        landed = next(e for e in after.enemies if e.kind == "CorruptedSoulBoss")
+        self.assertEqual((landed.hp, landed.poison > 0, [t["cell"] for t in after.traps]), (48, True, [7]))
+
+    def test_the_logged_fight_is_predicted(self):
+        """run21, the fight itself: the Soul's cell, action, queue and pattern on every turn it hovers."""
+        import check_predictions
+        log = Path(__file__).resolve().parent.parent / "research" / "logs" / "run21" / "state.jsonl"
+        rows = [json.loads(line) for line in log.read_text(encoding="utf-8").splitlines()]
+        wrong = []
+        for name, before, tile, after, spawned in check_predictions.turns_from_log(rows):
+            if before["room"] == "CampRoom":
+                continue
+            state = state_from_log(before)
+            predicted, outcome = step(state, check_predictions.to_action(state, name, tile, after))
+            problems = check_predictions.compare(predicted, after, spawned or outcome.summons > 0)
+            if any(field.startswith("Soul") or field.startswith("CorruptedSoulBoss") for field, _, _ in problems):
+                wrong.append((before["turn"], problems))
+        self.assertEqual(wrong, [])
 
     def test_it_stays_up_with_someone_under_it(self):
         after, outcome = step(self.board(self.soul(4, action="Attack", queue=[self.TRIAD])), Action("Wait"))

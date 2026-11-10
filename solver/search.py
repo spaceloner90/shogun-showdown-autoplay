@@ -173,7 +173,45 @@ def line_for(state, action, depth, search):
 def _sorted(lines, state=None):
     lines = [line for line in lines if not line.wasted]
     lines.sort(key=lambda line: line.sort_key, reverse=True)
-    return _keep_the_guarantee(state, lines) if state is not None else lines
+    if state is None:
+        return lines
+    lines = _load_first(state, lines)
+    lines.sort(key=lambda line: line.sort_key, reverse=True)
+    return _keep_the_guarantee(state, lines)
+
+
+def _load_first(state, lines):
+    """When the best line waits and then loads a tile, the same line with the load moved to the front, if that
+    plays out the same: every turn scoring the same and the same board once both are done. The beam often cuts that
+    twin, since a loaded queue offers attacks that look better than a wait, and the wait then won with the tile
+    still in hand (logs/run19, fight 18 turn 2). Put in, it ties and wins on having the tile loaded sooner, which is
+    ready for whatever the next turn shows that the search couldn't."""
+    if not lines:
+        return lines
+    top = lines[0]
+    waits = next((i for i, action in enumerate(top.actions) if action.kind != "Wait"), 0)
+    if waits == 0 or top.actions[waits].kind != "PlayTile":
+        return lines
+    load = top.actions[waits]
+    slot = next((i for i, line in enumerate(lines) if line.actions[0] == load), None)
+    if slot is None:
+        return lines
+    twin = [load] + top.actions[:waits] + top.actions[waits + 1:]
+    ours, theirs, labels, after_load = state, state, [], None
+    for mine, other in zip(twin[:waits + 1], top.actions[:waits + 1]):
+        labels.append(mine.label(ours))
+        ours, our_score, our_end, _ = _turn(ours, mine)
+        theirs, their_score, their_end, _ = _turn(theirs, other)
+        after_load = after_load or ours
+        if our_score != their_score or our_end or their_end or _factor(ours) != _factor(theirs):
+            return lines
+    if state_key(ours) != state_key(theirs):
+        return lines
+    line = Line(twin, top.score, labels + top.labels[waits + 1:], top.terms, top.position_next_turn, False,
+                _leaf(after_load))
+    if line.sort_key > lines[slot].sort_key:
+        lines = lines[:slot] + [line] + lines[slot + 1:]
+    return lines
 
 
 def _clears_room(state, action):

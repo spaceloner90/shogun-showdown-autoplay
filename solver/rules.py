@@ -213,6 +213,7 @@ class State:
     combo_curse: bool = False  # Combo Curse: a combo kill curses a random enemy not cursed.
     combo_recharge: int = 0  # Combo Recharge: charge a combo kill adds to the hero's tile making it (4 a level).
     kobushi_combo: bool = False  # Kobushi Combo: a combo kill fully recharges every tile in the hand.
+    kobushi_due: bool = False  # A combo kill has happened and the hand hasn't been recharged for it yet.
     firing_tile: bool = False  # Whether a hero tile is firing now (Agent.TileInProgress).
     tile_recharge: int = 0  # Charge Combo Recharge has given the firing tile so far.
     # This is the fight before the Shogun's, the castle's last room (mod 0.18.0's `progression`). He can't be
@@ -1342,6 +1343,16 @@ def fight_won(state):
     return not any(e.alive for e in state.enemies) and (state.turns_until_wave is None or state.last_wave)
 
 
+def kobushi_recharge(state):
+    """Kobushi Combo's recharge for combo kills so far: every tile in the hand, so none in the attack queue, which
+    holds the volley being fired (KobushiComboSkill.PerformCooldownRecharge). Only for a board that owns its tiles."""
+    if state.kobushi_due:
+        for tile in state.tiles:
+            if not tile.in_queue:
+                tile.charge = tile.cooldown
+        state.kobushi_due = False
+
+
 def combo_kill(state, outcome):
     """An enemy died: the turn's kill streak grows, by anyone's kill (CombatManager.OnEnemyDied). From the second,
     each is a combo kill; from the third, Triple Combo Heal heals the hero 1 at once, nothing past full HP
@@ -1357,12 +1368,12 @@ def combo_kill(state, outcome):
     # Combo Recharge: the hero's tile firing now gets 4 a level back once it's done (ComboRechargeSkill.OnComboKill).
     if state.combo_recharge and state.firing_tile:
         state.tile_recharge += state.combo_recharge
-    # Kobushi Combo: every tile in the hand that isn't fully charged is, whoever made the kill. Tiles in the attack
-    # queue aren't in the hand, so not the volley being fired (KobushiComboSkill.PerformCooldownRecharge).
+    # Kobushi Combo: every tile in the hand that isn't fully charged is, whoever made the kill. Only marked here:
+    # the evaluator fires attacks on copies of the board that share its tiles, so the recharge is done where a real
+    # turn is played out (kobushi_recharge). Done here in v3.21 to v3.23, a previewed combo kill recharged the real
+    # board's tiles, and a score could depend on what had been evaluated before it.
     if state.kobushi_combo:
-        for tile in state.tiles:
-            if not tile.in_queue:
-                tile.charge = tile.cooldown
+        state.kobushi_due = True
     # Chilling Combo and Combo Curse pick a random enemy, so they're simulated only when exactly one can be picked
     # (ChillingComboSkill: alive with at most 1 ice; ComboCurseSkill: alive and not cursed). Otherwise counted.
     # With more than one to pick from, the effect isn't simulated; it counts what it's worth on the least valuable
@@ -1496,6 +1507,7 @@ def fire_hero_queue(state, outcome, order=None):
         apply_attack(state, state.hero, tile.attack, outcome)
         spring_traps(state, outcome, before)
         state.firing_tile = False
+        kobushi_recharge(state)
         fire_crossbow(tile, outcome)
         # Combo Recharge's charge, once the tile is done, capped at full (Tile.PostExecutionCooldownRechargeSequence).
         tile.charge = min(tile.cooldown, state.tile_recharge)
@@ -1664,6 +1676,7 @@ def step(state, action):
     next_state = state.clone()
     outcome = Outcome()
     next_state.kill_streak = 0  # Reset as each turn begins (CombatManager.ProcessTurn).
+    next_state.kobushi_due = False
     swapped = hero_action(next_state, action, outcome)
     already_on_the_way = len(next_state.hazards)
     resolve_enemies(next_state, outcome)
@@ -1674,5 +1687,6 @@ def step(state, action):
     for enemy in list(next_state.enemies):
         if enemy.kind == "NobunagaBoss":
             relocate_lights(next_state, enemy)
+    kobushi_recharge(next_state)  # For combo kills outside the hero's volley, the fired tiles now back in the hand.
     end_turn(next_state, swapped)
     return next_state, outcome

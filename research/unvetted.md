@@ -42,6 +42,13 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.24: load before waiting; two fixes
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **Wait-then-load swapped for load-then-wait when both play out the same** | **Scoring** | **Day 6 run fight 18 turn 2 now loads first; tests** | **A wait with a ready tile in hand and room in the queue** |
+| Kobushi Combo's recharge only on real turns; the reach cache key completed | Rule | Repeated searches of one board now agree; tests | The same board scored differently on a retry |
+
 ## New in v3.23: a Summon going off costs half a kill
 
 | Item | Kind | What's already confirmed | What to look for |

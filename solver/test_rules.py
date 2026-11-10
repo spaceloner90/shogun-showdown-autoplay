@@ -3464,6 +3464,17 @@ class ComboTest(unittest.TestCase):
         after, _ = step(state, Action("Attack"))
         self.assertEqual([t.charge for t in after.tiles], [0, 0, 4])
 
+    def test_evaluating_a_board_leaves_its_tiles_alone(self):
+        # The evaluator fires the queue on copies that share the board's tiles: a combo kill there must not
+        # recharge the real ones (it did in v3.21 to v3.23).
+        state = self.triple()
+        state.kobushi_combo = True
+        state.tiles.append(Tile(KATANA, cooldown=4, charge=0))
+        before = [t.charge for t in state.tiles]
+        leaf_terms(state)
+        rank_actions(state, depth=1)
+        self.assertEqual([t.charge for t in state.tiles], before)
+
     def test_kobushi_combo_needs_a_combo_kill(self):
         state = make_state(enemies=[enemy(3, hp=1), enemy(6, hp=5)], queue=["Swirl"])
         state.cells = 8

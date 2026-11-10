@@ -312,6 +312,43 @@ class LastEnemiesAITest(unittest.TestCase):
         self.assertEqual((after.enemies[0].action, after.enemies[0].first_turn), ("Wait", False))
 
 
+class LoadFirstTest(unittest.TestCase):
+    """A best line that waits and then loads a tile is swapped for its twin that loads first, when both play out
+    the same (v3.24): the beam often cuts the twin."""
+
+    def lines(self, enemies):
+        from evaluator import Line
+        from rules import legal_actions
+        state = make_state(enemies=enemies)
+        state.cells = 9
+        load = next(a for a in legal_actions(state) if a.kind == "PlayTile")
+        wait = Action("Wait")
+        top = Line([wait, load], 50.0, ["Wait", "PlayTile"], {}, 10.0, False, 1.0)
+        other = Line([load, Action("Flip")], 20.0, ["PlayTile", "Flip"], {}, 5.0, False, 2.0)
+        return state, load, wait, search._load_first(state, [top, other])
+
+    def test_the_load_moves_ahead_of_the_wait(self):
+        state, load, wait, lines = self.lines([enemy(8)])
+        self.assertEqual(lines[1].actions, [load, wait])
+        self.assertEqual((lines[1].score, lines[1].position_next_turn), (50.0, 10.0))
+        ranked = sorted(lines, key=lambda line: line.sort_key, reverse=True)
+        self.assertEqual(ranked[0].actions[0], load)
+
+    def test_not_when_the_two_orders_play_out_differently(self):
+        # A Kabukai fires its Mirror only with a tile in the hero's hand to copy, so loading the last one first
+        # changes what it does.
+        state, load, wait, lines = self.lines([enemy(8)])
+        state.tiles = [t for t in state.tiles if state.tiles.index(t) == load.tile]
+        mirror = Attack("CopycatMirror", 0, [1], first_target=True)
+        state.enemies = [Agent("Kabukai", 8, -1, 5, 5, queue=[mirror], action="Wait")]
+        from evaluator import Line
+        load = Action("PlayTile", tile=0)
+        top = Line([wait, load], 50.0, ["Wait", "PlayTile"], {}, 10.0, False, 1.0)
+        other = Line([load, Action("Flip")], 20.0, ["PlayTile", "Flip"], {}, 5.0, False, 2.0)
+        lines = search._load_first(state, [top, other])
+        self.assertEqual(lines[1].actions[1].kind, "Flip")
+
+
 class SearchTest(unittest.TestCase):
     def test_a_known_turn_isnt_discounted(self):
         state = make_state(enemies=[ashigaru(4, queue=[KATANA])])

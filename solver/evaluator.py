@@ -58,7 +58,7 @@ from rules import (EDAMAME_HEAL, ICE_TURNS, ONE_ENEMY_WAVE_CAP, PHASE, QUEUE_CAP
                    apply_attack, apply_potion, armored, can_use_special, enemy_cells, fight_won, fireable_attacks, free_hand_tiles, is_tank, fire_crossbow, legal_actions, move_destination, perform_special,
                    spring_traps, step, strike_cell, targets_of)
 
-VERSION = "v3.23"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
+VERSION = "v3.24"  # Unvetted: see research/unvetted.md for what real logs haven't confirmed.
 
 WEIGHTS = {
     # What happens along the line.
@@ -488,9 +488,18 @@ def _reach_key(state, target, transport):
     else:
         used = (transport.attack.name, transport.attack.value, tuple(transport.attack.range), transport.attack.effect,
                 transport.in_queue, transport.free_play)
+    # Everything that decides where a transport leaves the hero and whether the target survives it: what each enemy
+    # takes from a hit (its curse, an elite's shield) and what the hero's hits add (the damage skills, Dynamic Boost
+    # once on, Nobunaga's lights). Left out before v3.24, boards alike in the rest shared an answer, and a score
+    # could depend on what had been searched before it.
+    start = (state.tile_start_cell, state.tile_directional) if state.backstab_bonus or state.close_bonus else None
     return (state.cells, hero.kind, hero.cell, hero.facing, state.special, state.swap_charge >= state.swap_cooldown,
             state.two_way_swap, state.swap_damage, state.enemies.index(target), used,
-            tuple((e.kind, e.cell, e.facing, e.hp, e.alive, e.shield, e.movable) for e in state.enemies))
+            state.boosted, state.dynamic_bonus, state.sniper_bonus, state.close_bonus, state.chikara_bonus,
+            state.backstab_bonus, state.friendly_bonus, state.mono_bonus, state.mono_active, start,
+            tuple(state.lit_cells) if state.lit_cells is not None else None,
+            tuple((e.kind, e.cell, e.facing, e.hp, e.alive, e.shield, e.movable, e.curse, e.elite)
+                  for e in state.enemies))
 
 
 def _reach_nodes(state, target, transport=None):

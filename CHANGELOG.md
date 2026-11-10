@@ -10,6 +10,19 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.24 — load before waiting; two cases of a score depending on earlier searches (2026-11-10)
+- **Search: a best line that waits and then loads a tile is swapped for the same line loading first**, when both
+  play out the same: every turn scoring alike and the same board once both are done. v3.10's tie-break already
+  prefers the tile loaded sooner, but the beam often cut that twin, since a loaded queue offers attacks that look
+  better than a wait. In the day 6 run (fight 18, turn 2) the hero waited with the Tanegashima in hand and loaded
+  it the turn after; it now loads first. No extra search time.
+- **Fix: Kobushi Combo recharged the real board's tiles from a previewed kill.** The evaluator fires attacks on
+  copies of the board that share its tiles, and v3.21's recharge was done in the shared kill code. Scores could
+  then depend on what had been evaluated before: the same board gave 410.7 in a new process and 405.1 after another
+  search. The recharge is now done only where a real turn is played out. Present in v3.21 to v3.23.
+- **Fix: the reach cache's key left out what decides a hit**: an enemy's curse and elite type, Dynamic Boost being
+  on, the damage skills, Nobunaga's lights. Boards alike in the rest shared an answer. Older than this run.
+
 ## v3.23 — a Summon going off costs half a kill (2026-11-10)
 - **Scoring: each enemy Summon that goes off costs 30**, half a kill and tied to it in code. Who arrives and where
   is random, so the arrival still isn't simulated; the penalty makes killing a summoner before it summons worth

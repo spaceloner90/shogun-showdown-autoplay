@@ -42,6 +42,12 @@ Confirmed by the first Ronin log (`logs/run6`, 3 fights on v1.2): the shove (5 u
 hero (13) and Grappling Hook played by the hero (11). Predictions were exact on all but the 2 turns where new
 enemies appeared, and the player confirmed the hook looks right.
 
+## New in v3.20: the Tanegashima
+
+| Item | Kind | What's already confirmed | What to look for |
+|---|---|---|---|
+| **Tanegashima: 4 to the first ahead, target kicked a cell away, user a cell back, collision hits when blocked** | **Rule** | **The game's code; tests** | **Positions after a shot matching the log; the hero hurt firing with an enemy behind; a body hitting whoever stood behind it** |
+
 ## New in v3.19: the HP curve no longer follows max HP
 
 | Item | Kind | What's already confirmed | What to look for |

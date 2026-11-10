@@ -3491,6 +3491,61 @@ SIGNATURE = Attack("SignatureMove", 0, [], first_target=True)
 
 
 BO = Attack("Bo", 1, [1], first_target=True)
+GUN = Attack("Tanegashima", 4, list(range(1, 11)), first_target=True)
+
+
+class TanegashimaTest(unittest.TestCase):
+    """TanegashimaAttack in the game's code: hits the first agent ahead at any range, kicks it a cell away and its
+    user a cell back. A kick into someone is a collision hit on both instead."""
+
+    @staticmethod
+    def board(**kwargs):
+        state = make_state(**kwargs)
+        state.cells = 8
+        return state
+
+    def test_it_hits_and_both_recoil(self):
+        after, outcome = fire(self.board(hero_cell=2, enemies=[enemy(5, hp=6)]), GUN)
+        self.assertEqual((after.enemies[0].hp, after.enemies[0].cell, after.hero.cell), (2, 6, 1))
+        self.assertEqual(outcome.wasted_attacks, 0)
+
+    def test_a_target_kicked_into_another_hurts_both(self):
+        after, _ = fire(self.board(hero_cell=2, enemies=[enemy(4, hp=6), enemy(5, hp=3)]), GUN)
+        self.assertEqual([(e.cell, e.hp) for e in after.enemies], [(4, 1), (5, 2)])
+
+    def test_a_body_still_hits_whoever_is_behind_it(self):
+        after, _ = fire(self.board(hero_cell=2, enemies=[enemy(4, hp=4), enemy(5, hp=3)]), GUN)
+        self.assertEqual([(e.cell, e.hp) for e in after.enemies], [(5, 2)])
+
+    def test_firing_with_an_enemy_behind_costs_the_hero(self):
+        state = self.board(hero_cell=2, enemies=[enemy(5, hp=6), enemy(1, hp=3, facing=1)])
+        after, outcome = fire(state, GUN)
+        self.assertEqual((after.hero.cell, outcome.hp_lost, after.enemies[1].hp), (2, 1, 2))
+
+    def test_at_the_wall_the_hero_stays(self):
+        after, outcome = fire(self.board(hero_cell=0, enemies=[enemy(3, hp=6)]), GUN)
+        self.assertEqual((after.hero.cell, outcome.hp_lost), (0, 0))
+
+    def test_a_heavy_target_stays(self):
+        heavy = enemy(4, hp=6)
+        heavy.movable = False
+        after, _ = fire(self.board(hero_cell=2, enemies=[heavy]), GUN)
+        self.assertEqual((after.enemies[0].cell, after.hero.cell), (4, 1))
+
+    def test_fired_at_nobody_it_still_moves_the_hero(self):
+        state = self.board(hero_cell=3, facing=-1, enemies=[enemy(5, hp=6)])
+        after, outcome = fire(state, GUN)
+        self.assertEqual((after.hero.cell, outcome.wasted_attacks), (4, 0))
+
+    def test_the_recoil_is_a_move_attack(self):
+        # It raises the game's move-attack event, which Dynamic Boost listens for, but only when the hero moved.
+        from rules import Outcome, apply_attack
+        state = self.board(hero_cell=2, enemies=[enemy(5, hp=9)])
+        apply_attack(state, state.hero, GUN, Outcome())
+        self.assertTrue(state.boosted)
+        state = self.board(hero_cell=0, enemies=[enemy(5, hp=9)])
+        apply_attack(state, state.hero, GUN, Outcome())
+        self.assertFalse(state.boosted)
 
 
 class BoTest(unittest.TestCase):

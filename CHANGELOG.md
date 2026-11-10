@@ -10,6 +10,13 @@ confirms it, as [`research/unvetted.md`](research/unvetted.md) tracks.
 Logs are named in [`research/logs/`](research/logs/). "Rule" means the simulation, read from the game's code;
 "scoring" means a judgment in the evaluator.
 
+## v3.20 — the Tanegashima (2026-11-10)
+- **Rule: the Tanegashima**, from `TanegashimaAttack`: 4 damage to the first agent ahead at any range, cooldown 7.
+  It kicks a movable target one cell away, dead or not, and then its user one cell back, target or none. A kick
+  into someone moves nobody: each of the two takes a collision hit (1, plus Chikara Crush on enemies), so firing
+  with an enemy at the hero's back costs an HP. At the wall the user stays. A recoil that moves the hero raises the
+  move-attack event, so Dynamic Boost applies to later hits.
+
 ## v3.19 — the HP curve no longer follows max HP (2026-11-10)
 - **Scoring: each HP lost costs 1000 / the HP it's lost at, whatever the max HP**: the curve a 10 max HP hero had,
   applied to all. At 5 max HP on day 6 the first HP was still priced at 100, as if the hero were safe; it now costs

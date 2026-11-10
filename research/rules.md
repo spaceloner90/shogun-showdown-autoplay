@@ -217,6 +217,10 @@ Later bosses in that log, with the rules read from the game's code (simulated as
 - **Bo** (`BoAttack`): hits the first agent in front (range 1, cooldown 5), then turns it round if it's movable
   (`FlipTarget`). Its telegraphed action stays as it was, unlike Rain of Mirrors, so an attack shown toward the
   hero goes the other way. Simulated as of v3.16.
+- **Tanegashima** (`TanegashimaAttack`): 4 damage to the first agent ahead at any range, cooldown 7. A movable
+  target is kicked one cell away, dead or not, then the user one cell back, whether or not anyone was hit
+  (`ApplyEffect`, `Recoil`). If the cell is taken nobody moves and each of the two takes a collision hit of 1; at
+  the wall nothing happens. A hero that moved raises the move-attack event (Dynamic Boost).
 - **Signature Move** (`SignatureMoveAttack`): a Free Play tile, cooldown 5, that performs the hero's special move
   without touching its charge (`SpecialMove.Perform` with `depleteSpecialMoveCooldown` false): the special's usual
   way, else with Two Way Move the other. A special that moves the hero raises the move-attack event, so Dynamic

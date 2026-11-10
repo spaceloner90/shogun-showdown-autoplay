@@ -21,7 +21,7 @@ MODELED = {"Arrow", "BackCharge", "BackShadowDash", "BackStrike", "BackSmokeBomb
            "BossSwap", "Charge", "Crossbow",
            "CopycatMirror", "CorruptedBarrage", "CorruptedWaveL2R", "CorruptedWaveR2L", "Curse", "Dash", "DragonPunch", "EarthImpale", "GrapplingHook", "Hookblade", "Katana", "Kunai", "Lightning", "Maku", "MeteorHammer", "Mirror", "OriginOfSymmetry", "Shield",
            "ShieldAllied", "ShadowDash", "ShadowKama", "Shuriken", "Sai", "ScarStrike", "SmokeBomb", "Spear", "Summon", "SwapToss",
-           "Swirl", "Tetsubo", "Trap", "TurnAround", "TwinTessen", "Volley"}
+           "Swirl", "Tanegashima", "Tetsubo", "Trap", "TurnAround", "TwinTessen", "Volley"}
 
 # Skills the solver handles. Most need no modeling because their effects show up in the logged state,
 # like a shield, max HP or a shorter Swap cooldown. Damaging Move, Dynamic Boost, Sniper, Two Way Move and Unfriendly Fire
@@ -94,7 +94,7 @@ SMOKE_BOMBS = {"SmokeBomb", "BackSmokeBomb"}  # Trade places with the first targ
 # when they actually moved or turned it: a Smoke Bomb with nobody to trade places with does nothing.
 MOVE_ATTACKS = set(CHARGES) | set(PLAIN_DASHES) | set(SHADOW_DASHES) | SMOKE_BOMBS | {"TurnAround", "Mirror",
                                                                                      "OriginOfSymmetry", "Hookblade",
-                                                                                     "SignatureMove"}
+                                                                                     "SignatureMove", "Tanegashima"}
 
 # An enemy tile being played. Its identity isn't visible until it lands in the queue.
 UNKNOWN_TILE = "Unknown"
@@ -888,6 +888,24 @@ def push(state, attacker, target, direction, outcome, credit_distance=True):
             land_hit(state, attacker, target, _crash(state, target), outcome, collision=True)
 
 
+def recoil(state, attacker, agent, direction, outcome):
+    """The Tanegashima's kick: one cell that way if it's free, and at the wall nothing. With someone there the agent
+    stays, and each of the two takes a collision hit, the one in the way even from a body (TanegashimaAttack.Recoil).
+    Returns whether anything happened."""
+    cell = agent.cell + direction
+    if not 0 <= cell < state.cells:
+        return False
+    behind = state.occupant(cell)
+    if behind is None:
+        if agent.alive:
+            agent.cell = cell
+        return agent.alive
+    land_hit(state, attacker, behind, _crash(state, behind), outcome, collision=True)
+    if agent.alive:
+        land_hit(state, attacker, agent, _crash(state, agent), outcome, collision=True)
+    return True
+
+
 def _crash(state, agent):
     """A push collision's damage to one agent: 1, plus Chikara Crush's level on an enemy. Only these hits are the game's
     collisions (Agent.Pushed builds them with IsCollision; ChikaraCrushSkill.ProcessAttack adds to those on enemies),
@@ -1073,7 +1091,7 @@ def _apply_attack(state, attacker, attack, outcome):
     # An attack that moved or turned the hero still did something, even if it hit nothing, and so does a reload.
     reload = attack.name == "Crossbow" and attack.value == 0
     if (not hits and attacker is state.hero and attacker.cell == start_cell and attacker.facing == start_facing
-            and not reload):
+            and not reload and attack.name != "Tanegashima"):
         outcome.wasted_attacks += 1
     for target in hits:
         # A boss killed earlier in this sweep takes everyone else with it.
@@ -1098,6 +1116,15 @@ def _apply_attack(state, attacker, attack, outcome):
         # (DragonPunchAttack.PerformAttack has no check, and logs/run9 shows it twice).
         if attack.name == "DragonPunch" and target.movable:
             push(state, attacker, target, attacker.facing, outcome)
+    # The Tanegashima kicks its movable target a cell away, dead or not, and then its user a cell back, target or
+    # none (TanegashimaAttack.ApplyEffect).
+    if attack.name == "Tanegashima":
+        for target in hits:
+            if target.movable:
+                recoil(state, attacker, target, attacker.facing, outcome)
+        kicked = recoil(state, attacker, attacker, -attacker.facing, outcome)
+        if not hits and not kicked and attacker is state.hero:
+            outcome.wasted_attacks += 1
     # Twin Tessen hits both sides, then pushes every movable one it hit away from its user, as far as each goes,
     # dead or not, as Dragon Punch does (TwinTessenAttack.ApplyEffect, PerformPushing).
     if attack.name == "TwinTessen":
